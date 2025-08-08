@@ -13,7 +13,7 @@ const Home = () => {
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Discover Local Treasures</h1>
             <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto">Your favorite local marketplace for unique products and services</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a href="/login/customer" className="bg-white text-primary font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition transform hover:-translate-y-1">
+              <a href="/login/customer" className="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white/10 transition">
                 Shop Now
               </a>
               <a href="/login/vendor" className="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white/10 transition">
@@ -172,22 +172,6 @@ const Home = () => {
                 </div>
                 <p className="text-gray-600 italic">"The customer service is exceptional. When I had an issue with my order, they resolved it immediately and even gave me a discount for my next purchase."</p>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-16 px-6 bg-gradient-to-r from-primary to-orange-600 text-white">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Journey?</h2>
-            <p className="text-xl mb-10 max-w-2xl mx-auto">Join thousands of satisfied customers and vendors on Locarto today</p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a href="/login/customer" className="bg-white text-primary font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition">
-                <i className="fas fa-shopping-cart mr-2"></i> Shop Now
-              </a>
-              <a href="/login/vendor" className="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white/10 transition">
-                <i className="fas fa-store mr-2"></i> Sell With Us
-              </a>
             </div>
           </div>
         </section>

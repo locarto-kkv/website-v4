@@ -2,8 +2,9 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-secondary text-white py-12 px-6 mt-auto">
+    <footer className="bg-secondary text-gray-400 py-12 px-6 mt-auto">
       <div className="max-w-6xl mx-auto">
+        <div className="border-t border-gray-800 mb-10"></div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-2xl font-bold mb-4">Locarto</h3>
