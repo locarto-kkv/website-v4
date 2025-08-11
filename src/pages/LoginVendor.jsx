@@ -2,25 +2,102 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+// Reusable Password input with conditional show/hide
+const PasswordInput = ({ value, onChange, showPassword, setShowPassword, id = "password" }) => (
+  <div>
+    <label htmlFor={id} className="block text-sm font-medium text-gray-700">Password</label>
+    <div className="relative">
+      <input
+        id={id}
+        name="password"
+        type={showPassword ? 'text' : 'password'}
+        required
+        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+        value={value}
+        onChange={onChange}
+      />
+      {value.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+          tabIndex={-1}
+        >
+          {showPassword ? '🙈' : '👁️'}
+        </button>
+      )}
+    </div>
+  </div>
+);
+
 const LoginVendor = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    businessName: '', email: '', password: '', phone: '', address: '', documents: null
+    businessName: '', email: '', password: ''
   });
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  // Fake helpers if you don't have a backend yet
+  const fakeApi = {
+    login: async ({ email, password }) => {
+      await new Promise(r => setTimeout(r, 300));
+      // return a token + vendor object as your real API would
+      return {
+        token: 'fake-login-token',
+        vendor: { id: 'v_123', email, businessName: 'My Biz', approved: true }
+      };
+    },
+    signup: async ({ businessName, email, password }) => {
+      await new Promise(r => setTimeout(r, 400));
+      // immediately "approved" by design OR just ignored
+      return {
+        token: 'fake-signup-token',
+        vendor: { id: 'v_999', email, businessName, approved: true }
+      };
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isLogin) {
-      login('vendor');
-      navigate('/vendor/dashboard');
-    } else {
-      navigate('/vendor/pending-approval');
+    try {
+      if (isLogin) {
+        // ---- LOGIN ----
+        // replace with your real API. Example:
+        // const res = await fetch('/api/vendors/login', {...})
+        // const { token, vendor } = await res.json()
+        const { token, vendor } = await fakeApi.login({
+          email: formData.email,
+          password: formData.password
+        });
+        await login('vendor', { token, vendor });
+        navigate('/vendor/dashboard');
+      } else {
+        // ---- SIGNUP (NO PENDING APPROVAL) ----
+        // Replace with your real API endpoint; the point is: do NOT redirect to pending.
+        // const res = await fetch('/api/vendors/signup', {...})
+        // const { token, vendor } = await res.json()
+        const { token, vendor } = await fakeApi.signup({
+          businessName: formData.businessName,
+          email: formData.email,
+          password: formData.password
+        });
+
+        // Ensure any legacy UI that reads "approved" won't blow up
+        const normalizedVendor = { ...vendor, approved: true };
+
+        await login('vendor', { token, vendor: normalizedVendor });
+        navigate('/vendor/dashboard'); // ✅ straight to dashboard
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Something went wrong');
     }
   };
 
@@ -31,22 +108,24 @@ const LoginVendor = () => {
           <div className="flex justify-center mb-6">
             <div className="text-2xl font-bold text-primary">Locarto</div>
           </div>
-          
+
           <div className="flex mb-6">
             <button
+              type="button"
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 px-4 text-center font-medium rounded-l-lg ${isLogin ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`flex-1 py-2 px-4 text-center font-medium rounded-l-lg ${isLogin ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
             >
               Login
             </button>
             <button
+              type="button"
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 px-4 text-center font-medium rounded-r-lg ${!isLogin ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`flex-1 py-2 px-4 text-center font-medium rounded-r-lg ${!isLogin ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
             >
               Setup
             </button>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {isLogin ? (
               <>
@@ -58,18 +137,18 @@ const LoginVendor = () => {
                     type="email"
                     required
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                    value={formData.email}
+                    onChange={handleChange}
                   />
                 </div>
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                  />
-                </div>
+
+                <PasswordInput
+                  value={formData.password}
+                  onChange={handleChange}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                  id="password"
+                />
               </>
             ) : (
               <>
@@ -81,6 +160,8 @@ const LoginVendor = () => {
                     type="text"
                     required
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                    value={formData.businessName}
+                    onChange={handleChange}
                   />
                 </div>
                 <div>
@@ -91,76 +172,39 @@ const LoginVendor = () => {
                     type="email"
                     required
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                    value={formData.email}
+                    onChange={handleChange}
                   />
                 </div>
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">Business Address</label>
-                  <input
-                    id="address"
-                    name="address"
-                    type="text"
-                    required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Upload Documents</label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                    <div className="space-y-1 text-center">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      <div className="flex text-sm text-gray-600">
-                        <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-orange-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
-                          <span>Upload a file</span>
-                          <input id="file-upload" name="file-upload" type="file" className="sr-only" />
-                        </label>
-                        <p className="pl-1">or drag and drop</p>
-                      </div>
-                      <p className="text-xs text-gray-500">PDF, DOC, JPG up to 10MB</p>
-                    </div>
-                  </div>
-                </div>
+
+                <PasswordInput
+                  value={formData.password}
+                  onChange={handleChange}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                  id="password"
+                />
               </>
             )}
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
               >
-                {isLogin ? 'Sign in' : 'Submit for Approval'}
+                {isLogin ? 'Sign in' : 'Create Account'}
               </button>
             </div>
           </form>
-          
+
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               {isLogin ? "New vendor? " : "Already have an account? "}
               <button
                 onClick={() => setIsLogin(!isLogin)}
                 className="font-medium text-primary hover:text-orange-600"
+                type="button"
               >
-                {isLogin ? 'Create account' : 'Sign in'}
+                {isLogin ? 'Create Account' : 'Sign in'}
               </button>
             </p>
           </div>
