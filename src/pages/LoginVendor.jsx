@@ -1,5 +1,6 @@
+// LoginVendor.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Make sure to import useNavigate
 import { useAuth } from '../context/AuthContext';
 
 // Reusable Password input with conditional show/hide
@@ -59,7 +60,7 @@ const LoginVendor = () => {
       // immediately "approved" by design OR just ignored
       return {
         token: 'fake-signup-token',
-        vendor: { id: 'v_999', email, businessName, approved: true }
+        vendor: { id: 'v_999', email, businessName, approved: true } // Assuming approved for immediate access
       };
     }
   };
@@ -69,31 +70,27 @@ const LoginVendor = () => {
     try {
       if (isLogin) {
         // ---- LOGIN ----
-        // replace with your real API. Example:
-        // const res = await fetch('/api/vendors/login', {...})
-        // const { token, vendor } = await res.json()
         const { token, vendor } = await fakeApi.login({
           email: formData.email,
           password: formData.password
         });
         await login('vendor', { token, vendor });
+        // Navigate to dashboard without special state for login
         navigate('/vendor/dashboard');
       } else {
         // ---- SIGNUP (NO PENDING APPROVAL) ----
-        // Replace with your real API endpoint; the point is: do NOT redirect to pending.
-        // const res = await fetch('/api/vendors/signup', {...})
-        // const { token, vendor } = await res.json()
         const { token, vendor } = await fakeApi.signup({
           businessName: formData.businessName,
           email: formData.email,
           password: formData.password
         });
 
-        // Ensure any legacy UI that reads "approved" won't blow up
         const normalizedVendor = { ...vendor, approved: true };
 
         await login('vendor', { token, vendor: normalizedVendor });
-        navigate('/vendor/dashboard'); // ✅ straight to dashboard
+        // Navigate to dashboard and indicate it's after a new signup
+        // Pass state to indicate the user just signed up
+        navigate('/vendor/dashboard', { state: { fromSignup: true } });
       }
     } catch (err) {
       console.error(err);

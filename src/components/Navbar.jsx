@@ -27,7 +27,7 @@ const Navbar = () => {
     <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center sticky top-0 z-50">
       {/* Logo */}
       <div className="flex items-center">
-        <Link to="#main-content" className="text-xl font-medium text-gray-500">Locarto</Link>
+      <Link to="#main-content" className="text-3xl font-bold text-orange-500">Locarto</Link>
       </div>
       
       {/* Navigation Links */}
