@@ -75,146 +75,187 @@ const VendorDashboard = () => {
       </nav>
       
       {/* Main Content Area */}
-      <div className="max-w-6xl mx-auto py-8 px-6">
-        {/* Conditional rendering for Vendor Setup Wizard */}
-        {showVendorSetup ? (
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-secondary">Vendor Setup Wizard</h2>
-              <button 
-                onClick={() => setShowVendorSetup(false)}
-                className="text-gray-500 hover:text-gray-700"
+      <div className="flex">
+        {/* Left Sidebar - hugging the left border */}
+        <div className="w-64 bg-white shadow-md p-4 h-screen sticky top-0">
+          <ul className="space-y-3 pt-4">
+            <li>
+              <button
+                onClick={handleSetupClick}
+                className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
+                  showVendorSetup 
+                    ? 'bg-primary text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                }`}
               >
-                <i className="fas fa-times"></i> Close
+                Setup
               </button>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="border-b pb-4">
-                <h3 className="text-lg font-semibold text-primary">Step 1: Business Info</h3>
-                <p className="text-gray-600">Please provide your business details.</p>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNavigation('/vendor/analytics')}
+                className="w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-lg transition font-medium"
+              >
+                Analytics
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNavigation('/vendor/settings')}
+                className="w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-lg transition font-medium"
+              >
+                Settings
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNavigation('/vendor/profile')}
+                className="w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-lg transition font-medium"
+              >
+                Profile
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 p-6">
+          {/* Conditional rendering for Vendor Setup Wizard */}
+          {showVendorSetup ? (
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-secondary">Vendor Setup Wizard</h2>
+                <button 
+                  onClick={() => setShowVendorSetup(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <i className="fas fa-times"></i> Close
+                </button>
               </div>
               
-              <form className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-700 mb-2">Legal Business Name *</label>
-                    <input 
-                      type="text" 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                      placeholder="Enter legal business name" 
-                      required 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">Doing Business As</label>
-                    <input 
-                      type="text" 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                      placeholder="Enter DBA (if applicable)" 
-                    />
-                  </div>
+              <div className="space-y-6">
+                <div className="border-b pb-4">
+                  <h3 className="text-lg font-semibold text-primary">Step 1: Business Info</h3>
+                  <p className="text-gray-600">Please provide your business details.</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-700 mb-2">Business Type *</label>
-                    <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
-                      <option value="">Select Business Type</option>
-                      <option value="sole-prop">Sole Proprietorship</option>
-                      <option value="partnership">Partnership</option>
-                      <option value="llc">LLC</option>
-                      <option value="corp">Corporation</option>
-                      <option value="non-profit">Non-Profit</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">Tax ID (TIN/EIN) *</label>
-                    <input 
-                      type="text" 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                      placeholder="Enter Tax ID" 
-                      required 
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-700 mb-2">Country *</label>
-                    <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
-                      <option value="">Select Country</option>
-                      <option value="us">United States</option>
-                      <option value="ca">Canada</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-2">Website</label>
-                    <input 
-                      type="url" 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                      placeholder="https://example.com" 
-                    />
-                  </div>
-                </div>
-                
-                <div className="border-t pt-4 mt-6">
-                  <h4 className="text-md font-semibold text-secondary mb-3">Primary Contact</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="md:col-span-1">
-                      <label className="block text-gray-700 mb-2">Name *</label>
+                <form className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-700 mb-2">Legal Business Name *</label>
                       <input 
                         type="text" 
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                        placeholder="Full Name" 
+                        placeholder="Enter legal business name" 
                         required 
                       />
                     </div>
-                    <div className="md:col-span-1">
-                      <label className="block text-gray-700 mb-2">Email *</label>
+                    <div>
+                      <label className="block text-gray-700 mb-2">Doing Business As</label>
                       <input 
-                        type="email" 
+                        type="text" 
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                        placeholder="contact@example.com" 
-                        required 
+                        placeholder="Enter DBA (if applicable)" 
                       />
                     </div>
-                    <div className="md:col-span-1">
-                      <label className="block text-gray-700 mb-2">Phone *</label>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-700 mb-2">Business Type *</label>
+                      <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <option value="">Select Business Type</option>
+                        <option value="sole-prop">Sole Proprietorship</option>
+                        <option value="partnership">Partnership</option>
+                        <option value="llc">LLC</option>
+                        <option value="corp">Corporation</option>
+                        <option value="non-profit">Non-Profit</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 mb-2">Tax ID (TIN/EIN) *</label>
                       <input 
-                        type="tel" 
+                        type="text" 
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                        placeholder="+1 (555) 123-4567" 
+                        placeholder="Enter Tax ID" 
                         required 
                       />
                     </div>
                   </div>
-                </div>
-                
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button 
-                    type="button"
-                    onClick={() => setShowVendorSetup(false)}
-                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={handleNextStep} // Use the new handler
-                    className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-orange-600 transition"
-                  >
-                    Next Step
-                  </button>
-                </div>
-              </form>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-700 mb-2">Country *</label>
+                      <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        <option value="">Select Country</option>
+                        <option value="us">United States</option>
+                        <option value="ca">Canada</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 mb-2">Website</label>
+                      <input 
+                        type="url" 
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                        placeholder="https://example.com  " 
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-4 mt-6">
+                    <h4 className="text-md font-semibold text-secondary mb-3">Primary Contact</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="md:col-span-1">
+                        <label className="block text-gray-700 mb-2">Name *</label>
+                        <input 
+                          type="text" 
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                          placeholder="Full Name" 
+                          required 
+                        />
+                      </div>
+                      <div className="md:col-span-1">
+                        <label className="block text-gray-700 mb-2">Email *</label>
+                        <input 
+                          type="email" 
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                          placeholder="contact@example.com" 
+                          required 
+                        />
+                      </div>
+                      <div className="md:col-span-1">
+                        <label className="block text-gray-700 mb-2">Phone *</label>
+                        <input 
+                          type="tel" 
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                          placeholder="+1 (555) 123-4567" 
+                          required 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end space-x-3 pt-4">
+                    <button 
+                      type="button"
+                      onClick={() => setShowVendorSetup(false)}
+                      className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={handleNextStep} // Use the new handler
+                      className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-orange-600 transition"
+                    >
+                      Next Step
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        ) : (
-          // Original Dashboard Content Grid
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6"> {/* Adjusted grid columns */}
-            {/* Dashboard Cards and Main Content */}
-            <div className="lg:col-span-3"> {/* Adjusted column span */}
+          ) : (
+            <div className="max-w-6xl mx-auto">
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white p-6 rounded-xl shadow-md dashboard-card border-l-4 border-primary">
@@ -373,52 +414,8 @@ const VendorDashboard = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Right Sidebar for new buttons */}
-            <div className="lg:col-span-1">
-              <div className="bg-white shadow-md p-4 rounded-lg sticky top-6 h-fit">
-                <ul className="space-y-3">
-                  <li>
-                    <button
-                      onClick={handleSetupClick}
-                      className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-                        showVendorSetup 
-                          ? 'bg-primary text-white' 
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-                      }`}
-                    >
-                      Setup
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleNavigation('/vendor/analytics')}
-                      className="w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-lg transition font-medium"
-                    >
-                      Analytics
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleNavigation('/vendor/settings')}
-                      className="w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-lg transition font-medium"
-                    >
-                      Settings
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleNavigation('/vendor/profile')}
-                      className="w-full text-left bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-lg transition font-medium"
-                    >
-                      Profile
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Confirmation Popup Modal */}

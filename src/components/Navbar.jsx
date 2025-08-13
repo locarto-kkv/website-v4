@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -24,24 +25,58 @@ const Navbar = () => {
   }, [dropdownOpen]);
 
   return (
-    <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center sticky top-0 z-50">
+    <nav className="bg-white shadow-md py-3 px-4 flex justify-between items-center sticky top-0 z-50">
       {/* Logo */}
       <div className="flex items-center">
-      <Link to="#main-content" className="text-3xl font-bold text-orange-500">Locarto</Link>
+        <Link to="/" className="text-2xl font-bold text-orange-500">Locarto</Link>
       </div>
       
+      {/* Mobile Menu Button */}
+      <button 
+        className="md:hidden text-gray-700"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      >
+        <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'} text-xl`}></i>
+      </button>
+      
       {/* Navigation Links */}
-      <div className="hidden md:flex space-x-8">
-        <Link to="#main-content" className="nav-link text-gray-700 hover:text-gray-900 font-medium">Home</Link>
-        <a href="#categories" className="nav-link text-gray-700 hover:text-gray-900 font-medium">Categories</a>
-        <a href="#how-it-works" className="nav-link text-gray-700 hover:text-gray-900 font-medium">How It Works</a>
-        <a href="#testimonials" className="nav-link text-gray-700 hover:text-gray-900 font-medium">Testimonials</a>
+      <div className={`absolute md:static top-16 left-0 w-full md:w-auto bg-white md:bg-transparent shadow-md md:shadow-none z-40 ${mobileMenuOpen ? 'block' : 'hidden'} md:block`}>
+        <div className="flex flex-col md:flex-row md:items-center md:space-x-6 p-4 md:p-0">
+          <Link 
+            to="/" 
+            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Home
+          </Link>
+          <a 
+            href="#categories" 
+            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Categories
+          </a>
+          <a 
+            href="#how-it-works" 
+            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            How It Works
+          </a>
+          <a 
+            href="#testimonials" 
+            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Testimonials
+          </a>
+        </div>
       </div>
       
       {/* Right Side Elements */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-3">
         {/* Cart Icon */}
-        <Link to="/cart" className="text-gray-700 hover:text-gray-900">
+        <Link to="/cart" className="text-gray-700 hover:text-orange-500 transition-colors">
           <i className="fas fa-shopping-cart text-lg"></i>
         </Link>
 
@@ -50,9 +85,9 @@ const Navbar = () => {
           <button 
             ref={buttonRef}
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="bg-gray-200 text-gray-700 rounded-full w-9 h-9 flex items-center justify-center hover:bg-gray-300 transition"
+            className="bg-gray-200 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-300 transition"
           >
-            <span className="text-lg">👤</span>
+            <span className="text-sm">👤</span>
           </button>
           
           {/* Dropdown Menu */}
