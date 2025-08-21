@@ -1,0 +1,11 @@
+{
+  "folders": [
+	{
+		"name": "locarto",
+		"path": "."
+	}
+],
+  "settings": {
+    "editor.formatOnSave": true
+  }
+}
