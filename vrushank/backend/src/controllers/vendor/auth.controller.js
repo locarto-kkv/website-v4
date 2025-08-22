@@ -13,7 +13,6 @@ import { generateToken } from "../../lib/vendor/utils.js";
 export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    console.log(name, email, password);
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -37,9 +36,9 @@ export const signup = async (req, res) => {
       .insert(newUser)
       .select()
       .single();
-
-    if (user) return res.status(400).json({ message: "User already exists" });
-
+          
+    if (error) return res.status(400).json({ message: "User already exists" });
+      
     fs.mkdirSync(`./uploads/documents/${user.id}`);
 
     generateToken(user.id, res);

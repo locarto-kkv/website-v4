@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   const signup = async (data, type) => {
     try {
       const res = await axiosInstance.post(`/${type}/auth/signup`, data);
-
+      
       setCurrentUser(res.data);
       setUserType(type);
       toast.success("Signup Successful");
