@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
   const signup = async (data, type) => {
     try {
       const res = await axiosInstance.post(`/${type}/auth/signup`, data);
-      
+
       setCurrentUser(res.data);
       setUserType(type);
       toast.success("Signup Successful");
@@ -54,8 +54,6 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-      console.log(res);
-
       setCurrentUser(res.data);
     } catch (error) {
       console.log("Error in checkAuth: ", error.response.data.message);

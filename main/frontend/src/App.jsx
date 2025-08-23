@@ -14,7 +14,7 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, []);
-  console.log("App: ", currentUser);
+  // console.log("App: ", currentUser);
 
   return (
     <div className="min-h-screen flex flex-col">
