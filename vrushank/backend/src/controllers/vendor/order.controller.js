@@ -1,4 +1,4 @@
-import db from "../../lib/vendor/db.js";
+import db from "../../lib/db.js";
 
 export const getOrders = async (req, res) => {
   try {

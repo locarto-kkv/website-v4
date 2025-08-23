@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-import db from "../../lib/vendor/db.js";
+import db from "../lib/db.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
@@ -18,9 +18,11 @@ export const protectRoute = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized - Invalid Token" });
     }
 
+    // console.log(decoded);
+
     const { data: user, error } = await db
-      .from("vendors")
-      .select("id, created_at, name, email, phone_no, address, documents")
+      .from(decoded.userType + "s")
+      .select("id")
       .eq("id", decoded.userId)
       .single();
 
@@ -29,6 +31,7 @@ export const protectRoute = async (req, res, next) => {
     }
 
     req.user = user;
+    req.userType = decoded.userType;
 
     next();
   } catch (error) {

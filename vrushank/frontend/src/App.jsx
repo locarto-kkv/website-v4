@@ -6,27 +6,32 @@ import AuthVendor from "./pages/authVendor";
 import VendorDashboard from "./pages/vendorDashboard";
 import CustomerDashboard from "./pages/customerDashboard";
 import { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
 
 function App() {
-  const { currentUser } = useAuth();
-  // console.log("App: ", currentUser);
+  const { currentUser, checkAuth } = useAuth();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+  console.log("App: ", currentUser);
 
   return (
     <div className="min-h-screen flex flex-col">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
-          path="/login/customer"
+          path="/consumer/login"
           element={
             !currentUser ? (
               <AuthConsumer />
             ) : (
-              <Navigate to="/customer/dashboard" />
+              <Navigate to="/consumer/dashboard" />
             )
           }
         />
         <Route
-          path="/login/vendor"
+          path="/vendor/login"
           element={
             !currentUser ? <AuthVendor /> : <Navigate to="/vendor/dashboard" />
           }
@@ -34,20 +39,16 @@ function App() {
         <Route
           path="/vendor/dashboard"
           element={
-            currentUser ? (
-              <VendorDashboard />
-            ) : (
-              <Navigate to="/vendor/dashboard" />
-            )
+            currentUser ? <VendorDashboard /> : <Navigate to="/vendor/login" />
           }
         />
         <Route
-          path="/customer/dashboard"
+          path="/consumer/dashboard"
           element={
             currentUser ? (
               <CustomerDashboard />
             ) : (
-              <Navigate to="/customer/dashboard" />
+              <Navigate to="/consumer/login" />
             )
           }
         />

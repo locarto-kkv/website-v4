@@ -3,10 +3,8 @@ import {
   signup,
   login,
   logout,
-  checkAuth,
   loginGoogle,
 } from "../../controllers/vendor/auth.controller.js";
-import { protectRoute } from "../../middleware/vendor/auth.middleware.js";
 
 const router = Router();
 
@@ -14,6 +12,5 @@ router.post("/signup", signup);
 router.post("/login", login);
 router.post("/login-google", loginGoogle);
 router.post("/logout", logout);
-router.get("/check", protectRoute, checkAuth);
 
 export default router;

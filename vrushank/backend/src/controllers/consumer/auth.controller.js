@@ -41,7 +41,7 @@ export const signup = async (req, res) => {
 
     fs.mkdirSync(`./uploads/documents/${user.id}`);
 
-    generateToken(user.id, res);
+    generateToken(user.id, "consumer", res);
 
     return res.status(201).json({
       id: user.id,
@@ -146,15 +146,6 @@ export const logout = (req, res) => {
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const checkAuth = (req, res) => {
-  try {
-    res.status(200).json(req.user);
-  } catch (error) {
-    console.log("Error in checkAuth controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

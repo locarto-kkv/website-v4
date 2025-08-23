@@ -18,7 +18,7 @@ const VendorDashboard = () => {
   const handleLogout = async (e) => {
     e.preventDefault();
     await logout("vendor");
-    navigate("/login/vendor");
+    navigate("/vendor/login");
   };
 
   const handleNavigation = (path) => {

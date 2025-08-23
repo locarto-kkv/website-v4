@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
       toast.success("Login Successful");
     } catch (error) {
       toast.error(error.response.data.message);
+      console.log("Error in login: ", error.response.data.message);
     }
   };
 
@@ -33,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       toast.success("Signup Successful");
     } catch (error) {
       toast.error(error.response.data.message);
-      console.log(error.response.data.message);
+      console.log("Error in signup: ", error.response.data.message);
     }
   };
 
@@ -45,8 +46,19 @@ export const AuthProvider = ({ children }) => {
       setUserType(null);
       toast.success("Logout Successful");
     } catch (error) {
-      toast.error(error.response);
-      console.log(error.response);
+      toast.error(error.response.data.message);
+      console.log("Error in logout: ", error.response.data.message);
+    }
+  };
+
+  const checkAuth = async () => {
+    try {
+      const res = await axiosInstance.get("/auth/check");
+      console.log(res);
+
+      setCurrentUser(res.data);
+    } catch (error) {
+      console.log("Error in checkAuth: ", error.response.data.message);
     }
   };
 
@@ -56,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     signup,
+    checkAuth,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
