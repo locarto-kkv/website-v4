@@ -44,7 +44,7 @@ const AuthVendor = () => {
     email: "",
     password: "",
   });
-  const { login, signup, currentUser, userType } = useAuth();
+  const { login, signup } = useAuth();
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));

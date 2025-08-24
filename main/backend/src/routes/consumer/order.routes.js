@@ -1,17 +1,13 @@
 import { Router } from "express";
-import { protectRoute } from "../../middleware/vendor/auth.middleware.js";
+import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
-  getProducts,
-  addProduct,
-  removeProduct,
-  editProduct,
-} from "../../controllers/vendor/order.controller.js";
+  cancelOrder,
+  getOrders,
+} from "../../controllers/consumer/order.controller.js";
 
 const router = Router();
 
-router.get("/", getProducts);
-router.post("/add", protectRoute, addProduct);
-router.delete("/:id", protectRoute, removeProduct);
-router.put("/:id", protectRoute, editProduct);
+router.get("/", protectRoute, getOrders);
+router.put("/cancel/:id", protectRoute, cancelOrder);
 
 export default router;

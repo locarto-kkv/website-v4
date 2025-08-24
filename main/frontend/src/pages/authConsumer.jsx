@@ -53,7 +53,7 @@ const AuthConsumer = () => {
     sex: "",
     country: "",
   });
-  const navigate = useNavigate();
+
   const { login, signup } = useAuth();
 
   const handleChange = (e) => {
@@ -65,7 +65,6 @@ const AuthConsumer = () => {
     isLogin
       ? await login(formData, "consumer")
       : await signup(formData, "consumer");
-    navigate("/customer/dashboard");
   };
 
   return (
@@ -167,7 +166,7 @@ const AuthConsumer = () => {
                     id="phone"
                     name="phone"
                     type="tel"
-                    required
+                    // required
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1.5 px-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
                     value={formData.phone}
                     onChange={handleChange}
@@ -185,7 +184,7 @@ const AuthConsumer = () => {
                     id="address"
                     name="address"
                     type="text"
-                    required
+                    // required
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1.5 px-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
                     value={formData.address}
                     onChange={handleChange}
@@ -205,7 +204,7 @@ const AuthConsumer = () => {
                       <select
                         id="age"
                         name="age"
-                        required
+                        // required
                         className="block w-full h-8 px-2 pr-5 border border-gray-300 rounded text-xs leading-4 bg-white appearance-none focus:outline-none focus:ring-primary focus:border-primary"
                         value={formData.age}
                         onChange={handleChange}
@@ -234,7 +233,7 @@ const AuthConsumer = () => {
                       <select
                         id="sex"
                         name="sex"
-                        required
+                        // required
                         className="block w-full h-8 px-2 pr-5 border border-gray-300 rounded text-xs leading-4 bg-white appearance-none focus:outline-none focus:ring-primary focus:border-primary"
                         value={formData.sex}
                         onChange={handleChange}
@@ -263,7 +262,7 @@ const AuthConsumer = () => {
                     <select
                       id="country"
                       name="country"
-                      required
+                      // required
                       className="block w-full h-8 px-2 pr-5 border border-gray-300 rounded text-xs leading-4 bg-white appearance-none focus:outline-none focus:ring-primary focus:border-primary"
                       value={formData.country}
                       onChange={handleChange}

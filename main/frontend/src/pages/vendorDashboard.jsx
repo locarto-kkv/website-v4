@@ -12,13 +12,11 @@ const VendorDashboard = () => {
   // State for the confirmation popup
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
 
-  const navigate = useNavigate();
   const { logout } = useAuth();
 
   const handleLogout = async (e) => {
     e.preventDefault();
     await logout("vendor");
-    navigate("/vendor/login");
   };
 
   const handleNavigation = (path) => {

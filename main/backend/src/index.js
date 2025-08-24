@@ -6,7 +6,8 @@ import dotenv from "dotenv";
 import path from "path";
 
 import vendorRoutes from "./routes/vendor/index.js";
-import { protectRoute } from "./middleware/auth.middleware.js";
+import consumerRoutes from "./routes/consumer/index.js";
+import { checkAuth, protectRoute } from "./middleware/auth.middleware.js";
 
 dotenv.config();
 
@@ -21,18 +22,11 @@ app.use(cookieParser());
 app.use(cors({ origin: frontendURL, credentials: true }));
 
 app.use("/api/vendor", vendorRoutes);
+app.use("/api/consumer", consumerRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.get("/api/auth/check", protectRoute, (req, res) => {
-  try {
-    res.status(200).json({ user: req.user, type: req.userType });
-    console.log(req.user);
-  } catch (error) {
-    console.log("Error in checkAuth controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
+app.get("/api/auth/check", protectRoute, checkAuth);
 
 app.get("/", async (req, res) => {
   res.json(data);

@@ -7,8 +7,8 @@ dotenv.config();
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } =
   process.env;
 
-import db from "../../lib/vendor/db.js";
-import { generateToken } from "../../lib/vendor/utils.js";
+import db from "../../lib/db.js";
+import { generateToken } from "../../lib/utils.js";
 
 export const signup = async (req, res) => {
   try {
@@ -32,14 +32,14 @@ export const signup = async (req, res) => {
     };
 
     const { data: user, error } = await db
-      .from("vendors")
+      .from("consumers")
       .insert(newUser)
       .select()
       .single();
 
     if (error) return res.status(400).json({ message: "User already exists" });
 
-    fs.mkdirSync(`./uploads/documents/${user.id}`);
+    // fs.mkdirSync(`./uploads/documents/${user.id}`);
 
     generateToken(user.id, "consumer", res);
 
@@ -77,14 +77,13 @@ export const login = async (req, res) => {
     }
 
     const { data: user, error } = await db
-      .from("vendors")
+      .from("consumers")
       .select()
       .eq("email", email)
       .limit(1)
       .single();
 
     if (!user) {
-      console.log(error);
       return res.status(400).json({ message: "User does not exist" });
     }
 
@@ -92,7 +91,7 @@ export const login = async (req, res) => {
     if (!isPasswordCorrect)
       return res.status(400).json({ message: "Invalid Credentials" });
 
-    generateToken(user.id, res);
+    generateToken(user.id, "consumer", res);
 
     res.status(200).json({
       id: user.id,
@@ -101,7 +100,7 @@ export const login = async (req, res) => {
       profilePic: user.profilePic,
     });
   } catch (error) {
-    console.log("Error in login controller: ", error.message);
+    console.log("Error in login controller: ", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
