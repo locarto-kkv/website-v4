@@ -7,8 +7,8 @@ dotenv.config();
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } =
   process.env;
 
-import db from "../../lib/vendor/db.js";
-import { generateToken } from "../../lib/vendor/utils.js";
+import db from "../../lib/db.js";
+import { generateToken } from "../../lib/utils.js";
 
 export const signup = async (req, res) => {
   try {

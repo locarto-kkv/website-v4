@@ -1,4 +1,4 @@
-import db from "../../lib/vendor/db.js";
+import db from "../../lib/db.js";
 
 export const getReviews = async (req, res) => {
   try {
@@ -36,6 +36,27 @@ export const addReview = async (req, res) => {
     res.status(200).json(review);
   } catch (error) {
     console.log("Error in addReview controller: ", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const editReview = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.id;
+    const updateContent = req.body;
+
+    const { data: review } = await db
+      .from("reviews")
+      .update(updateContent)
+      .eq("product_id", productId)
+      .eq("consumer_id", userId)
+      .select()
+      .single();
+
+    res.status(200).json(review);
+  } catch (error) {
+    console.log("Error in updateReview controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

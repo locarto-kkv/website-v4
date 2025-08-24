@@ -4,7 +4,7 @@ import {
   login,
   logout,
   loginGoogle,
-} from "../../controllers/vendor/auth.controller.js";
+} from "../../controllers/consumer/auth.controller.js";
 
 const router = Router();
 

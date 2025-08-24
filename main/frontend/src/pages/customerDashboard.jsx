@@ -21,12 +21,11 @@ const CustomerDashboard = () => {
     content: "",
   });
 
-  const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    await logout("consumer");
   };
 
   const updateQuantity = (id, change) => {

@@ -1,8 +1,9 @@
-import db from "../../lib/vendor/db.js";
+import db from "../../lib/db.js";
 
 export const getOrders = async (req, res) => {
   try {
     const userId = req.user.id;
+
     const { data: orders, error } = await db
       .from("orders")
       .select()
@@ -20,7 +21,7 @@ export const cancelOrder = async (req, res) => {
     const userId = req.user.id;
     const { data: orders, error } = await db
       .from("orders")
-      .select()
+      .update({ order_status: "cancelled" })
       .eq("consumer_id", userId);
 
     res.status(200).json(orders);
