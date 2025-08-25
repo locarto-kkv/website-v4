@@ -1,12 +1,12 @@
 import { axiosInstance } from "../../lib/axios.js";
 
-const BASE_URL = "/api/vendor/orders";
+const BASE_URL = "/vendor/order";
 
 export const VendorOrderService = {
   // GET /api/vendor/orders/
   getOrders: async () => {
     const response = await axiosInstance.get(`${BASE_URL}/`);
-    return response.data;
+    return response;
   },
 
   // PUT /api/vendor/orders/update-status/:id

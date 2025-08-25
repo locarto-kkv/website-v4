@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "../context/authContext";
 import { Link } from "react-router-dom";
 
-const Navbar = ({
-  onAddProductClick,
-  showAddProduct,
-  onLogout,
-  cartItems = [],
-}) => {
-  const { userType } = useAuth();
+const Navbar = ({ onAddProductClick, showAddProduct, cartItems = [] }) => {
+  const { currentUser, logout, logoutLoading } = useAuth();
 
-  if (userType === "vendor") {
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logout("vendor");
+  };
+
+  console.log("Dashboard Navbar: userType: ", currentUser.type);
+
+  if (currentUser.type === "vendor") {
     return (
       <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
         <div className="flex items-center">
@@ -36,10 +38,11 @@ const Navbar = ({
             {showAddProduct ? "Close Form" : "Add Product"}
           </button>
           <button
-            onClick={onLogout}
+            onClick={handleLogout}
             className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
           >
-            <i className="fas fa-sign-out-alt mr-2"></i> Logout
+            <i className="fas fa-sign-out-alt mr-2"></i>
+            {!logoutLoading ? "Logout" : "Logging Out....."}
           </button>
         </div>
       </nav>
@@ -71,10 +74,11 @@ const Navbar = ({
           <span className="notification-badge">2</span>
         </div>
         <button
-          onClick={onLogout}
+          onClick={handleLogout}
           className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
         >
-          <i className="fas fa-sign-out-alt mr-2"></i> Logout
+          <i className="fas fa-sign-out-alt mr-2"></i>{" "}
+          {!logoutLoading ? "Logout" : "Logging Out....."}
         </button>
       </div>
     </nav>

@@ -55,7 +55,7 @@ const AuthConsumer = () => {
     country: "",
   });
 
-  const { login, signup } = useAuth();
+  const { login, signup, loginLoading, signupLoading } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -314,7 +314,9 @@ const AuthConsumer = () => {
                 type="submit"
                 className="w-full flex justify-center py-1.5 px-3 rounded-md shadow-sm text-xs font-medium bg-gray-200 text-gray-700 hover:bg-orange-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary"
               >
-                {isLogin ? "Sign in" : "Create Account"}
+                {isLogin && (!loginLoading ? "Login" : "Logging in.....")}
+                {!isLogin &&
+                  (!signupLoading ? "Create Account" : "Signing up.....")}
               </button>
             </div>
           </form>

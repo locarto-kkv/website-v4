@@ -7,7 +7,7 @@ import {
 
 const router = Router();
 
-router.get("/", getOrders);
+router.get("/", protectRoute, getOrders);
 router.put("/update-status/:id", protectRoute, updateOrderStatus);
 
 export default router;
