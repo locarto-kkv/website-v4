@@ -45,7 +45,7 @@ const AuthVendor = () => {
     email: "",
     password: "",
   });
-  const { login, signup } = useAuth();
+  const { login, signup, loginLoading, signupLoading } = useAuth();
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -201,7 +201,9 @@ const AuthVendor = () => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
               >
-                {isLogin ? "Sign in" : "Create Account"}
+                {isLogin && (!loginLoading ? "Login" : "Logging in.....")}
+                {!isLogin &&
+                  (!signupLoading ? "Create Account" : "Signing up.....")}
               </button>
             </div>
           </form>

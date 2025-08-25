@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
 import DashboardNavbar from "../../components/DashboardNavbar";
+import { VendorOrderService } from "../../services/vendor/vendorOrderService";
 
 const VendorDashboard = () => {
   const location = useLocation();
@@ -13,12 +14,15 @@ const VendorDashboard = () => {
   // State for the confirmation popup
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
 
-  const { logout } = useAuth();
+  const { getOrders } = VendorOrderService;
+  useEffect(() => {
+    async function fetchData() {
+      const res = await getOrders();
+      console.log("Vendor Dashboard: getOrders: ", res.data);
+    }
 
-  const handleLogout = (e) => {
-    e.preventDefault();
-    logout("vendor");
-  };
+    fetchData();
+  });
 
   const handleNavigation = (path) => {
     setShowVendorSetup(false);

@@ -39,15 +39,11 @@ export const signup = async (req, res) => {
 
     if (error) return res.status(400).json({ message: "User already exists" });
 
-    fs.mkdirSync(`./uploads/documents/${user.id}`);
+    // fs.mkdirSync(`./uploads/documents/${user.id}`);
 
     generateToken(user.id, "vendor", res);
 
-    return res.status(201).json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
+    return res.status(201).json({ user, type: "vendor" });
   } catch (error) {
     console.log("Error in signup controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -94,12 +90,7 @@ export const login = async (req, res) => {
 
     generateToken(user.id, "vendor", res);
 
-    res.status(200).json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      profilePic: user.profilePic,
-    });
+    res.status(200).json({ user, type: "vendor" });
   } catch (error) {
     console.log("Error in login controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });

@@ -8,12 +8,13 @@ import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 
 function App() {
-  const { currentUser, checkAuth } = useAuth();
+  const { currentUser, authLoading } = useAuth();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-  // console.log("App: ", currentUser);
+  console.log("App: ", authLoading);
+
+  if (authLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

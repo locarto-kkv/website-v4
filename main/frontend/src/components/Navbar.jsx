@@ -8,7 +8,8 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
-  const { userType, logout } = useAuth();
+  const { currentUser, logout } = useAuth();
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -27,6 +28,8 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownOpen]);
+
+  console.log("Home Navbar: userType: ", currentUser?.type);
 
   return (
     <nav className="bg-white shadow-md py-3 px-4 flex justify-between items-center sticky top-0 z-50">
@@ -107,7 +110,7 @@ const Navbar = () => {
 
           {/* Dropdown Menu */}
           {dropdownOpen &&
-            (userType ? (
+            (currentUser ? (
               <div
                 ref={dropdownRef}
                 className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50"
@@ -121,7 +124,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   className="block px-4 py-3 hover:bg-gray-100 text-gray-700"
-                  onClick={() => logout(userType)}
+                  onClick={() => logout(currentUser.type)}
                 >
                   Logout
                 </Link>
