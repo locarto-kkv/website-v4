@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/authContext";
-import ProductCard from "../components/ProductCard";
+import { useAuth } from "../../context/authContext";
+import ProductCard from "../../components/ProductCard";
+import Navbar from "../../components/DashboardNavbar";
 
 const CustomerDashboard = () => {
   const [cartItems, setCartItems] = useState([
@@ -23,9 +24,9 @@ const CustomerDashboard = () => {
 
   const { logout } = useAuth();
 
-  const handleLogout = async (e) => {
+  const handleLogout = (e) => {
     e.preventDefault();
-    await logout("consumer");
+    logout("consumer");
   };
 
   const updateQuantity = (id, change) => {
@@ -62,35 +63,10 @@ const CustomerDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
-        <div className="flex items-center">
-          <div className="text-2xl font-bold text-primary">Locarto</div>
-          <span className="ml-4 bg-orange-100 text-primary text-sm font-medium px-3 py-1 rounded-full">
-            Customer Dashboard
-          </span>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
-              <i className="fas fa-shopping-cart mr-2"></i> Cart
-            </button>
-            <span className="notification-badge">{cartItems.length}</span>
-          </div>
-          <div className="relative">
-            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
-              <i className="fas fa-bell mr-2"></i> Notifications
-            </button>
-            <span className="notification-badge">2</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
-          >
-            <i className="fas fa-sign-out-alt mr-2"></i> Logout
-          </button>
-        </div>
-      </nav>
+      <Navbar
+        onLogout={handleLogout}
+        cartItems={cartItems} // pass array of cart items
+      />
 
       <div className="max-w-6xl mx-auto py-8 px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

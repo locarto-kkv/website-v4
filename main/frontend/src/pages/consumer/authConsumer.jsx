@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../../context/authContext";
+import Navbar from "../../components/Navbar";
+import { Link } from "react-router-dom";
 
 // Reusable Password input with conditional show/hide
 const PasswordInput = ({
@@ -69,11 +70,13 @@ const AuthConsumer = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6">
+      <div className="text-2xl font-bold text-primary text-center">
+        <Link to="/">Locarto</Link>
+      </div>
+
       <div className="max-w-md w-full mx-auto">
         <div className="bg-white py-6 px-4 shadow rounded-lg sm:px-6">
-          <div className="flex justify-center mb-4">
-            <div className="text-xl font-bold text-primary">Locarto</div>
-          </div>
+          <div className="flex justify-center mb-4"></div>
 
           <div className="text-center mb-5">
             <h1 className="text-xl font-bold text-gray-800">
