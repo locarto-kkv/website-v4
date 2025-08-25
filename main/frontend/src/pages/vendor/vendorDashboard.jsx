@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../../context/authContext";
+import DashboardNavbar from "../../components/DashboardNavbar";
 
 const VendorDashboard = () => {
   const location = useLocation();
@@ -14,9 +15,9 @@ const VendorDashboard = () => {
 
   const { logout } = useAuth();
 
-  const handleLogout = async (e) => {
+  const handleLogout = (e) => {
     e.preventDefault();
-    await logout("vendor");
+    logout("vendor");
   };
 
   const handleNavigation = (path) => {
@@ -48,34 +49,11 @@ const VendorDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
-        <div className="flex items-center">
-          <div className="text-2xl font-bold text-primary">Locarto</div>
-          <span className="ml-4 bg-orange-100 text-primary text-sm font-medium px-3 py-1 rounded-full">
-            Vendor Dashboard
-          </span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
-              <i className="fas fa-bell mr-2"></i> Notifications
-            </button>
-            <span className="notification-badge">3</span>
-          </div>
-          <button
-            onClick={() => setShowAddProduct(!showAddProduct)}
-            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
-          >
-            <i className="fas fa-plus mr-2"></i> Add Product
-          </button>
-          <button
-            onClick={handleLogout}
-            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
-          >
-            <i className="fas fa-sign-out-alt mr-2"></i> Logout
-          </button>
-        </div>
-      </nav>
+      <DashboardNavbar
+        onAddProductClick={() => setShowAddProduct(!showAddProduct)}
+        showAddProduct={showAddProduct}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content Area */}
       <div className="flex">

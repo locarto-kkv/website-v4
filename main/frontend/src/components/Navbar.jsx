@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/authContext";
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -7,6 +8,7 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
+  const { userType, logout } = useAuth();
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -52,13 +54,13 @@ const Navbar = () => {
         } md:block`}
       >
         <div className="flex flex-col md:flex-row md:items-center md:space-x-6 p-4 md:p-0">
-          <Link
-            to="/"
+          <a
+            href="#home"
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
             onClick={() => setMobileMenuOpen(false)}
           >
             Home
-          </Link>
+          </a>
           <a
             href="#categories"
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
@@ -104,27 +106,47 @@ const Navbar = () => {
           </button>
 
           {/* Dropdown Menu */}
-          {dropdownOpen && (
-            <div
-              ref={dropdownRef}
-              className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50"
-            >
-              <Link
-                to="/consumer/login"
-                className="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100 text-gray-700"
-                onClick={() => setDropdownOpen(false)}
+          {dropdownOpen &&
+            (userType ? (
+              <div
+                ref={dropdownRef}
+                className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50"
               >
-                Login as Customer
-              </Link>
-              <Link
-                to="/vendor/login"
-                className="block px-4 py-3 hover:bg-gray-100 text-gray-700"
-                onClick={() => setDropdownOpen(false)}
+                <Link
+                  to="/dashboard"
+                  className="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100 text-gray-700"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  className="block px-4 py-3 hover:bg-gray-100 text-gray-700"
+                  onClick={() => logout(userType)}
+                >
+                  Logout
+                </Link>
+              </div>
+            ) : (
+              <div
+                ref={dropdownRef}
+                className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50"
               >
-                Login as Vendor
-              </Link>
-            </div>
-          )}
+                <Link
+                  to="/consumer/login"
+                  className="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100 text-gray-700"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Login as Customer
+                </Link>
+                <Link
+                  to="/vendor/login"
+                  className="block px-4 py-3 hover:bg-gray-100 text-gray-700"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Login as Vendor
+                </Link>
+              </div>
+            ))}
         </div>
       </div>
     </nav>

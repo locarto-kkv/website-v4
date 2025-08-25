@@ -1,10 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/authContext";
 import Home from "./pages/Home";
-import AuthConsumer from "./pages/authConsumer";
-import AuthVendor from "./pages/authVendor";
-import VendorDashboard from "./pages/vendorDashboard";
-import CustomerDashboard from "./pages/customerDashboard";
+import AuthConsumer from "./pages/consumer/authConsumer";
+import AuthVendor from "./pages/vendor/authVendor";
+import Dashboard from "./pages/dashboard";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 
@@ -23,34 +22,16 @@ function App() {
         <Route
           path="/consumer/login"
           element={
-            !currentUser ? (
-              <AuthConsumer />
-            ) : (
-              <Navigate to="/consumer/dashboard" />
-            )
+            !currentUser ? <AuthConsumer /> : <Navigate to="/dashboard" />
           }
         />
         <Route
           path="/vendor/login"
-          element={
-            !currentUser ? <AuthVendor /> : <Navigate to="/vendor/dashboard" />
-          }
+          element={!currentUser ? <AuthVendor /> : <Navigate to="/dashboard" />}
         />
         <Route
-          path="/vendor/dashboard"
-          element={
-            currentUser ? <VendorDashboard /> : <Navigate to="/vendor/login" />
-          }
-        />
-        <Route
-          path="/consumer/dashboard"
-          element={
-            currentUser ? (
-              <CustomerDashboard />
-            ) : (
-              <Navigate to="/consumer/login" />
-            )
-          }
+          path="/dashboard"
+          element={currentUser ? <Dashboard /> : <Navigate to="/" />}
         />
       </Routes>
       <Toaster />

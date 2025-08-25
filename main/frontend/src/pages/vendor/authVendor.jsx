@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../../context/authContext";
+import { Link } from "react-router-dom";
 
 const PasswordInput = ({
   value,
@@ -59,12 +60,13 @@ const AuthVendor = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="text-2xl font-bold text-primary text-center">
+        <Link to="/">Locarto</Link>
+      </div>
+
+      <div className="flex justify-center mb-6"></div>
       <div className="max-w-md w-full mx-auto">
         <div className="bg-white py-8 px-4 shadow rounded-lg sm:px-10">
-          <div className="flex justify-center mb-6">
-            <div className="text-2xl font-bold text-primary">Locarto</div>
-          </div>
-
           <div className="text-center mb-5">
             <h1 className="text-xl font-bold text-gray-800">
               {isLogin ? "Vendor Login" : "Vendor Sign Up"}
