@@ -60,26 +60,6 @@ export const updateSupportStatus = async (req, res) => {
   }
 };
 
-export const addOrder = async (req, res) => {
-  try {
-    const { title, content } = req.body;
-    const user = req.user;
-
-    const newProduct = {
-      title,
-      content,
-      editor: user.name,
-    };
-
-    const { data, error } = await db.from("products").insert(newProduct);
-
-    res.status(201).json({ message: "Product Added" });
-  } catch (error) {
-    console.log("Error in addOrders controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 export const editOrder = async (req, res) => {
   try {
     const { id: orderId } = req.params;
