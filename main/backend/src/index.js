@@ -7,6 +7,8 @@ import path from "path";
 
 import vendorRoutes from "./routes/vendor/index.js";
 import consumerRoutes from "./routes/consumer/index.js";
+import adminRoutes from "./routes/admin/index.js";
+
 import { checkAuth, protectRoute } from "./middleware/auth.middleware.js";
 
 dotenv.config();
@@ -23,7 +25,7 @@ app.use(cors({ origin: frontendURL, credentials: true }));
 
 app.use("/api/vendor", vendorRoutes);
 app.use("/api/consumer", consumerRoutes);
-
+app.use("/api/admin", adminRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/api/auth/check", protectRoute, checkAuth);

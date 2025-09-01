@@ -14,11 +14,13 @@ const VendorDashboard = () => {
   // State for the confirmation popup
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
 
+  const navigate = useNavigate();
+
   const { getOrders } = VendorOrderService;
   useEffect(() => {
     async function fetchData() {
       const res = await getOrders();
-      console.log("Vendor Dashboard: getOrders: ", res.data);
+      // console.log("Vendor Dashboard: getOrders: ", res.data);
     }
 
     fetchData();
@@ -56,7 +58,6 @@ const VendorDashboard = () => {
       <DashboardNavbar
         onAddProductClick={() => setShowAddProduct(!showAddProduct)}
         showAddProduct={showAddProduct}
-        onLogout={handleLogout}
       />
 
       {/* Main Content Area */}

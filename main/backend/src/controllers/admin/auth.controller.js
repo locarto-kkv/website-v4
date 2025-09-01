@@ -1,11 +1,7 @@
 import bcrypt from "bcryptjs";
-// passport-google-oauth2
 import dotenv from "dotenv";
 import fs from "fs";
 dotenv.config();
-
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } =
-  process.env;
 
 import db from "../../lib/db.js";
 import { generateToken } from "../../lib/utils.js";
@@ -32,22 +28,18 @@ export const signup = async (req, res) => {
     };
 
     const { data: user, error } = await db
-      .from("vendors")
+      .from("admins")
       .insert(newUser)
       .select()
       .single();
 
-    if (error) return res.status(400).json({ message: "User already exists" });
+    if (error) return res.status(400).json({ message: "Admin already exists" });
 
     fs.mkdirSync(`./uploads/documents/${user.id}`);
 
     generateToken(user.id, "admin", res);
 
-    return res.status(201).json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
+    return res.status(201).json({ user, type: "admin" });
   } catch (error) {
     console.log("Error in signup controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -56,20 +48,6 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { loginType } = req.body;
-
-    if (loginType === "login-google") {
-      const redirectUrl =
-        `https://accounts.google.com/o/oauth2/v2/auth` +
-        `?client_id=${GOOGLE_CLIENT_ID}` +
-        `&redirect_uri=${GOOGLE_REDIRECT_URI}` +
-        `&response_type=code` +
-        `&scope=openid%20email%20profile`;
-
-      res.redirect(redirectUrl);
-      return;
-    }
-
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -77,7 +55,7 @@ export const login = async (req, res) => {
     }
 
     const { data: user, error } = await db
-      .from("vendors")
+      .from("admins")
       .select()
       .eq("email", email)
       .limit(1)
@@ -85,7 +63,7 @@ export const login = async (req, res) => {
 
     if (!user) {
       console.log(error);
-      return res.status(400).json({ message: "User does not exist" });
+      return res.status(400).json({ message: "Admin does not exist" });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
@@ -94,12 +72,7 @@ export const login = async (req, res) => {
 
     generateToken(user.id, "admin", res);
 
-    res.status(200).json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      profilePic: user.profilePic,
-    });
+    res.status(200).json({ user, type: "admin" });
   } catch (error) {
     console.log("Error in login controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });

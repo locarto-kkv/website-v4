@@ -18,9 +18,16 @@ export const getProducts = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const { name, quantity, price } = req.body;
+    const { name, quantity, price, category, product_images } = req.body;
     const userId = req.user.id;
-    const newProduct = { name, quantity, price, vendor_id: userId };
+    const newProduct = {
+      name,
+      quantity,
+      price,
+      vendor_id: userId,
+      category,
+      product_images,
+    };
 
     const { data: product, error } = await db
       .from("products")
@@ -33,7 +40,7 @@ export const addProduct = async (req, res) => {
       return res.status(400).json({ message: "Product already exists" });
     }
 
-    fs.mkdirSync(`./uploads/products/${product.id}`);
+    // fs.mkdirSync(`./uploads/products/${product.id}`);
 
     res.status(201).json(product);
   } catch (error) {

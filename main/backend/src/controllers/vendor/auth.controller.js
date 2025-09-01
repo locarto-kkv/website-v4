@@ -80,7 +80,7 @@ export const login = async (req, res) => {
       .single();
 
     if (!user) {
-      console.log(error);
+      // console.log(error);
       return res.status(400).json({ message: "User does not exist" });
     }
 

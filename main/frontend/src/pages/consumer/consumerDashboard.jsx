@@ -3,18 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
 import ProductCard from "../../components/ProductCard";
 import Navbar from "../../components/DashboardNavbar";
+import { ConsumerOrderService } from "../../services/consumer/consumerOrderService";
+import { useEffect } from "react";
+import { DateTimeDisplay } from "../../lib/utils";
 
 const CustomerDashboard = () => {
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Smartphone Case", price: 19.99, quantity: 1 },
-    { id: 2, name: "Wireless Charger", price: 24.99, quantity: 2 },
-    { id: 3, name: "Phone Stand", price: 12.99, quantity: 1 },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
 
-  const [wishlistItems, setWishlistItems] = useState([
-    { id: 1, name: "Gaming Keyboard", price: 79.99 },
-    { id: 2, name: "Noise Cancelling Headphones", price: 129.99 },
-  ]);
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   const [reviewForm, setReviewForm] = useState({
     rating: 0,
@@ -22,12 +20,20 @@ const CustomerDashboard = () => {
     content: "",
   });
 
-  const { logout } = useAuth();
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
-  const handleLogout = (e) => {
-    e.preventDefault();
-    logout("consumer");
-  };
+  const { getOrders } = ConsumerOrderService;
+
+  useEffect(() => {
+    async function fetchData() {
+      const res = await getOrders();
+      console.log("Consumer Dashboard: getOrders: ", res.data);
+      setOrders(res.data);
+    }
+
+    fetchData();
+  }, []);
 
   const updateQuantity = (id, change) => {
     setCartItems(
@@ -64,25 +70,24 @@ const CustomerDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <Navbar
-        onLogout={handleLogout}
         cartItems={cartItems} // pass array of cart items
       />
 
       <div className="max-w-6xl mx-auto py-8 px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-md dashboard-card border-l-4 border-primary">
+          <div className="bg-white p-6 rounded-xl shadow-md dashboard-card border-l-4 border-background">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-gray-600">Total Orders</p>
-                <h3 className="text-3xl font-bold mt-2">12</h3>
+                <h3 className="text-3xl font-bold mt-2">{orders.length}</h3>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                <i className="fas fa-shopping-bag text-primary text-xl"></i>
+                <i className="fas fa-shopping-bag text-black text-xl"></i>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-md dashboard-card border-l-4 border-primary">
+          <div className="bg-white p-6 rounded-xl shadow-md dashboard-card border-l-4 border-background">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-gray-600">Wishlist</p>
@@ -91,19 +96,19 @@ const CustomerDashboard = () => {
                 </h3>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                <i className="fas fa-heart text-primary text-xl"></i>
+                <i className="fas fa-heart text-black text-xl"></i>
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-md dashboard-card border-l-4 border-primary">
+          <div className="bg-white p-6 rounded-xl shadow-md dashboard-card border-l-4 border-background">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-gray-600">Reviews</p>
-                <h3 className="text-3xl font-bold mt-2">5</h3>
+                <h3 className="text-3xl font-bold mt-2">{reviews.length}</h3>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                <i className="fas fa-star text-primary text-xl"></i>
+                <i className="fas fa-star text-black text-xl"></i>
               </div>
             </div>
           </div>
@@ -116,60 +121,51 @@ const CustomerDashboard = () => {
                 <h2 className="text-xl font-bold text-secondary">
                   Recent Orders
                 </h2>
-                <a href="#" className="text-primary hover:underline">
+                <a href="#" className="text-primary hover:text-secondary">
                   View All
                 </a>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center border-b pb-4">
-                  <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">Wireless Headphones</h3>
-                    <p className="text-gray-600 text-sm">Order #ORD-7841</p>
-                    <p className="text-gray-600 text-sm">
-                      Delivered on May 15, 2023
-                    </p>
+                {orders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center border-b pb-4 last:border-b-0"
+                  >
+                    <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4">
+                      <img src="https://media.wired.com/photos/65b0438c22aa647640de5c75/master/pass/Mechanical-Keyboard-Guide-Gear-GettyImages-1313504623.jpg" />
+                      {/* <img src={order.product.product_images[0]} /> */}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium">{order.product.name}</h3>
+                      <p className="text-gray-600 text-sm">
+                        <DateTimeDisplay dateString={order.created_at} />
+                      </p>
+                      <p className="text-gray-600 text-sm">
+                        {order.order_status === "delivered"
+                          ? `Delivered on ${order.delivery_date}`
+                          : order.order_status === "shipped"
+                          ? `Shipped on ${order.delivery_date}`
+                          : order.order_status}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">Rs.{order.product.price}</p>
+                      <span
+                        className={`${
+                          order.order_status === "delivered"
+                            ? "bg-green-100 text-green-800"
+                            : order.order_status === "shipped"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        } text-xs font-medium px-2.5 py-0.5 rounded-full`}
+                      >
+                        {order.order_status.charAt(0).toUpperCase() +
+                          order.order_status.slice(1)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">$89.99</p>
-                    <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      Delivered
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center border-b pb-4">
-                  <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">Smart Watch</h3>
-                    <p className="text-gray-600 text-sm">Order #ORD-7839</p>
-                    <p className="text-gray-600 text-sm">
-                      Shipped on May 10, 2023
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">$149.99</p>
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      Shipped
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">Bluetooth Speaker</h3>
-                    <p className="text-gray-600 text-sm">Order #ORD-7835</p>
-                    <p className="text-gray-600 text-sm">Processing</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">$59.99</p>
-                    <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                      Processing
-                    </span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 

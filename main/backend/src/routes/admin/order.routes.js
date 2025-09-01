@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { protectRoute } from "../../middleware/vendor/auth.middleware.js";
+import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
   getProducts,
   addProduct,
   removeProduct,
   editProduct,
-} from "../../controllers/vendor/order.controller.js";
+} from "../../controllers/admin/order.controller.js";
 
 const router = Router();
 
