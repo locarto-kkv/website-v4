@@ -10,6 +10,6 @@ const router = Router();
 
 router.get("/get-orders", protectRoute, getOrderHistory);
 router.post("/place-order", protectRoute, placeOrderTransaction);
-router.post("/cancel-order/:id", protectRoute, cancelOrderTransaction);
+router.patch("/cancel-order/:id", protectRoute, cancelOrderTransaction);
 
 export default router;

@@ -9,6 +9,7 @@ import { useEffect } from "react";
 
 function App() {
   const { currentUser, authLoading } = useAuth();
+  // console.log("App: ", currentUser);
 
   if (authLoading) {
     return <div>Loading...</div>;

@@ -3,15 +3,26 @@ import db from "../../lib/db.js";
 export const getListItems = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { type: list_type } = req.body;
 
-    const { data: listItems } = await db
+    const { data: listItems, error } = await db
       .from("consumer_lists")
-      .select()
-      .eq("consumer_id", userId)
-      .eq("list_type", list_type);
+      .select(
+        "list_type, quantity, products(id, name, price, category, product_images)"
+      )
+      .eq("consumer_id", userId);
 
-    res.status(200).json(listItems);
+    if (error) throw error;
+
+    const groupedList = listItems.reduce((acc, item) => {
+      const { list_type, quantity, products } = item;
+      if (!acc[list_type]) {
+        acc[list_type] = [];
+      }
+      acc[list_type].push({ ...products, quantity });
+      return acc;
+    }, {});
+
+    res.status(200).json(groupedList);
   } catch (error) {
     console.log("Error in getListItems controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -24,21 +35,19 @@ export const updateList = async (req, res) => {
     const { type: list_type, quantity } = req.body;
     const productId = req.params.id;
 
-    const { data: updatedList } = await db
-      .from("consumer_lists")
-      .upsert(
-        {
-          consumer_id: userId,
-          list_type,
-          product_id: productId,
-          quantity,
-        },
-        { onConflict: ["consumer_id", "list_type", "product_id"] }
-      )
-      .select()
-      .single();
+    const { data: updatedList, error } = await db.from("consumer_lists").upsert(
+      {
+        consumer_id: userId,
+        list_type,
+        product_id: productId,
+        quantity,
+      },
+      { onConflict: ["consumer_id", "list_type", "product_id"] }
+    );
 
-    res.status(200).json(updatedList);
+    if (error) throw error;
+
+    getListItems(req, res);
   } catch (error) {
     console.log("Error in updateList controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -48,7 +57,7 @@ export const updateList = async (req, res) => {
 export const removeFromList = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { type: list_type } = req.body;
+    const { type: list_type } = req.query;
     const productId = req.params.id;
 
     const { data } = await db
