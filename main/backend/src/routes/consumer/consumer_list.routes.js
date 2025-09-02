@@ -8,7 +8,7 @@ import {
 
 const router = Router();
 
-router.get("/", getListItems);
+router.get("/", protectRoute, getListItems);
 router.patch("/:id", protectRoute, updateList);
 router.delete("/:id", protectRoute, removeFromList);
 

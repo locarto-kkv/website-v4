@@ -6,10 +6,15 @@ import Navbar from "../../components/DashboardNavbar";
 import { ConsumerOrderService } from "../../services/consumer/consumerOrderService";
 import { useEffect } from "react";
 import { DateTimeDisplay } from "../../lib/utils";
+import { ConsumerListService } from "../../services/consumer/consumerListService";
 
 const CustomerDashboard = () => {
   const [cartItems, setCartItems] = useState([]);
-
+  const [prices, setPrices] = useState({
+    subtotal: null,
+    shipping: null,
+    total: null,
+  });
   const [wishlistItems, setWishlistItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -24,28 +29,42 @@ const CustomerDashboard = () => {
   const navigate = useNavigate();
 
   const { getOrders } = ConsumerOrderService;
+  const { getList, updateList, removeFromList } = ConsumerListService;
 
   useEffect(() => {
     async function fetchData() {
-      const res = await getOrders();
-      console.log("Consumer Dashboard: getOrders: ", res.data);
-      setOrders(res.data);
+      const orderRes = await getOrders();
+      const listRes = await getList();
+
+      setOrders(orderRes);
+      listRes.wishlist && setWishlistItems(listRes.wishlist);
+      listRes.cart && setCartItems(listRes.cart);
+      updatePrices(listRes.cart);
     }
 
     fetchData();
   }, []);
 
-  const updateQuantity = (id, change) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
+  const updateQuantity = async (item, change) => {
+    const res = await updateList("cart", item.quantity + change, item.id);
+    setCartItems(res.cart);
+    updatePrices(res.cart);
   };
 
-  const removeFromCart = (id) => {
+  const updatePrices = (items) => {
+    console.log("Update Prices: ", items);
+
+    const subtotal = items.reduce((sum, item) => {
+      return sum + item.price * item.quantity;
+    }, 0);
+    const shipping = 5.99;
+    const total = subtotal + shipping;
+
+    setPrices({ subtotal, shipping, total });
+  };
+
+  const removeFromCart = async (id) => {
+    await removeFromList("cart", id);
     setCartItems(cartItems.filter((item) => item.id !== id));
   };
 
@@ -58,13 +77,6 @@ const CustomerDashboard = () => {
     alert("Review submitted successfully!");
     setReviewForm({ rating: 0, title: "", content: "" });
   };
-
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const shipping = 5.99;
-  const total = subtotal + shipping;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -242,64 +254,77 @@ const CustomerDashboard = () => {
 
           <div>
             <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-              <h2 className="text-xl font-bold text-secondary mb-6">
-                Shopping Cart
-              </h2>
-              <div className="space-y-4">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center border-b pb-4"
-                  >
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
-                    <div className="flex-1">
-                      <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-gray-600 text-sm">${item.price}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <button
-                        className="w-8 h-8 bg-gray-100 rounded-l flex items-center justify-center"
-                        onClick={() => updateQuantity(item.id, -1)}
-                      >
-                        -
-                      </button>
-                      <span className="w-10 h-8 flex items-center justify-center border-y">
-                        {item.quantity}
-                      </span>
-                      <button
-                        className="w-8 h-8 bg-gray-100 rounded-r flex items-center justify-center"
-                        onClick={() => updateQuantity(item.id, 1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                    <button
-                      className="ml-4 text-red-500 hover:text-red-700"
-                      onClick={() => removeFromCart(item.id)}
-                    >
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </div>
-                ))}
-              </div>
+              {cartItems.length > 0 ? (
+                <>
+                  <h2 className="text-xl font-bold text-secondary mb-6">
+                    Shopping Cart
+                  </h2>
 
-              <div className="mt-6 pt-4 border-t">
-                <div className="flex justify-between mb-2">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <div className="space-y-4">
+                    {cartItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center border-b pb-4"
+                      >
+                        <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
+                        <div className="flex-1">
+                          <h3 className="font-medium">{item.name}</h3>
+                          <p className="text-gray-600 text-sm">${item.price}</p>
+                        </div>
+                        <div className="flex items-center">
+                          <button
+                            className="w-8 h-8 bg-gray-100 rounded-l flex items-center justify-center"
+                            onClick={() => updateQuantity(item, -1)}
+                          >
+                            -
+                          </button>
+                          <span className="w-10 h-8 flex items-center justify-center border-y">
+                            {item.quantity}
+                          </span>
+                          <button
+                            className="w-8 h-8 bg-gray-100 rounded-r flex items-center justify-center"
+                            onClick={() => updateQuantity(item, 1)}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          className="ml-4 text-red-500 hover:text-red-700"
+                          onClick={() => removeFromCart(item.id)}
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="flex justify-center">
+                  <h2 className="text-xl font-bold text-secondary mb-6">
+                    Add Items to your Cart
+                  </h2>
                 </div>
-                <div className="flex justify-between mb-2">
-                  <span>Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
+              )}
+
+              {prices.subtotal ? (
+                <div className="mt-6 pt-4 border-t">
+                  <div className="flex justify-between mb-2">
+                    <span>Subtotal</span>
+                    <span>${prices.subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span>Shipping</span>
+                    <span>${prices.shipping.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-lg mt-4 pt-2 border-t">
+                    <span>Total</span>
+                    <span>${prices.total.toFixed(2)}</span>
+                  </div>
+                  <button className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition mt-6">
+                    Proceed to Checkout
+                  </button>
                 </div>
-                <div className="flex justify-between font-bold text-lg mt-4 pt-2 border-t">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
-                <button className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition mt-6">
-                  Proceed to Checkout
-                </button>
-              </div>
+              ) : null}
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6">

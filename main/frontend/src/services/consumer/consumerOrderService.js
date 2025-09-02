@@ -3,15 +3,22 @@ import { axiosInstance } from "../../lib/axios.js";
 const BASE_URL = "/consumer/order";
 
 export const ConsumerOrderService = {
-  // GET /api/consumer/order/
   getOrders: async () => {
     const response = await axiosInstance.get(`${BASE_URL}/get-orders`);
-    return response;
+    return response.data;
   },
 
-  // DELETE /api/consumer/order/cancel/:id
+  placeOrder: async (productId, product, transaction) => {
+    const response = await axiosInstance.post(`${BASE_URL}/place-order`, {
+      productId,
+      product,
+      transaction,
+    });
+    return response.data;
+  },
+
   cancelOrder: async (orderId) => {
-    const response = await axiosInstance.put(
+    const response = await axiosInstance.patch(
       `${BASE_URL}/cancel-order/${orderId}`
     );
     return response.data;
