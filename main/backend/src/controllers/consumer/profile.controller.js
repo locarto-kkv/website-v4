@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import db from "../../lib/db.js";
+import bcrypt from "bcryptjs";
 
 export const getProfile = async (req, res) => {
   try {
@@ -16,6 +17,28 @@ export const getProfile = async (req, res) => {
     res.status(200).json(userProfile);
   } catch (error) {
     console.log("Error in getProfile controller: ", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updatePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { password } = req.body;
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const { data: updatedUser } = await db
+      .from("consumers")
+      .update({ password: hashedPassword })
+      .eq("id", userId)
+      .select()
+      .single();
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.log("Error in updatePassword controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
