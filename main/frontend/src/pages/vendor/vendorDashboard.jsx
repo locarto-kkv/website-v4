@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/authContext";
 import DashboardNavbar from "../../components/DashboardNavbar";
 import { VendorOrderService } from "../../services/vendor/vendorOrderService";
 

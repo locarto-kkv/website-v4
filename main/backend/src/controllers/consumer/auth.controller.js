@@ -1,15 +1,22 @@
 import bcrypt from "bcryptjs";
-// passport-google-oauth2
+import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
-import fs from "fs";
 dotenv.config();
-
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } =
-  process.env;
 
 import db from "../../lib/db.js";
 import { generateToken } from "../../lib/utils.js";
 import { sendOtp, verifyOtp } from "../../services/consumer/otp.service.js";
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
+const client = new OAuth2Client(
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URI
+);
 
 export const sendVerification = async (req, res) => {
   try {
@@ -57,20 +64,6 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { loginType } = req.body;
-
-    if (loginType === "login-google") {
-      const redirectUrl =
-        `https://accounts.google.com/o/oauth2/v2/auth` +
-        `?client_id=${GOOGLE_CLIENT_ID}` +
-        `&redirect_uri=${GOOGLE_REDIRECT_URI}` +
-        `&response_type=code` +
-        `&scope=openid%20email%20profile`;
-
-      res.redirect(redirectUrl);
-      return;
-    }
-
     const {
       email = null,
       phone_no = null,
@@ -113,38 +106,67 @@ export const login = async (req, res) => {
   }
 };
 
-export const loginGoogle = (req, res) => {
-  console.log("login-google controller");
-  res.send("Google login callback received.");
+export const loginGoogle = async (req, res) => {
+  try {
+    console.log("Google");
 
-  const code = req.query.code;
+    const { code = null } = req.query;
 
-  // try {
-  //   // Step 3: Exchange code for access token
-  //   const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', null, {
-  //     params: {
-  //       code,
-  //       client_id: GOOGLE_CLIENT_ID,
-  //       client_secret: GOOGLE_CLIENT_SECRET,
-  //       redirect_uri: GOOGLE_REDIRECT_URI,
-  //       grant_type: 'authorization_code',
-  //     },
-  //   });
+    if (!code) {
+      const url = client.generateAuthUrl({
+        access_type: "offline",
+        prompt: "consent",
+        scope: ["openid", "email", "profile"],
+      });
 
-  //   const access_token = tokenResponse.data.access_token;
+      return res.redirect(url);
+    }
 
-  //   // Step 4: Use token to get user info
-  //   const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-  //     headers: { Authorization: `Bearer ${access_token}` },
-  //   });
+    const { tokens } = await client.getToken(code);
 
-  //   const user = userInfoResponse.data;
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: GOOGLE_CLIENT_ID,
+    });
 
-  //   res.status(201).json(user);
-  // } catch (error) {
-  // console.log("Error in loginGoogle controller: ", error.message);
-  // res.status(500).json({ message: "Internal Server Error" });
-  // }
+    const payload = ticket.getPayload();
+    const userData = {
+      id: payload.sub,
+      name: payload.name,
+      email: payload.email,
+    };
+
+    const { data: existingUser } = await db
+      .from("consumers")
+      .select()
+      .eq("email", userData.email)
+      .limit(1)
+      .single();
+
+    if (existingUser) {
+      generateToken(existingUser.id, "consumer", res);
+      console.log("User Logged In");
+
+      return res.redirect(FRONTEND_URL + "/dashboard");
+    }
+
+    const { data: newUser, error } = await db
+      .from("consumers")
+      .insert({ email: userData.email, name: userData.name })
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(400).json({ message: "Signup failed" });
+    }
+    console.log("User Signed Up");
+
+    generateToken(newUser.id, "consumer", res);
+    return res.redirect(FRONTEND_URL + "/dashboard");
+  } catch (error) {
+    console.error("Error in loginGoogle controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 export const logout = (req, res) => {

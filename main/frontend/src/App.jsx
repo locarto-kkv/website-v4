@@ -1,15 +1,19 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./context/authContext";
 import Home from "./pages/Home";
 import AuthConsumer from "./pages/consumer/authConsumer";
 import AuthVendor from "./pages/vendor/authVendor";
 import Dashboard from "./pages/dashboard";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
+import { useAuthStore } from "./store/useAuthStore";
 
 function App() {
-  const { currentUser, authLoading } = useAuth();
+  const { currentUser, authLoading, checkAuth } = useAuthStore();
   // console.log("App: ", currentUser);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   if (authLoading) {
     return <div>Loading...</div>;

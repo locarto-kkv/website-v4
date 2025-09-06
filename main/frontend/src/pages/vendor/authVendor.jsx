@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../../context/authContext";
+import { useAuthStore } from "../../store/useAuthStore";
 import { Link } from "react-router-dom";
 
 const PasswordInput = ({
@@ -45,7 +45,7 @@ const AuthVendor = () => {
     email: "",
     password: "",
   });
-  const { login, signup, loginLoading, signupLoading } = useAuth();
+  const { login, signup, loginLoading, signupLoading } = useAuthStore();
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));

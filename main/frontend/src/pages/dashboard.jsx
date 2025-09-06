@@ -1,9 +1,9 @@
 import ConsumerDashboard from "./consumer/consumerDashboard";
 import VendorDashboard from "./vendor/vendorDashboard";
-import { useAuth } from "../context/authContext";
+import { useAuthStore } from "../store/useAuthStore";
 
 function dashboard() {
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   return currentUser.type === "vendor" ? (
     <VendorDashboard />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -8,7 +8,7 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout } = useAuthStore();
 
   useEffect(() => {
     const handleClickOutside = (event) => {

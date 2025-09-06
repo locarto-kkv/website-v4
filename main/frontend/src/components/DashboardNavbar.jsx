@@ -1,9 +1,9 @@
 import React from "react";
-import { useAuth } from "../context/authContext";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Navbar = ({ onAddProductClick, showAddProduct, cartItems = [] }) => {
-  const { currentUser, logout, logoutLoading } = useAuth();
+  const { currentUser, logout, logoutLoading } = useAuthStore();
 
   const handleLogout = (e) => {
     e.preventDefault();

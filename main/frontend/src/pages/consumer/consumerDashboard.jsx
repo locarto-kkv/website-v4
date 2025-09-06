@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/authContext";
 import ProductCard from "../../components/ProductCard";
 import Navbar from "../../components/DashboardNavbar";
 import { ConsumerOrderService } from "../../services/consumer/consumerOrderService";
-import { useEffect } from "react";
 import { DateTimeDisplay } from "../../lib/utils";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const CustomerDashboard = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -25,9 +24,6 @@ const CustomerDashboard = () => {
     content: "",
   });
 
-  const { currentUser } = useAuth();
-  const navigate = useNavigate();
-
   const { getOrders } = ConsumerOrderService;
   const { getList, updateList, removeFromList } = ConsumerListService;
 
@@ -38,8 +34,7 @@ const CustomerDashboard = () => {
 
       setOrders(orderRes);
       listRes.wishlist && setWishlistItems(listRes.wishlist);
-      listRes.cart && setCartItems(listRes.cart);
-      updatePrices(listRes.cart);
+      listRes.cart && setCartItems(listRes.cart) && updatePrices(listRes.cart);
     }
 
     fetchData();
