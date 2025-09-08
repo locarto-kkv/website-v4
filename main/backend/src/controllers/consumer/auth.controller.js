@@ -55,7 +55,7 @@ export const signup = async (req, res) => {
 
     generateToken(user.id, "consumer", res);
 
-    return res.status(201).json({ user, type: "consumer" });
+    return res.status(201).json({ id: user.id, type: "consumer" });
   } catch (error) {
     console.log("Error in signup controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -99,7 +99,7 @@ export const login = async (req, res) => {
 
     generateToken(user.id, "consumer", res);
 
-    res.status(200).json({ user, type: "consumer" });
+    res.status(200).json({ id: user.id, type: "consumer" });
   } catch (error) {
     console.log("Error in login controller: ", error);
     res.status(500).json({ message: "Internal Server Error" });

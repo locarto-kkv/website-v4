@@ -1,5 +1,6 @@
 import db from "../../lib/db.js";
-import fs from "fs";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const getProducts = async (req, res) => {
   try {
@@ -18,60 +19,92 @@ export const getProducts = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const { name, quantity, price, category, product_images } = req.body;
+    const {
+      name,
+      quantity,
+      price,
+      category,
+      images_metadata = null,
+    } = req.body;
     const userId = req.user.id;
-    const newProduct = {
+
+    const productData = {
       name,
       quantity,
       price,
       vendor_id: userId,
       category,
-      product_images,
     };
 
-    const { data: product, error } = await db
+    const { data: newProduct, error } = await db
       .from("products")
-      .insert(newProduct)
+      .insert(productData)
       .select()
       .single();
 
     if (error) {
-      console.log(error);
+      console.log("Error in addProduct 1: ", error);
       return res.status(400).json({ message: "Product already exists" });
     }
 
-    // fs.mkdirSync(`./uploads/products/${product.id}`);
+    if (images_metadata) {
+      const imgUploadUrls = await getImgUploadUrl(
+        newProduct.id,
+        images_metadata
+      );
+      const imgPublicUrls = imgUploadUrls.map(
+        (image) =>
+          `${process.env.SUPABASE_PROJECT_URL}/storage/v1/object/public/product-images/${image.filePath}`
+      );
 
-    res.status(201).json(product);
+      const { data: updatedProduct } = await db
+        .from("products")
+        .update({ product_images: imgPublicUrls })
+        .eq("id", newProduct.id)
+        .select()
+        .single();
+
+      res.status(201).json({ product: updatedProduct, imgUploadUrls });
+    } else {
+      res.status(201).json({ product: newProduct });
+    }
   } catch (error) {
     console.log("Error in addProduct controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const uploadImages = async (req, res) => {
+export const getImgUploadUrl = async (productId, files) => {
   try {
-    const productId = req.body.id;
-    const files = req.files;
-    const product_images = [];
+    const imgUploadUrls = [];
 
-    // console.log(files);
+    for (const file of files) {
+      const fileType = file.type;
+      const fileName = file.name;
+      const fileSize = file.size;
 
-    files.forEach((file, index) => {
-      product_images.push(file.backend_filepath);
-    });
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const formattedFileName = `${productId}_${timestamp}_${fileName}`;
 
-    const { data: product } = await db
-      .from("products")
-      .update({ product_images })
-      .eq("id", productId)
-      .select()
-      .single();
+      const filePath = `${productId}/${formattedFileName}`;
 
-    res.status(201).json(product);
-  } catch (error) {
-    console.log("Error in uploadImages controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
+      const { data, error } = await db.storage
+        .from("product-images")
+        .createSignedUploadUrl(filePath);
+
+      if (error) throw error;
+
+      imgUploadUrls.push({
+        uploadUrl: data.signedUrl,
+        filePath,
+        fileType,
+        fileSize,
+      });
+    }
+
+    return imgUploadUrls;
+  } catch (err) {
+    console.log("Error in getImgUploadUrl:", err);
   }
 };
 
@@ -94,18 +127,17 @@ export const removeProduct = async (req, res) => {
 
 export const editProduct = async (req, res) => {
   try {
-    const userId = req.user.id;
     const productId = req.params.id;
-    const { name, price, quantity } = req.body;
+    const productData = req.body;
 
     const { data: product } = await db
       .from("products")
-      .update({ name, price, quantity })
+      .update(productData)
       .eq("id", productId)
       .select()
       .single();
 
-    res.status(200).json(products);
+    res.status(200).json(product);
   } catch (error) {
     console.log("Error in editProduct controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });

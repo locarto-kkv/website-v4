@@ -1,43 +1,79 @@
+import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios.js";
 
-const BASE_URL = "/api/vendor/products";
+const BASE_URL = "/vendor/product";
 
 export const VendorProductService = {
-  // GET /api/vendor/products/
-  getProducts: async () => {
-    const response = await axiosInstance.get(`${BASE_URL}/`);
+  getProducts: async (userId) => {
+    const response = userId
+      ? await axiosInstance.get(`${BASE_URL}/${userId}`)
+      : await axiosInstance.get(`${BASE_URL}/`);
+
     return response.data;
   },
 
-  // GET /api/vendor/products/:id
-  getProductById: async (id) => {
+  getProductById: async (productId) => {
     const response = await axiosInstance.get(`${BASE_URL}/${id}`);
     return response.data;
   },
 
-  // POST /api/vendor/products/add
-  addProduct: async (productData) => {
-    const response = await axiosInstance.post(`${BASE_URL}/add`, productData);
-    return response.data;
+  uploadImage: async (files, imgUploadUrls) => {
+    await Promise.all(
+      imgUploadUrls.map(async (url, i) => {
+        const { uploadUrl, fileType } = url;
+
+        await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": fileType },
+          body: files[i],
+        });
+      })
+    );
   },
 
-  // POST /api/vendor/products/upload
-  uploadImages: async (formData) => {
-    const response = await axiosInstance.post(`${BASE_URL}/upload`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+  addProduct: async (productData) => {
+    // console.log(productData.product_images);
+
+    try {
+      if (productData.product_images.length > 0) {
+        const images_metadata = productData.product_images.map((file) => ({
+          type: file.type,
+          name: file.name,
+          size: file.size,
+        }));
+
+        productData = { ...productData, images_metadata };
+      }
+
+      const { data: response } = await axiosInstance.post(
+        `${BASE_URL}/add`,
+        productData
+      );
+
+      // console.log(response.product);
+
+      if (response.imgUploadUrls) {
+        await VendorProductService.uploadImage(
+          productData.product_images,
+          response.imgUploadUrls
+        );
+      }
+      return response;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Add Product failed");
+      console.log("Error in addProduct:", error.response?.data?.message);
+    }
+  },
+
+  editProduct: async (productId, productData) => {
+    const response = await axiosInstance.put(`${BASE_URL}/${productId}`, {
+      productData,
     });
     return response.data;
   },
 
-  // PUT /api/vendor/products/:id
-  editProduct: async (id, productData) => {
-    const response = await axiosInstance.put(`${BASE_URL}/${id}`, productData);
-    return response.data;
-  },
-
-  // DELETE /api/vendor/products/:id
-  removeProduct: async (id) => {
-    const response = await axiosInstance.delete(`${BASE_URL}/${id}`);
+  removeProduct: async (productId) => {
+    const response = await axiosInstance.delete(`${BASE_URL}/${productId}`);
     return response.data;
   },
 };

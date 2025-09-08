@@ -9,11 +9,12 @@ import { useAuthStore } from "./store/useAuthStore";
 
 function App() {
   const { currentUser, authLoading, checkAuth } = useAuthStore();
-  // console.log("App: ", currentUser);
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // console.log("App: ", currentUser, authLoading);
 
   if (authLoading) {
     return <div>Loading...</div>;
@@ -25,13 +26,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route
           path="/consumer/login"
-          element={
-            !currentUser ? <AuthConsumer /> : <Navigate to="/dashboard" />
-          }
+          element={!currentUser ? <AuthConsumer /> : <Navigate to="/" />}
         />
         <Route
           path="/vendor/login"
-          element={!currentUser ? <AuthVendor /> : <Navigate to="/dashboard" />}
+          element={!currentUser ? <AuthVendor /> : <Navigate to="/" />}
         />
         <Route
           path="/dashboard"

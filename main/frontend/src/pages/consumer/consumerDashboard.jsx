@@ -5,7 +5,6 @@ import Navbar from "../../components/DashboardNavbar";
 import { ConsumerOrderService } from "../../services/consumer/consumerOrderService";
 import { DateTimeDisplay } from "../../lib/utils";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
-import { useAuthStore } from "../../store/useAuthStore";
 
 const CustomerDashboard = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -31,6 +30,7 @@ const CustomerDashboard = () => {
     async function fetchData() {
       const orderRes = await getOrders();
       const listRes = await getList();
+      console.log(orderRes);
 
       setOrders(orderRes);
       listRes.wishlist && setWishlistItems(listRes.wishlist);

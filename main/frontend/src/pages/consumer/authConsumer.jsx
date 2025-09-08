@@ -76,11 +76,12 @@ const AuthConsumer = () => {
   });
 
   const {
+    sendVerification,
     login,
     signup,
     googleLogin,
+    checkAuth,
     sentOtp,
-    sendVerification,
     loginLoading,
     signupLoading,
     otpLoading,
@@ -112,6 +113,7 @@ const AuthConsumer = () => {
       isLogin
         ? await login(formData, "consumer")
         : await signup(formData, "consumer");
+      setSentOtp(false);
     } else {
       const otpRes = await sendVerification(formData, "consumer");
       setSentOtp(true);
@@ -120,6 +122,7 @@ const AuthConsumer = () => {
 
   const handleGoogleSubmit = async (e) => {
     googleLogin();
+    await checkAuth();
   };
 
   const resendOtp = async () => {
@@ -127,6 +130,7 @@ const AuthConsumer = () => {
     const otpRes = await sendVerification(formData, "consumer");
     console.log(sentOtp);
     setSentOtp(true);
+    setFormData({ ...formData, otp: "" });
   };
 
   useEffect(() => {
@@ -166,7 +170,6 @@ const AuthConsumer = () => {
               type="button"
               onClick={() => {
                 setIsLogin(true);
-                setSentOtp(false);
               }}
               className={`flex-1 py-1.5 px-1 text-center font-medium rounded-l text-xs ${
                 isLogin
@@ -180,7 +183,6 @@ const AuthConsumer = () => {
               type="button"
               onClick={() => {
                 setIsLogin(false);
-                setSentOtp(false);
               }}
               className={`flex-1 py-1.5 px-1 text-center font-medium rounded-r text-xs ${
                 !isLogin

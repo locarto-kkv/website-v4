@@ -2,8 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardNavbar from "../../components/DashboardNavbar";
 import { VendorOrderService } from "../../services/vendor/vendorOrderService";
+import { VendorProductService } from "../../services/vendor/vendorProductService";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const VendorDashboard = () => {
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    category: "",
+    price: 0,
+    quantity: 0,
+    product_images: [],
+  });
   const location = useLocation();
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showVendorSetup, setShowVendorSetup] = useState(
@@ -14,16 +25,22 @@ const VendorDashboard = () => {
   const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
 
   const navigate = useNavigate();
+  const { currentUser } = useAuthStore();
 
   const { getOrders } = VendorOrderService;
+  const { getProducts, addProduct } = VendorProductService;
+
   useEffect(() => {
     async function fetchData() {
-      const res = await getOrders();
-      // console.log("Vendor Dashboard: getOrders: ", res.data);
+      const resOrders = await getOrders();
+      const resProducts = await getProducts(currentUser.id);
+
+      setOrders(resOrders);
+      setProducts(resProducts);
     }
 
     fetchData();
-  });
+  }, []);
 
   const handleNavigation = (path) => {
     setShowVendorSetup(false);
@@ -35,6 +52,16 @@ const VendorDashboard = () => {
     if (!showVendorSetup) {
       setShowAddProduct(false);
     }
+  };
+
+  const handleChange = (e) => {
+    setNewProduct((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    // console.log(newProduct);
+    await addProduct(newProduct);
   };
 
   // Handler for the "Next Step" button
@@ -279,7 +306,9 @@ const VendorDashboard = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-gray-600">Total Products</p>
-                      <h3 className="text-3xl font-bold mt-2">24</h3>
+                      <h3 className="text-3xl font-bold mt-2">
+                        {products.length || 0}
+                      </h3>
                     </div>
                     <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                       <i className="fas fa-box text-primary text-xl"></i>
@@ -290,7 +319,9 @@ const VendorDashboard = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-gray-600">Total Orders</p>
-                      <h3 className="text-3xl font-bold mt-2">18</h3>
+                      <h3 className="text-3xl font-bold mt-2">
+                        {orders.length || 0}
+                      </h3>
                     </div>
                     <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                       <i className="fas fa-shopping-cart text-primary text-xl"></i>
@@ -301,7 +332,13 @@ const VendorDashboard = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-gray-600">Total Revenue</p>
-                      <h3 className="text-3xl font-bold mt-2">$2,450</h3>
+                      <h3 className="text-3xl font-bold mt-2">
+                        Rs.
+                        {products.reduce(
+                          (sum, product) => sum + product.price,
+                          0
+                        )}
+                      </h3>
                     </div>
                     <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                       <i className="fas fa-dollar-sign text-primary text-xl"></i>
@@ -333,9 +370,6 @@ const VendorDashboard = () => {
                               Product
                             </th>
                             <th className="text-left py-3 text-gray-600 font-medium">
-                              Customer
-                            </th>
-                            <th className="text-left py-3 text-gray-600 font-medium">
                               Status
                             </th>
                             <th className="text-left py-3 text-gray-600 font-medium">
@@ -344,39 +378,28 @@ const VendorDashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="border-b hover:bg-gray-50">
-                            <td className="py-4">#ORD-7841</td>
-                            <td className="py-4">Wireless Headphones</td>
-                            <td className="py-4">John Smith</td>
-                            <td className="py-4">
-                              <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                Delivered
-                              </span>
-                            </td>
-                            <td className="py-4">$89.99</td>
-                          </tr>
-                          <tr className="border-b hover:bg-gray-50">
-                            <td className="py-4">#ORD-7839</td>
-                            <td className="py-4">Smart Watch</td>
-                            <td className="py-4">Emma Johnson</td>
-                            <td className="py-4">
-                              <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                Shipped
-                              </span>
-                            </td>
-                            <td className="py-4">$149.99</td>
-                          </tr>
-                          <tr className="border-b hover:bg-gray-50">
-                            <td className="py-4">#ORD-7835</td>
-                            <td className="py-4">Bluetooth Speaker</td>
-                            <td className="py-4">Michael Brown</td>
-                            <td className="py-4">
-                              <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                Processing
-                              </span>
-                            </td>
-                            <td className="py-4">$59.99</td>
-                          </tr>
+                          {orders.map((order) => (
+                            <tr
+                              key={order.id}
+                              className="border-b hover:bg-gray-50"
+                            >
+                              <td className="py-4">{order.id}</td>
+
+                              <td className="py-4">{order.product?.name}</td>
+
+                              <td className="py-4">
+                                <span
+                                  className={`font-medium px-2.5 py-0.5 rounded-full`}
+                                >
+                                  {order.order_status}
+                                </span>
+                              </td>
+
+                              <td className="py-4">
+                                Rs. {order.transaction?.amount}
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
@@ -388,13 +411,17 @@ const VendorDashboard = () => {
                       <h2 className="text-xl font-bold text-secondary mb-6">
                         Add New Product
                       </h2>
-                      <form className="space-y-4">
+                      <form className="space-y-4" onSubmit={handleAddProduct}>
                         <div>
                           <label className="block text-gray-700 mb-2">
                             Product Name
                           </label>
                           <input
+                            name="name"
                             type="text"
+                            required
+                            value={newProduct.name}
+                            onChange={handleChange}
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                             placeholder="Enter product name"
                           />
@@ -403,7 +430,13 @@ const VendorDashboard = () => {
                           <label className="block text-gray-700 mb-2">
                             Category
                           </label>
-                          <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                          <select
+                            required
+                            name="category"
+                            value={newProduct.category}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          >
                             <option value="">Select Category</option>
                             <option value="electronics">Electronics</option>
                             <option value="fashion">Fashion</option>
@@ -417,7 +450,11 @@ const VendorDashboard = () => {
                               Price (Rs)
                             </label>
                             <input
+                              name="price"
                               type="number"
+                              required
+                              value={newProduct.price}
+                              onChange={handleChange}
                               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                               placeholder="0.00"
                             />
@@ -427,7 +464,11 @@ const VendorDashboard = () => {
                               Quantity
                             </label>
                             <input
+                              name="quantity"
                               type="number"
+                              required
+                              value={newProduct.quantity}
+                              onChange={handleChange}
                               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                               placeholder="0"
                             />
@@ -437,7 +478,21 @@ const VendorDashboard = () => {
                           <label className="block text-gray-700 mb-2">
                             Product Images
                           </label>
-                          <div className="flex items-center justify-center w-full">
+                          <div
+                            className="flex items-center justify-center w-full"
+                            onDragOver={(e) => e.preventDefault()} // allow drop
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const files = Array.from(e.dataTransfer.files);
+                              setNewProduct((prev) => ({
+                                ...prev,
+                                product_images: [
+                                  ...prev.product_images,
+                                  ...files,
+                                ],
+                              }));
+                            }}
+                          >
                             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
@@ -451,9 +506,57 @@ const VendorDashboard = () => {
                                   JPG, PNG (MAX. 5MB)
                                 </p>
                               </div>
-                              <input type="file" className="hidden" multiple />
+                              <input
+                                type="file"
+                                name="product_images"
+                                multiple
+                                accept=".png,.jpg,.jpeg"
+                                className="hidden"
+                                onChange={(e) =>
+                                  setNewProduct((prev) => ({
+                                    ...prev,
+                                    product_images: [
+                                      ...prev.product_images,
+                                      ...Array.from(e.target.files),
+                                    ],
+                                  }))
+                                }
+                              />
                             </label>
                           </div>
+
+                          {/* Preview Uploaded Images */}
+                          {newProduct.product_images.length > 0 && (
+                            <div className="mt-4 grid grid-cols-3 gap-4">
+                              {newProduct.product_images.map((file, index) => (
+                                <div
+                                  key={index}
+                                  className="relative w-full h-24 border rounded-lg overflow-hidden"
+                                >
+                                  <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={file.name}
+                                    className="object-cover w-full h-full"
+                                  />
+                                  <button
+                                    type="button"
+                                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-1 rounded"
+                                    onClick={() =>
+                                      setNewProduct((prev) => ({
+                                        ...prev,
+                                        product_images:
+                                          prev.product_images.filter(
+                                            (_, i) => i !== index
+                                          ),
+                                      }))
+                                    }
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         <button
                           type="submit"

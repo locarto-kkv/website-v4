@@ -39,31 +39,37 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const uploadDocs = async (req, res) => {
+export const getDocUploadUrl = async (userId, files) => {
   try {
-    const files = req.files;
-    const userId = req.user.id;
+    const docUploadUrls = [];
 
-    // console.log(files);
+    for (const file of files) {
+      const fileType = file.type;
+      const fileName = file.name;
+      const fileSize = file.size;
 
-    const documents = {};
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const formattedFileName = `${userId}_${timestamp}_${fileName}`;
 
-    for (const key in files) {
-      const file = files[key][0];
-      documents[key] = file.backend_filepath;
+      const filePath = `${userId}/${formattedFileName}`;
+
+      const { data, error } = await db.storage
+        .from("vendor-documents")
+        .createSignedUploadUrl(filePath);
+
+      if (error) throw error;
+
+      docUploadUrls.push({
+        uploadUrl: data.signedUrl,
+        filePath,
+        fileType,
+        fileSize,
+      });
     }
 
-    const { data: updatedUser } = await db
-      .from("vendors")
-      .update({ documents })
-      .eq("id", userId)
-      .select()
-      .single();
-
-    return res.status(200).json(updatedUser);
-  } catch (error) {
-    console.log("Error in uploadDocs controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
+    return docUploadUrls;
+  } catch (err) {
+    console.log("Error in getDocUploadUrl:", err);
   }
 };
 

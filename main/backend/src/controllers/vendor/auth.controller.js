@@ -43,7 +43,7 @@ export const signup = async (req, res) => {
 
     generateToken(user.id, "vendor", res);
 
-    return res.status(201).json({ user, type: "vendor" });
+    return res.status(201).json({ id: user.id, type: "vendor" });
   } catch (error) {
     console.log("Error in signup controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -52,20 +52,6 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { loginType } = req.body;
-
-    if (loginType === "login-google") {
-      const redirectUrl =
-        `https://accounts.google.com/o/oauth2/v2/auth` +
-        `?client_id=${GOOGLE_CLIENT_ID}` +
-        `&redirect_uri=${GOOGLE_REDIRECT_URI}` +
-        `&response_type=code` +
-        `&scope=openid%20email%20profile`;
-
-      res.redirect(redirectUrl);
-      return;
-    }
-
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -90,7 +76,7 @@ export const login = async (req, res) => {
 
     generateToken(user.id, "vendor", res);
 
-    res.status(200).json({ user, type: "vendor" });
+    res.status(200).json({ id: user.id, type: "vendor" });
   } catch (error) {
     console.log("Error in login controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });

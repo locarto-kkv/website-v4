@@ -42,7 +42,7 @@ export const protectRoute = async (req, res, next) => {
 
 export const checkAuth = (req, res) => {
   try {
-    res.status(200).json({ user: req.user, type: req.userType });
+    res.status(200).json({ ...req.user, type: req.userType });
     // console.log(req.user);
   } catch (error) {
     console.log("Error in checkAuth controller: ", error.message);

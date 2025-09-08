@@ -50,8 +50,15 @@ const Navbar = ({ onAddProductClick, showAddProduct, cartItems = [] }) => {
             onClick={onAddProductClick}
             className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
           >
-            <i className="fas fa-plus mr-2"></i>
-            {showAddProduct ? "Close Form" : "Add Product"}
+            {showAddProduct ? (
+              <>
+                <i className="fas fa-xmark mr-2"></i>Close Form
+              </>
+            ) : (
+              <>
+                <i className="fas fa-plus mr-2"></i>Add Product
+              </>
+            )}
           </button>
         )}
 
