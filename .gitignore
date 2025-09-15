@@ -22,6 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD
 
 package-lock.json
 .env
+=======
+__pycache__/
+>>>>>>> 9bba190e924d2f552150b79717838f5982dd6b1a
