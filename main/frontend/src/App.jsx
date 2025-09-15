@@ -1,41 +1,57 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import Homepage from "./pages/homepage";
-import LandingPage from "./pages/landingpage"; // Make sure this import is correct
-import AuthConsumer from "./pages/consumer/authConsumer";
-import AuthVendor from "./pages/vendor/authVendor";
-import Dashboard from "./pages/dashboard";
+import React, { useEffect } from "react";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
+
+// Public Pages
+import Homepage from "./pages/Homepage";
+import LandingPage from "./pages/landingpage";
+import AuthVendor from "./pages/vendor/authVendor";
+// Vendor Pages and Layout
+import VendorDashboardLayout from "./components/vendor/VendorDashboardLayout";
+import VendorDashboard from "./pages/vendor/vendorDashboard";
+import VendorProfile from "./components/vendor/VendorProfile";
+import VendorAnalytics from "./components/vendor/VendorAnalytics";
+import VendorSettings from "./components/vendor/VendorSettings";
+
+// A component to protect routes
+const ProtectedRoute = () => {
+  const { currentUser } = useAuthStore();
+  return currentUser ? <Outlet /> : <Navigate to="/vendor/login" replace />;
+};
 
 function App() {
   const { currentUser, authLoading, checkAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   if (authLoading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen flex flex-col">
       <Routes>
+        {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<Homepage />} />
         <Route path="/landing" element={<LandingPage />} />
         <Route
-          path="/consumer/login"
-          element={!currentUser ? <AuthConsumer /> : <Navigate to="/" />}
-        />
-        <Route
           path="/vendor/login"
-          element={!currentUser ? <AuthVendor /> : <Navigate to="/" />}
+          element={currentUser ? <Navigate to="/vendor/dashboard" /> : <AuthVendor />}
         />
-        <Route
-          path="/dashboard"
-          element={currentUser ? <Dashboard /> : <Navigate to="/" />}
-        />
+
+        {/* --- PROTECTED VENDOR ROUTES --- */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/vendor" element={<VendorDashboardLayout />}>
+            <Route index element={<VendorDashboard />} />
+            <Route path="dashboard" element={<VendorDashboard />} />
+            <Route path="profile" element={<VendorProfile />} />
+            <Route path="analytics" element={<VendorAnalytics />} />
+            <Route path="settings" element={<VendorSettings />} />
+          </Route>
+        </Route>
       </Routes>
       <Toaster />
     </div>
