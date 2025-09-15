@@ -57,13 +57,14 @@ const Navbar = () => {
         } md:block`}
       >
         <div className="flex flex-col md:flex-row md:items-center md:space-x-6 p-4 md:p-0">
-          <a
-            href="#home"
+          {/* Changed from href="#home" to Link to="/" */}
+          <Link
+            to="/"
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
             onClick={() => setMobileMenuOpen(false)}
           >
             Home
-          </a>
+          </Link>
           <a
             href="#categories"
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
@@ -124,7 +125,10 @@ const Navbar = () => {
                 </Link>
                 <Link
                   className="block px-4 py-3 hover:bg-gray-100 text-gray-700"
-                  onClick={() => logout(currentUser.type)}
+                  onClick={() => {
+                    logout(currentUser.type);
+                    setDropdownOpen(false);
+                  }}
                 >
                   Logout
                 </Link>

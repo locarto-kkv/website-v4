@@ -1,8 +1,9 @@
+// src/pages/LandingPage.jsx
 import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const Home = () => {
+const LandingPage = () => {
   return (
     <>
       <Navbar />
@@ -187,4 +188,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default LandingPage;
