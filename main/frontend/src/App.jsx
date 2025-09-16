@@ -4,8 +4,9 @@ import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 
 // Public Pages
-import Homepage from "./pages/Homepage";
+import Homepage from "./pages/homepage";
 import LandingPage from "./pages/landingpage";
+import AuthConsumer from "./pages/consumer/authConsumer"; // Add this import
 import AuthVendor from "./pages/vendor/authVendor";
 // Vendor Pages and Layout
 import VendorDashboardLayout from "./components/vendor/VendorDashboardLayout";
@@ -37,6 +38,10 @@ function App() {
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<Homepage />} />
         <Route path="/landing" element={<LandingPage />} />
+        <Route
+          path="/consumer/login"
+          element={currentUser ? <Navigate to="/dashboard" /> : <AuthConsumer />}
+        />
         <Route
           path="/vendor/login"
           element={currentUser ? <Navigate to="/vendor/dashboard" /> : <AuthVendor />}
