@@ -31,7 +31,6 @@ function App() {
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<Homepage />} />
         <Route path="/landing" element={<LandingPage />} />
-
         <Route path="vendor/*" element={<VendorRoutes />} />
         <Route path="consumer/*" element={<ConsumerRoutes />} />
       </Routes>

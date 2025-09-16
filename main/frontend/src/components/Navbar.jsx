@@ -1,15 +1,37 @@
 // src/components/Navbar.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import SideCart from "../pages/consumer/SideCart.jsx"
+import { ConsumerListService } from "../services/consumer/consumerListService";
 
 const Navbar = ({ pageType = "landing" }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { currentUser, logout } = useAuthStore();
+  const { getList } = ConsumerListService;
+
+  // Load cart items
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        const res = await getList();
+        if (res.cart) {
+          setCartItems(res.cart);
+        }
+      } catch (error) {
+        console.log("Error loading cart items");
+      }
+    };
+    loadCart();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -42,7 +64,45 @@ const Navbar = ({ pageType = "landing" }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  console.log("Navbar: userType: ", currentUser?.type, "pageType:", pageType);
+  // Toggle cart open/close
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen);
+  };
+
+  // Handle navigation to sections
+  const handleSectionNavigation = (sectionId) => {
+    setMobileMenuOpen(false);
+    
+    // If already on landing page, scroll to section
+    if (location.pathname === "/landing") {
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      // Navigate to landing page with hash
+      navigate(`/landing#${sectionId}`);
+    }
+  };
+
+  // Handle dashboard navigation based on user role with auto-scroll to top
+  const handleDashboardNavigation = () => {
+    setDropdownOpen(false);
+    
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Navigate to appropriate dashboard
+    if (currentUser?.type === "vendor") {
+      navigate("/vendor/dashboard");
+    } else if (currentUser?.type === "consumer") {
+      navigate("/consumer/dashboard");
+    } else {
+      navigate("/consumer/login");
+    }
+  };
 
   return (
     <nav className="bg-white shadow-md py-3 px-4 flex justify-between items-center sticky top-0 z-50">
@@ -77,39 +137,47 @@ const Navbar = ({ pageType = "landing" }) => {
           >
             {pageType === "homepage" ? "About Us" : "Home"}
           </Link>
-          <a
-            href="#categories"
-            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
-            onClick={() => setMobileMenuOpen(false)}
+          
+          {/* Categories Button */}
+          <button
+            onClick={() => handleSectionNavigation('categories')}
+            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
           >
             Categories
-          </a>
-          <a
-            href="#how-it-works"
-            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
-            onClick={() => setMobileMenuOpen(false)}
+          </button>
+          
+          {/* How It Works Button */}
+          <button
+            onClick={() => handleSectionNavigation('how-it-works')}
+            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
           >
             How It Works
-          </a>
-          <a
-            href="#testimonials"
-            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
-            onClick={() => setMobileMenuOpen(false)}
+          </button>
+          
+          {/* Testimonials Button */}
+          <button
+            onClick={() => handleSectionNavigation('testimonials')}
+            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
           >
             Testimonials
-          </a>
+          </button>
         </div>
       </div>
 
       {/* Right Side Elements */}
       <div className="flex items-center space-x-3">
-        {/* Cart Icon */}
-        <Link
-          to="/cart"
-          className="text-gray-700 hover:text-orange-500 transition-colors"
+        {/* Cart Icon - Click to open side cart */}
+        <button
+          onClick={toggleCart}
+          className="text-gray-700 hover:text-orange-500 transition-colors relative"
         >
           <i className="fas fa-shopping-cart text-lg"></i>
-        </Link>
+          {cartItems.length > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {cartItems.length}
+            </span>
+          )}
+        </button>
 
         {/* Circular Login Button */}
         <div className="relative">
@@ -128,13 +196,12 @@ const Navbar = ({ pageType = "landing" }) => {
                 ref={dropdownRef}
                 className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50"
               >
-                <Link
-                  to="/vendor/dashboard"
-                  className="block px-4 py-3 hover:bg-gray-100 border-b border-gray-100 text-gray-700"
-                  onClick={() => setDropdownOpen(false)}
+                <button
+                  onClick={handleDashboardNavigation}
+                  className="block w-full text-left px-4 py-3 hover:bg-gray-100 border-b border-gray-100 text-gray-700"
                 >
                   Dashboard
-                </Link>
+                </button>
                 <button
                   className="block w-full text-left px-4 py-3 hover:bg-gray-100 text-gray-700"
                   onClick={() => {
@@ -168,6 +235,9 @@ const Navbar = ({ pageType = "landing" }) => {
             ))}
         </div>
       </div>
+
+      {/* Side Cart */}
+      <SideCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>
   );
 };
