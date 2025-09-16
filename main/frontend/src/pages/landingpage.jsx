@@ -1,12 +1,12 @@
-// src/pages/LandingPage.jsx
+// src/pages/landingpage.jsx
 import React from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar"; // Use existing Navbar
 import Footer from "../components/Footer";
 
 const LandingPage = () => {
   return (
     <>
-      <Navbar />
+      <Navbar pageType="landing" /> {/* Specify it's the landing page */}
       <main id="home" className="active">
         {/* Hero Section */}
         <section className="hero-gradient text-white py-16 md:py-24 px-6">
@@ -19,13 +19,13 @@ const LandingPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <a
-                href="/login/customer"
+                href="/consumer/login"
                 className="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white/10 transition"
               >
                 Shop Now
               </a>
               <a
-                href="/login/vendor"
+                href="/vendor/login"
                 className="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white/10 transition"
               >
                 Sell With Us

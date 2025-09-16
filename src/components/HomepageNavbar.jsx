@@ -1,9 +1,9 @@
-// src/components/Navbar.jsx
+// src/components/HomepageNavbar.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 
-const Navbar = ({ pageType = "landing" }) => {
+const HomepageNavbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -42,7 +42,7 @@ const Navbar = ({ pageType = "landing" }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  console.log("Navbar: userType: ", currentUser?.type, "pageType:", pageType);
+  console.log("Homepage Navbar: userType: ", currentUser?.type);
 
   return (
     <nav className="bg-white shadow-md py-3 px-4 flex justify-between items-center sticky top-0 z-50">
@@ -71,11 +71,11 @@ const Navbar = ({ pageType = "landing" }) => {
       >
         <div className="flex flex-col md:flex-row md:items-center md:space-x-6 p-4 md:p-0">
           <Link
-            to={pageType === "homepage" ? "/landing" : "/"}
+            to="/landing"
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
             onClick={() => setMobileMenuOpen(false)}
           >
-            {pageType === "homepage" ? "About Us" : "Home"}
+            About Us
           </Link>
           <a
             href="#categories"
@@ -172,4 +172,4 @@ const Navbar = ({ pageType = "landing" }) => {
   );
 };
 
-export default Navbar;
+export default HomepageNavbar;
