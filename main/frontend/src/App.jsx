@@ -1,25 +1,14 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 
 // Public Pages
 import Homepage from "./pages/homepage";
 import LandingPage from "./pages/landingpage";
-import AuthConsumer from "./pages/consumer/authConsumer"; // Add this import
-import AuthVendor from "./pages/vendor/authVendor";
-// Vendor Pages and Layout
-import VendorDashboardLayout from "./components/vendor/VendorDashboardLayout";
-import VendorDashboard from "./pages/vendor/vendorDashboard";
-import VendorProfile from "./components/vendor/VendorProfile";
-import VendorAnalytics from "./components/vendor/VendorAnalytics";
-import VendorSettings from "./components/vendor/VendorSettings";
 
-// A component to protect routes
-const ProtectedRoute = () => {
-  const { currentUser } = useAuthStore();
-  return currentUser ? <Outlet /> : <Navigate to="/vendor/login" replace />;
-};
+import VendorRoutes from "./pages/vendor/vendorRoutes";
+import ConsumerRoutes from "./pages/consumer/consumerRoutes";
 
 function App() {
   const { currentUser, authLoading, checkAuth } = useAuthStore();
@@ -29,7 +18,11 @@ function App() {
   }, [checkAuth]);
 
   if (authLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -38,26 +31,11 @@ function App() {
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<Homepage />} />
         <Route path="/landing" element={<LandingPage />} />
-        <Route
-          path="/consumer/login"
-          element={currentUser ? <Navigate to="/dashboard" /> : <AuthConsumer />}
-        />
-        <Route
-          path="/vendor/login"
-          element={currentUser ? <Navigate to="/vendor/dashboard" /> : <AuthVendor />}
-        />
 
-        {/* --- PROTECTED VENDOR ROUTES --- */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/vendor" element={<VendorDashboardLayout />}>
-            <Route index element={<VendorDashboard />} />
-            <Route path="dashboard" element={<VendorDashboard />} />
-            <Route path="profile" element={<VendorProfile />} />
-            <Route path="analytics" element={<VendorAnalytics />} />
-            <Route path="settings" element={<VendorSettings />} />
-          </Route>
-        </Route>
+        <Route path="vendor/*" element={<VendorRoutes />} />
+        <Route path="consumer/*" element={<ConsumerRoutes />} />
       </Routes>
+
       <Toaster />
     </div>
   );

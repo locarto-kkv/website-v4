@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
 import { VendorOrderService } from "../../services/vendor/vendorOrderService";
 import { VendorProductService } from "../../services/vendor/vendorProductService";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -12,8 +11,8 @@ import TopSellingProducts from "../../components/vendor/TopSellingProducts";
 // NOTE: We remove imports for Layout components like Navbar and Sidebar
 
 const VendorDashboard = () => {
-  const { showAddProduct } = useOutletContext(); // Get state from layout
-  
+  const { showAddProduct } = useState();
+
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
 
