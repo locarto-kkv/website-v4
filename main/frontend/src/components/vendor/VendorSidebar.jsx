@@ -11,7 +11,7 @@ const VendorSidebar = ({ onNavigate }) => {
   return (
     <div className="w-64 bg-white shadow-md p-4 h-screen sticky top-0">
       <ul className="space-y-3 pt-4">
-         <li>
+        <li>
           <button
             onClick={() => onNavigate("/vendor/dashboard")}
             className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
@@ -29,6 +29,16 @@ const VendorSidebar = ({ onNavigate }) => {
             }`}
           >
             Analytics
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => onNavigate("/vendor/products")}
+            className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
+              activePath.endsWith('/products') ? activeClass : inactiveClass
+            }`}
+          >
+            Products
           </button>
         </li>
         <li>

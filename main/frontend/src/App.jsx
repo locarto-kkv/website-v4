@@ -10,7 +10,9 @@ import Homepage from "./pages/homepage";
 import LandingPage from "./pages/landingpage";
 import MapView from "./components/MapView";
 
+// Vendor Pages
 import VendorRoutes from "./pages/vendor/vendorRoutes";
+
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
 
 function App() {
@@ -34,9 +36,11 @@ function App() {
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<Homepage />} />
         <Route path="/landing" element={<LandingPage />} />
-        <Route path="/test-map" element={<TestMap />} /> {/* Add this test route */}
-        <Route path="/map" element={<MapView />} />
+        
+        {/* --- VENDOR ROUTES --- */}
         <Route path="vendor/*" element={<VendorRoutes />} />
+        
+        {/* --- CONSUMER ROUTES --- */}
         <Route path="consumer/*" element={<ConsumerRoutes />} />
       </Routes>
 
