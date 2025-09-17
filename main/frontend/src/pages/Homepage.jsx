@@ -2,7 +2,7 @@
 import React from "react";
 import SearchIcon from "../components/SearchIcon";
 import CharacterIcon from "../components/CharacterIcon";
-import Navbar from "../components/Navbar"; // Use existing Navbar
+import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 
 const Homepage = () => {
@@ -28,7 +28,7 @@ const Homepage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar pageType="homepage" /> {/* Specify it's the homepage */}
+      <Navbar pageType="homepage" />
       
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center p-8">
@@ -42,9 +42,10 @@ const Homepage = () => {
             
             {/* Right Side - Text and Search */}
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+              {/* Make this clickable to go to map */}
+              <Link to="/map" className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight hover:text-orange-500 transition-colors cursor-pointer block">
                 What are you in the mood for today?
-              </h1>
+              </Link>
               
               <div className="relative inline-block">
                 <input
@@ -54,6 +55,12 @@ const Homepage = () => {
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <SearchIcon />
+                </div>
+                {/* Globe Icon - Also links to map */}
+                <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
+                  <Link to="/map" className="text-gray-600 hover:text-orange-500 transition">
+                    <i className="fas fa-globe text-xl"></i>
+                  </Link>
                 </div>
               </div>
             </div>

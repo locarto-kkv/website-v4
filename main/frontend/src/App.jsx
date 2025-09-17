@@ -1,17 +1,20 @@
+// src/App.jsx
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
+import TestMap from "./components/TestMap";
 
 // Public Pages
 import Homepage from "./pages/homepage";
 import LandingPage from "./pages/landingpage";
+import MapView from "./components/MapView";
 
 import VendorRoutes from "./pages/vendor/vendorRoutes";
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
 
 function App() {
-  const { currentUser, authLoading, checkAuth } = useAuthStore();
+  const { authLoading, checkAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
@@ -31,6 +34,8 @@ function App() {
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<Homepage />} />
         <Route path="/landing" element={<LandingPage />} />
+        <Route path="/test-map" element={<TestMap />} /> {/* Add this test route */}
+        <Route path="/map" element={<MapView />} />
         <Route path="vendor/*" element={<VendorRoutes />} />
         <Route path="consumer/*" element={<ConsumerRoutes />} />
       </Routes>
