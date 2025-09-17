@@ -1,30 +1,51 @@
 // src/pages/Homepage.jsx
-import React from "react";
+import React, { useState } from "react";
 import SearchIcon from "../components/SearchIcon";
 import CharacterIcon from "../components/CharacterIcon";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 
 const Homepage = () => {
-  const [isLoginDropdownOpen, setIsLoginDropdownOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showError, setShowError] = useState(false);
+  const [suggestedCategory, setSuggestedCategory] = useState('');
 
-  const toggleLoginDropdown = () => {
-    setIsLoginDropdownOpen(!isLoginDropdownOpen);
+  // Available categories
+  const availableCategories = ['bakery', 'restaurant', 'cafe'];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    
+    if (searchQuery.trim() === '') {
+      return;
+    }
+    
+    const normalizedQuery = searchQuery.toLowerCase().trim();
+    const foundCategory = availableCategories.find(category => 
+      category.includes(normalizedQuery)
+    );
+    
+    if (foundCategory) {
+      // Redirect to map with selected category
+      window.location.href = `/map?category=${foundCategory}`;
+    } else {
+      // Show error message with suggestion
+      setShowError(true);
+      setSuggestedCategory(availableCategories[0]); // Suggest first available category
+    }
   };
 
-  // Close dropdown when clicking outside
-  React.useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isLoginDropdownOpen && !event.target.closest('.login-dropdown')) {
-        setIsLoginDropdownOpen(false);
-      }
-    };
+  const handleInputChange = (e) => {
+    setSearchQuery(e.target.value);
+    // Clear error when typing
+    if (showError) {
+      setShowError(false);
+    }
+  };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [isLoginDropdownOpen]);
+  const handleSuggestionClick = (category) => {
+    window.location.href = `/map?category=${category}`;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,14 +63,15 @@ const Homepage = () => {
             
             {/* Right Side - Text and Search */}
             <div className="flex-1">
-              {/* Make this clickable to go to map */}
-              <Link to="/map" className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight hover:text-orange-500 transition-colors cursor-pointer block">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
                 What are you in the mood for today?
-              </Link>
+              </h1>
               
-              <div className="relative inline-block">
+              <form onSubmit={handleSearch} className="relative inline-block">
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={handleInputChange}
                   placeholder="Search..."
                   className="w-80 md:w-96 px-4 py-3 rounded-full border-2 border-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-900 placeholder-gray-600"
                 />
@@ -62,9 +84,39 @@ const Homepage = () => {
                     <i className="fas fa-globe text-xl"></i>
                   </Link>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
+          
+          {/* Error Message */}
+          {showError && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-bold text-red-600">Oops!</h3>
+                  <button 
+                    onClick={() => setShowError(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+                <p className="text-gray-700 mb-4">The category "{searchQuery}" is not available yet.</p>
+                <p className="text-gray-700 mb-6">Try one of these popular categories:</p>
+                <div className="flex space-x-2">
+                  {availableCategories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => handleSuggestionClick(category)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                    >
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
