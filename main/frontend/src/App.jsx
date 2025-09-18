@@ -35,6 +35,7 @@ function App() {
       <Routes>
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<Homepage />} />
+        <Route path="/map" element={<MapView />} />
         <Route path="/landing" element={<LandingPage />} />
         
         {/* --- VENDOR ROUTES --- */}
