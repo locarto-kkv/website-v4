@@ -51,7 +51,6 @@ const VendorSidebar = ({ onNavigate }) => {
             Products
           </button>
         </li>
-        {/* Support Button Added Here */}
         <li>
           <button
             onClick={() => onNavigate("/vendor/settings")}

@@ -6,276 +6,168 @@ const VendorProfile = () => {
     email: '',
     phone: '',
     address: '',
+    website: '',
   });
 
   const [documents, setDocuments] = useState([
-    { name: 'BusinessLicense.pdf', size: '1.2MB' },
-    { name: 'TaxID.pdf', size: '800KB' },
+    { name: 'Business_License.pdf', size: '1.2MB' },
+    { name: 'Tax_ID_Verification.pdf', size: '800KB' },
+    { name: 'Insurance_Certificate.pdf', size: '500KB' },
   ]);
-
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [newEmail, setNewEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   // In a real app, you would fetch the vendor's data when the component loads
   useEffect(() => {
-    // Example: fetchVendorData().then(data => setProfileData(data));
     setProfileData({
-      companyName: 'Lucario Merge Inc.',
-      email: 'contact@lucariomerge.com',
-      phone: '+91 98765 43210',
-      address: '123 Tech Park, Innovation Drive, Mumbai, Maharashtra, 400076',
+      companyName: 'Apex Innovations Inc.',
+      email: 'info@apexinnovations.com',
+      phone: '+1 (555) 123-4567',
+      address: '123 Tech Park Avenue, Suite 101, Silicon Valley, CA 94043, USA',
+      website: 'https://www.apexinnovations.com',
     });
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProfileData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    const newFiles = Array.from(e.target.files);
-    // Handle the file upload logic here
-    console.log(newFiles);
-  };
-  
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Logic to save updated profile data to the backend
-    console.log('Saving profile data:', profileData);
-    alert('Profile updated successfully!');
-  };
-
-  const handleEditEmailClick = () => {
-    setNewEmail(profileData.email);
-    setPassword('');
-    setShowPasswordModal(true);
-  };
-
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    // In a real app, you would verify the password with your backend
-    // For demo purposes, we'll just check if password is not empty
-    if (password.trim() !== '') {
-      setIsEditingEmail(true);
-      setShowPasswordModal(false);
-      setPassword('');
-    } else {
-      alert('Please enter your password');
-    }
-  };
-
-  const handleEmailChange = (e) => {
-    setNewEmail(e.target.value);
-  };
-
-  const handleSaveEmail = () => {
-    setProfileData(prev => ({ ...prev, email: newEmail }));
-    setIsEditingEmail(false);
-  };
-
-  const handleCancelEmailEdit = () => {
-    setIsEditingEmail(false);
-    setNewEmail(profileData.email);
+  const handleDownloadDocument = (fileName) => {
+    // In a real app, this would trigger a file download
+    alert(`Downloading ${fileName}...`);
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">
-        Vendor Profile
-      </h1>
+    <div className="p-4 bg-gray-50 min-h-screen">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Vendor Profile</h1>
       
-      <form onSubmit={handleSubmit} className="space-y-8">
-
-        {/* Company Information Section */}
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold text-secondary mb-4">Company Information</h2>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Company Name</label>
-              <input
-                type="text"
-                name="companyName"
-                id="companyName"
-                value={profileData.companyName}
-                onChange={handleChange}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Profile Information */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-start space-x-6 mb-8">
+              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4 0V5a2 2 0 012-2h2a2 2 0 012 2v2m-4 0V5a2 2 0 012-2h2a2 2 0 012 2v2m-4 0V5a2 2 0 012-2h2a2 2 0 012 2v2" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800">{profileData.companyName}</h2>
+                <p className="text-gray-600">{profileData.email}</p>
+                <p className="text-gray-600">{profileData.phone}</p>
+              </div>
             </div>
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
-              <textarea
-                name="address"
-                id="address"
-                rows="3"
-                value={profileData.address}
-                onChange={handleChange}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-              ></textarea>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">Address</h3>
+                <p className="text-gray-600">{profileData.address}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">Website</h3>
+                <a 
+                  href={profileData.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-orange-600 hover:text-orange-700 transition-colors"
+                >
+                  {profileData.website}
+                </a>
+              </div>
+            </div>
+
+            <div className="border-t pt-6">
+              <h3 className="font-semibold text-gray-800 mb-4">Uploaded Documents</h3>
+              <div className="space-y-3">
+                {documents.map((doc, index) => (
+                  <div 
+                    key={index} 
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+                    onClick={() => handleDownloadDocument(doc.name)}
+                  >
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span className="text-gray-800">{doc.name}</span>
+                    </div>
+                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-        
-        {/* Contact & Security Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-xl font-semibold text-secondary mb-4">Contact Details</h2>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
-                <div className="mt-1 flex items-center">
-                  {isEditingEmail ? (
-                    <>
-                      <input
-                        type="email"
-                        value={newEmail}
-                        onChange={handleEmailChange}
-                        className="block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                      />
-                      <div className="ml-2 flex space-x-1">
-                        <button
-                          type="button"
-                          onClick={handleSaveEmail}
-                          className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600"
-                          title="Save"
-                        >
-                          <i className="fas fa-check"></i>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleCancelEmailEdit}
-                          className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600"
-                          title="Cancel"
-                        >
-                          <i className="fas fa-times"></i>
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <input
-                        type="email"
-                        value={profileData.email}
-                        readOnly
-                        className="block w-full p-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleEditEmailClick}
-                        className="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-700 p-3 rounded-lg"
-                        title="Edit Email"
-                      >
-                        <i className="fas fa-pen"></i>
-                      </button>
-                    </>
-                  )}
-                </div>
+
+        {/* Account Milestones Sidebar */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Account Milestones</h2>
+          
+          <div className="space-y-6">
+            <div>
+              <div className="flex justify-between text-sm text-gray-600 mb-1">
+                <span>Orders Completed</span>
+                <span className="text-orange-600 font-medium">250/500</span>
               </div>
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  id="phone"
-                  value={profileData.phone}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                />
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: '50%' }}
+                ></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Vendor Since</div>
+              <div className="font-medium text-gray-800">January 15, 2022</div>
+            </div>
+
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Ratings</div>
+              <div className="flex items-center">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <svg 
+                      key={i} 
+                      className={`w-5 h-5 ${i < 4 ? 'text-yellow-400' : 'text-gray-300'}`}
+                      fill="currentColor" 
+                      viewBox="0 0 20 20" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.122a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.122a1 1 0 00-1.175 0l-3.976 2.122c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.122c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  ))}
+                </div>
+                <span className="ml-2 font-medium text-gray-800">4.5</span>
+                <span className="text-gray-500">(128 reviews)</span>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm text-gray-600 mb-3">Earned Badges</div>
+              <div className="flex space-x-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.122a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.122a1 1 0 00-1.175 0l-3.976 2.122c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.122c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
+                </div>
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.041 11.041 0 006.105 6.105l.774-1.548a1 1 0 011.058-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C9.716 18 3 11.284 3 6V3z" />
+                  </svg>
+                </div>
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-xl font-semibold text-secondary mb-4">Security</h2>
-            <p className="text-sm text-gray-600 mb-4">Manage your account security settings.</p>
-            <button type="button" className="w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 rounded-lg transition font-medium">
-              Change Password
+
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <button className="w-full px-6 py-3 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors">
+              View Membership Status
             </button>
           </div>
         </div>
-
-        {/* Documents Section */}
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold text-secondary mb-4">Documents</h2>
-          <div className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <i className="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
-              <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-orange-600">
-                <span>Upload a file</span>
-                <input id="file-upload" name="file-upload" type="file" multiple className="sr-only" onChange={handleFileChange} />
-              </label>
-              <p className="text-xs text-gray-500 mt-1">PDF, PNG, JPG up to 10MB</p>
-            </div>
-            <ul className="divide-y divide-gray-200">
-              {documents.map((doc, index) => (
-                <li key={index} className="py-3 flex items-center justify-between">
-                  <div className="flex items-center">
-                    <i className="fas fa-file-alt text-gray-500 text-xl"></i>
-                    <span className="ml-3 font-medium text-gray-800">{doc.name}</span>
-                  </div>
-                  <span className="text-sm text-gray-500">{doc.size}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        
-        {/* Save Button */}
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="px-8 py-3 bg-primary text-white rounded-lg font-bold hover:bg-orange-600 transition"
-          >
-            Save Changes
-          </button>
-        </div>
-
-      </form>
-
-      {/* Password Confirmation Modal */}
-      {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div className="p-6">
-              <h3 className="text-xl font-bold mb-4">Confirm Password</h3>
-              <p className="text-gray-600 mb-4">Please enter your password to edit your email address</p>
-              
-              <form onSubmit={handlePasswordSubmit}>
-                <div className="mb-4">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
-                    placeholder="Enter your password"
-                    autoFocus
-                  />
-                </div>
-                
-                <div className="flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowPasswordModal(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-orange-600"
-                  >
-                    Confirm
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

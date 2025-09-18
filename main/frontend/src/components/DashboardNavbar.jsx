@@ -42,13 +42,14 @@ const Navbar = ({ cartItems = [] }) => {
     <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center sticky top-0 z-50">
       {/* Left side: Brand + Dashboard type */}
       <div className="flex items-center">
-        <div className="text-2xl font-bold text-secondary">
+        <div className="text-2xl font-bold text-orange-500">
           <Link to="/">Locarto</Link>
         </div>
-        <span className="ml-4 bg-orange-100 text-secondary text-sm font-medium px-3 py-1 rounded-full">
+        <span className="ml-4 bg-orange-100 text-sm font-medium px-3 py-1 rounded-full">
           {isVendor ? "Vendor Dashboard" : "Customer Dashboard"}
         </span>
       </div>
+
 
       {/* Right side: Actions */}
       <div className="flex items-center space-x-4">
