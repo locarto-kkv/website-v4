@@ -91,7 +91,7 @@ const VendorProducts = () => {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto p-8">
+      <div className="p-6 bg-gray-50 min-h-screen">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
@@ -100,39 +100,41 @@ const VendorProducts = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">My Products</h1>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Page Title */}
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">My Products</h1>
+
+      {/* Top Tabs - Matching Analytics Style */}
+      <div className="flex border-b border-gray-200 mb-6">
+        {predefinedCategories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`px-4 py-2 font-medium ${
+              selectedCategory === category
+                ? 'text-orange-600 border-b-2 border-orange-600'
+                : 'text-gray-600 hover:text-gray-800 border-b-2 border-transparent'
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+      {/* Category Filter Bar */}
+
+      {/* Action Button */}
+      <div className="flex justify-end mb-6">
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition"
+          className="flex items-center bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition"
         >
           <i className="fas fa-plus mr-2"></i>
           Add Product
         </button>
       </div>
 
-      {/* Category Filter Bar */}
-      <div className="mb-6 overflow-x-auto">
-        <div className="flex space-x-2 pb-2">
-          {predefinedCategories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
-                selectedCategory === category
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {filteredProducts.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-md p-12 text-center">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center">
           <i className="fas fa-box-open text-5xl text-gray-300 mb-4"></i>
           <h3 className="text-xl font-semibold text-gray-700 mb-2">
             {selectedCategory === 'All' 
@@ -146,7 +148,7 @@ const VendorProducts = () => {
           </p>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-primary hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition"
+            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition"
           >
             Add Product
           </button>
@@ -154,8 +156,8 @@ const VendorProducts = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-              <div className="h-48 bg-gray-200 flex items-center justify-center">
+            <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
+              <div className="h-48 bg-gray-100 flex items-center justify-center">
                 {product.image ? (
                   <img 
                     src={product.image} 
@@ -172,7 +174,13 @@ const VendorProducts = () => {
                     <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
                     <p className="text-gray-500 text-sm mt-1">{product.category}</p>
                   </div>
-                  <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded ${
+                    product.stock > 10 
+                      ? 'bg-green-100 text-green-800' 
+                      : product.stock > 0 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-red-100 text-red-800'
+                  }`}>
                     {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                   </span>
                 </div>
@@ -180,7 +188,7 @@ const VendorProducts = () => {
                 <div className="mt-4 flex justify-between items-center">
                   <span className="text-lg font-bold text-gray-900">{formatCurrency(product.price)}</span>
                   <div className="flex space-x-2">
-                    <button className="text-gray-500 hover:text-primary">
+                    <button className="text-gray-500 hover:text-orange-600">
                       <i className="fas fa-edit"></i>
                     </button>
                     <button className="text-gray-500 hover:text-red-500">
@@ -221,7 +229,7 @@ const VendorProducts = () => {
                       value={newProduct.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600"
                       placeholder="Enter product name"
                     />
                   </div>
@@ -236,7 +244,7 @@ const VendorProducts = () => {
                       onChange={handleInputChange}
                       required
                       rows="3"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600"
                       placeholder="Enter product description"
                     ></textarea>
                   </div>
@@ -254,7 +262,7 @@ const VendorProducts = () => {
                         required
                         min="0"
                         step="0.01"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600"
                         placeholder="0.00"
                       />
                     </div>
@@ -270,7 +278,7 @@ const VendorProducts = () => {
                         onChange={handleInputChange}
                         required
                         min="0"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600"
                         placeholder="0"
                       />
                     </div>
@@ -285,7 +293,7 @@ const VendorProducts = () => {
                       value={newProduct.category}
                       onChange={handleInputChange}
                       required
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600"
                     >
                       <option value="">Select category</option>
                       {predefinedCategories.slice(1).map(category => (
@@ -332,7 +340,7 @@ const VendorProducts = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-orange-600"
+                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
                   >
                     Add Product
                   </button>

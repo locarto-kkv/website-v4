@@ -33,6 +33,16 @@ const VendorSidebar = ({ onNavigate }) => {
         </li>
         <li>
           <button
+            onClick={() => onNavigate("/vendor/support")}
+            className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
+              activePath.endsWith('/support') ? activeClass : inactiveClass
+            }`}
+          >
+            Support
+          </button>
+        </li>
+        <li>
+          <button
             onClick={() => onNavigate("/vendor/products")}
             className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
               activePath.endsWith('/products') ? activeClass : inactiveClass
@@ -41,6 +51,7 @@ const VendorSidebar = ({ onNavigate }) => {
             Products
           </button>
         </li>
+        {/* Support Button Added Here */}
         <li>
           <button
             onClick={() => onNavigate("/vendor/settings")}
