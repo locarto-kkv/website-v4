@@ -102,7 +102,7 @@ const MapView = () => {
     }
   };
 
-  // Initialize or update map
+  // Initialize or update map with custom blue style
   const initializeOrUpdateMap = async () => {
     if (typeof window !== 'undefined') {
       try {
@@ -127,11 +127,58 @@ const MapView = () => {
         let map = mapInstance;
         if (!map) {
           map = L.map('map-container').setView([19.0760, 72.8777], 12);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(map);
           setMapInstance(map);
         }
+
+        // Clear existing tile layer
+        if (map.tileLayer) {
+          map.tileLayer.remove();
+        }
+
+        // Create custom blue map style
+        const customBlueStyle = L.tileLayer(
+          'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+          {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            maxZoom: 19,
+            minZoom: 2,
+            opacity: 1,
+          }
+        ).addTo(map);
+
+        // Store reference to tile layer
+        map.tileLayer = customBlueStyle;
+
+        // Add custom CSS for better styling
+        const style = document.createElement('style');
+        style.textContent = `
+          .leaflet-pane {
+            z-index: 1;
+          }
+          
+          .leaflet-tile {
+            filter: brightness(1.2);
+          }
+          
+          .leaflet-label {
+            color: #ffffff !important;
+            font-weight: bold;
+          }
+          
+          .leaflet-popup-content-wrapper {
+            background-color: rgba(0, 0, 64, 0.9) !important;
+            border: 1px solid #ffffff !important;
+          }
+          
+          .leaflet-popup-content {
+            color: #ffffff !important;
+          }
+          
+          .leaflet-popup-tip {
+            border-bottom-color: #ffffff !important;
+          }
+        `;
+        document.head.appendChild(style);
 
         // Clear existing markers
         clearMarkers();
@@ -194,6 +241,9 @@ const MapView = () => {
     return () => {
       clearMarkers();
       if (mapInstance) {
+        if (mapInstance.tileLayer) {
+          mapInstance.tileLayer.remove();
+        }
         mapInstance.remove();
         setMapInstance(null);
       }
@@ -204,22 +254,19 @@ const MapView = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-blue-900 relative">
-      {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-blue-900/90 to-transparent p-4">
-        <div className="flex justify-between items-center">
-          <div className="text-orange-500 text-xl font-bold">LOCARTO</div>
-          <Link 
-            to="/" 
-            className="text-white hover:text-orange-500 transition"
-          >
-            <i className="fas fa-arrow-left"></i>
-          </Link>
-        </div>
+    <div className="min-h-screen bg-transparent relative">
+      {/* Back Arrow - Top Left */}
+      <div className="absolute top-4 right-4 z-50">
+        <Link 
+          to="/" 
+          className="bg-white/20 hover:bg-white/30 text-white rounded-full w-10 h-10 flex items-center justify-center transition"
+        >
+          <i className="fas fa-arrow-left text-xl"></i>
+        </Link>
       </div>
       
       {/* Map Container */}
-      <div className="h-screen pt-16 pb-20 relative">
+      <div className="h-screen pt-0 pb-0 relative">
         <div id="map-container" className="w-full h-full"></div>
         
         {/* Product Card when marker is clicked - Highest z-index to ensure visibility */}
@@ -265,8 +312,8 @@ const MapView = () => {
         )}
       </div>
       
-      {/* Category Selector */}
-      <div className="absolute bottom-4 left-4 right-4 z-50">
+      {/* Category Selector - Top Center */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
         <div className="flex justify-center space-x-2">
           <button
             onClick={() => setSelectedCategory('bakery')}
