@@ -6,6 +6,7 @@ const VendorProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [newProduct, setNewProduct] = useState({
     name: '',
     description: '',
@@ -14,6 +15,22 @@ const VendorProducts = () => {
     category: '',
     image: null
   });
+
+  // Predefined categories list
+  const predefinedCategories = [
+    'All',
+    'Electronics',
+    'Clothing',
+    'Home & Kitchen',
+    'Books',
+    'Beauty'
+  ];
+
+  // Extract unique categories from products (including predefined ones)
+  const availableCategories = [...new Set([
+    ...predefinedCategories,
+    ...products.map(product => product.category)
+  ])].filter(category => category); // Remove empty categories
 
   useEffect(() => {
     fetchProducts();
@@ -44,7 +61,6 @@ const VendorProducts = () => {
     e.preventDefault();
     try {
       const productService = new VendorProductService();
-      // In a real app, you'd handle image upload separately
       await productService.addProduct(newProduct);
       setShowAddModal(false);
       setNewProduct({
@@ -67,6 +83,11 @@ const VendorProducts = () => {
       currency: 'USD'
     }).format(amount);
   };
+
+  // Filter products based on selected category
+  const filteredProducts = selectedCategory === 'All' 
+    ? products 
+    : products.filter(product => product.category === selectedCategory);
 
   if (loading) {
     return (
@@ -91,21 +112,48 @@ const VendorProducts = () => {
         </button>
       </div>
 
-      {products.length === 0 ? (
+      {/* Category Filter Bar */}
+      <div className="mb-6 overflow-x-auto">
+        <div className="flex space-x-2 pb-2">
+          {predefinedCategories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
+                selectedCategory === category
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {filteredProducts.length === 0 ? (
         <div className="bg-white rounded-xl shadow-md p-12 text-center">
           <i className="fas fa-box-open text-5xl text-gray-300 mb-4"></i>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No products yet</h3>
-          <p className="text-gray-500 mb-6">Get started by adding your first product</p>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            {selectedCategory === 'All' 
+              ? 'No products yet' 
+              : `No products in ${selectedCategory}`}
+          </h3>
+          <p className="text-gray-500 mb-6">
+            {selectedCategory === 'All' 
+              ? 'Get started by adding your first product' 
+              : `Add products to the ${selectedCategory} category`}
+          </p>
           <button
             onClick={() => setShowAddModal(true)}
             className="bg-primary hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition"
           >
-            Add Your First Product
+            Add Product
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
               <div className="h-48 bg-gray-200 flex items-center justify-center">
                 {product.image ? (
@@ -240,11 +288,9 @@ const VendorProducts = () => {
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
                     >
                       <option value="">Select category</option>
-                      <option value="Electronics">Electronics</option>
-                      <option value="Clothing">Clothing</option>
-                      <option value="Home & Kitchen">Home & Kitchen</option>
-                      <option value="Books">Books</option>
-                      <option value="Beauty">Beauty</option>
+                      {predefinedCategories.slice(1).map(category => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
                     </select>
                   </div>
                   
