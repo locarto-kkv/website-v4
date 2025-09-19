@@ -3,15 +3,16 @@ import React, { useState } from "react";
 import SearchIcon from "../components/SearchIcon";
 import CharacterIcon from "../components/CharacterIcon";
 import Navbar from "../components/Navbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Homepage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showError, setShowError] = useState(false);
   const [suggestedCategory, setSuggestedCategory] = useState('');
+  const navigate = useNavigate();
 
   // Available categories
-  const availableCategories = ['bakery', 'restaurant', 'cafe'];
+  const availableCategories = ['wellness', 'lifestyle', 'accessories'];
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ const Homepage = () => {
     
     if (foundCategory) {
       // Redirect to map with selected category
-      window.location.href = `/map?category=${foundCategory}`;
+      navigate(`/map?category=${foundCategory}`);
     } else {
       // Show error message with suggestion
       setShowError(true);
@@ -44,7 +45,13 @@ const Homepage = () => {
   };
 
   const handleSuggestionClick = (category) => {
-    window.location.href = `/map?category=${category}`;
+    navigate(`/map?category=${category}`);
+    closeError();
+  };
+
+  const closeError = () => {
+    setShowError(false);
+    setSearchQuery('');
   };
 
   return (
@@ -87,38 +94,38 @@ const Homepage = () => {
               </form>
             </div>
           </div>
-          
-          {/* Error Message */}
-          {showError && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-bold text-red-600">Oops!</h3>
-                  <button 
-                    onClick={() => setShowError(false)}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    <i className="fas fa-times"></i>
-                  </button>
-                </div>
-                <p className="text-gray-700 mb-4">The category "{searchQuery}" is not available yet.</p>
-                <p className="text-gray-700 mb-6">Try one of these popular categories:</p>
-                <div className="flex space-x-2">
-                  {availableCategories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => handleSuggestionClick(category)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
-                    >
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </main>
+      
+      {/* Error Message Modal */}
+      {showError && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-4">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-lg font-bold text-red-600">Oops!</h3>
+              <button 
+                onClick={closeError}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <p className="text-gray-700 mb-4">The category "{searchQuery}" is not available yet.</p>
+            <p className="text-gray-700 mb-6">Try one of these popular categories:</p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {availableCategories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => handleSuggestionClick(category)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                >
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

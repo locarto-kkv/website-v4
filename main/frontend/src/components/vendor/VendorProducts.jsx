@@ -19,11 +19,9 @@ const VendorProducts = () => {
   // Predefined categories list
   const predefinedCategories = [
     'All',
-    'Electronics',
-    'Clothing',
-    'Home & Kitchen',
-    'Books',
-    'Beauty'
+    'Wellness',
+    'Lifestyle',
+    'Accessories'
   ];
 
   // Extract unique categories from products (including predefined ones)
