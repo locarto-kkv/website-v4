@@ -1,11 +1,10 @@
 import bcrypt from "bcryptjs";
-// passport-google-oauth2
 import dotenv from "dotenv";
-import fs from "fs";
+import logger from "../../lib/logger.js";
 dotenv.config();
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } =
-  process.env;
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 import db from "../../lib/db.js";
 import { generateToken } from "../../lib/utils.js";
@@ -39,13 +38,16 @@ export const signup = async (req, res) => {
 
     if (error) return res.status(400).json({ message: "User already exists" });
 
-    // fs.mkdirSync(`./uploads/documents/${user.id}`);
-
     generateToken(user.id, "vendor", res);
 
     return res.status(201).json({ id: user.id, type: "vendor" });
   } catch (error) {
-    console.log("Error in signup controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "signup",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -65,10 +67,7 @@ export const login = async (req, res) => {
       .limit(1)
       .single();
 
-    if (!user) {
-      // console.log(error);
-      return res.status(400).json({ message: "User does not exist" });
-    }
+    if (!user) return res.status(400).json({ message: "User does not exist" });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect)
@@ -78,7 +77,12 @@ export const login = async (req, res) => {
 
     res.status(200).json({ id: user.id, type: "vendor" });
   } catch (error) {
-    console.log("Error in login controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "login",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -88,7 +92,12 @@ export const logout = (req, res) => {
     res.cookie("jwt", "", { maxAge: 0 });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.log("Error in logout controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "logout",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

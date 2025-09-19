@@ -6,7 +6,11 @@ import {
   addTransaction,
   cancelTransaction,
 } from "../../services/consumer/transaction.service.js";
+import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
+
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const getOrderHistory = async (req, res) => {
   try {
@@ -30,7 +34,12 @@ export const getOrderHistory = async (req, res) => {
 
     res.status(200).json(ordersWithRelations);
   } catch (error) {
-    console.log("Error in getOrderHistory controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getOrderHistory",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -46,7 +55,12 @@ export const placeOrderTransaction = async (req, res) => {
 
     res.status(200).json({ order: newOrder, transaction: newTransaction });
   } catch (error) {
-    console.error("Error in placeOrderTransaction:", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "placeOrderTransaction",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -65,7 +79,12 @@ export const cancelOrderTransaction = async (req, res) => {
       transactions: updatedTransaction,
     });
   } catch (error) {
-    console.error("Error in cancelOrderTransaction:", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "cancelOrderTransaction",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

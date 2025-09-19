@@ -1,4 +1,8 @@
+import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
+
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const getReviews = async (req, res) => {
   try {
@@ -10,7 +14,12 @@ export const getReviews = async (req, res) => {
 
     res.status(200).json(reviews);
   } catch (error) {
-    console.log("Error in getReviews controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getReviews",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -35,7 +44,12 @@ export const addReview = async (req, res) => {
 
     res.status(200).json(review);
   } catch (error) {
-    console.log("Error in addReview controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "addReview",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -56,7 +70,12 @@ export const editReview = async (req, res) => {
 
     res.status(200).json(review);
   } catch (error) {
-    console.log("Error in updateReview controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "editReview",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -82,7 +101,12 @@ export const uploadReviewImages = async (req, res) => {
 
     res.status(201).json(review);
   } catch (error) {
-    console.log("Error in uploadReviewImages controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "uploadReviewImages",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -100,7 +124,12 @@ export const deleteReview = async (req, res) => {
 
     res.status(200).json("Review Deleted");
   } catch (error) {
-    console.log("Error in deleteReview controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "deleteReview",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

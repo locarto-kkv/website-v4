@@ -1,6 +1,10 @@
 import db from "../../lib/db.js";
+import logger from "../../lib/logger.js";
 import dotenv from "dotenv";
 dotenv.config();
+
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const getProducts = async (req, res) => {
   try {
@@ -12,7 +16,12 @@ export const getProducts = async (req, res) => {
 
     res.status(200).json(products);
   } catch (error) {
-    console.log("Error in getProducts controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getProducts",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -43,7 +52,7 @@ export const addProduct = async (req, res) => {
       .single();
 
     if (error) {
-      console.log("Error in addProduct 1: ", error);
+      logger.error(error);
       return res.status(400).json({ message: "Product already exists" });
     }
 
@@ -69,7 +78,12 @@ export const addProduct = async (req, res) => {
       res.status(201).json({ product: newProduct });
     }
   } catch (error) {
-    console.log("Error in addProduct controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "addProduct",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -103,8 +117,13 @@ export const getImgUploadUrl = async (productId, files) => {
     }
 
     return imgUploadUrls;
-  } catch (err) {
-    console.log("Error in getImgUploadUrl:", err);
+  } catch (error) {
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getImgUploadUrl",
+    });
   }
 };
 
@@ -120,7 +139,12 @@ export const removeProduct = async (req, res) => {
 
     res.status(200).json({ message: "Product Removed Successfully" });
   } catch (error) {
-    console.log("Error in removeProduct controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "removeProduct",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -139,7 +163,12 @@ export const editProduct = async (req, res) => {
 
     res.status(200).json(product);
   } catch (error) {
-    console.log("Error in editProduct controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "editProduct",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

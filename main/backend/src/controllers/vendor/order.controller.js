@@ -1,4 +1,7 @@
 import db from "../../lib/db.js";
+import logger from "../../lib/logger.js";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const getOrders = async (req, res) => {
   try {
@@ -15,7 +18,7 @@ export const getOrders = async (req, res) => {
 
     res.status(200).json(orders);
   } catch (error) {
-    console.log("Error in getOrders controller: ", error.message);
+    logger.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -34,7 +37,7 @@ export const updateOrderStatus = async (req, res) => {
 
     res.status(200).json(updatedOrder);
   } catch (error) {
-    console.log("Error in updateOrderStatus controller: ", error.message);
+    logger.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

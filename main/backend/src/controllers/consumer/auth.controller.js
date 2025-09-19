@@ -1,7 +1,11 @@
 import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
+import logger from "../../lib/logger.js";
 import dotenv from "dotenv";
 dotenv.config();
+
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 import db from "../../lib/db.js";
 import { generateToken } from "../../lib/utils.js";
@@ -32,7 +36,12 @@ export const sendVerification = async (req, res) => {
       return res.status(400).json({ message: "Invalid Credentials" });
     }
   } catch (error) {
-    console.log("Error in signup controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "sendVerification",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -54,10 +63,14 @@ export const signup = async (req, res) => {
     if (error) return res.status(400).json({ message: "User already exists" });
 
     generateToken(user.id, "consumer", res);
-
     return res.status(201).json({ id: user.id, type: "consumer" });
   } catch (error) {
-    console.log("Error in signup controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "signup",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -101,15 +114,18 @@ export const login = async (req, res) => {
 
     res.status(200).json({ id: user.id, type: "consumer" });
   } catch (error) {
-    console.log("Error in login controller: ", error);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "login",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const loginGoogle = async (req, res) => {
   try {
-    console.log("Google");
-
     const { code = null } = req.query;
 
     if (!code) {
@@ -140,41 +156,61 @@ export const loginGoogle = async (req, res) => {
       .from("consumers")
       .select()
       .eq("email", userData.email)
-      .limit(1)
       .single();
 
     if (existingUser) {
       generateToken(existingUser.id, "consumer", res);
-      console.log("User Logged In");
-
       return res.redirect(FRONTEND_URL + "/dashboard");
     }
 
     const { data: newUser, error } = await db
       .from("consumers")
-      .insert({ email: userData.email, name: userData.name })
+      .insert({
+        email: userData.email,
+        name: userData.name,
+        auth_type: "google",
+      })
       .select()
       .single();
 
     if (error) {
+      logger({
+        level: "error",
+        message: error.message,
+        location: __filename,
+        func: "loginGoogle",
+      });
+
       return res.status(400).json({ message: "Signup failed" });
     }
-    console.log("User Signed Up");
 
     generateToken(newUser.id, "consumer", res);
+
     return res.redirect(FRONTEND_URL + "/dashboard");
   } catch (error) {
-    console.error("Error in loginGoogle controller:", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "loginGoogle",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const logout = (req, res) => {
   try {
+    const user = req.user;
     res.cookie("jwt", "", { maxAge: 0 });
+
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.log("Error in logout controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "logout",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

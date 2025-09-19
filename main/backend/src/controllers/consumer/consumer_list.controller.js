@@ -1,4 +1,7 @@
+import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const getListItems = async (req, res) => {
   try {
@@ -24,7 +27,12 @@ export const getListItems = async (req, res) => {
 
     res.status(200).json(groupedList);
   } catch (error) {
-    console.log("Error in getListItems controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getListItems",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -49,7 +57,12 @@ export const updateList = async (req, res) => {
 
     getListItems(req, res);
   } catch (error) {
-    console.log("Error in updateList controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "updateList",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -69,7 +82,12 @@ export const removeFromList = async (req, res) => {
 
     res.status(200).json("Item Removed From List");
   } catch (error) {
-    console.log("Error in replyToReview controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "removeFromList",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

@@ -1,4 +1,7 @@
+import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const getTransactions = async (req, res) => {
   try {
@@ -8,14 +11,11 @@ export const getTransactions = async (req, res) => {
       .from("products")
       .select("id")
       .eq("vendor_id", userId);
-    console.log(productIds);
 
     const { data: orderIds } = await db
       .from("orders")
       .select("id")
       .eq("product_id", productIds);
-
-    console.log(orderIds);
 
     const { data: transactions } = await db
       .from("transactions")
@@ -24,7 +24,12 @@ export const getTransactions = async (req, res) => {
 
     res.status(200).json(transactions);
   } catch (error) {
-    console.log("Error in getTransactions controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getTransactions",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

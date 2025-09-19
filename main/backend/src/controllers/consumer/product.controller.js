@@ -1,4 +1,7 @@
+import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const getAllProducts = async (req, res) => {
   try {
@@ -6,7 +9,12 @@ export const getAllProducts = async (req, res) => {
 
     res.status(200).json(products);
   } catch (error) {
-    console.log("Error in getAllProducts controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getAllProducts",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -22,7 +30,12 @@ export const getProductById = async (req, res) => {
 
     res.status(200).json(products);
   } catch (error) {
-    console.log("Error in getProductById controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getProductById",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -38,7 +51,12 @@ export const getProductsByCategory = async (req, res) => {
 
     res.status(200).json(products);
   } catch (error) {
-    console.log("Error in getProductByCategory controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getProductsByCategory",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
