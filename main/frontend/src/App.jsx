@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
-import TestMap from "./components/TestMap";
+
 
 // Public Pages
 import Homepage from "./pages/homepage";
