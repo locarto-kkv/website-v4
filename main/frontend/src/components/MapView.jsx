@@ -1,4 +1,3 @@
-// src/components/MapView.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import L from "leaflet";
@@ -268,26 +267,27 @@ const MapView = () => {
         {showOverlay && (
           <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/20 backdrop-blur-sm flex items-center justify-center z-[9999]">
             <div className="relative w-full max-w-6xl mx-auto text-center px-6">
-              {/* Navigation Arrows */}
+              {/* Navigation Arrows - Moved further to edges */}
               <button
                 onClick={prevCategory}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all duration-300 bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20"
+                className="absolute left-12 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all duration-300 bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
               >
                 <i className="fas fa-chevron-left text-xl"></i>
               </button>
 
               <button
                 onClick={nextCategory}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all duration-300 bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20"
+                className="absolute right-12 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all duration-300 bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
               >
                 <i className="fas fa-chevron-right text-xl"></i>
               </button>
 
               {/* Category Display */}
               <div className="relative w-full">
-                <div className="mb-6">
+                {/* Icon Container - Centered */}
+                <div className="flex flex-col items-center mb-6">
                   <div 
-                    className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center shadow-2xl"
+                    className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6"
                     style={{
                       background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`
                     }}
@@ -296,18 +296,23 @@ const MapView = () => {
                   </div>
                 </div>
                 
-                <button
-                  onClick={() => handleCategoryTextClick(currentCategoryIndex)}
-                  className="group text-6xl md:text-8xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-500 bg-transparent border-none block w-full"
-                  style={{
-                    color: currentCategory.color,
-                    textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20`
-                  }}
-                >
-                  {currentCategory.name}
-                </button>
+                {/* Category Name - Centered with max width */}
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => handleCategoryTextClick(currentCategoryIndex)}
+                    className="text-6xl md:text-8xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-500 bg-transparent border-none inline-block text-center mx-auto"
+                    style={{
+                      color: currentCategory.color,
+                      textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20`,
+                      maxWidth: "fit-content"
+                    }}
+                  >
+                    {currentCategory.name}
+                  </button>
+                </div>
                 
-                <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+                {/* Description - Already centered */}
+                <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed text-center">
                   {currentCategory.description}
                 </p>
               </div>
