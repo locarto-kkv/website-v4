@@ -1,9 +1,14 @@
-import React from 'react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const VendorSetupWizard = ({ onClose, onSubmit }) => {
+const VendorSetupWizard = ({ onSubmit }) => {
   // In a real application, you'd manage form state here
   // using useState or a library like Formik/React Hook Form.
 
+  const navigate = useNavigate();
+  const closeSetup = () => {
+    navigate("/vendor/profile");
+  };
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       <div className="flex justify-between items-center mb-6">
@@ -11,7 +16,7 @@ const VendorSetupWizard = ({ onClose, onSubmit }) => {
           Vendor Setup Wizard
         </h2>
         <button
-          onClick={onClose}
+          onClick={closeSetup}
           className="text-gray-500 hover:text-gray-700"
         >
           <i className="fas fa-times"></i> Close
@@ -23,9 +28,7 @@ const VendorSetupWizard = ({ onClose, onSubmit }) => {
           <h3 className="text-lg font-semibold text-primary">
             Step 1: Business Info
           </h3>
-          <p className="text-gray-600">
-            Please provide your business details.
-          </p>
+          <p className="text-gray-600">Please provide your business details.</p>
         </div>
 
         <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
@@ -143,7 +146,7 @@ const VendorSetupWizard = ({ onClose, onSubmit }) => {
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={closeSetup}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition"
             >
               Cancel

@@ -9,7 +9,7 @@ import VendorAnalytics from "../../components/vendor/VendorAnalytics";
 import VendorSettings from "../../components/vendor/VendorSettings";
 import VendorProducts from "../../components/vendor/VendorProducts"; // Add this import
 import VendorSupport from "../../components/vendor/VendorSupport"; // Add this import
-
+import VendorSetup from "../../components/vendor/VendorSetupWizard";
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
   return currentUser ? <Outlet /> : <Navigate to="/vendor/login" replace />;
@@ -33,19 +33,20 @@ const VendorRoutes = () => {
         }
       />
 
-    <Route element={<ProtectedRoute />}>
-            <Route element={<VendorDashboardLayout />}>
-              <Route index element={<VendorDashboard />} />
-              <Route path="dashboard" element={<VendorDashboard />} />
-              <Route path="products" element={<VendorProducts />} />
-              <Route path="profile" element={<VendorProfile />} />
-              <Route path="analytics" element={<VendorAnalytics />} />
-              <Route path="settings" element={<VendorSettings />} />
-              <Route path="support" element={<VendorSupport />} /> {/* Add this route */}
-            </Route>
-          </Route>
-        </Routes>
-      );
-    };
+      <Route element={<ProtectedRoute />}>
+        <Route element={<VendorDashboardLayout />}>
+          <Route index element={<VendorDashboard />} />
+          <Route path="dashboard" element={<VendorDashboard />} />
+          <Route path="products" element={<VendorProducts />} />
+          <Route path="profile" element={<VendorProfile />} />
+          <Route path="analytics" element={<VendorAnalytics />} />
+          <Route path="settings" element={<VendorSettings />} />
+          <Route path="support" element={<VendorSupport />} />
+          <Route path="setup" element={<VendorSetup />} />
+        </Route>
+      </Route>
+    </Routes>
+  );
+};
 
 export default VendorRoutes;
