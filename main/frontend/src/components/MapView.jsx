@@ -10,24 +10,24 @@ const MapView = () => {
 
   // Available categories
   const categories = [
-    { 
-      name: "Wellness", 
+    {
+      name: "Wellness",
       description: "Yoga studios, fitness centers, and wellness retreats",
       color: "#10B981", // emerald
-      icon: "fas fa-leaf"
+      icon: "fas fa-leaf",
     },
-    { 
-      name: "Lifestyle", 
+    {
+      name: "Lifestyle",
       description: "Fashion stores, home decor, and lifestyle products",
       color: "#F59E0B", // amber
-      icon: "fas fa-shopping-bag"
+      icon: "fas fa-shopping-bag",
     },
-    { 
-      name: "Accessories", 
+    {
+      name: "Accessories",
       description: "Jewellery, watches, and fashion accessories",
       color: "#EF4444", // red
-      icon: "fas fa-gem"
-    }
+      icon: "fas fa-gem",
+    },
   ];
 
   // Overlay starts visible
@@ -51,7 +51,9 @@ const MapView = () => {
   };
 
   const prevCategory = () => {
-    setCurrentCategoryIndex((prev) => (prev - 1 + categories.length) % categories.length);
+    setCurrentCategoryIndex(
+      (prev) => (prev - 1 + categories.length) % categories.length
+    );
   };
 
   const handleCategoryTextClick = (index) => {
@@ -67,15 +69,15 @@ const MapView = () => {
         name: "Serenity Yoga Studio",
         location: "Bandra West, Mumbai",
         position: [19.076, 72.8777],
-        address: "123 Carter Road, Bandra West, Mumbai 400050"
+        address: "123 Carter Road, Bandra West, Mumbai 400050",
       },
       {
         id: 2,
         name: "Mindful Fitness Center",
         location: "Juhu, Mumbai",
         position: [19.1075, 72.8263],
-        address: "456 Juhu Beach Road, Mumbai 400049"
-      }
+        address: "456 Juhu Beach Road, Mumbai 400049",
+      },
     ],
     lifestyle: [
       {
@@ -83,15 +85,15 @@ const MapView = () => {
         name: "Urban Style Boutique",
         location: "Andheri West, Mumbai",
         position: [19.1136, 72.8697],
-        address: "789 Link Road, Andheri West, Mumbai 400053"
+        address: "789 Link Road, Andheri West, Mumbai 400053",
       },
       {
         id: 2,
         name: "Casa Living",
         location: "Bandra East, Mumbai",
         position: [19.05, 72.8333],
-        address: "321 BKC Road, Bandra East, Mumbai 400051"
-      }
+        address: "321 BKC Road, Bandra East, Mumbai 400051",
+      },
     ],
     accessories: [
       {
@@ -99,23 +101,23 @@ const MapView = () => {
         name: "Golden Crown Jewellers",
         location: "Colaba, Mumbai",
         position: [18.922, 72.834],
-        address: "654 Colaba Causeway, Mumbai 400001"
+        address: "654 Colaba Causeway, Mumbai 400001",
       },
       {
         id: 2,
         name: "Timepiece Gallery",
         location: "Fort, Mumbai",
         position: [18.9322, 72.8311],
-        address: "987 Horniman Circle, Fort, Mumbai 400001"
-      }
-    ]
+        address: "987 Horniman Circle, Fort, Mumbai 400001",
+      },
+    ],
   };
 
   // Create custom marker icons
   const createCustomIcon = (category) => {
     const color = category.color;
     return L.divIcon({
-      className: 'custom-marker',
+      className: "custom-marker",
       html: `
         <div style="
           background: linear-gradient(135deg, ${color}, ${color}dd);
@@ -140,26 +142,29 @@ const MapView = () => {
       `,
       iconSize: [40, 40],
       iconAnchor: [20, 40],
-      popupAnchor: [0, -40]
+      popupAnchor: [0, -40],
     });
   };
 
   // Initialize map
   useEffect(() => {
     const mapInstance = L.map("map-container", {
-      zoomControl: false
+      zoomControl: false,
     }).setView([19.076, 72.8777], 12);
 
     // Custom zoom control
-    L.control.zoom({
-      position: 'bottomright'
-    }).addTo(mapInstance);
+    L.control
+      .zoom({
+        position: "bottomright",
+      })
+      .addTo(mapInstance);
 
     // Dark theme map
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         maxZoom: 19,
         minZoom: 10,
       }
@@ -191,19 +196,22 @@ const MapView = () => {
 
       markersData.forEach((marker) => {
         const customIcon = createCustomIcon(currentCategory);
-        const mapMarker = L.marker(marker.position, { icon: customIcon }).addTo(map);
+        const mapMarker = L.marker(marker.position, { icon: customIcon }).addTo(
+          map
+        );
 
         // Permanent tooltip with shop name
         mapMarker.bindTooltip(marker.name, {
           permanent: true,
-          direction: 'top',
+          direction: "top",
           offset: [0, -45],
-          className: 'custom-tooltip',
-          opacity: 0.9
+          className: "custom-tooltip",
+          opacity: 0.9,
         });
 
         // Enhanced popup
-        mapMarker.bindPopup(`
+        mapMarker.bindPopup(
+          `
           <div class="custom-popup">
             <div class="popup-header">
               <h3>${marker.name}</h3>
@@ -223,10 +231,12 @@ const MapView = () => {
               </button>
             </div>
           </div>
-        `, {
-          maxWidth: 300,
-          className: 'modern-popup'
-        });
+        `,
+          {
+            maxWidth: 300,
+            className: "modern-popup",
+          }
+        );
       });
     }
   }, [currentCategoryIndex, map, showOverlay]);
@@ -240,7 +250,7 @@ const MapView = () => {
         <Link
           to="/"
           className="group text-3xl font-bold text-orange-500 hover:text-orange-400 transition-colors duration-300 hover:scale-105 transform"
-          style={{ textShadow: '0 2px 10px rgba(245, 158, 11, 0.3)' }}
+          style={{ textShadow: "0 2px 10px rgba(245, 158, 11, 0.3)" }}
         >
           Locarto
         </Link>
@@ -286,31 +296,35 @@ const MapView = () => {
               <div className="relative w-full">
                 {/* Icon Container - Centered */}
                 <div className="flex flex-col items-center mb-6">
-                  <div 
+                  <div
                     className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6"
                     style={{
-                      background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`
+                      background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
                     }}
                   >
-                    <i className={`${currentCategory.icon} text-3xl text-white`}></i>
+                    <i
+                      className={`${currentCategory.icon} text-3xl text-white`}
+                    ></i>
                   </div>
                 </div>
-                
+
                 {/* Category Name - Centered with max width */}
                 <div className="flex justify-center">
                   <button
-                    onClick={() => handleCategoryTextClick(currentCategoryIndex)}
+                    onClick={() =>
+                      handleCategoryTextClick(currentCategoryIndex)
+                    }
                     className="text-6xl md:text-8xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-500 bg-transparent border-none inline-block text-center mx-auto"
                     style={{
                       color: currentCategory.color,
                       textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20`,
-                      maxWidth: "fit-content"
+                      maxWidth: "fit-content",
                     }}
                   >
                     {currentCategory.name}
                   </button>
                 </div>
-                
+
                 {/* Description - Already centered */}
                 <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed text-center">
                   {currentCategory.description}
@@ -324,14 +338,15 @@ const MapView = () => {
                     key={category.name}
                     onClick={() => setCurrentCategoryIndex(index)}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      index === currentCategoryIndex 
-                        ? 'scale-125 shadow-lg' 
-                        : 'bg-white/30 hover:bg-white/50'
+                      index === currentCategoryIndex
+                        ? "scale-125 shadow-lg"
+                        : "bg-white/30 hover:bg-white/50"
                     }`}
                     style={{
-                      background: index === currentCategoryIndex 
-                        ? category.color
-                        : undefined
+                      background:
+                        index === currentCategoryIndex
+                          ? category.color
+                          : undefined,
                     }}
                   />
                 ))}
@@ -359,7 +374,11 @@ const MapView = () => {
         }
 
         .modern-popup .leaflet-popup-content-wrapper {
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)) !important;
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0.9)
+          ) !important;
           border-radius: 16px !important;
           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
           backdrop-filter: blur(20px);
@@ -367,7 +386,11 @@ const MapView = () => {
         }
 
         .modern-popup .leaflet-popup-tip {
-          background: linear-gradient(45deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)) !important;
+          background: linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0.9)
+          ) !important;
           border: 1px solid rgba(255, 255, 255, 0.3);
           box-shadow: none !important;
         }

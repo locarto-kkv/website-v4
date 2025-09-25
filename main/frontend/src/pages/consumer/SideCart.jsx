@@ -19,20 +19,23 @@ const SideCart = ({ isOpen, onClose }) => {
   const { getList, removeFromList, updateList } = ConsumerListService;
 
   // Load cart items on mount
-  useEffect(() => {
-    const loadCart = async () => {
-      const res = await getList();
-      if (res.cart) {
-        setCartItems(res.cart);
-        updatePrices(res.cart);
-      }
-    };
-    loadCart();
-  }, []);
+  // useEffect(() => {
+  //   const loadCart = async () => {
+  //     const res = await getList();
+  //     if (res.cart) {
+  //       setCartItems(res.cart);
+  //       updatePrices(res.cart);
+  //     }
+  //   };
+  // loadCart();
+  // }, []);
 
   // Update prices based on cart items
   const updatePrices = (items) => {
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
     const shipping = 5.99;
     const tax = subtotal * 0.08; // 8% tax example
     const total = subtotal + shipping + tax;
@@ -42,8 +45,11 @@ const SideCart = ({ isOpen, onClose }) => {
 
   // Update quantity
   const updateQuantity = async (itemId, change) => {
-    const newQty = Math.max(1, cartItems.find(item => item.id === itemId)?.quantity + change);
-    const updatedCart = cartItems.map(item =>
+    const newQty = Math.max(
+      1,
+      cartItems.find((item) => item.id === itemId)?.quantity + change
+    );
+    const updatedCart = cartItems.map((item) =>
       item.id === itemId ? { ...item, quantity: newQty } : item
     );
     await updateList("cart", newQty, itemId);
@@ -54,8 +60,8 @@ const SideCart = ({ isOpen, onClose }) => {
   // Remove item from cart
   const removeFromCart = async (id) => {
     await removeFromList("cart", id);
-    setCartItems(cartItems.filter(item => item.id !== id));
-    updatePrices(cartItems.filter(item => item.id !== id));
+    setCartItems(cartItems.filter((item) => item.id !== id));
+    updatePrices(cartItems.filter((item) => item.id !== id));
   };
 
   // Apply coupon code
@@ -73,17 +79,19 @@ const SideCart = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div 
-      className={`fixed inset-0 z-50 overflow-hidden ${isOpen ? 'block' : 'hidden'}`}
+    <div
+      className={`fixed inset-0 z-50 overflow-hidden ${
+        isOpen ? "block" : "hidden"
+      }`}
       onClick={onClose}
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-50" />
 
       {/* Cart Drawer */}
-      <div 
+      <div
         className={`absolute right-0 top-0 h-full w-80 md:w-96 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -92,7 +100,7 @@ const SideCart = ({ isOpen, onClose }) => {
             <i className="fas fa-shopping-cart mr-2"></i>
             Your Cart
           </h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
           >
@@ -104,7 +112,13 @@ const SideCart = ({ isOpen, onClose }) => {
         <div className="p-4 max-h-[calc(100vh-120px)] overflow-y-auto">
           {/* Coupon Message */}
           {couponMessage && (
-            <div className={`mb-4 p-2 text-sm rounded ${couponApplied ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+            <div
+              className={`mb-4 p-2 text-sm rounded ${
+                couponApplied
+                  ? "bg-green-100 text-green-800"
+                  : "bg-yellow-100 text-yellow-800"
+              }`}
+            >
               {couponMessage}
             </div>
           )}
@@ -126,7 +140,9 @@ const SideCart = ({ isOpen, onClose }) => {
                   />
                   <div className="flex-1">
                     <h3 className="font-medium">{item.name}</h3>
-                    <p className="text-sm text-gray-600">₹{item.price.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">
+                      ₹{item.price.toFixed(2)}
+                    </p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
@@ -194,7 +210,15 @@ const SideCart = ({ isOpen, onClose }) => {
               </div>
               <div className="flex justify-between">
                 <span>Discount</span>
-                <span className="text-red-500">-₹{(prices.total - prices.subtotal - prices.shipping - prices.tax).toFixed(2)}</span>
+                <span className="text-red-500">
+                  -₹
+                  {(
+                    prices.total -
+                    prices.subtotal -
+                    prices.shipping -
+                    prices.tax
+                  ).toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t">
                 <span>Total</span>

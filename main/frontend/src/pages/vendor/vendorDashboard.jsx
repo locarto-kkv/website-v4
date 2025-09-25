@@ -36,18 +36,18 @@ const VendorDashboard = () => {
       }
     };
 
-    fetchData();
+    // fetchData();
   }, []);
 
   return (
     <div className="max-w-6xl mx-auto">
       <DashboardStats products={products} orders={orders} />
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         <div className="lg:col-span-2">
           <RecentOrdersTable orders={orders} />
         </div>
-        
+
         <div>
           <TopSellingProducts />
         </div>

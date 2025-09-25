@@ -1,5 +1,5 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React from "react";
+import { useLocation } from "react-router-dom";
 
 const VendorSidebar = ({ onNavigate }) => {
   const location = useLocation();
@@ -15,7 +15,10 @@ const VendorSidebar = ({ onNavigate }) => {
           <button
             onClick={() => onNavigate("/vendor/dashboard")}
             className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith('/vendor/dashboard') || activePath === '/vendor' ? activeClass : inactiveClass
+              activePath.endsWith("/vendor/dashboard") ||
+              activePath === "/vendor"
+                ? activeClass
+                : inactiveClass
             }`}
           >
             Dashboard
@@ -25,7 +28,7 @@ const VendorSidebar = ({ onNavigate }) => {
           <button
             onClick={() => onNavigate("/vendor/analytics")}
             className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith('/analytics') ? activeClass : inactiveClass
+              activePath.endsWith("/analytics") ? activeClass : inactiveClass
             }`}
           >
             Analytics
@@ -35,7 +38,7 @@ const VendorSidebar = ({ onNavigate }) => {
           <button
             onClick={() => onNavigate("/vendor/support")}
             className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith('/support') ? activeClass : inactiveClass
+              activePath.endsWith("/support") ? activeClass : inactiveClass
             }`}
           >
             Support
@@ -45,7 +48,7 @@ const VendorSidebar = ({ onNavigate }) => {
           <button
             onClick={() => onNavigate("/vendor/products")}
             className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith('/products') ? activeClass : inactiveClass
+              activePath.endsWith("/products") ? activeClass : inactiveClass
             }`}
           >
             Products
@@ -55,7 +58,7 @@ const VendorSidebar = ({ onNavigate }) => {
           <button
             onClick={() => onNavigate("/vendor/settings")}
             className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith('/settings') ? activeClass : inactiveClass
+              activePath.endsWith("/settings") ? activeClass : inactiveClass
             }`}
           >
             Settings
@@ -65,7 +68,7 @@ const VendorSidebar = ({ onNavigate }) => {
           <button
             onClick={() => onNavigate("/vendor/profile")}
             className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith('/profile') ? activeClass : inactiveClass
+              activePath.endsWith("/profile") ? activeClass : inactiveClass
             }`}
           >
             Profile

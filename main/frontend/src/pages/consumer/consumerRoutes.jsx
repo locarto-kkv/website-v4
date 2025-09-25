@@ -16,7 +16,7 @@ const ProtectedRoute = () => {
 
 const ConsumerRoutes = () => {
   const { currentUser } = useAuthStore();
-  console.log(currentUser);
+  // console.log(currentUser);
 
   return (
     <Routes>

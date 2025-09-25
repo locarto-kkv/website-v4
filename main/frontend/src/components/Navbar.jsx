@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import SideCart from "../pages/consumer/SideCart.jsx"
+import SideCart from "../pages/consumer/SideCart.jsx";
 import { ConsumerListService } from "../services/consumer/consumerListService";
 
 const Navbar = ({ pageType = "landing" }) => {
@@ -30,7 +30,7 @@ const Navbar = ({ pageType = "landing" }) => {
         console.log("Error loading cart items");
       }
     };
-    loadCart();
+    // loadCart();
   }, []);
 
   useEffect(() => {
@@ -72,13 +72,13 @@ const Navbar = ({ pageType = "landing" }) => {
   // Handle navigation to sections
   const handleSectionNavigation = (sectionId) => {
     setMobileMenuOpen(false);
-    
+
     // If already on landing page, scroll to section
     if (location.pathname === "/landing") {
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+          element.scrollIntoView({ behavior: "smooth" });
         }
       }, 100);
     } else {
@@ -90,10 +90,10 @@ const Navbar = ({ pageType = "landing" }) => {
   // Handle dashboard navigation based on user role with auto-scroll to top
   const handleDashboardNavigation = () => {
     setDropdownOpen(false);
-    
+
     // Scroll to top of page
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
     // Navigate to appropriate dashboard
     if (currentUser?.type === "vendor") {
       navigate("/vendor/dashboard");
@@ -137,26 +137,26 @@ const Navbar = ({ pageType = "landing" }) => {
           >
             {pageType === "homepage" ? "About Us" : "Home"}
           </Link>
-          
+
           {/* Categories Button */}
           <button
-            onClick={() => handleSectionNavigation('categories')}
+            onClick={() => handleSectionNavigation("categories")}
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
           >
             Categories
           </button>
-          
+
           {/* How It Works Button */}
           <button
-            onClick={() => handleSectionNavigation('how-it-works')}
+            onClick={() => handleSectionNavigation("how-it-works")}
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
           >
             How It Works
           </button>
-          
+
           {/* Testimonials Button */}
           <button
-            onClick={() => handleSectionNavigation('testimonials')}
+            onClick={() => handleSectionNavigation("testimonials")}
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
           >
             Testimonials

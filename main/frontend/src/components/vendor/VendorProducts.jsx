@@ -1,34 +1,31 @@
 // src/pages/VendorProducts.jsx
-import React, { useState, useEffect } from 'react';
-import { VendorProductService } from '../../services/vendor/vendorProductService';
+import React, { useState, useEffect } from "react";
+import { VendorProductService } from "../../services/vendor/vendorProductService";
 
 const VendorProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [newProduct, setNewProduct] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stock: '',
-    category: '',
-    image: null
+    name: "",
+    description: "",
+    price: "",
+    stock: "",
+    category: "",
+    image: null,
   });
 
   // Predefined categories list
-  const predefinedCategories = [
-    'All',
-    'Wellness',
-    'Lifestyle',
-    'Accessories'
-  ];
+  const predefinedCategories = ["All", "Wellness", "Lifestyle", "Accessories"];
 
   // Extract unique categories from products (including predefined ones)
-  const availableCategories = [...new Set([
-    ...predefinedCategories,
-    ...products.map(product => product.category)
-  ])].filter(category => category); // Remove empty categories
+  const availableCategories = [
+    ...new Set([
+      ...predefinedCategories,
+      ...products.map((product) => product.category),
+    ]),
+  ].filter((category) => category); // Remove empty categories
 
   useEffect(() => {
     fetchProducts();
@@ -36,11 +33,11 @@ const VendorProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const productService = new VendorProductService();
-      const fetchedProducts = await productService.getProducts();
-      setProducts(fetchedProducts);
+      // const productService = VendorProductService();
+      // const fetchedProducts = await productService.getProducts();
+      // setProducts(fetchedProducts);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
@@ -48,11 +45,11 @@ const VendorProducts = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct(prev => ({ ...prev, [name]: value }));
+    setNewProduct((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
-    setNewProduct(prev => ({ ...prev, image: e.target.files[0] }));
+    setNewProduct((prev) => ({ ...prev, image: e.target.files[0] }));
   };
 
   const handleAddProduct = async (e) => {
@@ -62,30 +59,31 @@ const VendorProducts = () => {
       await productService.addProduct(newProduct);
       setShowAddModal(false);
       setNewProduct({
-        name: '',
-        description: '',
-        price: '',
-        stock: '',
-        category: '',
-        image: null
+        name: "",
+        description: "",
+        price: "",
+        stock: "",
+        category: "",
+        image: null,
       });
       fetchProducts(); // Refresh product list
     } catch (error) {
-      console.error('Error adding product:', error);
+      console.error("Error adding product:", error);
     }
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
   // Filter products based on selected category
-  const filteredProducts = selectedCategory === 'All' 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+  const filteredProducts =
+    selectedCategory === "All"
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
 
   if (loading) {
     return (
@@ -110,8 +108,8 @@ const VendorProducts = () => {
             onClick={() => setSelectedCategory(category)}
             className={`px-4 py-2 font-medium ${
               selectedCategory === category
-                ? 'text-orange-600 border-b-2 border-orange-600'
-                : 'text-gray-600 hover:text-gray-800 border-b-2 border-transparent'
+                ? "text-orange-600 border-b-2 border-orange-600"
+                : "text-gray-600 hover:text-gray-800 border-b-2 border-transparent"
             }`}
           >
             {category}
@@ -135,13 +133,13 @@ const VendorProducts = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-12 text-center">
           <i className="fas fa-box-open text-5xl text-gray-300 mb-4"></i>
           <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            {selectedCategory === 'All' 
-              ? 'No products yet' 
+            {selectedCategory === "All"
+              ? "No products yet"
               : `No products in ${selectedCategory}`}
           </h3>
           <p className="text-gray-500 mb-6">
-            {selectedCategory === 'All' 
-              ? 'Get started by adding your first product' 
+            {selectedCategory === "All"
+              ? "Get started by adding your first product"
               : `Add products to the ${selectedCategory} category`}
           </p>
           <button
@@ -154,12 +152,15 @@ const VendorProducts = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
+            <div
+              key={product.id}
+              className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition"
+            >
               <div className="h-48 bg-gray-100 flex items-center justify-center">
                 {product.image ? (
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
+                  <img
+                    src={product.image}
+                    alt={product.name}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -169,22 +170,34 @@ const VendorProducts = () => {
               <div className="p-6">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
-                    <p className="text-gray-500 text-sm mt-1">{product.category}</p>
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-500 text-sm mt-1">
+                      {product.category}
+                    </p>
                   </div>
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded ${
-                    product.stock > 10 
-                      ? 'bg-green-100 text-green-800' 
-                      : product.stock > 0 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : 'bg-red-100 text-red-800'
-                  }`}>
-                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                  <span
+                    className={`text-xs font-semibold px-2.5 py-0.5 rounded ${
+                      product.stock > 10
+                        ? "bg-green-100 text-green-800"
+                        : product.stock > 0
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {product.stock > 0
+                      ? `${product.stock} in stock`
+                      : "Out of stock"}
                   </span>
                 </div>
-                <p className="text-gray-600 mt-3 line-clamp-2">{product.description}</p>
+                <p className="text-gray-600 mt-3 line-clamp-2">
+                  {product.description}
+                </p>
                 <div className="mt-4 flex justify-between items-center">
-                  <span className="text-lg font-bold text-gray-900">{formatCurrency(product.price)}</span>
+                  <span className="text-lg font-bold text-gray-900">
+                    {formatCurrency(product.price)}
+                  </span>
                   <div className="flex space-x-2">
                     <button className="text-gray-500 hover:text-orange-600">
                       <i className="fas fa-edit"></i>
@@ -207,14 +220,14 @@ const VendorProducts = () => {
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">Add New Product</h3>
-                <button 
+                <button
                   onClick={() => setShowAddModal(false)}
                   className="text-gray-500 hover:text-gray-700"
                 >
                   <i className="fas fa-times"></i>
                 </button>
               </div>
-              
+
               <form onSubmit={handleAddProduct}>
                 <div className="space-y-4">
                   <div>
@@ -231,7 +244,7 @@ const VendorProducts = () => {
                       placeholder="Enter product name"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Description
@@ -246,7 +259,7 @@ const VendorProducts = () => {
                       placeholder="Enter product description"
                     ></textarea>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -264,7 +277,7 @@ const VendorProducts = () => {
                         placeholder="0.00"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Stock Quantity
@@ -281,7 +294,7 @@ const VendorProducts = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Category
@@ -294,12 +307,14 @@ const VendorProducts = () => {
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600"
                     >
                       <option value="">Select category</option>
-                      {predefinedCategories.slice(1).map(category => (
-                        <option key={category} value={category}>{category}</option>
+                      {predefinedCategories.slice(1).map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
                       ))}
                     </select>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Product Image
@@ -309,12 +324,15 @@ const VendorProducts = () => {
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
                           <p className="text-sm text-gray-500">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>{" "}
+                            or drag and drop
                           </p>
                         </div>
-                        <input 
-                          type="file" 
-                          className="hidden" 
+                        <input
+                          type="file"
+                          className="hidden"
                           accept="image/*"
                           onChange={handleImageChange}
                         />
@@ -327,7 +345,7 @@ const VendorProducts = () => {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="mt-8 flex justify-end space-x-3">
                   <button
                     type="button"
