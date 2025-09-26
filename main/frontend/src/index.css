@@ -3,7 +3,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* src/index.css */
 
+@font-face {
+  font-family: 'Degular Display';
+  src: url('/src/assets/fonts/Degular-Display-Regular.woff2') format('woff2'); /* Adjust path if needed */
+  font-weight: normal;
+  font-style: normal;
+}
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f9f9f9;

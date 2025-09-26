@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import SideCart from "../pages/consumer/SideCart.jsx";
 import { ConsumerListService } from "../services/consumer/consumerListService";
+import locartoImg from "../assets/locarto.png";
 
 const Navbar = ({ pageType = "landing" }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
