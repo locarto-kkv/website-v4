@@ -14,7 +14,7 @@ import tagImg from "../assets/tag.png";
 import locartoImg from "../assets/locarto.png";
 import snabbitImg from "../assets/snabbitimage.png"; // Import Snabbit image
 import landingVid from "../assets/landing_vid.mp4";
-
+import WhatInItForYou from "/Users/patrick/Desktop/Projects/Locarto_Merge/main/frontend/src/components/landing/WhatInItForYou.jsx";
 // --- Assign images to the brand data ---
 const brandsWithImages = brandData.map((brand) => {
   if (brand.id === "snabbit") {
@@ -75,8 +75,8 @@ const LandingPage = () => {
             <img
               src={locartoImg}
               alt="Locarto"
-              className="-mt-[200px] h-28 w-auto md:h-36 md:-mt-[270px]"
-            />
+              className="-mt-[300px] sm:-mt-[270px] md:-mt-[340px] lg:-mt-[300px] w-full max-w-[160px] sm:max-w-[220px] md:max-w-[320px] lg:max-w-[420px] h-auto"
+              />
 
             {/* Sub Text */}
             <p className="mt-8 text-center text-2xl font-semibold text-[#FBF5E5] md:text-3xl">
@@ -142,9 +142,21 @@ const LandingPage = () => {
                 />
               ))}
             </div>
+            <div className="mt-12 flex justify-center">
+                <button
+                  onClick ={() => alert("Discover More clicked!")}
+                  className="bg-[#0D1539] hover:bg-[#1A244C] text-white font-medium py-4 px-8 rounded-[12px] transition-colors duration-200 shadow-md text-xl flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Discover More</span>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
           </div>
         </div>
       </section>
+      <WhatInItForYou />
 
       <Footer />
     </div>

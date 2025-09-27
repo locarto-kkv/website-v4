@@ -5,18 +5,18 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
   const brandDetails = brand || {};
 
   return (
-    <div className="mt-[32px] w-full flex flex-col items-center pl-[8px] pr-[8px]">
-      {/* Card with border + inner image */}
-      <div className="relative w-full max-w-[1024px]"> {/* Increased max-width */}
+    <div className="mt-6 w-full flex flex-col items-center px-2">
+      {/* Outer wrapper for the card */}
+      <div className="relative w-full max-w-[1024px]">
         {/* Border Frame */}
         <img
           src={borderElementImg}
           alt="Card Border"
-          className="w-full object-contain"
+          className="w-full h-auto object-contain"
         />
 
-        {/* Dedicated Image Container - Shorter and wider */}
-        <div className="absolute top-[38px] left-1/2 -translate-x-1/2 w-[82%] aspect-[3/1] rounded-[16px] overflow-hidden bg-gray-200 flex items-center justify-center">
+        {/* Image container - responsive aspect ratio */}
+        <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[80%] aspect-[3/1] sm:aspect-[3/1] md:aspect-[3/1] rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center">
           <img
             src={brandDetails.image}
             alt={brandDetails.title || "Brand"}
@@ -26,30 +26,26 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
 
         {/* Text Content */}
         {showContent && (
-          <div className="absolute top-[150px] left-1/2 -translate-x-1/2 w-[80%] text-center flex flex-col h-full">
-            <h3 className="text-[12px] font-bold text-[#FBF5E5] md:text-[14px]">
+          <div className="absolute top-[40%] sm:top-[45%] md:top-[150px] left-1/2 -translate-x-1/2 w-[85%] text-center flex flex-col">
+            <h3 className="text-lg sm:text-base md:text-base font-bold text-[#FBF5E5]">
               {brandDetails.title}
             </h3>
 
-            <p className="mt-[12px] text-[16px] md:text-[14px] text-[#FBF5E5] leading-relaxed text-justify">
+            <p className="mt-2 text-sm sm:text-[10px] md:text-xs text-[#FBF5E5] leading-relaxed text-justify px-4 sm:px-3 md:px-4">
               {brandDetails.description}
             </p>
-
-            <div className="mt-auto"></div>
           </div>
         )}
 
-        {/* Button positioned lower at bottom of the border image */}
+        {/* Button */}
         {showContent && (
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full flex justify-center">
-            <div className="mb-[40px]"> {/* Increased from 64px to 80px - or adjust as needed */}
-              <button
-                onClick={() => onReadMore(brandDetails.id)}
-                className="bg-gray-900 hover:bg-gray-700 text-white font-medium py-[12px] px-[32px] rounded-[5px] transition-colors duration-200 shadow-md text-[16px]"
-              >
-                Read More
-              </button>
-            </div>
+          <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-full flex justify-center">
+            <button
+              onClick={() => onReadMore(brandDetails.id)}
+              className="bg-gray-900 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 shadow-md text-sm sm:text-base"
+            >
+              Read More
+            </button>
           </div>
         )}
       </div>
