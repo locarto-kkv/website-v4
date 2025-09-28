@@ -320,11 +320,12 @@ const Homepage = () => {
               </div>
               
               <h3 className="text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
-                Join the Beta Revolution
+                 Reserve your spot, Sign up for our Beta
+
               </h3>
               
               <p className="text-lg md:text-xl mb-8 opacity-90 max-w-2xl mx-auto leading-relaxed">
-                Be among the first to experience the future of local discovery. Get exclusive early access and shape the platform.
+                Be one of the first to explore the future of local discovery. Gain exclusive early access and help shape Locarto the way you want it
               </p>
               
               <form className="max-w-lg mx-auto space-y-4">

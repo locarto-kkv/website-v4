@@ -4,77 +4,111 @@ import { useLocation } from "react-router-dom";
 const VendorSidebar = ({ onNavigate }) => {
   const location = useLocation();
   const activePath = location.pathname;
-
-  const activeClass = "bg-primary text-white";
-  const inactiveClass = "bg-gray-100 hover:bg-gray-200 text-gray-800";
+  
+  const menuItems = [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: "fas fa-chart-line",
+      path: "/vendor/dashboard",
+      isActive: activePath.endsWith("/vendor/dashboard") || activePath === "/vendor"
+    },
+    {
+      id: "analytics",
+      label: "Analytics", 
+      icon: "fas fa-chart-bar",
+      path: "/vendor/analytics",
+      isActive: activePath.endsWith("/analytics")
+    },
+    {
+      id: "products",
+      label: "Products",
+      icon: "fas fa-box",
+      path: "/vendor/products", 
+      isActive: activePath.endsWith("/products")
+    },
+    {
+      id: "support",
+      label: "Support",
+      icon: "fas fa-headset",
+      path: "/vendor/support",
+      isActive: activePath.endsWith("/support")
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: "fas fa-cog",
+      path: "/vendor/settings",
+      isActive: activePath.endsWith("/settings")
+    },
+    {
+      id: "profile",
+      label: "Profile",
+      icon: "fas fa-user-circle", 
+      path: "/vendor/profile",
+      isActive: activePath.endsWith("/profile")
+    }
+  ];
 
   return (
-    <div className="w-64 bg-white shadow-md p-4 h-screen sticky top-0">
-      <ul className="space-y-3 pt-4">
-        <li>
-          <button
-            onClick={() => onNavigate("/vendor/dashboard")}
-            className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith("/vendor/dashboard") ||
-              activePath === "/vendor"
-                ? activeClass
-                : inactiveClass
-            }`}
-          >
-            Dashboard
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => onNavigate("/vendor/analytics")}
-            className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith("/analytics") ? activeClass : inactiveClass
-            }`}
-          >
-            Analytics
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => onNavigate("/vendor/support")}
-            className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith("/support") ? activeClass : inactiveClass
-            }`}
-          >
-            Support
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => onNavigate("/vendor/products")}
-            className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith("/products") ? activeClass : inactiveClass
-            }`}
-          >
-            Products
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => onNavigate("/vendor/settings")}
-            className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith("/settings") ? activeClass : inactiveClass
-            }`}
-          >
-            Settings
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => onNavigate("/vendor/profile")}
-            className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-              activePath.endsWith("/profile") ? activeClass : inactiveClass
-            }`}
-          >
-            Profile
-          </button>
-        </li>
-      </ul>
+    <div className="w-64 bg-white shadow-lg border-r border-gray-200 h-screen sticky top-0 flex flex-col">
+      {/* Header */}
+      <div className="p-6 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+            <i className="fas fa-store text-white text-lg"></i>
+          </div>
+          <div>
+            <h2 className="font-bold text-gray-900 text-lg">Vendor Portal</h2>
+            <p className="text-sm text-gray-500">Manage your business</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Menu */}
+      <nav className="flex-1 p-4">
+        <ul className="space-y-2">
+          {menuItems.map((item) => (
+            <li key={item.id}>
+              <button
+                onClick={() => onNavigate(item.path)}
+                className={`group w-full text-left py-3 px-4 rounded-xl transition-all duration-300 font-medium flex items-center gap-3 ${
+                  item.isActive
+                    ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg transform scale-105"
+                    : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 hover:shadow-md hover:scale-105"
+                }`}
+              >
+                <i className={`${item.icon} text-lg ${
+                  item.isActive 
+                    ? "text-white" 
+                    : "text-gray-500 group-hover:text-orange-500"
+                } transition-colors duration-300`}></i>
+                <span className="font-semibold">{item.label}</span>
+                
+                {/* Active indicator */}
+                {item.isActive && (
+                  <div className="ml-auto">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  </div>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-100">
+        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <i className="fas fa-lightbulb text-orange-500"></i>
+            <span className="text-sm font-semibold text-gray-700">Pro Tip</span>
+          </div>
+          <p className="text-xs text-gray-600 leading-relaxed">
+            Check your analytics daily to track performance and optimize your listings.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,31 +1,281 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const TopSellingProducts = () => {
-  // This is currently static data.
-  // You would typically fetch this data from an API.
-  const topProducts = [
-    { name: "Wireless Headphones", sold: 120 },
-    { name: "Smart Watch", sold: 98 },
-    { name: "Bluetooth Speaker", sold: 76 },
+const TopSellingProducts = ({ products = [] }) => {
+  const [timeRange, setTimeRange] = useState('week');
+  const [viewMode, setViewMode] = useState('grid');
+
+  // Enhanced static data with more details
+  const defaultTopProducts = [
+    { 
+      id: 1,
+      name: "Premium Wireless Headphones", 
+      sold: 120,
+      revenue: 14400,
+      growth: 15.2,
+      category: "Electronics",
+      image: null,
+      rating: 4.8,
+      inStock: true,
+      trend: 'up'
+    },
+    { 
+      id: 2,
+      name: "Smart Fitness Watch", 
+      sold: 98,
+      revenue: 19600,
+      growth: 8.7,
+      category: "Wearables",
+      image: null,
+      rating: 4.6,
+      inStock: true,
+      trend: 'up'
+    },
+    { 
+      id: 3,
+      name: "Bluetooth Speaker Pro", 
+      sold: 76,
+      revenue: 9120,
+      growth: -2.1,
+      category: "Audio",
+      image: null,
+      rating: 4.4,
+      inStock: false,
+      trend: 'down'
+    },
+    { 
+      id: 4,
+      name: "USB-C Power Bank", 
+      sold: 65,
+      revenue: 3250,
+      growth: 22.3,
+      category: "Accessories",
+      image: null,
+      rating: 4.5,
+      inStock: true,
+      trend: 'up'
+    }
+  ];
+
+  const topProducts = products.length > 0 ? products : defaultTopProducts;
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
+  const getProductIcon = (category) => {
+    const icons = {
+      'Electronics': 'fas fa-laptop',
+      'Wearables': 'fas fa-clock',
+      'Audio': 'fas fa-volume-up',
+      'Accessories': 'fas fa-plug',
+      'Default': 'fas fa-box'
+    };
+    return icons[category] || icons['Default'];
+  };
+
+  const getRankBadge = (index) => {
+    const badges = {
+      0: { color: 'bg-gradient-to-r from-yellow-400 to-yellow-600', icon: 'fas fa-crown' },
+      1: { color: 'bg-gradient-to-r from-gray-400 to-gray-600', icon: 'fas fa-medal' },
+      2: { color: 'bg-gradient-to-r from-amber-600 to-amber-800', icon: 'fas fa-award' }
+    };
+    return badges[index] || { color: 'bg-gradient-to-r from-blue-500 to-blue-700', icon: 'fas fa-star' };
+  };
+
+  const timeRanges = [
+    { value: 'week', label: 'This Week' },
+    { value: 'month', label: 'This Month' },
+    { value: 'quarter', label: 'This Quarter' },
+    { value: 'year', label: 'This Year' }
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold text-secondary mb-6">
-        Top Selling Products
-      </h2>
-      <div className="space-y-4">
-        {topProducts.map((product, index) => (
-          <div key={index} className="flex items-center">
-            <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4">
-              {/* You can add an <img /> tag here for product images */}
-            </div>
-            <div>
-              <h3 className="font-medium">{product.name}</h3>
-              <p className="text-gray-600 text-sm">{product.sold} sold</p>
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <i className="fas fa-trophy text-yellow-500"></i>
+              Top Selling Products
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">Best performing products by sales volume</p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            {/* Time Range Selector */}
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+            >
+              {timeRanges.map(range => (
+                <option key={range.value} value={range.value}>{range.label}</option>
+              ))}
+            </select>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded text-xs transition-all ${
+                  viewMode === 'grid' 
+                    ? 'bg-white text-indigo-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <i className="fas fa-th-large"></i>
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded text-xs transition-all ${
+                  viewMode === 'list' 
+                    ? 'bg-white text-indigo-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <i className="fas fa-list"></i>
+              </button>
             </div>
           </div>
-        ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {topProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <i className="fas fa-chart-bar text-gray-300 text-4xl mb-4"></i>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No sales data available</h3>
+            <p className="text-gray-500">Start selling products to see your top performers here.</p>
+          </div>
+        ) : (
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 gap-6' : 'space-y-4'}>
+            {topProducts.map((product, index) => {
+              const rankBadge = getRankBadge(index);
+              
+              return (
+                <div 
+                  key={product.id || index}
+                  className={`group relative bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all duration-300 p-6 ${
+                    viewMode === 'grid' ? '' : ''
+                  }`}
+                >
+                  {/* Rank Badge */}
+                  <div className={`absolute -top-3 -left-3 w-8 h-8 ${rankBadge.color} rounded-full flex items-center justify-center shadow-lg z-10`}>
+                    <i className={`${rankBadge.icon} text-white text-xs`}></i>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    {/* Product Image/Icon */}
+                    <div className="relative flex-shrink-0">
+                      <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center shadow-sm">
+                        <i className={`${getProductIcon(product.category)} text-indigo-600 text-xl`}></i>
+                      </div>
+                      {!product.inStock && (
+                        <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                          <i className="fas fa-exclamation text-white text-xs"></i>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Product Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 truncate text-lg">
+                            {product.name}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                              {product.category}
+                            </span>
+                            {product.rating && (
+                              <div className="flex items-center gap-1">
+                                <i className="fas fa-star text-yellow-400 text-xs"></i>
+                                <span className="text-xs text-gray-600">{product.rating}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Growth Indicator */}
+                        <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                          product.growth > 0 
+                            ? 'bg-green-100 text-green-800' 
+                            : product.growth < 0 
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          <i className={`fas fa-arrow-${product.growth > 0 ? 'up' : product.growth < 0 ? 'down' : 'right'} text-xs`}></i>
+                          {Math.abs(product.growth)}%
+                        </div>
+                      </div>
+
+                      {/* Metrics Row */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <div className="text-2xl font-bold text-gray-900">
+                            {product.sold}
+                          </div>
+                          <div className="text-sm text-gray-500">units sold</div>
+                        </div>
+                        
+                        <div className="text-right">
+                          <div className="text-xl font-bold text-gray-900">
+                            {formatCurrency(product.revenue)}
+                          </div>
+                          <div className="text-sm text-gray-500">revenue</div>
+                        </div>
+
+                        {/* Stock Status */}
+                        <div className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                          product.inStock 
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {product.inStock ? 'In Stock' : 'Out of Stock'}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button className="flex-1 p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors text-sm font-medium" title="View Details">
+                          <i className="fas fa-eye mr-2"></i>
+                          View
+                        </button>
+                        <button className="flex-1 p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium" title="Edit Product">
+                          <i className="fas fa-edit mr-2"></i>
+                          Edit
+                        </button>
+                        <button className="flex-1 p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors text-sm font-medium" title="Analytics">
+                          <i className="fas fa-chart-line mr-2"></i>
+                          Stats
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 flex items-center justify-between text-sm text-gray-600">
+        <div>
+          Showing top {topProducts.length} products
+        </div>
+        <button className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 font-medium hover:underline transition-colors">
+          <span>View Full Report</span>
+          <i className="fas fa-arrow-right text-xs"></i>
+        </button>
       </div>
     </div>
   );
