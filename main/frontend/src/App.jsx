@@ -9,6 +9,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import Homepage from "./pages/homepage";
 import LandingPage from "./pages/landingpage";
 import MapView from "./components/MapView";
+import DiscoverPage from "./pages/DiscoverPage";
 
 // Vendor Pages
 import VendorRoutes from "./pages/vendor/vendorRoutes";
@@ -37,6 +38,7 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/map" element={<MapView />} />
         <Route path="/landing" element={<LandingPage />} />
+        <Route path="/discover" element={<DiscoverPage />} />
         
         {/* --- VENDOR ROUTES --- */}
         <Route path="vendor/*" element={<VendorRoutes />} />

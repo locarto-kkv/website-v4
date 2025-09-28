@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 // Components
 import Navbar from "../components/Navbar";
@@ -15,9 +16,9 @@ import locartoImg from "../assets/locarto.png";
 import snabbitImg from "../assets/snabbitimage.png";
 import landingVid from "../assets/landing_vid.mp4";
 import WhatInItForYou from "../components/landing/WhatInItForYou.jsx";
-import Insta from "../../src/assets/insta.png"
-import Youtube from "../../src/assets/yt.png"
-import Whatsapp from "../../src/assets/whatsapp.png"
+import Insta from "../../src/assets/insta.png";
+import Youtube from "../../src/assets/yt.png";
+import Whatsapp from "../../src/assets/whatsapp.png";
 
 // --- Assign images to the brand data ---
 const brandsWithImages = brandData.map((brand) => {
@@ -35,23 +36,27 @@ const LandingPage = () => {
     alert(`Read more about ${brandId}`);
   };
 
-  
   return (
-    <div className="font-sans flex min-h-screen flex-col bg-[#0D1539] text-[#FBF5E5]">
+    <div
+      className="font-sans flex flex-col text-[#FBF5E5] min-h-screen"
+      style={{
+        backgroundImage: `url(${backgroundImg})`,
+        backgroundSize: "cover",              // stretch to cover full page
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center center",  // vertically & horizontally centered
+      }}
+    >
       <Navbar pageType="landing" />
-  
+
       {/* Hero Section */}
-      <section
-        className="flex flex-col items-center justify-center bg-cover bg-center"
-        style={{ backgroundImage: `url(${backgroundImg})` }}
-      >
+      <section className="flex flex-col items-center justify-center">
         <div className="w-full max-w-7xl px-4 md:px-6">
-          {/* Main Title - Smaller text on mobile */}
+          {/* Main Title */}
           <h1 className="mb-2 pt-32 pb-12 text-3xl font-extrabold text-left md:text-5xl lg:text-7xl">
             THE PLATFORM THAT GETS IT...
           </h1>
-  
-          {/* Sub Title - Smaller text on mobile */}
+
+          {/* Sub Title */}
           <p className="-mt-2 text-xl leading-relaxed text-left md:text-3xl lg:text-4xl">
             <span className="text-orange-500">For brands</span> with something
             to say and <br />
@@ -145,8 +150,8 @@ const LandingPage = () => {
 
             {/* Discover More Button */}
             <div className="mt-12 flex justify-center">
-              <button
-                onClick={() => alert("Discover More clicked!")}
+              <Link
+                to="/discover"
                 className="bg-[#0D1539] hover:bg-[#1A244C] text-white font-medium py-4 px-8 rounded-[12px] transition-colors duration-200 shadow-md text-xl flex items-center gap-2 cursor-pointer"
               >
                 <span>Discover More</span>
@@ -165,11 +170,10 @@ const LandingPage = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
-      </section>
 
       <WhatInItForYou />
 
@@ -184,62 +188,45 @@ const LandingPage = () => {
       </div>
 
       {/* Email Subscription Section */}
+        {/* Email Subscription Section */}
       <div className="bg-[#0D1539] py-8 px-4 text-center">
-        <div className="max-w-xl mx-auto">
-          <div className="flex items-stretch border border-white/30 rounded-full overflow-hidden">
-            <input
-              type="email"
-              placeholder="emailaddress@gmail.com"
-              className="flex-1 px-4 py-2 text-sm text-[#FBF5E5] bg-transparent focus:outline-none placeholder:text-white/70"
-            />
-            <button className="px-4 py-2 text-sm font-medium bg-white text-[#0D1539] hover:bg-gray-100 transition-colors duration-200 whitespace-nowrap rounded-full">
-              Plug into the rhythm
-            </button>
+          <div className="max-w-xl mx-auto">
+            <div className="flex items-stretch border border-white/30 rounded-full overflow-hidden">
+                <input
+                type="email"
+                placeholder="emailaddress@gmail.com"
+                className="flex-1 px-4 py-2 text-sm text-[#FBF5E5] bg-transparent focus:outline-none placeholder:text-white/70"
+                />
+                <button className="px-4 py-2 text-sm font-medium bg-white text-[#0D1539] hover:bg-gray-100 transition-colors duration-200 whitespace-nowrap rounded-full">
+                Plug into the rhythm
+                </button>
+            </div>
           </div>
-        </div>
       </div>
 
-            {/* Social Media Buttons */}
+      {/* Social Media Buttons */}
       <div className="bg-[#0D1539] py-8 px-4 text-center">
         <div className="max-w-xl mx-auto flex justify-center gap-1">
-          {/* Instagram Button */}
-          <a 
-            href="https://instagram.com" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="group"
-          >
-            <img 
-              src={Insta} 
-              alt="Instagram" 
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="group">
+            <img
+              src={Insta}
+              alt="Instagram"
               className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-200 cursor-pointer"
             />
           </a>
 
-          {/* YouTube Button */}
-          <a 
-            href="https://youtube.com" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="group"
-          >
-            <img 
-              src={Youtube} 
-              alt="YouTube" 
+          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="group">
+            <img
+              src={Youtube}
+              alt="YouTube"
               className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-200 cursor-pointer"
             />
           </a>
 
-          {/* WhatsApp Button */}
-          <a 
-            href="https://wa.me/yournumber" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="group"
-          >
-            <img 
-              src={Whatsapp} 
-              alt="WhatsApp" 
+          <a href="https://wa.me/yournumber" target="_blank" rel="noopener noreferrer" className="group">
+            <img
+              src={Whatsapp}
+              alt="WhatsApp"
               className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-200 cursor-pointer"
             />
           </a>
@@ -252,7 +239,7 @@ const LandingPage = () => {
         </h3>
       </div>
 
-      {/* Locarto Logo Banner - Bottom (Full Width, No Crop, Only Top Half Visible) */}
+      {/* Locarto Logo Banner - Bottom */}
       <div className="bg-[#0D1539] w-full overflow-hidden">
         <div className="relative w-full h-48 md:h-64 lg:h-80">
           <img
@@ -263,8 +250,8 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <Footer />
-
+    </section>
+    <Footer />
 
     </div>
   );
