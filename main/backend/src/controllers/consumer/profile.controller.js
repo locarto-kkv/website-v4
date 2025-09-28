@@ -90,7 +90,7 @@ export const deleteProfile = async (req, res) => {
       .delete()
       .eq("id", userId);
 
-    return res.status(200).json({ message: "Profile Deleted Successfully" });
+    res.status(200).json({ message: "Profile Deleted Successfully" });
   } catch (error) {
     logger({
       level: "error",

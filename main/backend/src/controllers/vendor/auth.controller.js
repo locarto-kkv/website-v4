@@ -40,7 +40,7 @@ export const signup = async (req, res) => {
 
     generateToken(user.id, "vendor", res);
 
-    return res.status(201).json({ id: user.id, type: "vendor" });
+    res.status(201).json({ id: user.id, type: "vendor" });
   } catch (error) {
     logger({
       level: "error",

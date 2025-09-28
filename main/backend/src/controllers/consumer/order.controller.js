@@ -1,11 +1,8 @@
 import {
-  addOrder,
-  cancelOrder,
+  addOrderService,
+  cancelOrderService,
 } from "../../services/consumer/order.service.js";
-import {
-  addTransaction,
-  cancelTransaction,
-} from "../../services/consumer/transaction.service.js";
+
 import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
 
@@ -16,23 +13,27 @@ export const getOrderHistory = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const { data: ordersWithRelations, error } = await db
+    const { data: orders, error } = await db
       .from("orders")
       .select(
         `
     *,
-    product:products (*),
-    transaction:transactions (*)
+    product:products (*)
   `
       )
       .eq("consumer_id", userId);
 
     if (error) {
-      console.error(error);
+      logger({
+        level: "error",
+        message: error.message,
+        location: __filename,
+        func: "getOrderHistory",
+      });
       return res.status(500).json({ error: "Failed to fetch transactions" });
     }
 
-    res.status(200).json(ordersWithRelations);
+    res.status(200).json(orders);
   } catch (error) {
     logger({
       level: "error",
@@ -44,46 +45,41 @@ export const getOrderHistory = async (req, res) => {
   }
 };
 
-export const placeOrderTransaction = async (req, res) => {
+export const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { productId, order, transaction } = req.body;
+    const { productId, order } = req.body;
 
-    const newOrder = await addOrder(userId, productId, order);
+    const newOrder = await addOrderService(userId, productId, order);
 
-    const newTransaction = await addTransaction(newOrder.id, transaction);
-
-    res.status(200).json({ order: newOrder, transaction: newTransaction });
+    res.status(200).json({ order: newOrder });
   } catch (error) {
     logger({
       level: "error",
       message: error.message,
       location: __filename,
-      func: "placeOrderTransaction",
+      func: "placeOrder",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const cancelOrderTransaction = async (req, res) => {
+export const cancelOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
 
-    const updatedOrder = await cancelOrder(orderId);
-
-    const updatedTransaction = await cancelTransaction(orderId);
+    const updatedOrder = await cancelOrderService(orderId);
 
     res.status(200).json({
       message: "Order cancelled successfully",
-      orders: updatedOrder,
-      transactions: updatedTransaction,
+      order: updatedOrder,
     });
   } catch (error) {
     logger({
       level: "error",
       message: error.message,
       location: __filename,
-      func: "cancelOrderTransaction",
+      func: "cancelOrder",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }

@@ -1,24 +1,34 @@
 import db from "../../lib/db.js";
+import { cancelOrderService } from "../../services/vendor/order.service.js";
+
 import logger from "../../lib/logger.js";
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
 export const getOrders = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { data: productIds } = await db
-      .from("product")
-      .select("id")
-      .eq("vendor_id", userId);
+    const vendorId = req.user.id;
 
-    const { data: orders } = await db
+    const { data: orders, error } = await db
       .from("orders")
-      .select()
-      .eq("product_id", productIds);
+      .select(
+        `*,
+      product:products (*)
+      `
+      )
+      .eq("product.vendor_id", vendorId)
+      .not("product", "is", null);
+
+    if (error) throw error;
 
     res.status(200).json(orders);
   } catch (error) {
-    logger.error(error);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getOrders",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -37,7 +47,33 @@ export const updateOrderStatus = async (req, res) => {
 
     res.status(200).json(updatedOrder);
   } catch (error) {
-    logger.error(error);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "updateOrderStatus",
+    });
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const cancelOrder = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    const updatedOrder = await cancelOrderService(orderId);
+
+    res.status(200).json({
+      message: "Order cancelled successfully",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "cancelOrder",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
