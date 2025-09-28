@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import locartoImg from "../assets/locarto.png";
 
 const Navbar = ({ cartItems = [] }) => {
   const { currentUser, logout, logoutLoading } = useAuthStore();
@@ -42,14 +43,19 @@ const Navbar = ({ cartItems = [] }) => {
     <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center sticky top-0 z-50">
       {/* Left side: Brand + Dashboard type */}
       <div className="flex items-center">
-        <div className="text-2xl font-bold text-orange-500">
-          <Link to="/">Locarto</Link>
+        <div className="flex items-center">
+          <Link to="/" className="flex items-center">
+            <img 
+              src={locartoImg} 
+              alt="Locarto" 
+              className="h-8 w-auto" // Adjust size as needed
+            />
+          </Link>
         </div>
         <span className="ml-4 bg-orange-100 text-sm font-medium px-3 py-1 rounded-full">
           {isVendor ? "Vendor Dashboard" : "Customer Dashboard"}
         </span>
       </div>
-
 
       {/* Right side: Actions */}
       <div className="flex items-center space-x-4">

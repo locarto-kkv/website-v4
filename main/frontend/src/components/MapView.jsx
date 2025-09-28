@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import locartoImg from "../assets/locarto.png";
 
 const MapView = () => {
   const location = useLocation();
@@ -249,10 +250,13 @@ const MapView = () => {
       <div className="absolute top-6 left-6 z-[9999]">
         <Link
           to="/"
-          className="group text-3xl font-bold text-orange-500 hover:text-orange-400 transition-colors duration-300 hover:scale-105 transform"
-          style={{ textShadow: "0 2px 10px rgba(245, 158, 11, 0.3)" }}
+          className="group hover:scale-105 transform transition-transform duration-300"
         >
-          Locarto
+          <img 
+            src={locartoImg} 
+            alt="Locarto" 
+            className="h-8 w-auto" // Adjust size as needed
+          />
         </Link>
       </div>
 
