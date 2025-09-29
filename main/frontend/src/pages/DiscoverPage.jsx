@@ -228,4 +228,4 @@ const DiscoverPage = () => {
   );
 };
 
-export default DiscoverPage;
+export default DiscoverPage;ß
