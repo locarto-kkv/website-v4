@@ -7,9 +7,11 @@ import VendorDashboard from "./vendorDashboard";
 import VendorProfile from "../../components/vendor/VendorProfile";
 import VendorAnalytics from "../../components/vendor/VendorAnalytics";
 import VendorSettings from "../../components/vendor/VendorSettings";
-import VendorProducts from "../../components/vendor/VendorProducts"; // Add this import
-import VendorSupport from "../../components/vendor/VendorSupport"; // Add this import
+import VendorProducts from "../../components/vendor/VendorProducts";
+import VendorSupport from "../../components/vendor/VendorSupport";
 import VendorSetup from "../../components/vendor/VendorSetupWizard";
+import VendorsMemberHub from "../../components/vendor/VendorsMemberHub"; // Add this import
+
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
   return currentUser ? <Outlet /> : <Navigate to="/vendor/login" replace />;
@@ -38,6 +40,7 @@ const VendorRoutes = () => {
           <Route index element={<VendorDashboard />} />
           <Route path="dashboard" element={<VendorDashboard />} />
           <Route path="products" element={<VendorProducts />} />
+          <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
           <Route path="analytics" element={<VendorAnalytics />} />
           <Route path="settings" element={<VendorSettings />} />

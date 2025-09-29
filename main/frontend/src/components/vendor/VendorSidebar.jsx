@@ -28,6 +28,13 @@ const VendorSidebar = ({ onNavigate }) => {
       isActive: activePath.endsWith("/products")
     },
     {
+      id: "members-hub",
+      label: "Members Hub",
+      icon: "fas fa-users",
+      path: "/vendor/members-hub",
+      isActive: activePath.endsWith("/members-hub")
+    },
+    {
       id: "support",
       label: "Support",
       icon: "fas fa-headset",
@@ -66,7 +73,7 @@ const VendorSidebar = ({ onNavigate }) => {
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-4 overflow-y-auto">
         <ul className="space-y-2">
           {menuItems.map((item) => (
             <li key={item.id}>
