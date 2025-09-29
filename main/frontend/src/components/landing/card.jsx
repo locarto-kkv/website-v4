@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import borderElementImg from "../../assets/border_element.png";
 
 const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
@@ -118,12 +119,12 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
         {showContent && (
           <div className={`absolute ${responsiveStyles.textTop} left-1/2 -translate-x-1/2 w-[85%] text-center flex flex-col`}>
             {/* Title - Dynamically sized based on container */}
-            <h3 className={`font-bold text-[#FBF5E5] leading-tight ${responsiveStyles.title}`}>
+            <h3 className={`font-bold text-[#0D1539] leading-tight ${responsiveStyles.title}`}>
               {brandDetails.title}
             </h3>
 
             {/* Description - Dynamically sized based on container */}
-            <p className={`mt-2 text-[#FBF5E5] leading-relaxed text-justify ${responsiveStyles.textPadding} mt-3 sm:mt-4 ${responsiveStyles.description}`}>
+            <p className={`mt-2 text-[#0D1539] leading-relaxed text-justify ${responsiveStyles.textPadding} mt-3 sm:mt-4 ${responsiveStyles.description}`}>
               {brandDetails.description}
             </p>
           </div>
@@ -132,12 +133,12 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
         {/* Button */}
         {showContent && (
           <div className={`absolute ${responsiveStyles.buttonBottom} left-1/2 -translate-x-1/2 w-full flex justify-center`}>
-            <button
-              onClick={() => onReadMore(brandDetails.id)}
+            <Link
+              to={`/brand/${brandDetails.id}`}
               className="bg-gray-900 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 shadow-md"
             >
               <span className={responsiveStyles.button}>Read More</span>
-            </button>
+            </Link>
           </div>
         )}
       </div>

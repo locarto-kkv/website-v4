@@ -10,7 +10,7 @@ import BrandIdentityCard from "../components/landing/card.jsx";
 import brandData from "../branddata.js";
 
 // Assets
-import backgroundImg from "../assets/landing_background.png";
+// import backgroundImg from "../assets/landing_background.png"; // No longer needed
 import tagImg from "../assets/tag.png";
 import locartoImg from "../assets/locarto.png";
 import snabbitImg from "../assets/snabbitimage.png";
@@ -37,15 +37,8 @@ const LandingPage = () => {
   };
 
   return (
-    <div
-      className="font-sans flex flex-col text-[#FBF5E5] min-h-screen"
-      style={{
-        backgroundImage: `url(${backgroundImg})`,
-        backgroundSize: "cover",              // stretch to cover full page
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center center",  // vertically & horizontally centered
-      }}
-    >
+    // Main container: bg-white, text-[#0D1539]
+    <div className="font-sans flex flex-col text-[#0D1539] min-h-screen bg-white">
       <Navbar pageType="landing" />
 
       {/* Hero Section */}
@@ -72,6 +65,7 @@ const LandingPage = () => {
                 alt="Tag"
                 className="col-start-1 row-start-1 h-[700px] w-full max-w-[1800px] object-contain md:h-[850px]"
               />
+              {/* This text remains white/cream as requested */}
               <p className="col-start-1 row-start-1 translate-y-6 font-bold text-center text-2xl md:text-5xl text-[#FBF5E5] whitespace-nowrap [text-shadow:3px_3px_6px_rgba(0,0,0,0.7)]">
                 We get what's missing. so we made.
               </p>
@@ -85,7 +79,7 @@ const LandingPage = () => {
             />
 
             {/* Sub Text */}
-            <p className="mt-8 text-center text-2xl font-semibold text-[#FBF5E5] md:text-3xl">
+            <p className="mt-8 text-center text-2xl font-semibold md:text-3xl">
               A Community where
             </p>
 
@@ -118,10 +112,10 @@ const LandingPage = () => {
 
             {/* Text Below Video */}
             <div className="mt-28 text-center px-8">
-              <h2 className="text-4xl font-extrabold text-[#FBF5E5] md:text-6xl">
+              <h2 className="text-4xl font-extrabold md:text-6xl">
                 Every Big Brand Started Somewhere
               </h2>
-              <p className="mt-6 text-2xl text-[#FBF5E5] md:text-3xl leading-relaxed">
+              <p className="mt-6 text-2xl md:text-3xl leading-relaxed">
                 But Usually Not On Platforms Designed For Big Brands. So We're
                 Building <br />
                 The Place They Should Have Had From{" "}
@@ -131,22 +125,34 @@ const LandingPage = () => {
 
             {/* Extra Section */}
             <div className="mt-24 text-center px-6">
-              <h2 className="text-3xl font-bold text-[#FBF5E5] md:text-5xl">
+              <h2 className="text-3xl font-bold md:text-5xl">
                 Brands You've been searching for
               </h2>
             </div>
 
-            {/* Cards Section */}
-            <div className="mt-16 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 px-4 md:px-6">
-              {brandsWithImages.map((brand) => (
-                <BrandIdentityCard
-                  key={brand.id}
-                  brand={brand}
-                  showContent={showCardContent}
-                  onReadMore={handleReadMore}
-                />
-              ))}
+          {/* Cards Section */}
+          <div className="mt-16 w-full flex justify-center px-4 md:px-6">
+            <div className="w-full max-w-7xl">
+              <div
+                className="
+                  grid gap-12 justify-center
+                  [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]
+                "
+              >
+                {brandsWithImages.map((brand) => (
+                  <div key={brand.id} className="flex justify-center">
+                    <BrandIdentityCard
+                      brand={brand}
+                      showContent={showCardContent}
+                      onReadMore={handleReadMore}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
+          </div>
+
+
 
             {/* Discover More Button */}
             <div className="mt-12 flex justify-center">
@@ -178,26 +184,27 @@ const LandingPage = () => {
       <WhatInItForYou />
 
       {/* New Banner Section */}
-      <div className="mt-24 bg-[#0D1539] py-12 md:py-16 px-4 text-center">
-        <h2 className="text-4xl md:text-6xl text-white mb-4">
+      {/* Changed background to white, text to #0D1539 */}
+      <div className="mt-24 bg-white py-12 md:py-16 px-4 text-center">
+        <h2 className="text-4xl md:text-6xl text-[#0D1539] mb-4">
           This is just the Beginning
         </h2>
-        <p className="text-xl md:text-2xl text-white opacity-90">
-          The best it yet to come!
+        <p className="text-xl md:text-2xl text-[#0D1539] opacity-90">
+          The best is yet to come!
         </p>
       </div>
 
       {/* Email Subscription Section */}
-        {/* Email Subscription Section */}
-      <div className="bg-[#0D1539] py-8 px-4 text-center">
+      {/* Changed background to white, text to #0D1539 */}
+      <div className="bg-white py-8 px-4 text-center">
           <div className="max-w-xl mx-auto">
-            <div className="flex items-stretch border border-white/30 rounded-full overflow-hidden">
+            <div className="flex items-stretch border border-[#0D1539]/30 rounded-full overflow-hidden">
                 <input
                 type="email"
                 placeholder="emailaddress@gmail.com"
-                className="flex-1 px-4 py-2 text-sm text-[#FBF5E5] bg-transparent focus:outline-none placeholder:text-white/70"
+                className="flex-1 px-4 py-2 text-sm text-[#0D1539] bg-transparent focus:outline-none placeholder:text-[#0D1539]/70"
                 />
-                <button className="px-4 py-2 text-sm font-medium bg-white text-[#0D1539] hover:bg-gray-100 transition-colors duration-200 whitespace-nowrap rounded-full">
+                <button className="px-4 py-2 text-sm font-medium bg-[#0D1539] text-white hover:bg-[#1A244C] transition-colors duration-200 whitespace-nowrap rounded-full">
                 Plug into the rhythm
                 </button>
             </div>
@@ -205,9 +212,10 @@ const LandingPage = () => {
       </div>
 
       {/* Social Media Buttons */}
-      <div className="bg-[#0D1539] py-8 px-4 text-center">
+      {/* Changed background to white, text to #0D1539 */}
+      <div className="bg-white py-8 px-4 text-center">
         <div className="max-w-xl mx-auto flex justify-center gap-1">
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="group">
+          <a href="https://instagram.com  " target="_blank" rel="noopener noreferrer" className="group">
             <img
               src={Insta}
               alt="Instagram"
@@ -215,7 +223,7 @@ const LandingPage = () => {
             />
           </a>
 
-          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="group">
+          <a href="https://youtube.com  " target="_blank" rel="noopener noreferrer" className="group">
             <img
               src={Youtube}
               alt="YouTube"
@@ -223,7 +231,7 @@ const LandingPage = () => {
             />
           </a>
 
-          <a href="https://wa.me/yournumber" target="_blank" rel="noopener noreferrer" className="group">
+          <a href="https://wa.me/yournumber  " target="_blank" rel="noopener noreferrer" className="group">
             <img
               src={Whatsapp}
               alt="WhatsApp"
@@ -233,14 +241,17 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <div className="-mt-8 bg-[#0D1539] py-6 px-4 text-center">
-        <h3 className="text-lg md:text-xl font-light text-white/70 inline-block">
+      {/* Bottom Banner */}
+      {/* Changed background to white, text to #0D1539 */}
+      <div className="-mt-8 bg-white py-6 px-4 text-center">
+        <h3 className="text-lg md:text-xl font-light text-[#0D1539]/70 inline-block">
           Making it worthwhile.
         </h3>
       </div>
 
       {/* Locarto Logo Banner - Bottom */}
-      <div className="bg-[#0D1539] w-full overflow-hidden">
+      {/* Changed background to white */}
+      <div className="bg-white w-full overflow-hidden">
         <div className="relative w-full h-48 md:h-64 lg:h-80">
           <img
             src={locartoImg}

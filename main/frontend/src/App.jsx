@@ -10,7 +10,7 @@ import Homepage from "./pages/homepage";
 import LandingPage from "./pages/landingpage";
 import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
-
+import BrandInfoPage from "./pages/BrandInfoPage";
 // Vendor Pages
 import VendorRoutes from "./pages/vendor/vendorRoutes";
 
@@ -39,7 +39,8 @@ function App() {
         <Route path="/map" element={<MapView />} />
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/discover" element={<DiscoverPage />} />
-        
+        <Route path="/brand/:brandId" element={<BrandInfoPage />} />
+
         {/* --- VENDOR ROUTES --- */}
         <Route path="vendor/*" element={<VendorRoutes />} />
         
