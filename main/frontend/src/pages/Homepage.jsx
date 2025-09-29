@@ -108,7 +108,7 @@ const Homepage = () => {
           
           {/* Hero Section */}
           <div className="text-center mb-20">
-            {/* Multi-Logo Gallery with Spectacular Animations */}
+            {/* Multi-Logo Gallery with Orange Tinted Logos */}
             <div className="relative mx-auto mb-16">
               <div className="w-full max-w-5xl mx-auto">
                 {/* Massive animated background effects */}
@@ -117,151 +117,92 @@ const Homepage = () => {
                 <div className="absolute inset-16 bg-gradient-to-r from-orange-500 via-red-400 to-pink-500 rounded-xl blur-xl opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
                 
                 {/* Horizontal Logo Container */}
-                <div className="relative z-10 flex justify-center items-center gap-8 lg:gap-12 py-12 px-4">
+                <div className="relative z-10 flex justify-center items-center gap-8 lg:gap-16 py-16 px-4">
                   {/* Logo Images Array */}
                   {[1, 2, 3, 4, 5].map((logoNumber, index) => (
                     <div 
                       key={logoNumber}
-                      className="relative transform hover:scale-125 transition-all duration-1000 cursor-pointer group"
+                      className="relative transform hover:scale-110 transition-all duration-700 cursor-pointer group"
                       style={{
                         animationDelay: `${index * 0.2}s`,
                         animation: 'float 4s ease-in-out infinite'
                       }}
                     >
-                      {/* Individual logo container with unique effects */}
-                      <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 flex items-center justify-center relative">
-                        {/* Animated glow behind each logo */}
-                        <div 
-                          className={`absolute inset-0 bg-gradient-to-r rounded-2xl blur-md opacity-30 group-hover:opacity-60 transition-all duration-700 animate-pulse`}
-                          style={{
-                            background: `linear-gradient(45deg, 
-                              ${index === 0 ? '#ff6b6b, #ff8e53' : 
-                                index === 1 ? '#4ecdc4, #44a08d' : 
-                                index === 2 ? '#a8edea, #fed6e3' : 
-                                index === 3 ? '#ffecd2, #fcb69f' : 
-                                '#ff9a9e, #fecfef'})`,
-                            animationDelay: `${index * 0.3}s`
-                          }}
-                        ></div>
+                      {/* Logo container - just for positioning */}
+                      <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 flex items-center justify-center relative">
                         
-                        {/* Rotating ring effect */}
-                        <div 
-                          className="absolute inset-0 border-2 border-gradient rounded-2xl animate-spin opacity-20"
-                          style={{ 
-                            borderImage: `linear-gradient(45deg, transparent, ${
-                              index === 0 ? '#ff6b6b' : 
-                              index === 1 ? '#4ecdc4' : 
-                              index === 2 ? '#a8edea' : 
-                              index === 3 ? '#ffecd2' : 
-                              '#ff9a9e'
-                            }, transparent) 1`,
-                            animationDuration: `${3 + index}s`,
-                            animationDirection: index % 2 === 0 ? 'normal' : 'reverse'
-                          }}
-                        ></div>
-                        
-                        {/* Logo Image */}
+                        {/* Logo Image - Floating freely with no container */}
                         <img 
                           src={`/src/assets/${logoNumber}.png`}
                           alt={`Locarto Logo ${logoNumber}`} 
-                          className="relative z-10 w-20 h-auto sm:w-24 md:w-28 lg:w-32 filter drop-shadow-2xl group-hover:drop-shadow-3xl transition-all duration-700 transform group-hover:rotate-6"
+                          className="relative z-10 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain transition-all duration-700 transform group-hover:rotate-12 group-hover:scale-110"
                           style={{
-                            filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3)) brightness(1.1) contrast(1.1)',
-                            backgroundColor: 'transparent',
-                            mixBlendMode: 'normal'
+                            filter: 'drop-shadow(0 15px 35px rgba(255,100,50,0.4)) drop-shadow(0 5px 15px rgba(255,120,60,0.3))',
                           }}
                         />
                         
-                        {/* Animated shine effect overlay */}
+                        {/* Orbiting animated dots */}
                         <div 
-                          className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1500 skew-x-12 rounded-2xl overflow-hidden"
-                          style={{ animationDelay: `${index * 0.1}s` }}
-                        ></div>
+                          className="absolute inset-0 animate-spin"
+                          style={{ 
+                            animationDuration: `${18 + index * 2}s`,
+                            animationDirection: index % 2 === 0 ? 'normal' : 'reverse'
+                          }}
+                        >
+                          <div className="absolute top-0 left-1/2 w-2 h-2 bg-orange-400 rounded-full transform -translate-x-1/2 shadow-lg shadow-orange-300"></div>
+                        </div>
                         
-                        {/* Pulsating dot indicators */}
                         <div 
-                          className={`absolute -top-2 -right-2 w-3 h-3 rounded-full animate-ping`}
-                          style={{
-                            backgroundColor: index === 0 ? '#ff6b6b' : 
-                                           index === 1 ? '#4ecdc4' : 
-                                           index === 2 ? '#a8edea' : 
-                                           index === 3 ? '#ffecd2' : 
-                                           '#ff9a9e',
-                            animationDelay: `${index * 0.4}s`
+                          className="absolute inset-0 animate-spin"
+                          style={{ 
+                            animationDuration: `${14 + index * 2}s`,
+                            animationDirection: index % 2 === 0 ? 'reverse' : 'normal'
                           }}
-                        ></div>
+                        >
+                          <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-red-400 rounded-full transform -translate-x-1/2 shadow-lg shadow-red-300"></div>
+                        </div>
                         
-                        {/* Floating micro particles */}
                         <div 
-                          className="absolute -top-4 -left-2 w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-bounce opacity-70"
-                          style={{ animationDelay: `${index * 0.2 + 0.1}s` }}
-                        ></div>
-                        <div 
-                          className="absolute -bottom-3 -right-3 w-1.5 h-1.5 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full animate-bounce opacity-60"
-                          style={{ animationDelay: `${index * 0.2 + 0.8}s` }}
-                        ></div>
-                      </div>
-                      
-                      {/* Individual orbiting elements */}
-                      <div 
-                        className="absolute inset-0 animate-spin opacity-40"
-                        style={{ 
-                          animationDuration: `${15 + index * 2}s`,
-                          animationDirection: index % 2 === 0 ? 'normal' : 'reverse'
-                        }}
-                      >
-                        <div 
-                          className={`absolute top-0 left-1/2 w-2 h-2 rounded-full transform -translate-x-1/2`}
-                          style={{
-                            backgroundColor: index === 0 ? '#ff6b6b' : 
-                                           index === 1 ? '#4ecdc4' : 
-                                           index === 2 ? '#a8edea' : 
-                                           index === 3 ? '#ffecd2' : 
-                                           '#ff9a9e'
+                          className="absolute inset-0 animate-spin"
+                          style={{ 
+                            animationDuration: `${22 + index * 2}s`,
+                            animationDirection: 'normal'
                           }}
-                        ></div>
-                      </div>
-                      
-                      {/* Counter-rotating element */}
-                      <div 
-                        className="absolute inset-0 animate-spin opacity-30"
-                        style={{ 
-                          animationDuration: `${10 + index}s`,
-                          animationDirection: index % 2 === 0 ? 'reverse' : 'normal'
-                        }}
-                      >
+                        >
+                          <div className="absolute top-1/2 right-0 w-1.5 h-1.5 bg-orange-300 rounded-full transform -translate-y-1/2 shadow-lg shadow-orange-200"></div>
+                        </div>
+                        
                         <div 
-                          className={`absolute bottom-0 left-1/2 w-1.5 h-1.5 rounded-full transform -translate-x-1/2`}
-                          style={{
-                            backgroundColor: index === 0 ? '#orange' : 
-                                           index === 1 ? '#cyan' : 
-                                           index === 2 ? '#pink' : 
-                                           index === 3 ? '#yellow' : 
-                                           '#purple'
+                          className="absolute inset-0 animate-spin"
+                          style={{ 
+                            animationDuration: `${16 + index * 2}s`,
+                            animationDirection: 'reverse'
                           }}
-                        ></div>
+                        >
+                          <div className="absolute top-1/2 left-0 w-1.5 h-1.5 bg-red-300 rounded-full transform -translate-y-1/2 shadow-lg shadow-red-200"></div>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
                 
-                {/* Global floating particles with rainbow colors */}
-                <div className="absolute -top-8 left-1/4 w-4 h-4 bg-gradient-to-r from-red-400 to-pink-500 rounded-full animate-bounce opacity-60" style={{ animationDelay: '0.2s' }}></div>
-                <div className="absolute -bottom-6 right-1/4 w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-500 rotate-45 animate-bounce opacity-70" style={{ animationDelay: '0.8s' }}></div>
-                <div className="absolute top-1/3 -right-8 w-2 h-2 bg-gradient-to-r from-green-400 to-teal-500 rounded-full animate-bounce opacity-50" style={{ animationDelay: '1.2s' }}></div>
-                <div className="absolute top-1/4 -left-6 w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-bounce opacity-60" style={{ animationDelay: '1.6s' }}></div>
-                <div className="absolute bottom-1/3 left-1/6 w-2.5 h-2.5 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full animate-bounce opacity-40" style={{ animationDelay: '2s' }}></div>
-                <div className="absolute top-1/2 right-1/6 w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-bounce opacity-70" style={{ animationDelay: '2.4s' }}></div>
+                {/* Global floating particles with orange rainbow colors */}
+                <div className="absolute -top-8 left-1/4 w-4 h-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-60" style={{ animationDelay: '0.2s' }}></div>
+                <div className="absolute -bottom-6 right-1/4 w-3 h-3 bg-gradient-to-r from-orange-500 to-red-600 rotate-45 animate-bounce opacity-70" style={{ animationDelay: '0.8s' }}></div>
+                <div className="absolute top-1/3 -right-8 w-2 h-2 bg-gradient-to-r from-orange-300 to-orange-500 rounded-full animate-bounce opacity-50" style={{ animationDelay: '1.2s' }}></div>
+                <div className="absolute top-1/4 -left-6 w-3 h-3 bg-gradient-to-r from-red-400 to-orange-500 rounded-full animate-bounce opacity-60" style={{ animationDelay: '1.6s' }}></div>
+                <div className="absolute bottom-1/3 left-1/6 w-2.5 h-2.5 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-40" style={{ animationDelay: '2s' }}></div>
+                <div className="absolute top-1/2 right-1/6 w-2 h-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-bounce opacity-70" style={{ animationDelay: '2.4s' }}></div>
                 
-                {/* Large orbiting elements */}
+                {/* Large orbiting elements with orange theme */}
                 <div className="absolute inset-0 animate-spin opacity-20" style={{ animationDuration: '25s' }}>
                   <div className="absolute top-4 left-1/2 w-3 h-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-full transform -translate-x-1/2"></div>
                 </div>
                 <div className="absolute inset-0 animate-spin opacity-15" style={{ animationDuration: '20s', animationDirection: 'reverse' }}>
-                  <div className="absolute bottom-4 left-1/2 w-2.5 h-2.5 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full transform -translate-x-1/2"></div>
+                  <div className="absolute bottom-4 left-1/2 w-2.5 h-2.5 bg-gradient-to-r from-red-400 to-orange-500 rounded-full transform -translate-x-1/2"></div>
                 </div>
                 <div className="absolute inset-0 animate-spin opacity-25" style={{ animationDuration: '30s' }}>
-                  <div className="absolute top-1/2 right-8 w-2 h-2 bg-gradient-to-r from-green-400 to-teal-500 rounded-full transform -translate-y-1/2"></div>
+                  <div className="absolute top-1/2 right-8 w-2 h-2 bg-gradient-to-r from-orange-300 to-red-400 rounded-full transform -translate-y-1/2"></div>
                 </div>
               </div>
             </div>
