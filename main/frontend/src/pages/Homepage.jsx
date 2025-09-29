@@ -164,11 +164,11 @@ const Homepage = () => {
                         <img 
                           src={`/src/assets/${logoNumber}.png`}
                           alt={`Locarto Logo ${logoNumber}`} 
-                          className="relative z-10 w-20 h-auto sm:w-24 md:w-28 lg:w-32 transition-all duration-700 transform group-hover:rotate-6 logo-transparent"
+                          className="relative z-10 w-20 h-auto sm:w-24 md:w-28 lg:w-32 filter drop-shadow-2xl group-hover:drop-shadow-3xl transition-all duration-700 transform group-hover:rotate-6"
                           style={{
                             filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3)) brightness(1.1) contrast(1.1)',
                             backgroundColor: 'transparent',
-                            mixBlendMode: 'multiply'
+                            mixBlendMode: 'normal'
                           }}
                         />
                         
@@ -378,24 +378,6 @@ const Homepage = () => {
             
             .shadow-3xl {
               box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-            }
-
-            .logo-transparent {
-              background: transparent !important;
-              mix-blend-mode: multiply;
-              filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)) brightness(1.2) contrast(1.3) saturate(1.1);
-            }
-
-            .logo-transparent::before {
-              content: '';
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              background: white;
-              mix-blend-mode: difference;
-              pointer-events: none;
             }
           `}</style>
 
