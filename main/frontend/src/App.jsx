@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 
-
 // Public Pages
 import Homepage from "./pages/homepage";
 import LandingPage from "./pages/landingpage";
@@ -15,13 +14,21 @@ import BrandInfoPage from "./pages/BrandInfoPage";
 import VendorRoutes from "./pages/vendor/vendorRoutes";
 
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
+import { useAnalyticStore } from "./store/useAnalyticStore";
 
 function App() {
-  const { authLoading, checkAuth } = useAuthStore();
+  const { authLoading, checkAuth, currentUser } = useAuthStore();
+  const { getAnalyticData, dataLoading, products, orders } = useAnalyticStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (currentUser.type === "vendor") {
+      getAnalyticData();
+    }
+  }, [currentUser]);
 
   if (authLoading) {
     return (
@@ -38,12 +45,9 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/map" element={<MapView />} />
         <Route path="/landing" element={<LandingPage />} />
-        <Route path="/discover" element={<DiscoverPage />} />
-        <Route path="/brand/:brandId" element={<BrandInfoPage />} />
-
         {/* --- VENDOR ROUTES --- */}
         <Route path="vendor/*" element={<VendorRoutes />} />
-        
+
         {/* --- CONSUMER ROUTES --- */}
         <Route path="consumer/*" element={<ConsumerRoutes />} />
       </Routes>

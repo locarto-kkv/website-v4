@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useAnalyticStore } from "../../store/useAnalyticStore";
 
-const TopSellingProducts = ({ products = [] }) => {
-  const [timeRange, setTimeRange] = useState('week');
-  const [viewMode, setViewMode] = useState('grid');
+const TopSellingProducts = () => {
+  const [viewMode, setViewMode] = useState("grid");
+
+  const { products, changeDataRange } = useAnalyticStore();
 
   // Enhanced static data with more details
   const defaultTopProducts = [
-    { 
+    {
       id: 1,
-      name: "Premium Wireless Headphones", 
+      name: "Premium Wireless Headphones",
       sold: 120,
       revenue: 14400,
       growth: 15.2,
@@ -16,11 +18,11 @@ const TopSellingProducts = ({ products = [] }) => {
       image: null,
       rating: 4.8,
       inStock: true,
-      trend: 'up'
+      trend: "up",
     },
-    { 
+    {
       id: 2,
-      name: "Smart Fitness Watch", 
+      name: "Smart Fitness Watch",
       sold: 98,
       revenue: 19600,
       growth: 8.7,
@@ -28,11 +30,11 @@ const TopSellingProducts = ({ products = [] }) => {
       image: null,
       rating: 4.6,
       inStock: true,
-      trend: 'up'
+      trend: "up",
     },
-    { 
+    {
       id: 3,
-      name: "Bluetooth Speaker Pro", 
+      name: "Bluetooth Speaker Pro",
       sold: 76,
       revenue: 9120,
       growth: -2.1,
@@ -40,11 +42,11 @@ const TopSellingProducts = ({ products = [] }) => {
       image: null,
       rating: 4.4,
       inStock: false,
-      trend: 'down'
+      trend: "down",
     },
-    { 
+    {
       id: 4,
-      name: "USB-C Power Bank", 
+      name: "USB-C Power Bank",
       sold: 65,
       revenue: 3250,
       growth: 22.3,
@@ -52,93 +54,107 @@ const TopSellingProducts = ({ products = [] }) => {
       image: null,
       rating: 4.5,
       inStock: true,
-      trend: 'up'
-    }
+      trend: "up",
+    },
   ];
 
   const topProducts = products.length > 0 ? products : defaultTopProducts;
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
   const getProductIcon = (category) => {
     const icons = {
-      'Electronics': 'fas fa-laptop',
-      'Wearables': 'fas fa-clock',
-      'Audio': 'fas fa-volume-up',
-      'Accessories': 'fas fa-plug',
-      'Default': 'fas fa-box'
+      Electronics: "fas fa-laptop",
+      Wearables: "fas fa-clock",
+      Audio: "fas fa-volume-up",
+      Accessories: "fas fa-plug",
+      Default: "fas fa-box",
     };
-    return icons[category] || icons['Default'];
+    return icons[category] || icons["Default"];
   };
 
   const getRankBadge = (index) => {
     const badges = {
-      0: { color: 'bg-gradient-to-br from-yellow-400 to-yellow-500', icon: 'fas fa-crown', shadow: 'shadow-yellow-200' },
-      1: { color: 'bg-gradient-to-br from-gray-300 to-gray-400', icon: 'fas fa-medal', shadow: 'shadow-gray-200' },
-      2: { color: 'bg-gradient-to-br from-orange-400 to-orange-500', icon: 'fas fa-award', shadow: 'shadow-orange-200' }
+      0: {
+        color: "bg-gradient-to-r from-yellow-400 to-yellow-600",
+        icon: "fas fa-crown",
+      },
+      1: {
+        color: "bg-gradient-to-r from-gray-400 to-gray-600",
+        icon: "fas fa-medal",
+      },
+      2: {
+        color: "bg-gradient-to-r from-amber-600 to-amber-800",
+        icon: "fas fa-award",
+      },
     };
-    return badges[index] || { color: 'bg-gradient-to-br from-blue-400 to-blue-500', icon: 'fas fa-star', shadow: 'shadow-blue-200' };
+    return (
+      badges[index] || {
+        color: "bg-gradient-to-r from-blue-500 to-blue-700",
+        icon: "fas fa-star",
+      }
+    );
   };
 
   const timeRanges = [
-    { value: 'week', label: 'This Week' },
-    { value: 'month', label: 'This Month' },
-    { value: 'quarter', label: 'This Quarter' },
-    { value: 'year', label: 'This Year' }
+    { value: "week", label: "This Week" },
+    { value: "month", label: "This Month" },
+    { value: "total", label: "Total" },
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
-      {/* Compact Header */}
-      <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center shadow-sm">
-              <i className="fas fa-trophy text-white text-sm"></i>
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-gray-900">Top Selling Products</h2>
-              <p className="text-xs text-gray-500">Best performing by sales volume</p>
-            </div>
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <i className="fas fa-trophy text-yellow-500"></i>
+              Top Selling Products
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Best performing products by sales volume
+            </p>
           </div>
-          
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-3">
             {/* Time Range Selector */}
             <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="px-2 py-1 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-700 font-medium"
+              onChange={(e) => changeDataRange(e.target.value)}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
             >
-              {timeRanges.map(range => (
-                <option key={range.value} value={range.value}>{range.label}</option>
+              {timeRanges.map((range) => (
+                <option key={range.value} value={range.value}>
+                  {range.label}
+                </option>
               ))}
             </select>
 
             {/* View Mode Toggle */}
             <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
               <button
-                onClick={() => setViewMode('grid')}
+                onClick={() => setViewMode("grid")}
                 className={`p-1.5 rounded text-xs transition-all ${
-                  viewMode === 'grid' 
-                    ? 'bg-white text-orange-600 shadow-sm' 
-                    : 'text-gray-500 hover:text-gray-700'
+                  viewMode === "grid"
+                    ? "bg-white text-indigo-600 shadow-sm"
+                    : "text-gray-600 hover:text-gray-800"
                 }`}
               >
                 <i className="fas fa-th-large"></i>
               </button>
               <button
-                onClick={() => setViewMode('list')}
+                onClick={() => setViewMode("list")}
                 className={`p-1.5 rounded text-xs transition-all ${
-                  viewMode === 'list' 
-                    ? 'bg-white text-orange-600 shadow-sm' 
-                    : 'text-gray-500 hover:text-gray-700'
+                  viewMode === "list"
+                    ? "bg-white text-indigo-600 shadow-sm"
+                    : "text-gray-600 hover:text-gray-800"
                 }`}
               >
                 <i className="fas fa-list"></i>
@@ -151,31 +167,47 @@ const TopSellingProducts = ({ products = [] }) => {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-4">
         {topProducts.length === 0 ? (
-          <div className="text-center py-8">
-            <i className="fas fa-chart-bar text-gray-300 text-3xl mb-3"></i>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No sales data available</h3>
-            <p className="text-xs text-gray-500">Start selling to see top performers.</p>
+          <div className="text-center py-12">
+            <i className="fas fa-chart-bar text-gray-300 text-4xl mb-4"></i>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No sales data available
+            </h3>
+            <p className="text-gray-500">
+              Start selling products to see your top performers here.
+            </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div
+            className={
+              viewMode === "grid" ? "grid grid-cols-1 gap-6" : "space-y-4"
+            }
+          >
             {topProducts.map((product, index) => {
               const rankBadge = getRankBadge(index);
-              
+
               return (
-                <div 
+                <div
                   key={product.id || index}
-                  className="group relative bg-white rounded-lg border border-gray-200 hover:border-orange-300 hover:shadow-md transition-all duration-200 p-3"
+                  className={`group relative bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all duration-300 p-6 ${
+                    viewMode === "grid" ? "" : ""
+                  }`}
                 >
-                  {/* Rank Badge - Smaller and more subtle */}
-                  <div className={`absolute -top-2 -left-2 w-7 h-7 ${rankBadge.color} rounded-full flex items-center justify-center ${rankBadge.shadow} shadow-md z-10`}>
+                  {/* Rank Badge */}
+                  <div
+                    className={`absolute -top-3 -left-3 w-8 h-8 ${rankBadge.color} rounded-full flex items-center justify-center shadow-lg z-10`}
+                  >
                     <i className={`${rankBadge.icon} text-white text-xs`}></i>
                   </div>
 
                   <div className="flex items-center gap-3">
                     {/* Compact Product Icon */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center">
-                        <i className={`${getProductIcon(product.category)} text-orange-600 text-lg`}></i>
+                      <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center shadow-sm">
+                        <i
+                          className={`${getProductIcon(
+                            product.category
+                          )} text-indigo-600 text-xl`}
+                        ></i>
                       </div>
                       {!product.inStock && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center border-2 border-white">
@@ -198,58 +230,112 @@ const TopSellingProducts = ({ products = [] }) => {
                             {product.rating && (
                               <div className="flex items-center gap-0.5">
                                 <i className="fas fa-star text-yellow-400 text-xs"></i>
-                                <span className="text-xs text-gray-600 font-medium">{product.rating}</span>
+                                <span className="text-xs text-gray-600">
+                                  {product.rating}
+                                </span>
                               </div>
                             )}
                           </div>
                         </div>
-                        
-                        {/* Growth Indicator - Compact */}
-                        <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
-                          product.growth > 0 
-                            ? 'bg-green-50 text-green-700' 
-                            : product.growth < 0 
-                              ? 'bg-red-50 text-red-700'
-                              : 'bg-gray-50 text-gray-700'
-                        }`}>
-                          <i className={`fas fa-arrow-${product.growth > 0 ? 'up' : product.growth < 0 ? 'down' : 'right'} text-xs`}></i>
+
+                        {/* Growth Indicator */}
+                        <div
+                          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                            product.growth > 0
+                              ? "bg-green-100 text-green-800"
+                              : product.growth < 0
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          <i
+                            className={`fas fa-arrow-${
+                              product.growth > 0
+                                ? "up"
+                                : product.growth < 0
+                                ? "down"
+                                : "right"
+                            } text-xs`}
+                          ></i>
                           {Math.abs(product.growth)}%
                         </div>
                       </div>
 
-                      {/* Compact Metrics Row */}
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-lg font-bold text-gray-900">{product.sold}</span>
-                          <span className="text-xs text-gray-500">units</span>
-                        </div>
-                        
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-base font-bold text-gray-900">{formatCurrency(product.revenue)}</span>
-                          <span className="text-xs text-gray-500">revenue</span>
+                      {/* Metrics Row */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <div className="text-2xl font-bold text-gray-900">
+                            {product.sold}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            units sold
+                          </div>
                         </div>
 
-                        {/* Compact Stock Status */}
-                        <div className={`px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-                          product.inStock 
-                            ? 'bg-green-50 text-green-700'
-                            : 'bg-red-50 text-red-700'
-                        }`}>
-                          {product.inStock ? 'In Stock' : 'Out of Stock'}
+                        <div className="text-right">
+                          <div className="text-xl font-bold text-gray-900">
+                            {formatCurrency(product.revenue)}
+                          </div>
+                          <div className="text-sm text-gray-500">revenue</div>
                         </div>
+
+                        {/* Stock Status */}
+                        <div
+                          className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                            product.inStock
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {product.inStock ? "In Stock" : "Out of Stock"}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button
+                          className="flex-1 p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors text-sm font-medium"
+                          title="View Details"
+                        >
+                          <i className="fas fa-eye mr-2"></i>
+                          View
+                        </button>
+                        <button
+                          className="flex-1 p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium"
+                          title="Edit Product"
+                        >
+                          <i className="fas fa-edit mr-2"></i>
+                          Edit
+                        </button>
+                        <button
+                          className="flex-1 p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors text-sm font-medium"
+                          title="Analytics"
+                        >
+                          <i className="fas fa-chart-line mr-2"></i>
+                          Stats
+                        </button>
                       </div>
                     </div>
                   </div>
 
                   {/* Compact Action Buttons on Hover */}
                   <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <button className="flex-1 px-2 py-1 text-xs text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors font-medium" title="View Details">
+                    <button
+                      className="flex-1 px-2 py-1 text-xs text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors font-medium"
+                      title="View Details"
+                    >
                       <i className="fas fa-eye mr-1"></i>View
                     </button>
-                    <button className="flex-1 px-2 py-1 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors font-medium" title="Edit Product">
+                    <button
+                      className="flex-1 px-2 py-1 text-xs text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors font-medium"
+                      title="Edit Product"
+                    >
                       <i className="fas fa-edit mr-1"></i>Edit
                     </button>
-                    <button className="flex-1 px-2 py-1 text-xs text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors font-medium" title="Analytics">
+                    <button
+                      className="flex-1 px-2 py-1 text-xs text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors font-medium"
+                      title="Analytics"
+                    >
                       <i className="fas fa-chart-line mr-1"></i>Stats
                     </button>
                   </div>
@@ -260,11 +346,11 @@ const TopSellingProducts = ({ products = [] }) => {
         )}
       </div>
 
-      {/* Compact Footer */}
-      <div className="bg-gray-50 px-4 py-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600 flex-shrink-0">
-        <span>Showing top {topProducts.length} products</span>
-        <button className="flex items-center gap-1 text-orange-600 hover:text-orange-700 font-medium hover:underline transition-colors">
-          <span>View All</span>
+      {/* Footer */}
+      <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 flex items-center justify-between text-sm text-gray-600">
+        <div>Showing top {topProducts.length} products</div>
+        <button className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 font-medium hover:underline transition-colors">
+          <span>View Full Report</span>
           <i className="fas fa-arrow-right text-xs"></i>
         </button>
       </div>

@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAnalyticStore } from "../../store/useAnalyticStore";
 
 const VendorAnalytics = () => {
   const [activeTab, setActiveTab] = useState("sales");
-  const [timeRange, setTimeRange] = useState("month");
   const [viewMode, setViewMode] = useState("chart");
+
+  const { products, orders, changeDataRange } = useAnalyticStore();
 
   // Enhanced mock data for different tabs
   const salesData = {
@@ -15,23 +17,23 @@ const VendorAnalytics = () => {
         change: "+12%",
         positive: true,
         icon: "fas fa-rupee-sign",
-        color: "from-green-500 to-emerald-600"
+        color: "from-green-500 to-emerald-600",
       },
       {
-        label: "Avg. Order Value", 
+        label: "Avg. Order Value",
         value: "₹2,715",
         change: "-3.2%",
         positive: false,
         icon: "fas fa-calculator",
-        color: "from-blue-500 to-indigo-600"
+        color: "from-blue-500 to-indigo-600",
       },
-      { 
-        label: "Total Orders", 
-        value: "1,492", 
-        change: "+8%", 
+      {
+        label: "Total Orders",
+        value: "1,492",
+        change: "+8%",
         positive: true,
         icon: "fas fa-shopping-cart",
-        color: "from-purple-500 to-violet-600"
+        color: "from-purple-500 to-violet-600",
       },
       {
         label: "Conversion Rate",
@@ -39,7 +41,7 @@ const VendorAnalytics = () => {
         change: "+0.5%",
         positive: true,
         icon: "fas fa-percentage",
-        color: "from-orange-500 to-red-500"
+        color: "from-orange-500 to-red-500",
       },
     ],
     chartData: [
@@ -57,19 +59,19 @@ const VendorAnalytics = () => {
       { month: "Dec", value: 60, sales: 62000 },
     ],
     insights: [
-      { 
-        title: "Best Day for Sales", 
-        value: "Wednesday", 
+      {
+        title: "Best Day for Sales",
+        value: "Wednesday",
         type: "amber",
         icon: "fas fa-calendar-day",
-        description: "Peak sales day of the week"
+        description: "Peak sales day of the week",
       },
       {
         title: "Top Performing Product",
         value: "Smartwatch Pro",
         type: "blue",
         icon: "fas fa-trophy",
-        description: "Highest revenue generator"
+        description: "Highest revenue generator",
       },
       {
         title: "Customer Growth Trend",
@@ -77,7 +79,7 @@ const VendorAnalytics = () => {
         type: "emerald",
         trend: true,
         icon: "fas fa-chart-line",
-        description: "15% increase in new customers"
+        description: "15% increase in new customers",
       },
     ],
   };
@@ -85,21 +87,21 @@ const VendorAnalytics = () => {
   const ordersData = {
     title: "Monthly Order Frequency",
     metrics: [
-      { 
-        label: "Total Orders", 
-        value: "1,492", 
-        change: "+8%", 
+      {
+        label: "Total Orders",
+        value: "1,492",
+        change: "+8%",
         positive: true,
         icon: "fas fa-box",
-        color: "from-blue-500 to-cyan-600"
+        color: "from-blue-500 to-cyan-600",
       },
-      { 
-        label: "Pending Orders", 
-        value: "42", 
-        change: "-5%", 
+      {
+        label: "Pending Orders",
+        value: "42",
+        change: "-5%",
         positive: true,
         icon: "fas fa-clock",
-        color: "from-yellow-500 to-orange-500"
+        color: "from-yellow-500 to-orange-500",
       },
       {
         label: "Completed Orders",
@@ -107,15 +109,15 @@ const VendorAnalytics = () => {
         change: "+12%",
         positive: true,
         icon: "fas fa-check-circle",
-        color: "from-green-500 to-emerald-600"
+        color: "from-green-500 to-emerald-600",
       },
-      { 
-        label: "Cancelled Orders", 
-        value: "70", 
-        change: "-3%", 
+      {
+        label: "Cancelled Orders",
+        value: "70",
+        change: "-3%",
         positive: true,
         icon: "fas fa-times-circle",
-        color: "from-red-500 to-rose-600"
+        color: "from-red-500 to-rose-600",
       },
     ],
     chartData: [
@@ -133,26 +135,26 @@ const VendorAnalytics = () => {
       { month: "Dec", value: 110 },
     ],
     insights: [
-      { 
-        title: "Peak Order Day", 
-        value: "Friday", 
+      {
+        title: "Peak Order Day",
+        value: "Friday",
         type: "amber",
         icon: "fas fa-calendar-star",
-        description: "Highest order volume day"
+        description: "Highest order volume day",
       },
-      { 
-        title: "Most Popular Category", 
-        value: "Electronics", 
+      {
+        title: "Most Popular Category",
+        value: "Electronics",
         type: "blue",
         icon: "fas fa-microchip",
-        description: "62% of total orders"
+        description: "62% of total orders",
       },
-      { 
-        title: "Order Completion Rate", 
-        value: "92%", 
+      {
+        title: "Order Completion Rate",
+        value: "92%",
         type: "emerald",
         icon: "fas fa-chart-pie",
-        description: "Excellent fulfillment rate"
+        description: "Excellent fulfillment rate",
       },
     ],
   };
@@ -166,15 +168,15 @@ const VendorAnalytics = () => {
         change: "+15%",
         positive: true,
         icon: "fas fa-users",
-        color: "from-purple-500 to-indigo-600"
+        color: "from-purple-500 to-indigo-600",
       },
-      { 
-        label: "New Customers", 
-        value: "428", 
-        change: "+12%", 
+      {
+        label: "New Customers",
+        value: "428",
+        change: "+12%",
         positive: true,
         icon: "fas fa-user-plus",
-        color: "from-green-500 to-emerald-600"
+        color: "from-green-500 to-emerald-600",
       },
       {
         label: "Returning Customers",
@@ -182,7 +184,7 @@ const VendorAnalytics = () => {
         change: "+8%",
         positive: true,
         icon: "fas fa-user-check",
-        color: "from-blue-500 to-cyan-600"
+        color: "from-blue-500 to-cyan-600",
       },
       {
         label: "Customer Retention",
@@ -190,7 +192,7 @@ const VendorAnalytics = () => {
         change: "+3%",
         positive: true,
         icon: "fas fa-heart",
-        color: "from-pink-500 to-rose-600"
+        color: "from-pink-500 to-rose-600",
       },
     ],
     chartData: [
@@ -208,26 +210,26 @@ const VendorAnalytics = () => {
       { month: "Dec", value: 340 },
     ],
     insights: [
-      { 
-        title: "Highest Traffic Day", 
-        value: "Saturday", 
+      {
+        title: "Highest Traffic Day",
+        value: "Saturday",
         type: "amber",
         icon: "fas fa-calendar-week",
-        description: "Peak customer activity"
+        description: "Peak customer activity",
       },
-      { 
-        title: "Top Demographic", 
-        value: "25-34 years", 
+      {
+        title: "Top Demographic",
+        value: "25-34 years",
         type: "blue",
         icon: "fas fa-users",
-        description: "Primary customer segment"
+        description: "Primary customer segment",
       },
       {
         title: "Average Customer Lifetime",
         value: "14 months",
         type: "emerald",
         icon: "fas fa-clock",
-        description: "Strong customer loyalty"
+        description: "Strong customer loyalty",
       },
     ],
   };
@@ -235,13 +237,13 @@ const VendorAnalytics = () => {
   const productsData = {
     title: "Top Selling Products",
     metrics: [
-      { 
-        label: "Total Products", 
-        value: "142", 
-        change: "+5%", 
+      {
+        label: "Total Products",
+        value: "142",
+        change: "+5%",
         positive: true,
         icon: "fas fa-boxes",
-        color: "from-indigo-500 to-purple-600"
+        color: "from-indigo-500 to-purple-600",
       },
       {
         label: "Top Seller",
@@ -249,23 +251,23 @@ const VendorAnalytics = () => {
         change: "245 sold",
         positive: true,
         icon: "fas fa-crown",
-        color: "from-yellow-500 to-orange-500"
+        color: "from-yellow-500 to-orange-500",
       },
-      { 
-        label: "Low Stock Items", 
-        value: "18", 
-        change: "-3", 
+      {
+        label: "Low Stock Items",
+        value: "18",
+        change: "-3",
         positive: false,
         icon: "fas fa-exclamation-triangle",
-        color: "from-red-500 to-rose-600"
+        color: "from-red-500 to-rose-600",
       },
-      { 
-        label: "New This Month", 
-        value: "12", 
-        change: "+4", 
+      {
+        label: "New This Month",
+        value: "12",
+        change: "+4",
         positive: true,
         icon: "fas fa-plus-circle",
-        color: "from-green-500 to-emerald-600"
+        color: "from-green-500 to-emerald-600",
       },
     ],
     chartData: [
@@ -283,26 +285,26 @@ const VendorAnalytics = () => {
       { month: "Dec", value: 160 },
     ],
     insights: [
-      { 
-        title: "Best Selling Category", 
-        value: "Wearables", 
+      {
+        title: "Best Selling Category",
+        value: "Wearables",
         type: "amber",
         icon: "fas fa-watch",
-        description: "Leading product category"
+        description: "Leading product category",
       },
       {
         title: "Highest Rated Product",
         value: "Wireless Headphones",
         type: "blue",
         icon: "fas fa-star",
-        description: "4.9/5 customer rating"
+        description: "4.9/5 customer rating",
       },
-      { 
-        title: "Inventory Status", 
-        value: "Healthy", 
+      {
+        title: "Inventory Status",
+        value: "Healthy",
         type: "emerald",
         icon: "fas fa-warehouse",
-        description: "Well-stocked inventory"
+        description: "Well-stocked inventory",
       },
     ],
   };
@@ -335,7 +337,8 @@ const VendorAnalytics = () => {
     return data
       .map((item, index) => {
         const x = padding + (index * (width - 2 * padding)) / (data.length - 1);
-        const y = padding + ((maxValue - item.value) / range) * (height - 2 * padding);
+        const y =
+          padding + ((maxValue - item.value) / range) * (height - 2 * padding);
         return `${x},${y}`;
       })
       .join(" ");
@@ -347,21 +350,38 @@ const VendorAnalytics = () => {
     const width = 400;
     const height = 200;
     const padding = 20;
-    return `${padding},${height - padding} ${points} ${width - padding},${height - padding}`;
+    return `${padding},${height - padding} ${points} ${width - padding},${
+      height - padding
+    }`;
   };
 
   const timeRanges = [
     { value: "week", label: "This Week" },
-    { value: "month", label: "This Month" }, 
-    { value: "quarter", label: "This Quarter" },
-    { value: "year", label: "This Year" }
+    { value: "month", label: "This Month" },
+    { value: "total", label: "Total" },
   ];
 
   const tabConfig = {
-    sales: { icon: "fas fa-chart-line", color: "text-green-600", bgColor: "bg-green-50" },
-    orders: { icon: "fas fa-shopping-cart", color: "text-blue-600", bgColor: "bg-blue-50" },
-    customers: { icon: "fas fa-users", color: "text-purple-600", bgColor: "bg-purple-50" },
-    products: { icon: "fas fa-box", color: "text-orange-600", bgColor: "bg-orange-50" }
+    sales: {
+      icon: "fas fa-chart-line",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+    },
+    orders: {
+      icon: "fas fa-shopping-cart",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+    },
+    customers: {
+      icon: "fas fa-users",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+    },
+    products: {
+      icon: "fas fa-box",
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+    },
   };
 
   return (
@@ -375,21 +395,24 @@ const VendorAnalytics = () => {
             </div>
             Vendor Analytics
           </h1>
-          <p className="text-gray-600">Comprehensive insights into your business performance</p>
+          <p className="text-gray-600">
+            Comprehensive insights into your business performance
+          </p>
         </div>
-        
+
         <div className="flex items-center gap-4 mt-4 lg:mt-0">
           {/* Time Range Selector */}
           <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
+            onChange={(e) => changeDataRange(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white font-medium"
           >
-            {timeRanges.map(range => (
-              <option key={range.value} value={range.value}>{range.label}</option>
+            {timeRanges.map((range) => (
+              <option key={range.value} value={range.value}>
+                {range.label}
+              </option>
             ))}
           </select>
-          
+
           {/* Export Button */}
           <button className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium">
             <i className="fas fa-download"></i>
@@ -429,12 +452,16 @@ const VendorAnalytics = () => {
             className="group relative bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
           >
             {/* Gradient Background */}
-            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${metric.color} rounded-t-2xl`}></div>
-            
+            <div
+              className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${metric.color} rounded-t-2xl`}
+            ></div>
+
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${metric.color} rounded-xl flex items-center justify-center shadow-lg`}>
+                  <div
+                    className={`w-12 h-12 bg-gradient-to-r ${metric.color} rounded-xl flex items-center justify-center shadow-lg`}
+                  >
                     <i className={`${metric.icon} text-white text-lg`}></i>
                   </div>
                   <div>
@@ -443,18 +470,28 @@ const VendorAnalytics = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="mb-3">
-                  <p className="text-3xl font-black text-gray-900">{metric.value}</p>
+                  <p className="text-3xl font-black text-gray-900">
+                    {metric.value}
+                  </p>
                 </div>
-                
-                <div className={`flex items-center gap-2 text-sm font-semibold ${
-                  metric.positive ? "text-green-600" : "text-red-600"
-                }`}>
-                  <div className={`p-1 rounded-full ${
-                    metric.positive ? "bg-green-100" : "bg-red-100"
-                  }`}>
-                    <i className={`fas fa-arrow-${metric.positive ? 'up' : 'down'} text-xs`}></i>
+
+                <div
+                  className={`flex items-center gap-2 text-sm font-semibold ${
+                    metric.positive ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  <div
+                    className={`p-1 rounded-full ${
+                      metric.positive ? "bg-green-100" : "bg-red-100"
+                    }`}
+                  >
+                    <i
+                      className={`fas fa-arrow-${
+                        metric.positive ? "up" : "down"
+                      } text-xs`}
+                    ></i>
                   </div>
                   <span>{metric.change} vs last month</span>
                 </div>
@@ -470,47 +507,67 @@ const VendorAnalytics = () => {
         <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">{currentData.title}</h2>
-              <p className="text-gray-600 text-sm">Performance trends over time</p>
+              <h2 className="text-xl font-bold text-gray-900">
+                {currentData.title}
+              </h2>
+              <p className="text-gray-600 text-sm">
+                Performance trends over time
+              </p>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setViewMode('chart')}
+                onClick={() => setViewMode("chart")}
                 className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'chart' 
-                    ? 'bg-orange-100 text-orange-600' 
-                    : 'text-gray-500 hover:bg-gray-100'
+                  viewMode === "chart"
+                    ? "bg-orange-100 text-orange-600"
+                    : "text-gray-500 hover:bg-gray-100"
                 }`}
               >
                 <i className="fas fa-chart-line"></i>
               </button>
               <button
-                onClick={() => setViewMode('bar')}
+                onClick={() => setViewMode("bar")}
                 className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'bar' 
-                    ? 'bg-orange-100 text-orange-600' 
-                    : 'text-gray-500 hover:bg-gray-100'
+                  viewMode === "bar"
+                    ? "bg-orange-100 text-orange-600"
+                    : "text-gray-500 hover:bg-gray-100"
                 }`}
               >
                 <i className="fas fa-chart-bar"></i>
               </button>
             </div>
           </div>
-          
+
           <div className="relative h-80 w-full bg-gradient-to-t from-gray-50 to-transparent rounded-xl p-4">
             <svg viewBox="0 0 400 200" className="w-full h-full">
               {/* Enhanced Grid */}
               <defs>
-                <pattern id="grid" width="40" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="0.5"/>
+                <pattern
+                  id="grid"
+                  width="40"
+                  height="20"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <path
+                    d="M 40 0 L 0 0 0 20"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="0.5"
+                  />
                 </pattern>
-                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#f97316" stopOpacity="0.3"/>
-                  <stop offset="100%" stopColor="#f97316" stopOpacity="0.05"/>
+                <linearGradient
+                  id="areaGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="0%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stopColor="#f97316" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#f97316" stopOpacity="0.05" />
                 </linearGradient>
               </defs>
-              
+
               <rect width="100%" height="100%" fill="url(#grid)" />
 
               {/* Area under the line */}
@@ -532,14 +589,23 @@ const VendorAnalytics = () => {
 
               {/* Enhanced data points */}
               {currentData.chartData.map((point, index) => {
-                const maxValue = Math.max(...currentData.chartData.map((item) => item.value));
-                const minValue = Math.min(...currentData.chartData.map((item) => item.value));
+                const maxValue = Math.max(
+                  ...currentData.chartData.map((item) => item.value)
+                );
+                const minValue = Math.min(
+                  ...currentData.chartData.map((item) => item.value)
+                );
                 const range = maxValue - minValue || 1;
                 const width = 400;
                 const height = 200;
                 const padding = 20;
-                const x = padding + (index * (width - 2 * padding)) / (currentData.chartData.length - 1);
-                const y = padding + ((maxValue - point.value) / range) * (height - 2 * padding);
+                const x =
+                  padding +
+                  (index * (width - 2 * padding)) /
+                    (currentData.chartData.length - 1);
+                const y =
+                  padding +
+                  ((maxValue - point.value) / range) * (height - 2 * padding);
 
                 return (
                   <g key={index}>
@@ -552,12 +618,7 @@ const VendorAnalytics = () => {
                       strokeWidth="3"
                       className="transition-all duration-300 hover:r-8 cursor-pointer filter drop-shadow-sm"
                     />
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r="2"
-                      fill="#f97316"
-                    />
+                    <circle cx={x} cy={y} r="2" fill="#f97316" />
                   </g>
                 );
               })}
@@ -596,23 +657,31 @@ const VendorAnalytics = () => {
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    insight.type === "amber"
-                      ? "bg-amber-500 text-white"
-                      : insight.type === "blue"
-                      ? "bg-blue-500 text-white"
-                      : "bg-emerald-500 text-white"
-                  }`}>
+                  <div
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      insight.type === "amber"
+                        ? "bg-amber-500 text-white"
+                        : insight.type === "blue"
+                        ? "bg-blue-500 text-white"
+                        : "bg-emerald-500 text-white"
+                    }`}
+                  >
                     <i className={`${insight.icon} text-sm`}></i>
                   </div>
-                  
+
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">{insight.title}</h3>
-                    <p className="text-gray-800 font-medium mb-1">{insight.value}</p>
-                    <p className="text-xs text-gray-600">{insight.description}</p>
+                    <h3 className="font-semibold text-gray-900 mb-1">
+                      {insight.title}
+                    </h3>
+                    <p className="text-gray-800 font-medium mb-1">
+                      {insight.value}
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {insight.description}
+                    </p>
                   </div>
                 </div>
-                
+
                 {insight.trend && (
                   <div className="absolute top-2 right-2">
                     <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -628,7 +697,7 @@ const VendorAnalytics = () => {
               <i className="fas fa-download"></i>
               Download Full Report
             </button>
-            
+
             <button className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all duration-300">
               <i className="fas fa-share-alt"></i>
               Share Insights

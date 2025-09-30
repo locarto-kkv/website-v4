@@ -14,5 +14,5 @@ router.use("/product", productRoutes);
 router.use("/profile", profileRoutes);
 router.use("/order", orderRoutes);
 router.use("/review", reviewRoutes);
-router.use("/analytics", analyticsRoutes);
+router.use("/analytic", analyticsRoutes);
 export default router;
