@@ -1,17 +1,33 @@
 // src/branddata.js
 
-// URLs for dummy images
+// Import local images (relative to src folder)
+import adidas from './assets/adidas.png';
+import Burberry from './assets/Burberry.png';
+import chanel from './assets/chanel.png';
+import levis from './assets/levis.png';
+import nike from './assets/nike.png';
+import Puma from './assets/Puma.png';
+import supreme from './assets/supreme.png';
+import thenorthface from './assets/thenorthface.png';
+import tommyhilfiger from './assets/tommyhilfiger.jpg';
+import snabbitImg from "./assets/snabbitimage.png"; // Import Snabbit image
+import locartoImg from "./assets/locarto.png"; // Import Locarto image
+import jordanImg from "./assets/jordan.png"; // 🆕 Import Jordan image
+
+// Map image imports to brand IDs
 const imageUrls = {
-  snabbit: "https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_750,h_400/http://assets.designhill.com/design-blog/wp-content/uploads/2019/04/14.png",
-  locarto: "https://www.edigitalagency.com.au/wp-content/uploads/Puma-logo-black-png-300x150.png",
-  dummy1: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVnjGhMxF8YY8yFxKeTUPv2BB9CRc--NtioA&s",
-  dummy2: "https://assets.turbologo.ru/blog/ru/2021/11/12073500/Burberry-Logo.png",
-  dummy3: "https://fabrikbrands.com/wp-content/uploads/Clothing-brand-logos-12-1200x750.png",
-  dummy4: "https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_750,h_400/http://assets.designhill.com/design-blog/wp-content/uploads/2019/04/9.png",
-  dummy5: "https://assets.turbologo.ru/blog/ru/2019/12/18163325/3-poloski-adidas-logo.png",
-  dummy6: "https://www.jetpunk.com/img/user-img/28/281719ca08-450.webp",
-  dummy7: "https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_750,h_400/https://assets.designhill.com/design-blog/wp-content/uploads/2019/04/26-min-1.jpg", // Added new URL
-  // Add more URLs here if needed
+  snabbit: snabbitImg,      // Use actual Snabbit image
+  locarto: locartoImg,      // Use actual Locarto image
+  dummy1: nike,
+  dummy2: Burberry,
+  dummy3: chanel,
+  dummy4: levis,
+  dummy5: supreme,
+  dummy6: thenorthface,
+  dummy7: tommyhilfiger,
+  dummy8: jordanImg,  
+  dummy9: Puma,
+  dummy10: adidas,       // 🆕 New: Jordan image assigned to dummy8
 };
 
 const brandData = [
@@ -20,7 +36,7 @@ const brandData = [
     title: "Snabbit",
     subtitle: "The Underrated Space Snake Game That Will Hook You Instantly",
     description: "Fast, challenging space snake game with simple tap-to-switch gravity mechanics. Visually sleek, addictive gameplay combining classic snake with modern physics and side-scrolling action.",
-    image: imageUrls.snabbit, // Use URL from object
+    image: imageUrls.snabbit,
     sections: [
       {
         title: "What Is Snabbit?",
@@ -62,7 +78,7 @@ const brandData = [
     title: "Locarto",
     subtitle: "India’s First Quick Service App",
     description: "Connects users with trained professionals for various household tasks like cleaning, laundry, and dishwashing. Simple, fast, and reliable platform for home services.",
-    image: imageUrls.locarto, // Use URL from object
+    image: imageUrls.locarto,
     sections: [
       {
         title: "What Is Locarto?",
@@ -82,7 +98,7 @@ const brandData = [
       {
         title: "Why You'll Keep Using Locarto",
         icon: "🔁",
-        content: "Locarto fosters loyalty through consistent reliability and exceptional service. Once you experience the convenience of having a trusted professional arrive promptly to handle your chores, you’ll find it hard to go back to traditional methods. It’s ideal for busy professionals juggling work and family, students managing tight schedules, or anyone seeking to reclaim time for what truly matters. The app’s commitment to quality assurance and customer satisfaction ensures that every interaction reinforces trust. For those who value efficiency and peace of mind, Locarto becomes an indispensable part of daily life."
+        content: "Locarto fosters loyalty through consistent reliability and exceptional service. Once you experience the convenience of having a trusted professional arrive promptly to handle your chores, you’ll find it hard to go back to traditional methods. It's ideal for busy professionals juggling work and family, students managing tight schedules, or anyone seeking to reclaim time for what truly matters. The app's commitment to quality assurance and customer satisfaction ensures that every interaction reinforces trust. For those who value efficiency and peace of mind, Locarto becomes an indispensable part of daily life."
       },
       {
         title: "Final Verdict",
@@ -101,260 +117,371 @@ const brandData = [
   },
   {
     id: "dummy1",
-    title: "Dummy Brand 1",
-    subtitle: "Subtitle for Dummy Brand 1",
-    description: "A brief description for Dummy Brand 1. This is a placeholder brand.",
-    image: imageUrls.dummy1, // Use URL from object
+    title: "Nike",
+    subtitle: "Just Do It",
+    description: "Global leader in athletic footwear, apparel, and equipment.",
+    image: imageUrls.dummy1,
     sections: [
       {
-        title: "About Dummy Brand 1",
+        title: "About Nike",
         icon: "✨",
-        content: "This is a dummy section for Dummy Brand 1. It contains placeholder text to demonstrate the structure."
+        content: "Nike is an American multinational corporation that is engaged in the design, development, manufacturing, and worldwide marketing and sales of footwear, apparel, equipment, accessories, and services."
       },
       {
         title: "Why Choose Us?",
         icon: "✅",
-        content: "Another dummy section for Dummy Brand 1. This could detail features or benefits."
+        content: "Innovation in sportswear, iconic Swoosh logo, and partnerships with world-class athletes make Nike a leader in athletic performance and style."
       },
       {
         title: "Final Thoughts",
         icon: "💭",
-        content: "A concluding dummy section for Dummy Brand 1. This might summarize the brand's value proposition."
+        content: "Nike continues to set trends in athletic wear and inspire athletes worldwide with cutting-edge technology and design."
       }
     ],
-    rating: 3.8,
+    rating: 4.5,
     related: [
       {
         id: "dummy2",
-        title: "Dummy Brand 2",
-        tagline: "Subtitle for Dummy Brand 2",
+        title: "Burberry",
+        tagline: "British Luxury Fashion House",
       },
       {
         id: "dummy3",
-        title: "Dummy Brand 3",
-        tagline: "Subtitle for Dummy Brand 3",
+        title: "Chanel",
+        tagline: "French Luxury Fashion",
       },
     ],
   },
   {
     id: "dummy2",
-    title: "Dummy Brand 2",
-    subtitle: "Subtitle for Dummy Brand 2",
-    description: "A brief description for Dummy Brand 2. This is a placeholder brand.",
-    image: imageUrls.dummy2, // Use URL from object
+    title: "Burberry",
+    subtitle: "British Luxury Fashion House",
+    description: "Renowned for its iconic check pattern and luxury goods.",
+    image: imageUrls.dummy2,
     sections: [
       {
-        title: "About Dummy Brand 2",
+        title: "About Burberry",
         icon: "✨",
-        content: "This is a dummy section for Dummy Brand 2. It contains placeholder text to demonstrate the structure."
+        content: "Burberry is a British luxury fashion house founded in 1856, known for its distinctive check pattern and high-quality outerwear."
       },
       {
         title: "Why Choose Us?",
         icon: "✅",
-        content: "Another dummy section for Dummy Brand 2. This could detail features or benefits."
+        content: "Burberry combines heritage craftsmanship with contemporary design, creating timeless pieces for modern consumers."
       },
       {
         title: "Final Thoughts",
         icon: "💭",
-        content: "A concluding dummy section for Dummy Brand 2. This might summarize the brand's value proposition."
+        content: "Burberry remains a symbol of British elegance and sophistication in the luxury fashion market."
       }
     ],
-    rating: 4.0,
+    rating: 4.7,
     related: [
       {
         id: "dummy1",
-        title: "Dummy Brand 1",
-        tagline: "Subtitle for Dummy Brand 1",
+        title: "Nike",
+        tagline: "Just Do It",
       },
       {
         id: "dummy4",
-        title: "Dummy Brand 4",
-        tagline: "Subtitle for Dummy Brand 4",
+        title: "Levi's",
+        tagline: "Original Jeans Brand",
       },
     ],
   },
   {
     id: "dummy3",
-    title: "Dummy Brand 3",
-    subtitle: "Subtitle for Dummy Brand 3",
-    description: "A brief description for Dummy Brand 3. This is a placeholder brand.",
-    image: imageUrls.dummy3, // Use URL from object
+    title: "Chanel",
+    subtitle: "French Luxury Fashion",
+    description: "Iconic French fashion house known for timeless elegance.",
+    image: imageUrls.dummy3,
     sections: [
       {
-        title: "About Dummy Brand 3",
+        title: "About Chanel",
         icon: "✨",
-        content: "This is a dummy section for Dummy Brand 3. It contains placeholder text to demonstrate the structure."
+        content: "Founded by Gabrielle 'Coco' Chanel, this luxury brand is famous for its quilted handbags, classic suits, and No. 5 perfume."
       },
       {
         title: "Why Choose Us?",
         icon: "✅",
-        content: "Another dummy section for Dummy Brand 3. This could detail features or benefits."
+        content: "Chanel represents luxury, femininity, and timeless style with iconic pieces that transcend seasonal trends."
       },
       {
         title: "Final Thoughts",
         icon: "💭",
-        content: "A concluding dummy section for Dummy Brand 3. This might summarize the brand's value proposition."
+        content: "Chanel continues to define luxury fashion with its classic designs and innovative approach to women's style."
       }
     ],
-    rating: 3.5,
+    rating: 4.8,
     related: [
       {
         id: "dummy1",
-        title: "Dummy Brand 1",
-        tagline: "Subtitle for Dummy Brand 1",
+        title: "Nike",
+        tagline: "Just Do It",
       },
       {
         id: "dummy5",
-        title: "Dummy Brand 5",
-        tagline: "Subtitle for Dummy Brand 5",
+        title: "Supreme",
+        tagline: "Streetwear Culture Brand",
       },
     ],
   },
   {
     id: "dummy4",
-    title: "Dummy Brand 4",
-    subtitle: "Subtitle for Dummy Brand 4",
-    description: "A brief description for Dummy Brand 4. This is a placeholder brand.",
-    image: imageUrls.dummy4, // Use URL from object
+    title: "Levi's",
+    subtitle: "Original Jeans Brand",
+    description: "Pioneer of blue jeans and denim clothing since 1853.",
+    image: imageUrls.dummy4,
     sections: [
       {
-        title: "About Dummy Brand 4",
+        title: "About Levi's",
         icon: "✨",
-        content: "This is a dummy section for Dummy Brand 4. It contains placeholder text to demonstrate the structure."
+        content: "Levi Strauss & Co. is an American clothing company known worldwide for its Levi's brand of denim jeans."
       },
       {
         title: "Why Choose Us?",
         icon: "✅",
-        content: "Another dummy section for Dummy Brand 4. This could detail features or benefits."
+        content: "Levi's represents durability, quality, and authentic American style with a rich heritage in denim craftsmanship."
       },
       {
         title: "Final Thoughts",
         icon: "💭",
-        content: "A concluding dummy section for Dummy Brand 4. This might summarize the brand's value proposition."
-      }
-    ],
-    rating: 4.1,
-    related: [
-      {
-        id: "dummy2",
-        title: "Dummy Brand 2",
-        tagline: "Subtitle for Dummy Brand 2",
-      },
-      {
-        id: "dummy6",
-        title: "Dummy Brand 6",
-        tagline: "Subtitle for Dummy Brand 6",
-      },
-    ],
-  },
-  {
-    id: "dummy5",
-    title: "Dummy Brand 5",
-    subtitle: "Subtitle for Dummy Brand 5",
-    description: "A brief description for Dummy Brand 5. This is a placeholder brand.",
-    image: imageUrls.dummy5, // Use URL from object
-    sections: [
-      {
-        title: "About Dummy Brand 5",
-        icon: "✨",
-        content: "This is a dummy section for Dummy Brand 5. It contains placeholder text to demonstrate the structure."
-      },
-      {
-        title: "Why Choose Us?",
-        icon: "✅",
-        content: "Another dummy section for Dummy Brand 5. This could detail features or benefits."
-      },
-      {
-        title: "Final Thoughts",
-        icon: "💭",
-        content: "A concluding dummy section for Dummy Brand 5. This might summarize the brand's value proposition."
-      }
-    ],
-    rating: 3.9,
-    related: [
-      {
-        id: "dummy3",
-        title: "Dummy Brand 3",
-        tagline: "Subtitle for Dummy Brand 3",
-      },
-      {
-        id: "dummy1",
-        title: "Dummy Brand 1",
-        tagline: "Subtitle for Dummy Brand 1",
-      },
-    ],
-  },
-  {
-    id: "dummy6",
-    title: "Dummy Brand 6",
-    subtitle: "Subtitle for Dummy Brand 6",
-    description: "A brief description for Dummy Brand 6. This is a placeholder brand.",
-    image: imageUrls.dummy6, // Use URL from object
-    sections: [
-      {
-        title: "About Dummy Brand 6",
-        icon: "✨",
-        content: "This is a dummy section for Dummy Brand 6. It contains placeholder text to demonstrate the structure."
-      },
-      {
-        title: "Why Choose Us?",
-        icon: "✅",
-        content: "Another dummy section for Dummy Brand 6. This could detail features or benefits."
-      },
-      {
-        title: "Final Thoughts",
-        icon: "💭",
-        content: "A concluding dummy section for Dummy Brand 6. This might summarize the brand's value proposition."
+        content: "Levi's remains the gold standard in denim, adapting to modern fashion while maintaining its classic appeal."
       }
     ],
     rating: 4.3,
     related: [
       {
-        id: "dummy4",
-        title: "Dummy Brand 4",
-        tagline: "Subtitle for Dummy Brand 4",
+        id: "dummy2",
+        title: "Burberry",
+        tagline: "British Luxury Fashion House",
       },
       {
-        id: "dummy2",
-        title: "Dummy Brand 2",
-        tagline: "Subtitle for Dummy Brand 2",
+        id: "dummy6",
+        title: "The North Face",
+        tagline: "Outdoor Recreation Products",
       },
     ],
   },
   {
-    id: "dummy7", // Added new dummy brand
-    title: "Dummy Brand 7",
-    subtitle: "Subtitle for Dummy Brand 7",
-    description: "A brief description for Dummy Brand 7. This is a placeholder brand using the new image URL.",
-    image: imageUrls.dummy7, // Use the new URL from object
+    id: "dummy5",
+    title: "Supreme",
+    subtitle: "Streetwear Culture Brand",
+    description: "Iconic skateboarding and streetwear brand from New York.",
+    image: imageUrls.dummy5,
     sections: [
       {
-        title: "About Dummy Brand 7",
+        title: "About Supreme",
         icon: "✨",
-        content: "This is a dummy section for Dummy Brand 7. It contains placeholder text to demonstrate the structure."
+        content: "Supreme is a New York-based skateboarding brand that has become a global phenomenon in streetwear culture."
       },
       {
         title: "Why Choose Us?",
         icon: "✅",
-        content: "Another dummy section for Dummy Brand 7. This could detail features or benefits."
+        content: "Supreme combines skateboarding culture with high fashion, creating limited-edition pieces that are highly coveted."
       },
       {
         title: "Final Thoughts",
         icon: "💭",
-        content: "A concluding dummy section for Dummy Brand 7. This might summarize the brand's value proposition."
+        content: "Supreme has redefined streetwear and continues to influence fashion and youth culture worldwide."
       }
     ],
-    rating: 4.0,
+    rating: 4.6,
+    related: [
+      {
+        id: "dummy3",
+        title: "Chanel",
+        tagline: "French Luxury Fashion",
+      },
+      {
+        id: "dummy1",
+        title: "Nike",
+        tagline: "Just Do It",
+      },
+    ],
+  },
+  {
+    id: "dummy6",
+    title: "The North Face",
+    subtitle: "Outdoor Recreation Products",
+    description: "Leading outdoor recreation clothing and equipment brand.",
+    image: imageUrls.dummy6,
+    sections: [
+      {
+        title: "About The North Face",
+        icon: "✨",
+        content: "The North Face is an American outdoor recreation company that manufactures outerwear, backpacks, and other equipment."
+      },
+      {
+        title: "Why Choose Us?",
+        icon: "✅",
+        content: "The North Face provides high-performance outdoor gear designed for extreme conditions and adventurous activities."
+      },
+      {
+        title: "Final Thoughts",
+        icon: "💭",
+        content: "The North Face continues to inspire exploration and outdoor adventure with innovative, reliable products."
+      }
+    ],
+    rating: 4.4,
+    related: [
+      {
+        id: "dummy4",
+        title: "Levi's",
+        tagline: "Original Jeans Brand",
+      },
+      {
+        id: "dummy2",
+        title: "Burberry",
+        tagline: "British Luxury Fashion House",
+      },
+    ],
+  },
+  {
+    id: "dummy7",
+    title: "Tommy Hilfiger",
+    subtitle: "American Luxury Lifestyle Brand",
+    description: "Global lifestyle brand featuring premium clothing and accessories.",
+    image: imageUrls.dummy7,
+    sections: [
+      {
+        title: "About Tommy Hilfiger",
+        icon: "✨",
+        content: "Tommy Hilfiger is an American multinational clothing company that designs and markets premium casual clothing."
+      },
+      {
+        title: "Why Choose Us?",
+        icon: "✅",
+        content: "Tommy Hilfiger represents classic American style with preppy designs and high-quality materials."
+      },
+      {
+        title: "Final Thoughts",
+        icon: "💭",
+        content: "Tommy Hilfiger continues to be a symbol of American luxury lifestyle with timeless designs."
+      }
+    ],
+    rating: 4.2,
     related: [
       {
         id: "dummy5",
-        title: "Dummy Brand 5",
-        tagline: "Subtitle for Dummy Brand 5",
+        title: "Supreme",
+        tagline: "Streetwear Culture Brand",
       },
       {
         id: "dummy6",
-        title: "Dummy Brand 6",
-        tagline: "Subtitle for Dummy Brand 6",
+        title: "The North Face",
+        tagline: "Outdoor Recreation Products",
+      },
+    ],
+  },
+  {
+    id: "dummy8", // 🆕 New brand: Jordan
+    title: "Jordan",
+    subtitle: "Flight. Legacy. Icon.",
+    description: "Legendary basketball brand created by Michael Jordan, blending performance, style, and cultural impact.",
+    image: imageUrls.dummy8, // This now points to jordanImg
+    sections: [
+      {
+        title: "About Jordan",
+        icon: "✨",
+        content: "Jordan Brand, launched in 1997 under Nike, is synonymous with excellence in basketball and streetwear. Known for its Air Jordan sneakers, the brand has transcended sports to become a global cultural phenomenon."
+      },
+      {
+        title: "Why Choose Us?",
+        icon: "✅",
+        content: "Iconic silhouettes, performance innovation, and unmatched cultural relevance make Jordan Brand a must-have for athletes and sneakerheads alike."
+      },
+      {
+        title: "Final Thoughts",
+        icon: "💭",
+        content: "From the court to the streets, Jordan continues to redefine what it means to be legendary — in sport, fashion, and culture."
+      }
+    ],
+    rating: 4.9,
+    related: [
+      {
+        id: "dummy1",
+        title: "Nike",
+        tagline: "Just Do It",
+      },
+      {
+        id: "adidas",
+        title: "Adidas",
+        tagline: "Impossible is Nothing",
+      },
+    ],
+  },
+  {
+    id: "dummy9",
+    title: "Adidas",
+    subtitle: "Impossible is Nothing",
+    description: "German multinational corporation that designs and manufactures sports shoes, clothing and accessories.",
+    image: imageUrls.dummy9,
+    sections: [
+      {
+        title: "About Adidas",
+        icon: "✨",
+        content: "Adidas AG is a German multinational corporation, founded in 1949, that designs and manufactures sports shoes, clothing and accessories. Known for its three-stripe logo, Adidas is one of the world's leading sportswear manufacturers."
+      },
+      {
+        title: "Why Choose Us?",
+        icon: "✅",
+        content: "Innovation in sportswear technology, iconic three-stripe design, and partnerships with top athletes make Adidas a leader in athletic performance and style."
+      },
+      {
+        title: "Final Thoughts",
+        icon: "💭",
+        content: "Adidas continues to push boundaries in athletic wear, combining performance with style to inspire athletes worldwide."
+      }
+    ],
+    rating: 4.4,
+    related: [
+      {
+        id: "dummy10",
+        title: "Puma",
+        tagline: "Forever Faster",
+      },
+      {
+        id: "dummy1",
+        title: "Nike",
+        tagline: "Just Do It",
+      },
+    ],
+  },
+  {
+    id: "dummy10",
+    title: "Puma",
+    subtitle: "Forever Faster",
+    description: "German multinational corporation that designs and develops athletic and casual footwear, apparel and accessories.",
+    image: imageUrls.dummy10,
+    sections: [
+      {
+        title: "About Puma",
+        icon: "✨",
+        content: "PUMA SE is a German multinational corporation that designs and develops athletic and casual footwear, apparel and accessories. Founded in 1948, PUMA is known for its distinctive formstrip logo and focus on sports and lifestyle products."
+      },
+      {
+        title: "Why Choose Us?",
+        icon: "✅",
+        content: "Performance-driven designs, celebrity endorsements, and innovative technology make PUMA a top choice for athletes and fashion-conscious consumers."
+      },
+      {
+        title: "Final Thoughts",
+        icon: "💭",
+        content: "PUMA continues to blend sport performance with street fashion, setting trends in both athletic and lifestyle markets."
+      }
+    ],
+    rating: 4.3,
+    related: [
+      {
+        id: "dummy9",
+        title: "Adidas",
+        tagline: "Impossible is Nothing",
+      },
+      {
+        id: "dummy1",
+        title: "Nike",
+        tagline: "Just Do It",
       },
     ],
   },
