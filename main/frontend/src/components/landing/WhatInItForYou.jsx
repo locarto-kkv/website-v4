@@ -5,8 +5,8 @@ import Dollar from "../../../src/assets/dollar.png";
 
 const WhatInItForYou = () => {
   return (
-    <div className="mt-24 w-full max-w-[400px] sm:max-w-[1200px] mx-auto bg-orange-500 p-8 md:p-12 rounded-xl shadow-lg min-h-[500px]">
-        <h2 className="text-3xl text-[#FFFFFF] text-center mb-6 font-semibold">
+    <div className="mt-24 w-full max-w-[400px] sm:max-w-[1200px] mx-auto p-8 md:p-12 rounded-xl shadow-lg min-h-[500px]" style={{ backgroundColor: "#f15b28" }}>
+      <h2 className="text-3xl text-[#FFFFFF] text-center mb-6 font-semibold">
         What's In It For You?
       </h2>
       <p className="text-[#FFFFFF] text-center mb-12 font-medium">
