@@ -24,6 +24,7 @@ SELECT
   vo.order_week,
 
   ARRAY_AGG(DISTINCT vo.consumer_id) FILTER (WHERE vo.consumer_id IS NOT NULL) AS consumer_ids,
+  COUNT(DISTINCT vo.consumer_id) AS consumers_count,
   COUNT(DISTINCT vo.product_id) AS products_count,
   COUNT(vo.order_id)          AS orders_count,
   SUM(vo.amount)              AS total_amount,

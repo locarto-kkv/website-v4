@@ -22,6 +22,8 @@ SELECT
   vo.vendor_id,
   vo.vendor_name,
   vo.order_month,
+  COUNT(DISTINCT vo.consumer_id) AS consumers_count,
+  
   ARRAY_AGG(DISTINCT vo.consumer_id) FILTER (WHERE vo.consumer_id IS NOT NULL) AS consumer_ids,
   COUNT(DISTINCT vo.product_id) AS products_count,
   COUNT(vo.order_id)          AS orders_count,

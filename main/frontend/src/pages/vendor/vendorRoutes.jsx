@@ -23,35 +23,39 @@ const VendorRoutes = () => {
   // console.log(currentUser);
 
   return (
-    <AnalyticProvider>
-      <Routes>
-        {/* Public route */}
-        <Route
-          path="login"
-          element={
-            currentUser ? (
-              <Navigate to="/vendor/dashboard" replace />
-            ) : (
-              <AuthVendor />
-            )
-          }
-        />
+    <Routes>
+      {/* Public route */}
+      <Route
+        path="login"
+        element={
+          currentUser ? (
+            <Navigate to="/vendor/dashboard" replace />
+          ) : (
+            <AuthVendor />
+          )
+        }
+      />
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<VendorDashboardLayout />}>
-            <Route index element={<VendorDashboard />} />
-            <Route path="dashboard" element={<VendorDashboard />} />
-            <Route path="products" element={<VendorProducts />} />
-            <Route path="members-hub" element={<VendorsMemberHub />} />
-            <Route path="profile" element={<VendorProfile />} />
-            <Route path="analytics" element={<VendorAnalytics />} />
-            <Route path="settings" element={<VendorSettings />} />
-            <Route path="support" element={<VendorSupport />} />
-            <Route path="setup" element={<VendorSetup />} />
-          </Route>
+      <Route
+        element={
+          <AnalyticProvider>
+            <ProtectedRoute />
+          </AnalyticProvider>
+        }
+      >
+        <Route element={<VendorDashboardLayout />}>
+          <Route index element={<VendorDashboard />} />
+          <Route path="dashboard" element={<VendorDashboard />} />
+          <Route path="products" element={<VendorProducts />} />
+          <Route path="members-hub" element={<VendorsMemberHub />} />
+          <Route path="profile" element={<VendorProfile />} />
+          <Route path="analytics" element={<VendorAnalytics />} />
+          <Route path="settings" element={<VendorSettings />} />
+          <Route path="support" element={<VendorSupport />} />
+          <Route path="setup" element={<VendorSetup />} />
         </Route>
-      </Routes>
-    </AnalyticProvider>
+      </Route>
+    </Routes>
   );
 };
 

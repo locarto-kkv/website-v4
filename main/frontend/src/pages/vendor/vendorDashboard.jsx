@@ -4,11 +4,7 @@ import TopSellingProducts from "../../components/vendor/TopSellingProducts";
 import { useAnalytic } from "../../context/vendorAnalyticContext";
 
 const VendorDashboard = () => {
-  const { products, vendor, dataLoading } = useAnalytic();
-
-  if (dataLoading || !products || !vendor) {
-    return <p>Loading analytics...</p>;
-  }
+  const { products, vendor } = useAnalytic();
 
   console.log(products, vendor);
 

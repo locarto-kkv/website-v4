@@ -5,7 +5,55 @@ const VendorAnalytics = () => {
   const [activeTab, setActiveTab] = useState("sales");
   const [viewMode, setViewMode] = useState("chart");
 
-  const { products, vendor } = useAnalytic();
+  const { products, vendor, analyticData } = useAnalytic();
+
+  function transformToMonthlyData(data, valueKey) {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // initialize all months with 0
+    const monthlyData = months.map((m) => ({ month: m, value: 0 }));
+
+    if (!data?.vendors?.monthly) return monthlyData;
+
+    data.vendors.monthly.forEach((entry) => {
+      const date = new Date(entry.order_month);
+      const monthIndex = date.getUTCMonth(); // 0 = Jan, 11 = Dec
+      monthlyData[monthIndex].value += entry[valueKey] || 0;
+    });
+
+    return monthlyData;
+  }
+
+  function getWeekNumber(dateString) {
+    const date = new Date(dateString);
+    const firstDayOfYear = new Date(date.getUTCFullYear(), 0, 1);
+    const pastDaysOfYear = Math.floor((date - firstDayOfYear) / 86400000);
+    return Math.floor(pastDaysOfYear / 7); // week index 0–52
+  }
+
+  function transformToWeeklySales(data) {
+    if (!data?.vendors?.weekly) return [];
+
+    return data.vendors.weekly.map((entry) => {
+      return {
+        week: getWeekNumber(entry.order_week),
+        sales: entry.total_amount || 0,
+      };
+    });
+  }
 
   // Enhanced mock data for different tabs
   const salesData = {
@@ -44,20 +92,7 @@ const VendorAnalytics = () => {
         color: "from-orange-500 to-red-500",
       },
     ],
-    chartData: [
-      { month: "Jan", value: 180, sales: 32000 },
-      { month: "Feb", value: 160, sales: 28000 },
-      { month: "Mar", value: 130, sales: 35000 },
-      { month: "Apr", value: 100, sales: 42000 },
-      { month: "May", value: 140, sales: 38000 },
-      { month: "Jun", value: 120, sales: 45000 },
-      { month: "Jul", value: 110, sales: 48000 },
-      { month: "Aug", value: 100, sales: 52000 },
-      { month: "Sep", value: 90, sales: 47000 },
-      { month: "Oct", value: 80, sales: 55000 },
-      { month: "Nov", value: 70, sales: 58000 },
-      { month: "Dec", value: 60, sales: 62000 },
-    ],
+    chartData: transformToMonthlyData(analyticData, "total_amount"),
     insights: [
       {
         title: "Best Day for Sales",
@@ -120,20 +155,7 @@ const VendorAnalytics = () => {
         color: "from-red-500 to-rose-600",
       },
     ],
-    chartData: [
-      { month: "Jan", value: 90 },
-      { month: "Feb", value: 110 },
-      { month: "Mar", value: 130 },
-      { month: "Apr", value: 100 },
-      { month: "May", value: 120 },
-      { month: "Jun", value: 140 },
-      { month: "Jul", value: 150 },
-      { month: "Aug", value: 160 },
-      { month: "Sep", value: 140 },
-      { month: "Oct", value: 130 },
-      { month: "Nov", value: 120 },
-      { month: "Dec", value: 110 },
-    ],
+    chartData: transformToMonthlyData(analyticData, "orders_count"),
     insights: [
       {
         title: "Peak Order Day",
@@ -195,20 +217,7 @@ const VendorAnalytics = () => {
         color: "from-pink-500 to-rose-600",
       },
     ],
-    chartData: [
-      { month: "Jan", value: 120 },
-      { month: "Feb", value: 140 },
-      { month: "Mar", value: 160 },
-      { month: "Apr", value: 180 },
-      { month: "May", value: 200 },
-      { month: "Jun", value: 220 },
-      { month: "Jul", value: 240 },
-      { month: "Aug", value: 260 },
-      { month: "Sep", value: 280 },
-      { month: "Oct", value: 300 },
-      { month: "Nov", value: 320 },
-      { month: "Dec", value: 340 },
-    ],
+    chartData: transformToMonthlyData(analyticData, "consumers_count"),
     insights: [
       {
         title: "Highest Traffic Day",
