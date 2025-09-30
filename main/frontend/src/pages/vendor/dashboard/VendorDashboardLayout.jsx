@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import DashboardNavbar from '../../components/DashboardNavbar';
-import VendorSidebar from '../../components/vendor/VendorSidebar';
+import React, { useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import DashboardNavbar from "../../../components/DashboardNavbar";
+import VendorSidebar from "../../../components/vendor/VendorSidebar";
 
 const VendorDashboardLayout = () => {
   const [showAddProduct, setShowAddProduct] = useState(false);

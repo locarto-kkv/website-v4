@@ -4,50 +4,56 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 
 export const useAnalyticStore = create(
-  persist((set, get) => ({
-    analyticData: null,
-    products: null,
-    orders: null,
-    dataLoading: false,
+  persist(
+    (set, get) => ({
+      analyticData: null,
+      products: null,
+      vendor: null, // singular = selected vendor data
+      orders: null,
+      dataLoading: false,
 
-    getAnalyticData: async () => {
-      set({ dataLoading: true });
-      try {
-        const response = await axiosInstance.get("/vendor/analytic/");
-        set({
-          analyticData: response.data,
-          products: response.data.products.total,
-          orders: response.data.vendors.total,
-        });
-      } catch (error) {
-        toast.error(
-          error.response?.data?.message || "Failed to fetch Analytics"
-        );
-        console.log("Error in getAnalyticData:", error);
-      } finally {
-        set({ dataLoading: false });
-      }
-    },
+      // fetch analytics
+      getAnalyticData: async () => {
+        set({ dataLoading: true });
+        try {
+          const response = await axiosInstance.get("/vendor/analytic/");
+          const orders = await axiosInstance.get("/vendor/order");
 
-    changeDataRange: (range) => {
-      console.log("changeDataRange: ", range);
+          set({
+            analyticData: response.data,
+            products: response.data.products.total,
+            vendor: response.data.vendors.total,
+            orders: orders.data,
+          });
+        } catch (error) {
+          toast.error(
+            error.response?.data?.message || "Failed to fetch Analytics"
+          );
+          console.error("Error in getAnalyticData:", error);
+        } finally {
+          set({ dataLoading: false });
+        }
+      },
 
-      if (range === "total") {
-        set({
-          products: get().analyticData.products.total,
-          orders: get().analyticData.vendors.total,
+      // update state by range
+      changeDataRange: (range) => {
+        set((state) => {
+          let products, vendor;
+          if (range === "total") {
+            products = state.analyticData.products.total;
+            vendor = state.analyticData.vendors.total;
+          } else if (range === "month") {
+            products = state.analyticData.products.monthly;
+            vendor = state.analyticData.vendors.monthly[0];
+          } else if (range === "week") {
+            products = state.analyticData.products.weekly;
+            vendor = state.analyticData.vendors.weekly[0];
+          }
+          console.log("changeDataRange:", range, vendor);
+          return { products, vendor };
         });
-      } else if (range === "month") {
-        set({
-          products: get().analyticData.products.monthly,
-          orders: get().analyticData.vendors.monthly,
-        });
-      } else if (range === "week") {
-        set({
-          products: get().analyticData.products.weekly,
-          orders: get().analyticData.vendors.weekly,
-        });
-      }
-    },
-  }))
+      },
+    }),
+    { name: "analytic-store" } // persist key
+  )
 );

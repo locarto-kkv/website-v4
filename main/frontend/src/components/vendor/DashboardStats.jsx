@@ -1,3 +1,5 @@
+import { formatCurrency } from "../../lib/utils.js";
+
 const StatCard = ({ title, value, iconClass, trend, trendValue, gradient }) => (
   <div className="group relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-orange-200 transform hover:-translate-y-1">
     {/* Gradient border accent */}
@@ -48,18 +50,8 @@ const StatCard = ({ title, value, iconClass, trend, trendValue, gradient }) => (
   </div>
 );
 
-const DashboardStats = ({ products = [], orders = [] }) => {
-  // Enhanced calculations with error handling
-  const totalRevenue = orders.total_amount || 0;
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+const DashboardStats = ({ products = [], vendor = [] }) => {
+  const totalRevenue = vendor.total_amount || 0;
 
   const formatNumber = (num) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
@@ -70,9 +62,9 @@ const DashboardStats = ({ products = [], orders = [] }) => {
   // Mock trend data - in real app this would come from props or API
   const getTrendData = (type) => {
     const trends = {
-      products: { trend: "up", value: "+12%" },
-      orders: { trend: "up", value: "+8.5%" },
-      revenue: { trend: "up", value: "+15.2%" },
+      products: { trend: "up", percent: "+12%" },
+      vendor: { trend: "up", percent: "+8.5%" },
+      revenue: { trend: "up", percent: "+15.2%" },
     };
     return trends[type] || {};
   };
@@ -80,17 +72,17 @@ const DashboardStats = ({ products = [], orders = [] }) => {
   const statsData = [
     {
       title: "Total Products",
-      value: formatNumber(products.products_count),
+      value: formatNumber(vendor.products_count),
       iconClass: "fas fa-cube",
       gradient: "bg-gradient-to-br from-blue-500 to-blue-600",
       ...getTrendData("products"),
     },
     {
-      title: "Total Orders",
-      value: formatNumber(orders.orders_count),
+      title: "Total vendor",
+      value: formatNumber(vendor.orders_count),
       iconClass: "fas fa-shopping-bag",
       gradient: "bg-gradient-to-br from-green-500 to-green-600",
-      ...getTrendData("orders"),
+      ...getTrendData("vendor"),
     },
     {
       title: "Total Revenue",

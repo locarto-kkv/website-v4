@@ -3,14 +3,14 @@ DROP VIEW total_product_summary;
 CREATE VIEW public.total_product_summary AS
 SELECT
     p.id AS product_id,
-    p.name AS product_name,
+    p.name AS name,
     p.vendor_id AS vendor_id,
     p.quantity AS quantity,
     p.price AS price,
-    
+    p.category AS category,
     -- basic aggregations
-    COUNT(DISTINCT o.id) AS total_orders,
-    COUNT(DISTINCT o.consumer_id) AS total_consumers,
+    COUNT(DISTINCT o.id) AS orders_count,
+    COUNT(DISTINCT o.consumer_id) AS consumers_count,
     SUM(o.amount) AS total_amount,
     AVG(o.amount) AS avg_amount,
 

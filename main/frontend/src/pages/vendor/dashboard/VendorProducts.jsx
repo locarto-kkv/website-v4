@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { VendorProductService } from "../../services/vendor/vendorProductService";
+import { VendorProductService } from "../../../services/vendor/vendorProductService";
 
 const VendorProducts = () => {
   const [products, setProducts] = useState([]);
@@ -42,13 +42,14 @@ const VendorProducts = () => {
         {
           id: 1,
           name: "Premium Wireless Headphones",
-          description: "High-quality wireless headphones with noise cancellation",
+          description:
+            "High-quality wireless headphones with noise cancellation",
           price: 299.99,
           stock: 15,
           category: "Accessories",
           image: null,
           rating: 4.8,
-          sales: 245
+          sales: 245,
         },
         {
           id: 2,
@@ -59,7 +60,7 @@ const VendorProducts = () => {
           category: "Wellness",
           image: null,
           rating: 4.6,
-          sales: 189
+          sales: 189,
         },
         {
           id: 3,
@@ -70,8 +71,8 @@ const VendorProducts = () => {
           category: "Lifestyle",
           image: null,
           rating: 4.9,
-          sales: 156
-        }
+          sales: 156,
+        },
       ];
       setProducts(mockProducts);
     } catch (error) {
@@ -120,7 +121,7 @@ const VendorProducts = () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         // Delete logic here
-        setProducts(prev => prev.filter(p => p.id !== productId));
+        setProducts((prev) => prev.filter((p) => p.id !== productId));
       } catch (error) {
         console.error("Error deleting product:", error);
       }
@@ -144,33 +145,38 @@ const VendorProducts = () => {
       style: "currency",
       currency: "INR",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
   const getStockStatus = (stock) => {
-    if (stock === 0) return { text: "Out of Stock", class: "bg-red-100 text-red-800" };
-    if (stock <= 5) return { text: "Low Stock", class: "bg-yellow-100 text-yellow-800" };
-    if (stock <= 10) return { text: "Limited", class: "bg-orange-100 text-orange-800" };
+    if (stock === 0)
+      return { text: "Out of Stock", class: "bg-red-100 text-red-800" };
+    if (stock <= 5)
+      return { text: "Low Stock", class: "bg-yellow-100 text-yellow-800" };
+    if (stock <= 10)
+      return { text: "Limited", class: "bg-orange-100 text-orange-800" };
     return { text: "In Stock", class: "bg-green-100 text-green-800" };
   };
 
   const getProductIcon = (category) => {
     const icons = {
-      'Wellness': 'fas fa-heart',
-      'Lifestyle': 'fas fa-home',
-      'Accessories': 'fas fa-gem',
-      'Default': 'fas fa-box'
+      Wellness: "fas fa-heart",
+      Lifestyle: "fas fa-home",
+      Accessories: "fas fa-gem",
+      Default: "fas fa-box",
     };
-    return icons[category] || icons['Default'];
+    return icons[category] || icons["Default"];
   };
 
   // Filter and sort products
   const filteredProducts = products
-    .filter(product => {
-      const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    .filter((product) => {
+      const matchesCategory =
+        selectedCategory === "All" || product.category === selectedCategory;
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
@@ -211,9 +217,11 @@ const VendorProducts = () => {
             </div>
             My Products
           </h1>
-          <p className="text-gray-600">Manage your product inventory and listings</p>
+          <p className="text-gray-600">
+            Manage your product inventory and listings
+          </p>
         </div>
-        
+
         <div className="flex items-center gap-4 mt-4 lg:mt-0">
           <button
             onClick={() => setShowAddModal(true)}
@@ -243,7 +251,7 @@ const VendorProducts = () => {
                 {category}
                 {category !== "All" && (
                   <span className="ml-2 text-xs opacity-75">
-                    ({products.filter(p => p.category === category).length})
+                    ({products.filter((p) => p.category === category).length})
                   </span>
                 )}
               </button>
@@ -252,21 +260,21 @@ const VendorProducts = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setViewMode('grid')}
+              onClick={() => setViewMode("grid")}
               className={`p-2 rounded-lg transition-all ${
-                viewMode === 'grid' 
-                  ? 'bg-orange-100 text-orange-600' 
-                  : 'text-gray-500 hover:bg-gray-100'
+                viewMode === "grid"
+                  ? "bg-orange-100 text-orange-600"
+                  : "text-gray-500 hover:bg-gray-100"
               }`}
             >
               <i className="fas fa-th-large"></i>
             </button>
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode("list")}
               className={`p-2 rounded-lg transition-all ${
-                viewMode === 'list' 
-                  ? 'bg-orange-100 text-orange-600' 
-                  : 'text-gray-500 hover:bg-gray-100'
+                viewMode === "list"
+                  ? "bg-orange-100 text-orange-600"
+                  : "text-gray-500 hover:bg-gray-100"
               }`}
             >
               <i className="fas fa-list"></i>
@@ -286,7 +294,7 @@ const VendorProducts = () => {
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             />
           </div>
-          
+
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
@@ -325,14 +333,17 @@ const VendorProducts = () => {
           </button>
         </div>
       ) : (
-        <div className={viewMode === 'grid' 
-          ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
-          : 'space-y-4'
-        }>
+        <div
+          className={
+            viewMode === "grid"
+              ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+              : "space-y-4"
+          }
+        >
           {filteredProducts.map((product) => {
             const stockStatus = getStockStatus(product.stock);
-            
-            if (viewMode === 'list') {
+
+            if (viewMode === "list") {
               return (
                 <div
                   key={product.id}
@@ -340,21 +351,31 @@ const VendorProducts = () => {
                 >
                   <div className="flex items-center gap-6">
                     <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <i className={`${getProductIcon(product.category)} text-2xl text-orange-600`}></i>
+                      <i
+                        className={`${getProductIcon(
+                          product.category
+                        )} text-2xl text-orange-600`}
+                      ></i>
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-xl font-bold text-gray-900 truncate">{product.name}</h3>
+                        <h3 className="text-xl font-bold text-gray-900 truncate">
+                          {product.name}
+                        </h3>
                         <div className="flex items-center gap-2 ml-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${stockStatus.class}`}>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${stockStatus.class}`}
+                          >
                             {stockStatus.text}
                           </span>
                         </div>
                       </div>
-                      
-                      <p className="text-gray-600 mb-3 line-clamp-2">{product.description}</p>
-                      
+
+                      <p className="text-gray-600 mb-3 line-clamp-2">
+                        {product.description}
+                      </p>
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6">
                           <span className="text-2xl font-black text-gray-900">
@@ -366,11 +387,13 @@ const VendorProducts = () => {
                           {product.rating && (
                             <div className="flex items-center gap-1">
                               <i className="fas fa-star text-yellow-400"></i>
-                              <span className="text-sm font-medium">{product.rating}</span>
+                              <span className="text-sm font-medium">
+                                {product.rating}
+                              </span>
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleEditProduct(product)}
@@ -408,13 +431,19 @@ const VendorProducts = () => {
                     />
                   ) : (
                     <div className="text-center">
-                      <i className={`${getProductIcon(product.category)} text-4xl text-gray-400 mb-2`}></i>
+                      <i
+                        className={`${getProductIcon(
+                          product.category
+                        )} text-4xl text-gray-400 mb-2`}
+                      ></i>
                       <p className="text-xs text-gray-500">No image</p>
                     </div>
                   )}
-                  
+
                   {/* Stock Status Badge */}
-                  <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${stockStatus.class}`}>
+                  <div
+                    className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${stockStatus.class}`}
+                  >
                     {stockStatus.text}
                   </div>
 
@@ -423,7 +452,7 @@ const VendorProducts = () => {
                     {product.category}
                   </div>
                 </div>
-                
+
                 <div className="p-6">
                   <div className="mb-4">
                     <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
@@ -433,22 +462,26 @@ const VendorProducts = () => {
                       {product.description}
                     </p>
                   </div>
-                  
+
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-2xl font-black text-gray-900">
                       {formatCurrency(product.price)}
                     </span>
                     <div className="text-right">
-                      <div className="text-sm text-gray-500">Stock: {product.stock}</div>
+                      <div className="text-sm text-gray-500">
+                        Stock: {product.stock}
+                      </div>
                       {product.rating && (
                         <div className="flex items-center gap-1 justify-end mt-1">
                           <i className="fas fa-star text-yellow-400 text-xs"></i>
-                          <span className="text-xs font-medium">{product.rating}</span>
+                          <span className="text-xs font-medium">
+                            {product.rating}
+                          </span>
                         </div>
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <button
                       onClick={() => handleEditProduct(product)}
@@ -481,10 +514,12 @@ const VendorProducts = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-2xl font-bold">
-                    {editingProduct ? 'Edit Product' : 'Add New Product'}
+                    {editingProduct ? "Edit Product" : "Add New Product"}
                   </h3>
                   <p className="text-orange-100 mt-1">
-                    {editingProduct ? 'Update your product information' : 'Fill in the details for your new product'}
+                    {editingProduct
+                      ? "Update your product information"
+                      : "Fill in the details for your new product"}
                   </p>
                 </div>
                 <button
@@ -539,7 +574,9 @@ const VendorProducts = () => {
                       Price (₹) *
                     </label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">₹</span>
+                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                        ₹
+                      </span>
                       <input
                         type="number"
                         name="price"
@@ -599,9 +636,14 @@ const VendorProducts = () => {
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <i className="fas fa-cloud-upload-alt text-4xl text-gray-400 group-hover:text-orange-500 transition-colors mb-3"></i>
                           <p className="text-sm text-gray-600 text-center">
-                            <span className="font-semibold text-orange-600">Click to upload</span> or drag and drop
+                            <span className="font-semibold text-orange-600">
+                              Click to upload
+                            </span>{" "}
+                            or drag and drop
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            PNG, JPG, GIF up to 10MB
+                          </p>
                         </div>
                         <input
                           type="file"
@@ -639,8 +681,12 @@ const VendorProducts = () => {
                     type="submit"
                     className="px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
-                    <i className={`fas ${editingProduct ? 'fa-save' : 'fa-plus'} mr-2`}></i>
-                    {editingProduct ? 'Update Product' : 'Add Product'}
+                    <i
+                      className={`fas ${
+                        editingProduct ? "fa-save" : "fa-plus"
+                      } mr-2`}
+                    ></i>
+                    {editingProduct ? "Update Product" : "Add Product"}
                   </button>
                 </div>
               </form>

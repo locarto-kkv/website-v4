@@ -1,84 +1,19 @@
 import React, { useState } from "react";
 import { useAnalyticStore } from "../../store/useAnalyticStore";
+import {
+  formatCurrency,
+  formatDate,
+  getOrderStatusConfig,
+  getProductIcon,
+} from "../../lib/utils.js";
 
 const TopSellingProducts = () => {
   const [viewMode, setViewMode] = useState("grid");
 
   const { products, changeDataRange } = useAnalyticStore();
 
-  // Enhanced static data with more details
-  const defaultTopProducts = [
-    {
-      id: 1,
-      name: "Premium Wireless Headphones",
-      sold: 120,
-      revenue: 14400,
-      growth: 15.2,
-      category: "Electronics",
-      image: null,
-      rating: 4.8,
-      inStock: true,
-      trend: "up",
-    },
-    {
-      id: 2,
-      name: "Smart Fitness Watch",
-      sold: 98,
-      revenue: 19600,
-      growth: 8.7,
-      category: "Wearables",
-      image: null,
-      rating: 4.6,
-      inStock: true,
-      trend: "up",
-    },
-    {
-      id: 3,
-      name: "Bluetooth Speaker Pro",
-      sold: 76,
-      revenue: 9120,
-      growth: -2.1,
-      category: "Audio",
-      image: null,
-      rating: 4.4,
-      inStock: false,
-      trend: "down",
-    },
-    {
-      id: 4,
-      name: "USB-C Power Bank",
-      sold: 65,
-      revenue: 3250,
-      growth: 22.3,
-      category: "Accessories",
-      image: null,
-      rating: 4.5,
-      inStock: true,
-      trend: "up",
-    },
-  ];
-
-  const topProducts = products.length > 0 ? products : defaultTopProducts;
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const getProductIcon = (category) => {
-    const icons = {
-      Electronics: "fas fa-laptop",
-      Wearables: "fas fa-clock",
-      Audio: "fas fa-volume-up",
-      Accessories: "fas fa-plug",
-      Default: "fas fa-box",
-    };
-    return icons[category] || icons["Default"];
-  };
+  const topProducts =
+    products.length > 0 ? products.slice(0, 3) : defaultTopProducts;
 
   const getRankBadge = (index) => {
     const badges = {
@@ -209,11 +144,6 @@ const TopSellingProducts = () => {
                           )} text-indigo-600 text-xl`}
                         ></i>
                       </div>
-                      {!product.inStock && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center border-2 border-white">
-                          <i className="fas fa-exclamation text-white text-xs"></i>
-                        </div>
-                      )}
                     </div>
 
                     {/* Compact Product Details */}
@@ -265,7 +195,7 @@ const TopSellingProducts = () => {
                       <div className="flex items-center justify-between mb-4">
                         <div>
                           <div className="text-2xl font-bold text-gray-900">
-                            {product.sold}
+                            {product.orders_count}
                           </div>
                           <div className="text-sm text-gray-500">
                             units sold
@@ -274,52 +204,16 @@ const TopSellingProducts = () => {
 
                         <div className="text-right">
                           <div className="text-xl font-bold text-gray-900">
-                            {formatCurrency(product.revenue)}
+                            {formatCurrency(product.total_amount)}
                           </div>
                           <div className="text-sm text-gray-500">revenue</div>
                         </div>
-
-                        {/* Stock Status */}
-                        <div
-                          className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                            product.inStock
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {product.inStock ? "In Stock" : "Out of Stock"}
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button
-                          className="flex-1 p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors text-sm font-medium"
-                          title="View Details"
-                        >
-                          <i className="fas fa-eye mr-2"></i>
-                          View
-                        </button>
-                        <button
-                          className="flex-1 p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium"
-                          title="Edit Product"
-                        >
-                          <i className="fas fa-edit mr-2"></i>
-                          Edit
-                        </button>
-                        <button
-                          className="flex-1 p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors text-sm font-medium"
-                          title="Analytics"
-                        >
-                          <i className="fas fa-chart-line mr-2"></i>
-                          Stats
-                        </button>
                       </div>
                     </div>
                   </div>
 
                   {/* Compact Action Buttons on Hover */}
-                  <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="flex items-center gap-1 mt-2">
                     <button
                       className="flex-1 px-2 py-1 text-xs text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors font-medium"
                       title="View Details"

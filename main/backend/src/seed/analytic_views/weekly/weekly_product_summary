@@ -21,8 +21,9 @@ WITH product_orders AS (
 SELECT
     po.vendor_id AS vendor_id,
     po.product_id AS product_id,
-    po.product_name AS product_name,
+    po.product_name AS name,
     po.order_week AS order_week,
+    po.category AS category,
     -- basic aggregations
     COUNT(DISTINCT po.order_id) AS orders_count,
     COUNT(DISTINCT po.consumer_id) AS consumers_count,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAnalyticStore } from "../../store/useAnalyticStore";
+import { useAnalyticStore } from "../../../store/useAnalyticStore";
 
 const VendorAnalytics = () => {
   const [activeTab, setActiveTab] = useState("sales");
@@ -391,7 +391,7 @@ const VendorAnalytics = () => {
         <div>
           <h1 className="text-3xl font-black text-gray-900 mb-2 flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-              <i className= "fas fa-chart-bar text-white"></i>
+              <i className="fas fa-chart-bar text-white"></i>
             </div>
             Vendor Analytics
           </h1>

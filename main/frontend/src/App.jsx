@@ -18,14 +18,14 @@ import { useAnalyticStore } from "./store/useAnalyticStore";
 
 function App() {
   const { authLoading, checkAuth, currentUser } = useAuthStore();
-  const { getAnalyticData, dataLoading, products, orders } = useAnalyticStore();
+  const { getAnalyticData } = useAnalyticStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
   useEffect(() => {
-    if (currentUser.type === "vendor") {
+    if (currentUser?.type === "vendor") {
       getAnalyticData();
     }
   }, [currentUser]);

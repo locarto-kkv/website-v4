@@ -9,7 +9,8 @@ export const getVendorData = async (userId) => {
     const { data: vendorTotalData } = await db
       .from("total_vendor_summary")
       .select()
-      .eq("vendor_id", userId);
+      .eq("vendor_id", userId)
+      .single();
 
     const { data: productTotalData } = await db
       .from("total_product_summary")

@@ -2,15 +2,15 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 
 import AuthVendor from "./authVendor";
-import VendorDashboardLayout from "../../components/vendor/VendorDashboardLayout";
+import VendorDashboardLayout from "./dashboard/VendorDashboardLayout";
 import VendorDashboard from "./vendorDashboard";
-import VendorProfile from "../../components/vendor/VendorProfile";
-import VendorAnalytics from "../../components/vendor/VendorAnalytics";
-import VendorSettings from "../../components/vendor/VendorSettings";
-import VendorProducts from "../../components/vendor/VendorProducts";
-import VendorSupport from "../../components/vendor/VendorSupport";
-import VendorSetup from "../../components/vendor/VendorSetupWizard";
-import VendorsMemberHub from "../../components/vendor/VendorsMemberHub"; // Add this import
+import VendorProfile from "./dashboard/VendorProfile";
+import VendorAnalytics from "./dashboard/VendorAnalytics";
+import VendorSettings from "./dashboard/VendorSettings";
+import VendorProducts from "./dashboard/VendorProducts";
+import VendorSupport from "./dashboard/VendorSupport";
+import VendorSetup from "./dashboard/VendorSetupWizard";
+import VendorsMemberHub from "./dashboard/VendorsMemberHub"; // Add this import
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
