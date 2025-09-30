@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Components
 import Navbar from "../components/Navbar";
@@ -36,10 +36,11 @@ const brandsWithImages = brandData.map((brand) => {
 
 const LandingPage = () => {
   const [showCardContent, setShowCardContent] = useState(true);
+  const navigate = useNavigate();
 
+  // FIXED: Navigate to brand info page
   const handleReadMore = (brandId) => {
-    console.log(`User wants to read more about brand: ${brandId}`);
-    alert(`Read more about ${brandId}`);
+    navigate(`/brand-info/${brandId}`);
   };
 
   return (
@@ -109,9 +110,6 @@ const LandingPage = () => {
           className="absolute top-[2800px] md:top-[4000px] -right-28 md:-right-44 w-[350px] h-[350px] md:w-[590px] md:h-[590px] opacity-[0.18] animate-[spin_46s_linear_infinite]"
           style={{ filter: 'blur(1px)' }}
         />
-        
-        
-       
       </div>
       
       <Navbar pageType="landing" />

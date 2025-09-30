@@ -1,6 +1,6 @@
 // src/pages/BrandInfoPage.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import brandData from "../branddata.js";
@@ -8,7 +8,7 @@ import Insta from "../assets/insta.png";
 import Youtube from "../assets/yt.png";
 import Whatsapp from "../assets/whatsapp.png";
 import locartoImg from "../assets/locarto.png";
-import BrandIdentityCard from "../components/landing/card.jsx";
+import snabbitImg from "../assets/snabbitimage.png";
 
 // Background Assets
 import asset1 from "../../src/assets/1.png";
@@ -20,11 +20,23 @@ import asset5 from "../../src/assets/5.png";
 const BrandInfoPage = () => {
   const { brandId } = useParams();
   const [brand, setBrand] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     const foundBrand = brandData.find((b) => b.id === brandId);
     if (foundBrand) {
-      setBrand(foundBrand);
+      // Assign images
+      if (foundBrand.id === "snabbit") {
+        setBrand({ ...foundBrand, image: snabbitImg });
+      } else if (foundBrand.id === "locarto") {
+        setBrand({ ...foundBrand, image: locartoImg });
+      } else {
+        setBrand(foundBrand);
+      }
     }
   }, [brandId]);
 
@@ -40,7 +52,6 @@ const BrandInfoPage = () => {
     <div className="font-sans text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
       {/* Background Decorative Assets */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Top Left - Large asset */}
         <img 
           src={asset1} 
           alt="" 
@@ -48,7 +59,6 @@ const BrandInfoPage = () => {
           style={{ filter: 'blur(1px)' }}
         />
                 
-        {/* Top Right */}
         <img 
           src={asset2} 
           alt="" 
@@ -56,7 +66,6 @@ const BrandInfoPage = () => {
           style={{ filter: 'blur(1px)' }}
         />
         
-        {/* Middle Left */}
         <img 
           src={asset4} 
           alt="" 
@@ -64,7 +73,6 @@ const BrandInfoPage = () => {
           style={{ filter: 'blur(1px)' }}
         />
         
-        {/* Middle Right */}
         <img 
           src={asset1} 
           alt="" 
@@ -72,9 +80,6 @@ const BrandInfoPage = () => {
           style={{ filter: 'blur(1px)' }}
         />
         
-       
-        
-        {/* Bottom Right */}
         <img 
           src={asset3} 
           alt="" 
@@ -82,7 +87,6 @@ const BrandInfoPage = () => {
           style={{ filter: 'blur(1px)' }}
         />
         
-        {/* Small accent asset - Hidden on mobile */}
         <img 
           src={asset2} 
           alt="" 
@@ -90,7 +94,6 @@ const BrandInfoPage = () => {
         />
       </div>
 
-      {/* Navbar */}
       <Navbar pageType="brand-info" />
 
       {/* Brand Image Box */}
@@ -178,50 +181,50 @@ const BrandInfoPage = () => {
           </div>
         )}
 
-        {/* Related Cards Section */}
-        <div className="mt-12 border-t pt-8 border-[#0D1539]/30">
-          <h3 className="text-xl font-bold mb-6 text-[#0D1539]">
-            You Might Also Like
-          </h3>
-          <div className="px-4 md:px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-            {(() => {
-              const relatedBrands = brand.related || [];
-              const allBrands = brandData;
-              
-              const getRandomBrandById = (id) => {
-                return allBrands.find(b => b.id === id) || null;
-              };
+        {/* Related Brands Section - Simple Version */}
+        {brand.related && brand.related.length > 0 && (
+          <div className="mt-12 border-t pt-8 border-[#0D1539]/30">
+            <h3 className="text-xl font-bold mb-6 text-[#0D1539]">
+              You Might Also Like
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {brand.related.map((relatedItem) => {
+                const relatedBrand = brandData.find(b => b.id === relatedItem.id);
+                if (!relatedBrand) return null;
 
-              const relatedBrandObjects = relatedBrands
-                .map(relatedItem => getRandomBrandById(relatedItem.id))
-                .filter(brandObj => brandObj !== null);
+                let brandImage = null;
+                if (relatedBrand.id === "snabbit") brandImage = snabbitImg;
+                if (relatedBrand.id === "locarto") brandImage = locartoImg;
 
-              const shuffled = [...relatedBrandObjects];
-              for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-              }
-
-              const selectedBrands = shuffled;
-
-              return selectedBrands.map((relatedBrandObj, idx) => {
-                if (!relatedBrandObj) return null;
                 return (
                   <div 
-                    key={idx} 
-                    className="flex justify-center transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
+                    key={relatedItem.id}
+                    onClick={() => navigate(`/brand-info/${relatedItem.id}`)}
+                    className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-[#0D1539]/20 hover:border-[#f15b28] transition-all duration-300 cursor-pointer hover:scale-105"
                   >
-                    <BrandIdentityCard
-                      brand={relatedBrandObj}
-                      showContent={true}
-                      onReadMore={() => console.log(`Read more for related brand: ${relatedBrandObj.id}`)}
-                    />
+                    {brandImage && (
+                      <div className="h-40 overflow-hidden bg-gray-100">
+                        <img
+                          src={brandImage}
+                          alt={relatedBrand.title}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h4 className="text-lg font-bold text-[#0D1539] mb-2">
+                        {relatedBrand.title}
+                      </h4>
+                      <p className="text-sm text-[#0D1539]/70 line-clamp-2">
+                        {relatedBrand.description}
+                      </p>
+                    </div>
                   </div>
                 );
-              });
-            })()}
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* New Banner Section */}
@@ -284,7 +287,7 @@ const BrandInfoPage = () => {
             target="_blank" 
             rel="noopener noreferrer" 
             className="group transition-transform duration-300 hover:scale-110"
-          >
+            >
             <img
               src={Whatsapp}
               alt="WhatsApp"
@@ -311,10 +314,9 @@ const BrandInfoPage = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <Footer />
       
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

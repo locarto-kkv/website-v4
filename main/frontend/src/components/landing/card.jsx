@@ -45,7 +45,7 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
         description: 'text-lg',
         button: 'text-base',
         imageTop: 'top-[10%]',
-        textTop: 'top-[150px]', // Fixed px for larger screens
+        textTop: 'top-[150px]',
         buttonBottom: 'bottom-[10%]',
         textPadding: 'px-4'
       };
@@ -55,7 +55,7 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
         description: 'text-xl',
         button: 'text-lg',
         imageTop: 'top-[10%]',
-        textTop: 'top-[180px]', // Scaled for very large screens
+        textTop: 'top-[180px]',
         buttonBottom: 'bottom-[10%]',
         textPadding: 'px-6'
       };
@@ -73,13 +73,9 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
       }
     };
 
-    // Initial measurement
     updateSize();
-
-    // Add resize listener
     window.addEventListener('resize', updateSize);
     
-    // Clean up
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
@@ -130,11 +126,11 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
           </div>
         )}
 
-        {/* Button */}
+        {/* Button - FIXED: Changed from /brand/ to /brand-info/ */}
         {showContent && (
           <div className={`absolute ${responsiveStyles.buttonBottom} left-1/2 -translate-x-1/2 w-full flex justify-center`}>
             <Link
-              to={`/brand/${brandDetails.id}`}
+              to={`/brand-info/${brandDetails.id}`}
               className="bg-gray-900 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 shadow-md"
             >
               <span className={responsiveStyles.button}>Read More</span>

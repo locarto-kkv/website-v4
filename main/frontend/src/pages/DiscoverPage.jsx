@@ -1,9 +1,9 @@
 // src/pages/DiscoverPage.jsx
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import locartoImg from "../assets/locarto.png"; // Import the images
+import locartoImg from "../assets/locarto.png";
 import snabbitImg from "../assets/snabbitimage.png";
 import Insta from "../assets/insta.png";
 import Youtube from "../assets/yt.png";
@@ -18,11 +18,12 @@ import asset4 from "../../src/assets/4.png";
 import asset5 from "../../src/assets/5.png";
 
 // Import the brand data
-import brandData from "../branddata.js"; // Adjust the path if needed
+import brandData from "../branddata.js";
 
 const DiscoverPage = () => {
   const [email, setEmail] = useState("");
   const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
+  const navigate = useNavigate();
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -52,20 +53,18 @@ const DiscoverPage = () => {
   const brandsWithImages = brandData.map((brand) => {
     if (brand.id === "snabbit") return { ...brand, image: snabbitImg };
     if (brand.id === "locarto") return { ...brand, image: locartoImg };
-    // Add more conditions if you have other brands
     return brand;
   });
 
   // Use the brandsWithImages array instead of the hardcoded one
-  // You can display all of them or a specific subset
-  // For example, if you want to repeat the available brands to fill 9 cards:
   const brandCards = [];
   for (let i = 0; i < 9; i++) {
     brandCards.push(brandsWithImages[i % brandsWithImages.length]);
   }
 
+  // FIXED: Navigate to brand info page
   const handleReadMore = (brandId) => {
-    console.log("Read More clicked for brand ID:", brandId);
+    navigate(`/brand-info/${brandId}`);
   };
 
   const handleSubscribe = (e) => {
@@ -119,8 +118,6 @@ const DiscoverPage = () => {
           className="absolute top-[2200px] md:top-[3000px] -right-24 md:-right-36 w-[310px] h-[310px] md:w-[490px] md:h-[490px] opacity-[0.25] animate-[spin_46s_linear_infinite]"
           style={{ filter: 'blur(1px)' }}
         />
-        
-       
       </div>
 
       {/* Navbar */}
@@ -292,7 +289,7 @@ const DiscoverPage = () => {
       {/* Footer */}
       <Footer />
       
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

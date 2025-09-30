@@ -10,9 +10,11 @@ import LandingPage from "./pages/landingpage";
 import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";
+
 // Vendor Pages
 import VendorRoutes from "./pages/vendor/vendorRoutes";
 
+// Consumer Pages
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
 import { useAnalyticStore } from "./store/useAnalyticStore";
 
@@ -45,6 +47,9 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/map" element={<MapView />} />
         <Route path="/landing" element={<LandingPage />} />
+        <Route path="/discover" element={<DiscoverPage />} />
+        <Route path="/brand-info/:brandId" element={<BrandInfoPage />} />
+        
         {/* --- VENDOR ROUTES --- */}
         <Route path="vendor/*" element={<VendorRoutes />} />
 
