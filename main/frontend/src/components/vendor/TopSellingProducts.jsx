@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { useAnalyticStore } from "../../store/useAnalyticStore";
 import {
   formatCurrency,
   formatDate,
   getOrderStatusConfig,
   getProductIcon,
 } from "../../lib/utils.js";
+import { useAnalytic } from "../../context/vendorAnalyticContext.jsx";
 
 const TopSellingProducts = () => {
   const [viewMode, setViewMode] = useState("grid");
 
-  const { products, changeDataRange } = useAnalyticStore();
+  const { products, changeDataRange } = useAnalytic();
 
   const topProducts =
     products.length > 0 ? products.slice(0, 3) : defaultTopProducts;

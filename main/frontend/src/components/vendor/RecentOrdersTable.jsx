@@ -4,7 +4,7 @@ import {
   formatDate,
   getOrderStatusConfig,
 } from "../../lib/utils.js";
-import { useAnalyticStore } from "../../store/useAnalyticStore.jsx";
+import { useAnalytic } from "../../context/vendorAnalyticContext.jsx";
 
 const StatusBadge = ({ status }) => {
   const config = getOrderStatusConfig(status);
@@ -20,7 +20,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const RecentOrdersTable = () => {
-  const { orders } = useAnalyticStore();
+  const { orders } = useAnalytic();
 
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("desc");

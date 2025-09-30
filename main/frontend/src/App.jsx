@@ -16,21 +16,14 @@ import VendorRoutes from "./pages/vendor/vendorRoutes";
 
 // Consumer Pages
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
-import { useAnalyticStore } from "./store/useAnalyticStore";
+import { useAnalytic } from "./context/vendorAnalyticContext";
 
 function App() {
   const { authLoading, checkAuth, currentUser } = useAuthStore();
-  const { getAnalyticData } = useAnalyticStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
-  useEffect(() => {
-    if (currentUser?.type === "vendor") {
-      getAnalyticData();
-    }
-  }, [currentUser]);
 
   if (authLoading) {
     return (
@@ -49,10 +42,9 @@ function App() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/brand-info/:brandId" element={<BrandInfoPage />} />
-        
+
         {/* --- VENDOR ROUTES --- */}
         <Route path="vendor/*" element={<VendorRoutes />} />
-
         {/* --- CONSUMER ROUTES --- */}
         <Route path="consumer/*" element={<ConsumerRoutes />} />
       </Routes>

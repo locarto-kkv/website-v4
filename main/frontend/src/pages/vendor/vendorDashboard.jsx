@@ -1,14 +1,14 @@
-// src/pages/VendorDashboard.jsx
-import React, { useEffect, useState } from "react";
-import { useAnalyticStore } from "../../store/useAnalyticStore";
-
-// Component imports
 import DashboardStats from "../../components/vendor/DashboardStats";
 import RecentOrdersTable from "../../components/vendor/RecentOrdersTable";
 import TopSellingProducts from "../../components/vendor/TopSellingProducts";
+import { useAnalytic } from "../../context/vendorAnalyticContext";
 
 const VendorDashboard = () => {
-  const { products, vendor } = useAnalyticStore();
+  const { products, vendor, dataLoading } = useAnalytic();
+
+  if (dataLoading || !products || !vendor) {
+    return <p>Loading analytics...</p>;
+  }
 
   console.log(products, vendor);
 

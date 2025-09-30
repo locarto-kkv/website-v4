@@ -6,6 +6,7 @@ WITH vendor_orders AS (
     v.id                           AS vendor_id,
     v.name                         AS vendor_name,
     p.id                           AS product_id,
+    o.consumer_id                  AS consumer_id,
     COALESCE(p.category, 'unknown') AS category,
     o.id                           AS order_id,
     o.amount,
@@ -22,6 +23,7 @@ SELECT
   vo.vendor_name,
   vo.order_week,
 
+  ARRAY_AGG(DISTINCT vo.consumer_id) FILTER (WHERE vo.consumer_id IS NOT NULL) AS consumer_ids,
   COUNT(DISTINCT vo.product_id) AS products_count,
   COUNT(vo.order_id)          AS orders_count,
   SUM(vo.amount)              AS total_amount,

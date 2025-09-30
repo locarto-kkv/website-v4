@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useAnalyticStore } from "../../../store/useAnalyticStore";
+import { useAnalytic } from "../../../context/vendorAnalyticContext";
 
 const VendorAnalytics = () => {
   const [activeTab, setActiveTab] = useState("sales");
   const [viewMode, setViewMode] = useState("chart");
 
-  const { products, orders, changeDataRange } = useAnalyticStore();
+  const { products, vendor } = useAnalytic();
 
   // Enhanced mock data for different tabs
   const salesData = {
@@ -13,7 +13,7 @@ const VendorAnalytics = () => {
     metrics: [
       {
         label: "Total Revenue",
-        value: "₹4,05,091",
+        value: vendor.total_amount || 0,
         change: "+12%",
         positive: true,
         icon: "fas fa-rupee-sign",
@@ -21,7 +21,7 @@ const VendorAnalytics = () => {
       },
       {
         label: "Avg. Order Value",
-        value: "₹2,715",
+        value: vendor.average_amount || 0,
         change: "-3.2%",
         positive: false,
         icon: "fas fa-calculator",
@@ -29,7 +29,7 @@ const VendorAnalytics = () => {
       },
       {
         label: "Total Orders",
-        value: "1,492",
+        value: vendor.orders_count || 0,
         change: "+8%",
         positive: true,
         icon: "fas fa-shopping-cart",
@@ -89,7 +89,7 @@ const VendorAnalytics = () => {
     metrics: [
       {
         label: "Total Orders",
-        value: "1,492",
+        value: vendor.orders_count || 0,
         change: "+8%",
         positive: true,
         icon: "fas fa-box",
@@ -97,7 +97,7 @@ const VendorAnalytics = () => {
       },
       {
         label: "Pending Orders",
-        value: "42",
+        value: vendor.order_status_counts.pending || 0,
         change: "-5%",
         positive: true,
         icon: "fas fa-clock",
@@ -105,7 +105,7 @@ const VendorAnalytics = () => {
       },
       {
         label: "Completed Orders",
-        value: "1,380",
+        value: vendor.order_status_counts.complete || 0,
         change: "+12%",
         positive: true,
         icon: "fas fa-check-circle",
@@ -113,7 +113,7 @@ const VendorAnalytics = () => {
       },
       {
         label: "Cancelled Orders",
-        value: "70",
+        value: vendor.order_status_counts.cancelled || 0,
         change: "-3%",
         positive: true,
         icon: "fas fa-times-circle",

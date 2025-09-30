@@ -4,6 +4,7 @@ CREATE VIEW public.total_vendor_summary AS
 SELECT v.id AS vendor_id,
        v.name AS vendor_name,
        COUNT(DISTINCT p.id) AS products_count,
+      ARRAY_AGG(DISTINCT o.consumer_id) FILTER (WHERE o.consumer_id IS NOT NULL) AS consumer_ids,
        SUM(o.amount) AS total_amount,
        COUNT(o.id) AS orders_count,
        AVG (o.amount) AS average_amount,

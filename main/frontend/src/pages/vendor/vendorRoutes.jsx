@@ -11,6 +11,7 @@ import VendorProducts from "./dashboard/VendorProducts";
 import VendorSupport from "./dashboard/VendorSupport";
 import VendorSetup from "./dashboard/VendorSetupWizard";
 import VendorsMemberHub from "./dashboard/VendorsMemberHub"; // Add this import
+import { AnalyticProvider } from "../../context/vendorAnalyticContext";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
@@ -22,33 +23,35 @@ const VendorRoutes = () => {
   // console.log(currentUser);
 
   return (
-    <Routes>
-      {/* Public route */}
-      <Route
-        path="login"
-        element={
-          currentUser ? (
-            <Navigate to="/vendor/dashboard" replace />
-          ) : (
-            <AuthVendor />
-          )
-        }
-      />
+    <AnalyticProvider>
+      <Routes>
+        {/* Public route */}
+        <Route
+          path="login"
+          element={
+            currentUser ? (
+              <Navigate to="/vendor/dashboard" replace />
+            ) : (
+              <AuthVendor />
+            )
+          }
+        />
 
-      <Route element={<ProtectedRoute />}>
-        <Route element={<VendorDashboardLayout />}>
-          <Route index element={<VendorDashboard />} />
-          <Route path="dashboard" element={<VendorDashboard />} />
-          <Route path="products" element={<VendorProducts />} />
-          <Route path="members-hub" element={<VendorsMemberHub />} />
-          <Route path="profile" element={<VendorProfile />} />
-          <Route path="analytics" element={<VendorAnalytics />} />
-          <Route path="settings" element={<VendorSettings />} />
-          <Route path="support" element={<VendorSupport />} />
-          <Route path="setup" element={<VendorSetup />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<VendorDashboardLayout />}>
+            <Route index element={<VendorDashboard />} />
+            <Route path="dashboard" element={<VendorDashboard />} />
+            <Route path="products" element={<VendorProducts />} />
+            <Route path="members-hub" element={<VendorsMemberHub />} />
+            <Route path="profile" element={<VendorProfile />} />
+            <Route path="analytics" element={<VendorAnalytics />} />
+            <Route path="settings" element={<VendorSettings />} />
+            <Route path="support" element={<VendorSupport />} />
+            <Route path="setup" element={<VendorSetup />} />
+          </Route>
         </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </AnalyticProvider>
   );
 };
 
