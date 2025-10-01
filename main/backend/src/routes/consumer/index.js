@@ -6,6 +6,7 @@ import profileRoutes from "./profile.routes.js";
 import orderRoutes from "./order.routes.js";
 import reviewRoutes from "./review.routes.js";
 import listRoutes from "./consumer_list.routes.js";
+import blogRoutes from "./blog.routes.js";
 
 const router = Router();
 
@@ -15,5 +16,6 @@ router.use("/profile", profileRoutes);
 router.use("/order", orderRoutes);
 router.use("/review", reviewRoutes);
 router.use("/list", listRoutes);
+router.use("/blog", blogRoutes);
 
 export default router;

@@ -1,7 +1,7 @@
 // src/pages/BrandInfoPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { AdminBlogService } from "../services/admin/adminBlogService.js";
+import { ConsumerBlogService } from "../services/consumer/consumerBlogService.js";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -18,10 +18,10 @@ import asset4 from "../../src/assets/4.png";
 
 const BrandInfoPage = () => {
   const { brandTitle } = useParams();
-  const [brand, setBrand] = useState(null);
+  const [brand, setBrand] = useState();
+  const [brandLoading, setBrandLoading] = useState(true);
   const [brandData, setBrandData] = useState(null);
-
-  const { getBlogs } = AdminBlogService;
+  const { getBlogs } = ConsumerBlogService;
 
   // Scroll to top whenever brandId changes
   useEffect(() => {
@@ -35,6 +35,7 @@ const BrandInfoPage = () => {
       const foundBrand = brandData.find((b) => b.title === brandTitle);
       setBrand(foundBrand || null);
       setBrandData(brandData);
+      setBrandLoading(false);
     };
     fetchBlogs();
   }, [brandTitle]);
@@ -49,12 +50,14 @@ const BrandInfoPage = () => {
     return otherBrands.slice(0, 3);
   };
 
-  if (!brand) {
+  if (!brand && !brandLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#0D1539] text-white">
         Brand not found.
       </div>
     );
+  } else if (brandLoading) {
+    return <div>Loading Brands...</div>;
   }
 
   const randomBrands = getRandomBrands(brand.title, brandData);

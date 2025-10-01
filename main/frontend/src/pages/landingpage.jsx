@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AdminBlogService } from "../services/admin/adminBlogService.js";
+import { ConsumerBlogService } from "../services/consumer/consumerBlogService.js";
 
 // Components
 import Navbar from "../components/Navbar";
@@ -28,7 +28,7 @@ const LandingPage = () => {
   const [showCardContent, setShowCardContent] = useState(true);
   const [blogs, setBlogs] = useState(null);
   const navigate = useNavigate();
-  const { getBlogs } = AdminBlogService;
+  const { getBlogs } = ConsumerBlogService;
 
   const handleReadMore = (brandId) => {
     navigate(`/brand-info/${brandId}`);
