@@ -7,6 +7,7 @@ import Insta from "../assets/insta.png";
 import Youtube from "../assets/yt.png";
 import Whatsapp from "../assets/whatsapp.png";
 import BrandIdentityCard from "../components/landing/card.jsx";
+import locartoImg from "../assets/locarto.png";
 
 // Background Assets
 import asset1 from "../../src/assets/1.png";
@@ -280,12 +281,12 @@ const DiscoverPage = () => {
       </main>
 
       {/* Locarto Logo Banner - Bottom */}
-      <div className="w-full overflow-hidden relative z-10">
+      <div className="bg-white w-full overflow-hidden relative z-10">
         <div className="relative w-full h-48 md:h-64 lg:h-80">
           <img
-            src={brandData.find((b) => b.id === "locarto")?.brand_logo || ""}
+            src={locartoImg}
             alt="Locarto"
-            className="absolute inset-0 w-full h-auto object-contain object-center -translate-y-[10%]"
+            className="absolute inset-0 w-full h-auto object-contain object-center -translate-y-[25%] transform scale-110"
           />
         </div>
       </div>

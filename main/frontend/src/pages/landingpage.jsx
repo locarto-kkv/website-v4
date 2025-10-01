@@ -111,7 +111,7 @@ const LandingPage = () => {
             listen.
           </p>
 
-          <div className="flex flex-col items-center mt-8 md:mt-16 relative">
+          <div className="flex flex-col items-center -mt-40 sm:mt-8 md:mt-16 relative">
             {/* Tag Image + Overlay */}
             <div className="relative grid place-items-center animate-[fadeIn_1.2s_ease-in]">
               <img
@@ -119,18 +119,16 @@ const LandingPage = () => {
                 alt="Tag"
                 className="col-start-1 row-start-1 h-[700px] w-full max-w-[1800px] object-contain md:h-[850px]"
               />
-              <p className="col-start-1 row-start-1 translate-y-6 font-bold text-center text-2xl md:text-5xl text-[#FBF5E5] whitespace-nowrap [text-shadow:3px_3px_6px_rgba(0,0,0,0.7)]">
+              <p className="col-start-1 row-start-1 translate-y-2 font-bold text-center text-sm sm:text-base md:text-5xl text-[#FBF5E5] whitespace-nowrap [text-shadow:3px_3px_6px_rgba(0,0,0,0.7)]">
                 We get what's missing. so we made.
               </p>
             </div>
 
-            {/* Locarto Logo */}
             <img
               src={locartoImg}
               alt="Locarto"
-              className="-mt-[300px] sm:-mt-[270px] md:-mt-[340px] lg:-mt-[300px] w-full max-w-[160px] sm:max-w-[220px] md:max-w-[320px] lg:max-w-[420px] h-auto relative z-10 animate-[fadeIn_1.4s_ease-in]"
+              className="-mt-[345px] sm:-mt-[270px] md:-mt-[340px] lg:-mt-[385px] w-full max-w-[180px] sm:max-w-[260px] md:max-w-[380px] lg:max-w-[500px] h-auto relative z-10 animate-[fadeIn_1.4s_ease-in]"
             />
-
             <p className="mt-8 text-center text-2xl font-semibold md:text-3xl relative z-10 animate-[fadeIn_1.6s_ease-in]">
               A Community where
             </p>
@@ -329,7 +327,7 @@ const LandingPage = () => {
             <img
               src={locartoImg}
               alt="Locarto"
-              className="absolute inset-0 w-full h-auto object-contain object-center -translate-y-[10%]"
+              className="absolute inset-0 w-full h-auto object-contain object-center -translate-y-[25%] transform scale-110"
             />
           </div>
         </div>
