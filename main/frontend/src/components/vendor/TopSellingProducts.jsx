@@ -12,8 +12,7 @@ const TopSellingProducts = () => {
 
   const { products, changeDataRange } = useAnalytic();
 
-  const topProducts =
-    products.length > 0 ? products.slice(0, 3) : defaultTopProducts;
+  const topProducts = products.slice(0, 3);
 
   const getRankBadge = (index) => {
     const badges = {

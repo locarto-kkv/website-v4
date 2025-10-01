@@ -11,15 +11,14 @@ import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";
 
-// Vendor Pages
 import VendorRoutes from "./pages/vendor/vendorRoutes";
 
-// Consumer Pages
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
-import { useAnalytic } from "./context/vendorAnalyticContext";
+
+import AdminRoutes from "./pages/admin/adminRoutes";
 
 function App() {
-  const { authLoading, checkAuth, currentUser } = useAuthStore();
+  const { authLoading, checkAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
@@ -47,6 +46,8 @@ function App() {
         <Route path="vendor/*" element={<VendorRoutes />} />
         {/* --- CONSUMER ROUTES --- */}
         <Route path="consumer/*" element={<ConsumerRoutes />} />
+        {/* --- ADMIN ROUTES --- */}
+        <Route path="admin/*" element={<AdminRoutes />} />
       </Routes>
 
       <Toaster />

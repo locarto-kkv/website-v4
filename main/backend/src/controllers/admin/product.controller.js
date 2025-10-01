@@ -1,5 +1,4 @@
 import db from "../../lib/db.js";
-import fs from "fs";
 
 export const getProducts = async (req, res) => {
   try {
@@ -42,7 +41,7 @@ export const editProduct = async (req, res) => {
       .select()
       .single();
 
-    res.status(200).json(products);
+    res.status(200).json(product);
   } catch (error) {
     console.log("Error in editProduct controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });

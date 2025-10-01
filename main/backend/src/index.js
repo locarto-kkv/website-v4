@@ -16,7 +16,6 @@ dotenv.config();
 const { PORT: port, FRONTEND_URL: frontendURL } = process.env;
 
 const app = express();
-const data = { message: "Hello World" };
 const __dirname = path.resolve();
 
 app.use(express.json());
@@ -26,13 +25,8 @@ app.use(cors({ origin: frontendURL, credentials: true }));
 app.use("/api/vendor", vendorRoutes);
 app.use("/api/consumer", consumerRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/api/auth/check", protectRoute, checkAuth);
-
-app.get("/", async (req, res) => {
-  res.json(data);
-});
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

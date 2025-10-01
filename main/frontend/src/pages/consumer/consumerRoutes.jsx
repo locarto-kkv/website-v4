@@ -11,7 +11,11 @@ import ConsumerDashboard from "./consumerDashboard";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
-  return currentUser ? <Outlet /> : <Navigate to="/consumer/login" relplace />;
+  return currentUser?.type === "consumer" ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/consumer/login" relplace />
+  );
 };
 
 const ConsumerRoutes = () => {
@@ -24,7 +28,7 @@ const ConsumerRoutes = () => {
       <Route
         path="login"
         element={
-          currentUser ? (
+          currentUser?.type === "consumer" ? (
             <Navigate to="/consumer/dashboard" replace />
           ) : (
             <AuthConsumer />

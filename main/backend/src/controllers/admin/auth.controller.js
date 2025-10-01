@@ -1,7 +1,10 @@
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import fs from "fs";
+import logger from "../../lib/logger.js";
 dotenv.config();
+
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 import db from "../../lib/db.js";
 import { generateToken } from "../../lib/utils.js";
@@ -33,15 +36,18 @@ export const signup = async (req, res) => {
       .select()
       .single();
 
-    if (error) return res.status(400).json({ message: "Admin already exists" });
-
-    fs.mkdirSync(`./uploads/documents/${user.id}`);
+    if (error) return res.status(400).json({ message: "User already exists" });
 
     generateToken(user.id, "admin", res);
 
-    return res.status(201).json({ user, type: "admin" });
+    res.status(201).json({ id: user.id, type: "admin" });
   } catch (error) {
-    console.log("Error in signup controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "signup",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -61,10 +67,7 @@ export const login = async (req, res) => {
       .limit(1)
       .single();
 
-    if (!user) {
-      console.log(error);
-      return res.status(400).json({ message: "Admin does not exist" });
-    }
+    if (!user) return res.status(400).json({ message: "User does not exist" });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect)
@@ -72,9 +75,14 @@ export const login = async (req, res) => {
 
     generateToken(user.id, "admin", res);
 
-    res.status(200).json({ user, type: "admin" });
+    res.status(200).json({ id: user.id, type: "admin" });
   } catch (error) {
-    console.log("Error in login controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "login",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -84,7 +92,12 @@ export const logout = (req, res) => {
     res.cookie("jwt", "", { maxAge: 0 });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.log("Error in logout controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "logout",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

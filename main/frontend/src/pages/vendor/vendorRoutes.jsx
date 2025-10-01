@@ -15,7 +15,11 @@ import { AnalyticProvider } from "../../context/vendorAnalyticContext";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
-  return currentUser ? <Outlet /> : <Navigate to="/vendor/login" replace />;
+  return currentUser?.type === "vendor" ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/vendor/login" replace />
+  );
 };
 
 const VendorRoutes = () => {
@@ -28,7 +32,7 @@ const VendorRoutes = () => {
       <Route
         path="login"
         element={
-          currentUser ? (
+          currentUser?.type === "vendor" ? (
             <Navigate to="/vendor/dashboard" replace />
           ) : (
             <AuthVendor />
