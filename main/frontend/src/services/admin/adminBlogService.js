@@ -29,17 +29,14 @@ export const AdminBlogService = {
         blogData = { ...blogData, brand_logo_metadata };
       }
 
-      const { data: response } = await axiosInstance.post(
-        `${BASE_URL}/add`,
-        blogData
-      );
+      const { data } = await axiosInstance.post(`${BASE_URL}/add`, blogData);
 
       // console.log(response.blog);
 
-      if (response.imgUploadUrl) {
+      if (data.imgUploadUrl) {
         await AdminBlogService.uploadImage(
           blogData.brand_logo,
-          response.imgUploadUrl
+          data.imgUploadUrl
         );
       }
 
@@ -51,14 +48,30 @@ export const AdminBlogService = {
   },
 
   editBlog: async (blogId, blogData) => {
-    const response = await axiosInstance.put(`${BASE_URL}/${blogId}`, {
-      blogData,
-    });
-    return response.data;
+    if (blogData.brand_logo) {
+      const brand_logo_metadata = {
+        type: blogData.brand_logo.type,
+        name: blogData.brand_logo.name,
+        size: blogData.brand_logo.size,
+      };
+
+      blogData = { ...blogData, brand_logo_metadata };
+    }
+
+    const { data } = await axiosInstance.put(`${BASE_URL}/${blogId}`, blogData);
+
+    if (data.imgUploadUrl) {
+      await AdminBlogService.uploadImage(
+        blogData.brand_logo,
+        data.imgUploadUrl
+      );
+    }
+
+    toast.success("Blog Updated");
   },
 
-  removeBlog: async (blogId) => {
-    const response = await axiosInstance.delete(`${BASE_URL}/${blogId}`);
-    return response.data;
+  deleteBlog: async (blogId) => {
+    await axiosInstance.delete(`${BASE_URL}/${blogId}`);
+    toast.success("Blog Deleted");
   },
 };

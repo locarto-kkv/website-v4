@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
+import { DataProvider } from "./context/blogContext";
 
 // Public Pages
 import Homepage from "./pages/homepage";
@@ -34,21 +35,22 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Routes>
-        {/* --- PUBLIC ROUTES --- */}
-        <Route path="/" element={<Homepage />} />
-        <Route path="/map" element={<MapView />} />
-        <Route path="/landing" element={<LandingPage />} />
-        <Route path="/discover" element={<DiscoverPage />} />
-        <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
-
-        {/* --- VENDOR ROUTES --- */}
-        <Route path="vendor/*" element={<VendorRoutes />} />
-        {/* --- CONSUMER ROUTES --- */}
-        <Route path="consumer/*" element={<ConsumerRoutes />} />
-        {/* --- ADMIN ROUTES --- */}
-        <Route path="admin/*" element={<AdminRoutes />} />
-      </Routes>
+      <DataProvider>
+        <Routes>
+          {/* --- PUBLIC ROUTES --- */}
+          <Route path="/" element={<Homepage />} />
+          <Route path="/map" element={<MapView />} />
+          <Route path="/landing" element={<LandingPage />} />
+          <Route path="/discover" element={<DiscoverPage />} />
+          <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
+          {/* --- ADMIN ROUTES --- */}
+          <Route path="admin/*" element={<AdminRoutes />} />
+          {/* --- VENDOR ROUTES --- */}
+          <Route path="vendor/*" element={<VendorRoutes />} />
+          {/* --- CONSUMER ROUTES --- */}
+          <Route path="consumer/*" element={<ConsumerRoutes />} />
+        </Routes>
+      </DataProvider>
 
       <Toaster />
     </div>

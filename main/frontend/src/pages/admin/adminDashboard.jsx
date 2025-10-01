@@ -1,5 +1,5 @@
 // import { useAnalytic } from "../../context/vendorAnalyticContext";
-import BlogForm from "./dashboard/AdminBlogs";
+import BlogPage from "./dashboard/AdminBlogs";
 
 const VendorDashboard = () => {
   // const { products, vendor } = useAnalytic();
@@ -8,7 +8,7 @@ const VendorDashboard = () => {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <BlogForm />
+      <BlogPage />
     </div>
   );
 };

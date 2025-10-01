@@ -1,7 +1,7 @@
 // src/pages/BrandInfoPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ConsumerBlogService } from "../services/consumer/consumerBlogService.js";
+import { useBlogs } from "../context/blogContext.jsx";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -10,7 +10,6 @@ import Youtube from "../assets/yt.png";
 import Whatsapp from "../assets/whatsapp.png";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import locartoImg from "../assets/locarto.png";
-
 
 // Background Assets
 import asset1 from "../../src/assets/1.png";
@@ -21,9 +20,7 @@ import asset4 from "../../src/assets/4.png";
 const BrandInfoPage = () => {
   const { brandTitle } = useParams();
   const [brand, setBrand] = useState();
-  const [brandLoading, setBrandLoading] = useState(true);
-  const [brandData, setBrandData] = useState(null);
-  const { getBlogs } = ConsumerBlogService;
+  const { blogs: brandData } = useBlogs();
 
   // Scroll to top whenever brandId changes
   useEffect(() => {
@@ -31,15 +28,8 @@ const BrandInfoPage = () => {
   }, [brandTitle]);
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      const brandData = await getBlogs();
-
-      const foundBrand = brandData.find((b) => b.title === brandTitle);
-      setBrand(foundBrand || null);
-      setBrandData(brandData);
-      setBrandLoading(false);
-    };
-    fetchBlogs();
+    const foundBrand = brandData.find((b) => b.title === brandTitle);
+    setBrand(foundBrand || null);
   }, [brandTitle]);
 
   // Shuffle + get random brands (excluding current one)
@@ -52,14 +42,12 @@ const BrandInfoPage = () => {
     return otherBrands.slice(0, 3);
   };
 
-  if (!brand && !brandLoading) {
+  if (!brand) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#0D1539] text-white">
         Brand not found.
       </div>
     );
-  } else if (brandLoading) {
-    return <div>Loading Brands...</div>;
   }
 
   const randomBrands = getRandomBrands(brand.title, brandData);
@@ -120,32 +108,26 @@ const BrandInfoPage = () => {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-12 relative z-10">
-        <Link
-          to="/discover"
-          className="mb-8 inline-flex items-center gap-4 text-[#0D1539] animate-[fadeIn_1s_ease-in]"
-        >
-          <div className="p-4 bg-white rounded-full hover:bg-gray-100 transition-all duration-200 hover:scale-110">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="text-[#0D1539]"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+        {/* Rating */}
+        {brand.rating && (
+          <div className="mt-8 flex items-center gap-3 text-3xl text-[#0D1539]">
+            <span className="font-medium">
+              <span className="text-orange-400">LETY</span> Rating:
+            </span>
+            <div className="flex text-5xl text-purple-900">
+              {"★".repeat(Math.floor(brand.rating))}
+              {"☆".repeat(5 - Math.floor(brand.rating))}
+            </div>
+            <span className="text-2xl">({brand.rating}/5)</span>
           </div>
-          <span className="text-xl font-semibold">Back to Brands</span>
-        </Link>
+        )}
 
-        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
-          {brand.subtitle || brand.title}
+        <h2 className="text-2xl md:text-5xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
+          {brand.title}
+        </h2>
+
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
+          {brand.subtitle}
         </h2>
 
         <div className="prose max-w-none mb-8 text-[#0D1539] animate-[fadeIn_1.4s_ease-in]">
@@ -181,17 +163,29 @@ const BrandInfoPage = () => {
           </div>
         ))}
 
-        {/* Rating */}
-        {brand.rating && (
-          <div className="mt-8 flex items-center gap-2 text-[#0D1539]">
-            <span>Rating:</span>
-            <div className="flex">
-              {"★".repeat(Math.floor(brand.rating))}
-              {"☆".repeat(5 - Math.floor(brand.rating))}
-            </div>
-            <span>({brand.rating}/5)</span>
+        <Link
+          to="/discover"
+          className="mb-4 mt-4 inline-flex items-center gap-4 text-[#0D1539] animate-[fadeIn_1s_ease-in]"
+        >
+          <div className="p-4 bg-gray-100 rounded-full hover:bg-orange-400 transition-all duration-200 hover:scale-110">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="text-[#0D1539]"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
           </div>
-        )}
+          <span className="text-xl font-semibold">Back to Brands</span>
+        </Link>
 
         {/* Related */}
         {randomBrands.length > 0 && (
@@ -201,11 +195,7 @@ const BrandInfoPage = () => {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {randomBrands.map((randomBrand) => (
-                <BrandIdentityCard
-                  key={randomBrand.id}
-                  brand={randomBrand}
-                  showContent={true}
-                />
+                <BrandIdentityCard key={randomBrand.id} brand={randomBrand} />
               ))}
             </div>
           </div>
@@ -296,7 +286,6 @@ const BrandInfoPage = () => {
           />
         </div>
       </div>
-
 
       <Footer />
 

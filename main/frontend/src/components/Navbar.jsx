@@ -100,6 +100,8 @@ const Navbar = ({ pageType = "landing" }) => {
       navigate("/vendor/dashboard");
     } else if (currentUser?.type === "consumer") {
       navigate("/consumer/dashboard");
+    } else if (currentUser?.type === "admin") {
+      navigate("/admin/dashboard");
     } else {
       navigate("/consumer/login");
     }
@@ -113,7 +115,7 @@ const Navbar = ({ pageType = "landing" }) => {
           <img
             src={locartoImg}
             alt="Locarto"
-            className="h-14 w-auto object-contain scale-125 translate-y-[2px]" 
+            className="h-14 w-auto object-contain scale-125 translate-y-[2px]"
           />
         </Link>
       </div>

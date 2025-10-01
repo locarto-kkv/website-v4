@@ -80,18 +80,56 @@ export const addBlog = async (req, res) => {
 
 export const editBlog = async (req, res) => {
   try {
-    const userId = req.user.id;
     const blogId = req.params.id;
-    const { name, price, quantity } = req.body;
+    const {
+      title,
+      subtitle,
+      description,
+      rating,
+      sections,
+      brand_logo_metadata = null,
+    } = req.body;
 
-    const { data: blog } = await db
-      .from("blogs")
-      .update({ name, price, quantity })
-      .eq("id", blogId)
-      .select()
-      .single();
+    if (brand_logo_metadata) {
+      const imgUploadUrl = await getImgUploadUrl(blogId, brand_logo_metadata);
 
-    res.status(200).json(blog);
+      const imgPublicUrl = `${process.env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
+
+      const blogData = {
+        title,
+        subtitle,
+        description,
+        brand_logo: imgPublicUrl,
+        rating,
+        sections,
+      };
+      const { data: updatedBlog } = await db
+        .from("blogs")
+        .update(blogData)
+        .eq("id", blogId)
+        .select()
+        .single();
+
+      res.status(200).json({ blog: updatedBlog, imgUploadUrl });
+    } else {
+      const blogData = {
+        title,
+        subtitle,
+        description,
+        brand_logo: null,
+        rating,
+        sections,
+      };
+
+      const { data: updatedBlog } = await db
+        .from("blogs")
+        .update(blogData)
+        .eq("id", blogId)
+        .select()
+        .single();
+
+      res.status(200).json({ blog: updatedBlog });
+    }
   } catch (error) {
     console.log("Error in editBlog controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });

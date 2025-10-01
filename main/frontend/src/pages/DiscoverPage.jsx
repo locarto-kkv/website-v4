@@ -1,6 +1,8 @@
 // src/pages/DiscoverPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useBlogs } from "../context/blogContext.jsx";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Insta from "../assets/insta.png";
@@ -15,26 +17,13 @@ import asset2 from "../../src/assets/2.png";
 import asset3 from "../../src/assets/3.png";
 import asset4 from "../../src/assets/4.png";
 import asset5 from "../../src/assets/5.png";
-import { ConsumerBlogService } from "../services/consumer/consumerBlogService.js";
 
 const DiscoverPage = () => {
   const [email, setEmail] = useState("");
   const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
   const [logoAnimationKey, setLogoAnimationKey] = useState(0);
-  const [brandData, setBrandData] = useState([]);
-  const navigate = useNavigate();
 
-  const [brandLoading, setBrandLoading] = useState(true);
-  const { getBlogs } = ConsumerBlogService;
-
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      const brandData = await getBlogs();
-      setBrandData(brandData);
-      setBrandLoading(false);
-    };
-    fetchBlogs();
-  }, []);
+  const { blogs: brandData } = useBlogs();
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -67,25 +56,18 @@ const DiscoverPage = () => {
   ];
   const brandCards = uniqueBrandCards.slice(0, 70);
 
-  // Navigate to brand info page
-  const handleReadMore = (brandId) => {
-    navigate(`/brand-info/${brandId}`);
-  };
-
   const handleSubscribe = (e) => {
     e.preventDefault();
     alert(`Subscribed with: ${email}`);
     setEmail("");
   };
 
-  if (!brandData && !brandLoading) {
+  if (!brandData) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#0D1539] text-white">
         Brand not found.
       </div>
     );
-  } else if (brandLoading) {
-    return <div>Loading Brands...</div>;
   }
 
   return (
@@ -151,7 +133,7 @@ const DiscoverPage = () => {
           <div className="flex items-center space-x-4">
             <Link
               to="/landing"
-              className="p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-gray-100 transition-all duration-200 shadow-lg hover:scale-110"
+              className="p-2 bg-white/80 backdrop-blur-sm rounded-full bg-gray-100 hover:bg-orange-400 transition-all duration-200 shadow-lg hover:scale-110"
               aria-label="Go back to home"
             >
               <svg
@@ -168,31 +150,22 @@ const DiscoverPage = () => {
                 />
               </svg>
             </Link>
-            <h1 className="text-2xl font-bold">
-              Brands You've Been Searching For
-            </h1>
+            <h1 className="text-2xl font-bold">Back to Home</h1>
           </div>
-          <button className="text-xl p-2 hover:text-orange-400 transition-colors">
-            <i className="fas fa-filter"></i>
-          </button>
         </div>
 
         {/* Grid of BrandIdentityCard Components */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {brandCards.map((cardData, index) => (
+          {brandCards.map((brand, index) => (
             <div
-              key={cardData.id} // Ensure key is based on the brand's unique ID
+              key={brand.id} // Ensure key is based on the brand's unique ID
               className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
               style={{
                 animation: `fadeIn 0.6s ease-in ${1.2 + index * 0.1}s both`,
               }}
             >
               {/* Pass the brand data (with resolved image) to the card component */}
-              <BrandIdentityCard
-                brand={cardData}
-                showContent={true}
-                onReadMore={handleReadMore}
-              />
+              <BrandIdentityCard key={brand.id} brand={brand} />
             </div>
           ))}
         </div>

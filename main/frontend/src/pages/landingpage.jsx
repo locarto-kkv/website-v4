@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ConsumerBlogService } from "../services/consumer/consumerBlogService.js";
+import { useBlogs } from "../context/blogContext.jsx";
 
 // Components
 import Navbar from "../components/Navbar";
@@ -25,23 +25,7 @@ import asset4 from "../../src/assets/4.png";
 import asset5 from "../../src/assets/5.png";
 
 const LandingPage = () => {
-  const [showCardContent, setShowCardContent] = useState(true);
-  const [blogs, setBlogs] = useState(null);
-  const navigate = useNavigate();
-  const { getBlogs } = ConsumerBlogService;
-
-  const handleReadMore = (brandId) => {
-    navigate(`/brand-info/${brandId}`);
-  };
-
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      const blogs = await getBlogs();
-      setBlogs(blogs);
-    };
-
-    fetchBlogs();
-  }, []);
+  const { blogs } = useBlogs();
 
   return (
     <div className="font-sans flex flex-col text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
@@ -195,16 +179,12 @@ const LandingPage = () => {
                         key={brand.id}
                         className="flex justify-center transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
                         style={{
-                          animation: `fadeIn 0.6s ease-in ${
+                          animation: `fadeIn 0.1s ease-in ${
                             2.6 + idx * 0.2
                           }s both`,
                         }}
                       >
-                        <BrandIdentityCard
-                          brand={brand}
-                          showContent={showCardContent}
-                          onReadMore={handleReadMore}
-                        />
+                        <BrandIdentityCard brand={brand} />
                       </div>
                     ))}
                 </div>

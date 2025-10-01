@@ -1,13 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import borderElementImg from "../../assets/border_element.png";
+import { AdminBlogService } from "../../services/admin/adminBlogService";
 
-const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
+const BrandIdentityCard = ({
+  brand,
+  showAdminButtons = false,
+  onEdit,
+  onDelete,
+}) => {
   const [containerWidth, setContainerWidth] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
   const brandDetails = brand || {};
 
-  // Calculate responsive text sizes and positions based on container width
   const calculateResponsiveStyles = useCallback((width) => {
     if (width <= 480) {
       return {
@@ -64,7 +68,6 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
 
   const responsiveStyles = calculateResponsiveStyles(containerWidth);
 
-  // Handle resize and initial measurement
   useEffect(() => {
     const updateSize = () => {
       const element = document.querySelector(".brand-card-container");
@@ -79,9 +82,7 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  // Handle image load to trigger size recalculation if needed
   const handleImageLoad = () => {
-    setIsLoaded(true);
     setTimeout(() => {
       const element = document.querySelector(".brand-card-container");
       if (element) {
@@ -92,7 +93,6 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
 
   return (
     <div className="mt-6 w-full flex flex-col items-center px-2">
-      {/* Outer wrapper for the card */}
       <div className="relative w-full max-w-[1024px] brand-card-container">
         {/* Border Frame */}
         <img
@@ -102,51 +102,61 @@ const BrandIdentityCard = ({ brand, showContent = false, onReadMore }) => {
           onLoad={handleImageLoad}
         />
 
-        {/* Image container - responsive aspect ratio */}
+        {/* Image */}
         <div
-          className={`absolute ${responsiveStyles.imageTop} left-1/2 -translate-x-1/2 w-[80%] aspect-[3/1] sm:aspect-[3/1] md:aspect-[3/1] rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center`}
+          className={`absolute ${responsiveStyles.imageTop} left-1/2 -translate-x-1/2 w-[80%] aspect-[3/1] rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center`}
         >
           <img
             src={brandDetails.brand_logo}
-            alt={brandDetails.brand_logo || "Brand"}
+            alt={brandDetails.title || "Brand"}
             className="w-full h-full object-cover transition-transform duration-300"
           />
         </div>
 
-        {/* Text Content */}
-        {showContent && (
-          <div
-            className={`absolute ${responsiveStyles.textTop} left-1/2 -translate-x-1/2 w-[85%] text-center flex flex-col`}
+        {/* Text */}
+        <div
+          className={`absolute ${responsiveStyles.textTop} left-1/2 -translate-x-1/2 w-[85%] text-center flex flex-col`}
+        >
+          <h3
+            className={`font-bold text-[#0D1539] leading-tight ${responsiveStyles.title}`}
           >
-            {/* Title - Dynamically sized based on container */}
-            <h3
-              className={`font-bold text-[#0D1539] leading-tight ${responsiveStyles.title}`}
-            >
-              {brandDetails.title}
-            </h3>
-
-            {/* Description - Dynamically sized based on container */}
-            <p
-              className={`mt-2 text-[#0D1539] leading-relaxed text-justify ${responsiveStyles.textPadding} mt-3 sm:mt-4 ${responsiveStyles.description}`}
-            >
-              {brandDetails.description}
-            </p>
-          </div>
-        )}
-
-        {/* Button - FIXED: Changed from /brand/ to /brand-info/ */}
-        {showContent && (
-          <div
-            className={`absolute ${responsiveStyles.buttonBottom} left-1/2 -translate-x-1/2 w-full flex justify-center`}
+            {brandDetails.title}
+          </h3>
+          <p
+            className={`mt-3 sm:mt-4 text-[#0D1539] leading-relaxed text-justify ${responsiveStyles.textPadding} ${responsiveStyles.description}`}
           >
+            {brandDetails.description}
+          </p>
+        </div>
+
+        {/* Buttons */}
+        <div
+          className={`absolute ${responsiveStyles.buttonBottom} left-1/2 -translate-x-1/2 w-full flex justify-center`}
+        >
+          {showAdminButtons ? (
+            <div className="flex space-x-3">
+              <button
+                onClick={() => onEdit?.(brandDetails)}
+                className="bg-gray-300 hover:bg-gray-500 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 shadow-md"
+              >
+                <span className={responsiveStyles.button}>Edit</span>
+              </button>
+              <button
+                onClick={() => onDelete?.(brandDetails)}
+                className="bg-orange-600 hover:bg-orange-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-md"
+              >
+                <span className={responsiveStyles.button}>Delete</span>
+              </button>
+            </div>
+          ) : (
             <Link
               to={`/brand-info/${brandDetails.title}`}
               className="bg-gray-900 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 shadow-md"
             >
               <span className={responsiveStyles.button}>Read More</span>
             </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
