@@ -1,14 +1,13 @@
 // src/pages/BrandInfoPage.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { AdminBlogService } from "../services/admin/adminBlogService.js";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import brandData from "../branddata.js";
 import Insta from "../assets/insta.png";
 import Youtube from "../assets/yt.png";
 import Whatsapp from "../assets/whatsapp.png";
-import snabbitImg from "../assets/snabbitimage.png"; // Import Snabbit image
-import locartoImg from "../assets/locarto.png"; // Import Locarto image
 import BrandIdentityCard from "../components/landing/card.jsx";
 
 // Background Assets
@@ -18,42 +17,31 @@ import asset3 from "../../src/assets/3.png";
 import asset4 from "../../src/assets/4.png";
 
 const BrandInfoPage = () => {
-  const { brandId } = useParams();
+  const { brandTitle } = useParams();
   const [brand, setBrand] = useState(null);
-  const navigate = useNavigate();
+  const [brandData, setBrandData] = useState(null);
+
+  const { getBlogs } = AdminBlogService;
 
   // Scroll to top whenever brandId changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [brandId]);
+  }, [brandTitle]);
 
   useEffect(() => {
-    let foundBrand = brandData.find((b) => b.id === brandId);
+    const fetchBlogs = async () => {
+      const brandData = await getBlogs();
 
-    if (foundBrand) {
-      // Apply image assignment logic here before setting state
-      if (foundBrand.id === "snabbit") {
-        foundBrand = { ...foundBrand, image: snabbitImg };
-      } else if (foundBrand.id === "locarto") {
-         foundBrand = { ...foundBrand, image: locartoImg };
-      }
-      setBrand(foundBrand); // Set the brand with the potentially updated image
-    } else {
-       // Optional: Handle the case where the brand isn't found more gracefully
-       // setBrand({ id: 'notfound', title: 'Not Found', subtitle: 'Brand not found' });
-    }
-  }, [brandId]); // Make sure brandId is the dependency
+      const foundBrand = brandData.find((b) => b.title === brandTitle);
+      setBrand(foundBrand || null);
+      setBrandData(brandData);
+    };
+    fetchBlogs();
+  }, [brandTitle]);
 
-  // Update getRandomBrands to also apply image logic if needed for the "You Might Also Like" section
+  // Shuffle + get random brands (excluding current one)
   const getRandomBrands = (currentId, allBrands) => {
-    // Apply image logic to the full brandData before filtering/shuffling
-    const allBrandsWithImages = allBrands.map(brand => {
-      if (brand.id === "snabbit") return { ...brand, image: snabbitImg };
-      if (brand.id === "locarto") return { ...brand, image: locartoImg };
-      return brand;
-    });
-
-    const otherBrands = allBrandsWithImages.filter((brand) => brand.id !== currentId);
+    const otherBrands = allBrands.filter((brand) => brand.id !== currentId);
     for (let i = otherBrands.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [otherBrands[i], otherBrands[j]] = [otherBrands[j], otherBrands[i]];
@@ -69,8 +57,7 @@ const BrandInfoPage = () => {
     );
   }
 
-  // Use the updated getRandomBrands function
-  const randomBrands = getRandomBrands(brand.id, brandData);
+  const randomBrands = getRandomBrands(brand.title, brandData);
 
   return (
     <div className="font-sans text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
@@ -115,26 +102,24 @@ const BrandInfoPage = () => {
 
       <Navbar pageType="brand-info" />
 
-      {/* Brand Image Box */}
+      {/* Brand Image */}
       <div className="mt-16 mb-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-[#0D1539]/40 overflow-hidden flex justify-center items-center max-w-3xl mx-4 sm:mx-auto h-48 sm:h-56 md:h-72 relative z-10 animate-[fadeIn_0.8s_ease-in]">
-        {brand.image && ( // Check if image exists after useEffect
+        {
           <img
-            src={brand.image} // Should now be the correct imported image URL
+            src={brand.brand_logo}
             alt={brand.title}
             className="absolute inset-0 w-full h-full object-contain"
           />
-        )}
+        }
       </div>
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-12 relative z-10">
-        {/* Back to Brands Link - Updated Styling to Match Discover Page */}
         <Link
           to="/discover"
-          className="mb-8 inline-flex items-center gap-4 text-[#0D1539] animate-[fadeIn_1s_ease-in]" // Removed hover effects, adjusted gap
+          className="mb-8 inline-flex items-center gap-4 text-[#0D1539] animate-[fadeIn_1s_ease-in]"
         >
-          {/* Back Arrow Button - Updated Styling to Match Discover Page */}
-          <div className="p-4 bg-white rounded-full hover:bg-gray-100 transition-all duration-200 hover:scale-110"> {/* Made it a div with same styles as Discover page button */}
+          <div className="p-4 bg-white rounded-full hover:bg-gray-100 transition-all duration-200 hover:scale-110">
             <svg
               width="20"
               height="20"
@@ -144,82 +129,85 @@ const BrandInfoPage = () => {
               strokeWidth="2"
               className="text-[#0D1539]"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </div>
-          <span className="text-xl font-semibold">Back to Brands</span> {/* Added font-semibold */}
+          <span className="text-xl font-semibold">Back to Brands</span>
         </Link>
 
         <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
-          {brand.subtitle ||
-            `${brand.title} – The Underrated Space Snake Game That Will Hook You Instantly`}
+          {brand.subtitle || brand.title}
         </h2>
 
         <div className="prose max-w-none mb-8 text-[#0D1539] animate-[fadeIn_1.4s_ease-in]">
           <p>{brand.description}</p>
         </div>
 
-        {brand.sections &&
-          brand.sections.map((section, idx) => (
-            <div
-              key={idx}
-              className="mb-8"
-              style={{
-                animation: `fadeIn 0.6s ease-in ${1.6 + idx * 0.2}s both`,
-              }}
-            >
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#0D1539]">
-                {section.icon && (
-                  <span className="text-orange-400">{section.icon}</span>
-                )}
-                {section.title}
-              </h3>
-              <div className="prose max-w-none text-[#0D1539]">
-                {typeof section.content === "string" ? (
-                  <p>{section.content}</p>
-                ) : (
-                  <ul className="list-disc pl-6 space-y-2">
-                    {section.content.map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+        {/* Sections */}
+        {brand.sections?.map((section, idx) => (
+          <div
+            key={idx}
+            className="mb-8"
+            style={{
+              animation: `fadeIn 0.6s ease-in ${1.6 + idx * 0.2}s both`,
+            }}
+          >
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#0D1539]">
+              {section.icon && (
+                <span className="text-orange-400">{section.icon}</span>
+              )}
+              {section.title}
+            </h3>
+            <div className="prose max-w-none text-[#0D1539]">
+              {Array.isArray(section.content) ? (
+                <ul className="list-disc pl-6 space-y-2">
+                  {section.content.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>{section.content}</p>
+              )}
             </div>
-          ))}
+          </div>
+        ))}
 
+        {/* Rating */}
         {brand.rating && (
           <div className="mt-8 flex items-center gap-2 text-[#0D1539]">
             <span>Rating:</span>
             <div className="flex">
-              {"★".repeat(Math.floor(brand.rating))}{" "}
+              {"★".repeat(Math.floor(brand.rating))}
               {"☆".repeat(5 - Math.floor(brand.rating))}
             </div>
             <span>({brand.rating}/5)</span>
           </div>
         )}
 
+        {/* Related */}
         {randomBrands.length > 0 && (
           <div className="mt-12 border-t pt-8 border-[#0D1539]/30">
             <h3 className="text-xl font-bold mb-6 text-[#0D1539]">
               You Might Also Like
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {randomBrands.map((randomBrand) => {
-                // randomBrand now has the correct image path due to getRandomBrands logic
-                return (
-                  <BrandIdentityCard
-                    key={randomBrand.id}
-                    brand={randomBrand} // Pass the randomBrand object directly
-                    showContent={true}
-                  />
-                );
-              })}
+              {randomBrands.map((randomBrand) => (
+                <BrandIdentityCard
+                  key={randomBrand.id}
+                  brand={randomBrand}
+                  showContent={true}
+                />
+              ))}
             </div>
           </div>
         )}
       </main>
 
+      {/* Newsletter */}
       <div className="mt-24 py-12 md:py-16 px-4 text-center relative z-10">
         <h2 className="text-4xl md:text-6xl text-[#0D1539] mb-4">
           This is just the Beginning
@@ -229,6 +217,7 @@ const BrandInfoPage = () => {
         </p>
       </div>
 
+      {/* Subscribe */}
       <div className="py-8 px-4 text-center relative z-10">
         <div className="max-w-xl mx-auto">
           <div className="flex items-stretch border-2 border-[#0D1539]/30 rounded-full overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:border-[#0D1539]/50">
@@ -244,6 +233,7 @@ const BrandInfoPage = () => {
         </div>
       </div>
 
+      {/* Socials */}
       <div className="py-8 px-4 text-center relative z-10">
         <div className="max-w-xl mx-auto flex justify-center gap-1">
           <a
@@ -289,17 +279,6 @@ const BrandInfoPage = () => {
         <h3 className="text-lg md:text-xl font-light text-[#0D1539]/70 inline-block">
           Making it worthwhile.
         </h3>
-      </div>
-
-      {/* Locarto Logo Banner - Bottom */}
-      <div className="w-full overflow-hidden relative z-10">
-        <div className="relative w-full h-48 md:h-64 lg:h-80">
-          <img
-            src={locartoImg}
-            alt="Locarto"
-            className="absolute inset-0 w-full h-auto object-contain object-center -translate-y-[10%]"
-          />
-        </div>
       </div>
 
       <Footer />

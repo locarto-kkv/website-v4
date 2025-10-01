@@ -3,7 +3,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 
 import AuthAdmin from "./authAdmin";
 import AdminDashboardLayout from "./dashboard/AdminDashboardLayout";
-import AdminDashboard from "./AdminDashboard";
+import AdminDashboard from "./adminDashboard";
 // import AdminProfile from "./dashboard/AdminProfile";
 // import AdminAnalytics from "./dashboard/AdminAnalytics";
 // import AdminSettings from "./dashboard/AdminSettings";

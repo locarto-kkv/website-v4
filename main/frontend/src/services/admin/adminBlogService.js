@@ -1,48 +1,32 @@
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios.js";
 
-const BASE_URL = "/vendor/blog";
+const BASE_URL = "/admin/blog";
 
 export const AdminBlogService = {
-  getBlogs: async (userId) => {
-    const response = userId
-      ? await axiosInstance.get(`${BASE_URL}/`)
-      : await axiosInstance.get(`${BASE_URL}/`);
-
+  getBlogs: async () => {
+    const response = await axiosInstance.get(`${BASE_URL}/`);
     return response.data;
   },
 
-  getBlogById: async (blogId) => {
-    const response = await axiosInstance.get(`${BASE_URL}/${id}`);
-    return response.data;
-  },
-
-  uploadImage: async (files, imgUploadUrls) => {
-    await Promise.all(
-      imgUploadUrls.map(async (url, i) => {
-        const { uploadUrl, fileType } = url;
-
-        await fetch(uploadUrl, {
-          method: "PUT",
-          headers: { "Content-Type": fileType },
-          body: files[i],
-        });
-      })
-    );
+  uploadImage: async (file, imgUploadUrl) => {
+    await fetch(imgUploadUrl.uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": imgUploadUrl.fileType },
+      body: file,
+    });
   },
 
   addBlog: async (blogData) => {
-    // console.log(blogData.blog_images);
-
     try {
-      if (blogData.blog_images.length > 0) {
-        const images_metadata = blogData.blog_images.map((file) => ({
-          type: file.type,
-          name: file.name,
-          size: file.size,
-        }));
+      if (blogData.brand_logo) {
+        const brand_logo_metadata = {
+          type: blogData.brand_logo.type,
+          name: blogData.brand_logo.name,
+          size: blogData.brand_logo.size,
+        };
 
-        blogData = { ...blogData, images_metadata };
+        blogData = { ...blogData, brand_logo_metadata };
       }
 
       const { data: response } = await axiosInstance.post(
@@ -52,16 +36,17 @@ export const AdminBlogService = {
 
       // console.log(response.blog);
 
-      if (response.imgUploadUrls) {
+      if (response.imgUploadUrl) {
         await AdminBlogService.uploadImage(
-          blogData.blog_images,
-          response.imgUploadUrls
+          blogData.brand_logo,
+          response.imgUploadUrl
         );
       }
-      return response;
+
+      toast.success("Blog Added");
     } catch (error) {
       toast.error(error.response?.data?.message || "Add blog failed");
-      console.log("Error in addBlog:", error.response?.data?.message);
+      console.log("Error in addBlog:", error);
     }
   },
 

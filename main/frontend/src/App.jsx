@@ -40,7 +40,7 @@ function App() {
         <Route path="/map" element={<MapView />} />
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/discover" element={<DiscoverPage />} />
-        <Route path="/brand-info/:brandId" element={<BrandInfoPage />} />
+        <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
 
         {/* --- VENDOR ROUTES --- */}
         <Route path="vendor/*" element={<VendorRoutes />} />

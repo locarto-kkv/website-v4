@@ -11,7 +11,7 @@ const VendorProducts = () => {
   const [sortBy, setSortBy] = useState("name");
   const [viewMode, setViewMode] = useState("grid");
   const [editingProduct, setEditingProduct] = useState(null);
-  const [newProduct, setNewProduct] = useState({
+  const [productData, setProductData] = useState({
     name: "",
     description: "",
     price: "",
@@ -84,18 +84,18 @@ const VendorProducts = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct((prev) => ({ ...prev, [name]: value }));
+    setProductData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
-    setNewProduct((prev) => ({ ...prev, image: e.target.files[0] }));
+    setProductData((prev) => ({ ...prev, image: e.target.files[0] }));
   };
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      const productService = new VendorProductService();
-      await productService.addProduct(newProduct);
+      const { addProduct } = VendorProductService;
+      await addProduct(productData);
       setShowAddModal(false);
       resetForm();
       fetchProducts();
@@ -106,7 +106,7 @@ const VendorProducts = () => {
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
-    setNewProduct({
+    setProductData({
       name: product.name,
       description: product.description,
       price: product.price.toString(),
@@ -129,7 +129,7 @@ const VendorProducts = () => {
   };
 
   const resetForm = () => {
-    setNewProduct({
+    setProductData({
       name: "",
       description: "",
       price: "",
@@ -546,7 +546,7 @@ const VendorProducts = () => {
                     <input
                       type="text"
                       name="name"
-                      value={newProduct.name}
+                      value={productData.name}
                       onChange={handleInputChange}
                       required
                       className="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
@@ -560,7 +560,7 @@ const VendorProducts = () => {
                     </label>
                     <textarea
                       name="description"
-                      value={newProduct.description}
+                      value={productData.description}
                       onChange={handleInputChange}
                       required
                       rows="4"
@@ -580,7 +580,7 @@ const VendorProducts = () => {
                       <input
                         type="number"
                         name="price"
-                        value={newProduct.price}
+                        value={productData.price}
                         onChange={handleInputChange}
                         required
                         min="0"
@@ -598,7 +598,7 @@ const VendorProducts = () => {
                     <input
                       type="number"
                       name="stock"
-                      value={newProduct.stock}
+                      value={productData.stock}
                       onChange={handleInputChange}
                       required
                       min="0"
@@ -613,7 +613,7 @@ const VendorProducts = () => {
                     </label>
                     <select
                       name="category"
-                      value={newProduct.category}
+                      value={productData.category}
                       onChange={handleInputChange}
                       required
                       className="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all bg-white"
@@ -653,11 +653,11 @@ const VendorProducts = () => {
                         />
                       </label>
                     </div>
-                    {newProduct.image && (
+                    {productData.image && (
                       <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                         <p className="text-sm text-green-800 flex items-center gap-2">
                           <i className="fas fa-check-circle"></i>
-                          Selected: {newProduct.image.name}
+                          Selected: {productData.image.name}
                         </p>
                       </div>
                     )}

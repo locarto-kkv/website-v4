@@ -19,7 +19,7 @@ const VendorDashboardLayout = () => {
       <div className="flex">
         <VendorSidebar onNavigate={(path) => navigate(path)} />
         <main className="flex-1 p-6">
-          <Outlet context={{ showAddProduct, setShowAddProduct }} />
+          <Outlet />
         </main>
       </div>
     </div>

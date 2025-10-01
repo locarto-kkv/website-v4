@@ -1,4 +1,10 @@
 import db from "../../lib/db.js";
+import logger from "../../lib/logger.js";
+
+import { getImgUploadUrl } from "../../services/admin/imgUpload.service.js";
+
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const getBlogs = async (req, res) => {
   try {
@@ -6,21 +12,68 @@ export const getBlogs = async (req, res) => {
 
     res.status(200).json(blogs);
   } catch (error) {
-    console.log("Error in getBlogs controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getBlogs",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const removeBlog = async (req, res) => {
+export const addBlog = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const blogId = req.params.id;
+    const {
+      title,
+      subtitle,
+      description,
+      rating,
+      sections,
+      brand_logo_metadata = null,
+    } = req.body;
 
-    const { data: blog } = await db.from("blogs").delete().eq("id", blogId);
+    const blogData = {
+      title,
+      subtitle,
+      description,
+      rating,
+      sections,
+    };
 
-    res.status(200).json({ message: "Blog Removed Successfully" });
+    const { data: newBlog, error } = await db
+      .from("blogs")
+      .insert(blogData)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    if (brand_logo_metadata) {
+      const imgUploadUrl = await getImgUploadUrl(
+        newBlog.id,
+        brand_logo_metadata
+      );
+      const imgPublicUrl = `${process.env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
+
+      const { data: updatedBlog } = await db
+        .from("blogs")
+        .update({ brand_logo: imgPublicUrl })
+        .eq("id", newBlog.id)
+        .select()
+        .single();
+
+      res.status(201).json({ blog: updatedBlog, imgUploadUrl });
+    } else {
+      res.status(201).json({ blog: newBlog });
+    }
   } catch (error) {
-    console.log("Error in removeBlog controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "addBlog",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
