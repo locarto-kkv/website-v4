@@ -106,14 +106,14 @@ const Navbar = ({ pageType = "landing" }) => {
   };
 
   return (
-    <nav className="bg-white shadow-md py-3 px-4 flex justify-between items-center sticky top-0 z-50">
+    <nav className="bg-white shadow-md h-[70px] px-4 flex justify-between items-center fixed top-0 left-0 w-full z-50">
       {/* Logo */}
       <div className="flex items-center">
         <Link to="/" className="flex items-center">
           <img
             src={locartoImg}
             alt="Locarto"
-            className="h-8 w-auto" // Adjust size as needed
+            className="h-14 w-auto object-contain scale-125 translate-y-[2px]" 
           />
         </Link>
       </div>

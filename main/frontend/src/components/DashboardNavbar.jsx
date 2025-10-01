@@ -40,18 +40,16 @@ const Navbar = ({ cartItems = [] }) => {
   }, [dropdownOpen]);
 
   return (
-    <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center sticky top-0 z-50">
-      {/* Left side: Brand + Dashboard type */}
+    <nav className="bg-white shadow-md h-[70px] px-4 flex justify-between items-center fixed top-0 left-0 w-full z-50">
+      {/* Logo */}
       <div className="flex items-center">
-        <div className="flex items-center">
-          <Link to="/" className="flex items-center">
-            <img 
-              src={locartoImg} 
-              alt="Locarto" 
-              className="h-8 w-auto" // Adjust size as needed
-            />
-          </Link>
-        </div>
+        <Link to="/" className="flex items-center">
+          <img
+            src={locartoImg}
+            alt="Locarto"
+            className="h-14 w-auto object-contain scale-125 translate-y-[2px]" 
+          />
+        </Link>
         <span className="ml-4 bg-orange-100 text-sm font-medium px-3 py-1 rounded-full">
           {isVendor ? "Vendor Dashboard" : "Customer Dashboard"}
         </span>
