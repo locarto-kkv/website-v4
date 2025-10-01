@@ -15,8 +15,8 @@ const VendorDashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* <DashboardNavbar /> */}
-      <div className="flex">
+      <DashboardNavbar />
+      <div className="flex pt-[70px]">
         <VendorSidebar onNavigate={(path) => navigate(path)} />
         <main className="flex-1 p-6">
           <Outlet />

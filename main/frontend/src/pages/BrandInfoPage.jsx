@@ -112,7 +112,7 @@ const BrandInfoPage = () => {
         {brand.rating && (
           <div className="mt-8 flex items-center gap-3 text-3xl text-[#0D1539]">
             <span className="font-medium">
-              <span className="text-orange-400">LETY</span> Rating:
+              <span className="text-orange-400 font-bold">LETY</span> Rating:
             </span>
             <div className="flex text-5xl text-purple-900">
               {"★".repeat(Math.floor(brand.rating))}
