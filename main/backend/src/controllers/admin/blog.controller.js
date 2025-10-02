@@ -116,7 +116,6 @@ export const editBlog = async (req, res) => {
         title,
         subtitle,
         description,
-        brand_logo: null,
         rating,
         sections,
       };

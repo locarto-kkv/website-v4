@@ -132,7 +132,7 @@ const VendorAnalytics = () => {
       },
       {
         label: "Pending Orders",
-        value: vendor.order_status_counts.pending || 0,
+        value: vendor.order_status_counts?.pending || 0,
         change: "-5%",
         positive: true,
         icon: "fas fa-clock",
@@ -140,7 +140,7 @@ const VendorAnalytics = () => {
       },
       {
         label: "Completed Orders",
-        value: vendor.order_status_counts.complete || 0,
+        value: vendor.order_status_counts?.complete || 0,
         change: "+12%",
         positive: true,
         icon: "fas fa-check-circle",
@@ -148,7 +148,7 @@ const VendorAnalytics = () => {
       },
       {
         label: "Cancelled Orders",
-        value: vendor.order_status_counts.cancelled || 0,
+        value: vendor.order_status_counts?.cancelled || 0,
         change: "-3%",
         positive: true,
         icon: "fas fa-times-circle",
