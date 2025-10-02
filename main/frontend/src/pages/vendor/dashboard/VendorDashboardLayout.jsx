@@ -26,10 +26,10 @@ const VendorDashboardLayout = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardNavbar />
-      {/* This pt-[70px] class is the crucial fix. It adds 70px of top padding. */}
       <div className="flex pt-[70px]">
         <VendorSidebar onNavigate={(path) => navigate(path)} />
-        <main className="flex-1 p-6">
+        {/* The main content area is now the scrollable container */}
+        <main className="flex-1 p-6 h-[calc(100vh-70px)] overflow-y-auto">
           <Outlet />
         </main>
       </div>
