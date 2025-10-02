@@ -5,13 +5,13 @@ import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 
 const Homepage = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [showError, setShowError] = useState(false);
-  const [suggestedCategory, setSuggestedCategory] = useState('');
+  const [suggestedCategory, setSuggestedCategory] = useState("");
   const navigate = useNavigate();
 
   // Available categories
-  const availableCategories = ['wellness', 'lifestyle', 'accessories'];
+  const availableCategories = ["wellness", "lifestyle", "accessories"];
 
   // Popular Products Data
   const popularProducts = [
@@ -22,7 +22,7 @@ const Homepage = () => {
       price: "$12.99",
       image: "🥗",
       category: "wellness",
-      bgColor: "from-green-400 to-emerald-500"
+      bgColor: "from-green-400 to-emerald-500",
     },
     {
       id: 2,
@@ -31,16 +31,17 @@ const Homepage = () => {
       price: "$18.50",
       image: "🍕",
       category: "lifestyle",
-      bgColor: "from-red-400 to-orange-500"
+      bgColor: "from-red-400 to-orange-500",
     },
     {
       id: 3,
       name: "Relaxing Spa Kit",
-      description: "Essential oils and bath bombs for the ultimate day of pampering",
+      description:
+        "Essential oils and bath bombs for the ultimate day of pampering",
       price: "$49.99",
       image: "🧴",
       category: "wellness",
-      bgColor: "from-purple-400 to-pink-500"
+      bgColor: "from-purple-400 to-pink-500",
     },
     {
       id: 4,
@@ -49,22 +50,22 @@ const Homepage = () => {
       price: "$35.00",
       image: "🏋️",
       category: "wellness",
-      bgColor: "from-blue-400 to-indigo-500"
-    }
+      bgColor: "from-blue-400 to-indigo-500",
+    },
   ];
 
   const handleSearch = (e) => {
     e.preventDefault();
-    
-    if (searchQuery.trim() === '') {
+
+    if (searchQuery.trim() === "") {
       return;
     }
-    
+
     const normalizedQuery = searchQuery.toLowerCase().trim();
-    const foundCategory = availableCategories.find(category => 
+    const foundCategory = availableCategories.find((category) =>
       category.includes(normalizedQuery)
     );
-    
+
     if (foundCategory) {
       // Redirect to map with selected category
       navigate(`/map?category=${foundCategory}`);
@@ -90,7 +91,7 @@ const Homepage = () => {
 
   const closeError = () => {
     setShowError(false);
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
   const handleProductClick = (product) => {
@@ -101,11 +102,10 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Navbar pageType="homepage" />
-      
+
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <div className="max-w-6xl w-full mx-auto">
-          
           {/* Hero Section */}
           <div className="text-center mb-20">
             {/* Multi-Logo Gallery with Orange Tinted Logos */}
@@ -113,70 +113,78 @@ const Homepage = () => {
               <div className="w-full max-w-5xl mx-auto">
                 {/* Massive animated background effects */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-red-500 via-pink-500 via-purple-500 to-blue-500 rounded-3xl blur-3xl opacity-15 animate-pulse scale-110"></div>
-                <div className="absolute inset-8 bg-gradient-to-r from-orange-300 via-pink-400 to-purple-400 rounded-2xl blur-2xl opacity-20 animate-pulse scale-105" style={{ animationDelay: '0.5s' }}></div>
-                <div className="absolute inset-16 bg-gradient-to-r from-orange-500 via-red-400 to-pink-500 rounded-xl blur-xl opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
-                
+                <div
+                  className="absolute inset-8 bg-gradient-to-r from-orange-300 via-pink-400 to-purple-400 rounded-2xl blur-2xl opacity-20 animate-pulse scale-105"
+                  style={{ animationDelay: "0.5s" }}
+                ></div>
+                <div
+                  className="absolute inset-16 bg-gradient-to-r from-orange-500 via-red-400 to-pink-500 rounded-xl blur-xl opacity-10 animate-pulse"
+                  style={{ animationDelay: "1s" }}
+                ></div>
+
                 {/* Horizontal Logo Container */}
                 <div className="relative z-10 flex justify-center items-center gap-8 lg:gap-16 py-16 px-4">
                   {/* Logo Images Array */}
                   {[1, 2, 3, 4, 5].map((logoNumber, index) => (
-                    <div 
+                    <div
                       key={logoNumber}
                       className="relative transform hover:scale-110 transition-all duration-700 cursor-pointer group"
                       style={{
                         animationDelay: `${index * 0.2}s`,
-                        animation: 'float 4s ease-in-out infinite'
+                        animation: "float 4s ease-in-out infinite",
                       }}
                     >
                       {/* Logo container - just for positioning */}
                       <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 flex items-center justify-center relative">
-                        
                         {/* Logo Image - Floating freely with no container */}
-                        <img 
+                        <img
                           src={`/src/assets/${logoNumber}.png`}
-                          alt={`Locarto Logo ${logoNumber}`} 
+                          alt={`Locarto Logo ${logoNumber}`}
                           className="relative z-10 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain transition-all duration-700 transform group-hover:rotate-12 group-hover:scale-110"
                           style={{
-                            filter: 'drop-shadow(0 15px 35px rgba(255,100,50,0.4)) drop-shadow(0 5px 15px rgba(255,120,60,0.3))',
+                            filter:
+                              "drop-shadow(0 15px 35px rgba(255,100,50,0.4)) drop-shadow(0 5px 15px rgba(255,120,60,0.3))",
                           }}
                         />
-                        
+
                         {/* Orbiting animated dots */}
-                        <div 
+                        <div
                           className="absolute inset-0 animate-spin"
-                          style={{ 
+                          style={{
                             animationDuration: `${18 + index * 2}s`,
-                            animationDirection: index % 2 === 0 ? 'normal' : 'reverse'
+                            animationDirection:
+                              index % 2 === 0 ? "normal" : "reverse",
                           }}
                         >
                           <div className="absolute top-0 left-1/2 w-2 h-2 bg-orange-400 rounded-full transform -translate-x-1/2 shadow-lg shadow-orange-300"></div>
                         </div>
-                        
-                        <div 
+
+                        <div
                           className="absolute inset-0 animate-spin"
-                          style={{ 
+                          style={{
                             animationDuration: `${14 + index * 2}s`,
-                            animationDirection: index % 2 === 0 ? 'reverse' : 'normal'
+                            animationDirection:
+                              index % 2 === 0 ? "reverse" : "normal",
                           }}
                         >
                           <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-red-400 rounded-full transform -translate-x-1/2 shadow-lg shadow-red-300"></div>
                         </div>
-                        
-                        <div 
+
+                        <div
                           className="absolute inset-0 animate-spin"
-                          style={{ 
+                          style={{
                             animationDuration: `${22 + index * 2}s`,
-                            animationDirection: 'normal'
+                            animationDirection: "normal",
                           }}
                         >
                           <div className="absolute top-1/2 right-0 w-1.5 h-1.5 bg-orange-300 rounded-full transform -translate-y-1/2 shadow-lg shadow-orange-200"></div>
                         </div>
-                        
-                        <div 
+
+                        <div
                           className="absolute inset-0 animate-spin"
-                          style={{ 
+                          style={{
                             animationDuration: `${16 + index * 2}s`,
-                            animationDirection: 'reverse'
+                            animationDirection: "reverse",
                           }}
                         >
                           <div className="absolute top-1/2 left-0 w-1.5 h-1.5 bg-red-300 rounded-full transform -translate-y-1/2 shadow-lg shadow-red-200"></div>
@@ -185,28 +193,58 @@ const Homepage = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Global floating particles with orange rainbow colors */}
-                <div className="absolute -top-8 left-1/4 w-4 h-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-60" style={{ animationDelay: '0.2s' }}></div>
-                <div className="absolute -bottom-6 right-1/4 w-3 h-3 bg-gradient-to-r from-orange-500 to-red-600 rotate-45 animate-bounce opacity-70" style={{ animationDelay: '0.8s' }}></div>
-                <div className="absolute top-1/3 -right-8 w-2 h-2 bg-gradient-to-r from-orange-300 to-orange-500 rounded-full animate-bounce opacity-50" style={{ animationDelay: '1.2s' }}></div>
-                <div className="absolute top-1/4 -left-6 w-3 h-3 bg-gradient-to-r from-red-400 to-orange-500 rounded-full animate-bounce opacity-60" style={{ animationDelay: '1.6s' }}></div>
-                <div className="absolute bottom-1/3 left-1/6 w-2.5 h-2.5 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-40" style={{ animationDelay: '2s' }}></div>
-                <div className="absolute top-1/2 right-1/6 w-2 h-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-bounce opacity-70" style={{ animationDelay: '2.4s' }}></div>
-                
+                <div
+                  className="absolute -top-8 left-1/4 w-4 h-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-60"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+                <div
+                  className="absolute -bottom-6 right-1/4 w-3 h-3 bg-gradient-to-r from-orange-500 to-red-600 rotate-45 animate-bounce opacity-70"
+                  style={{ animationDelay: "0.8s" }}
+                ></div>
+                <div
+                  className="absolute top-1/3 -right-8 w-2 h-2 bg-gradient-to-r from-orange-300 to-orange-500 rounded-full animate-bounce opacity-50"
+                  style={{ animationDelay: "1.2s" }}
+                ></div>
+                <div
+                  className="absolute top-1/4 -left-6 w-3 h-3 bg-gradient-to-r from-red-400 to-orange-500 rounded-full animate-bounce opacity-60"
+                  style={{ animationDelay: "1.6s" }}
+                ></div>
+                <div
+                  className="absolute bottom-1/3 left-1/6 w-2.5 h-2.5 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-40"
+                  style={{ animationDelay: "2s" }}
+                ></div>
+                <div
+                  className="absolute top-1/2 right-1/6 w-2 h-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-bounce opacity-70"
+                  style={{ animationDelay: "2.4s" }}
+                ></div>
+
                 {/* Large orbiting elements with orange theme */}
-                <div className="absolute inset-0 animate-spin opacity-20" style={{ animationDuration: '25s' }}>
+                <div
+                  className="absolute inset-0 animate-spin opacity-20"
+                  style={{ animationDuration: "25s" }}
+                >
                   <div className="absolute top-4 left-1/2 w-3 h-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-full transform -translate-x-1/2"></div>
                 </div>
-                <div className="absolute inset-0 animate-spin opacity-15" style={{ animationDuration: '20s', animationDirection: 'reverse' }}>
+                <div
+                  className="absolute inset-0 animate-spin opacity-15"
+                  style={{
+                    animationDuration: "20s",
+                    animationDirection: "reverse",
+                  }}
+                >
                   <div className="absolute bottom-4 left-1/2 w-2.5 h-2.5 bg-gradient-to-r from-red-400 to-orange-500 rounded-full transform -translate-x-1/2"></div>
                 </div>
-                <div className="absolute inset-0 animate-spin opacity-25" style={{ animationDuration: '30s' }}>
+                <div
+                  className="absolute inset-0 animate-spin opacity-25"
+                  style={{ animationDuration: "30s" }}
+                >
                   <div className="absolute top-1/2 right-8 w-2 h-2 bg-gradient-to-r from-orange-300 to-red-400 rounded-full transform -translate-y-1/2"></div>
                 </div>
               </div>
             </div>
-            
+
             {/* Enhanced Main Heading with Multiple Effects */}
             <div className="relative mb-12">
               <div className="text-center space-y-4">
@@ -220,25 +258,40 @@ const Homepage = () => {
                     mood for today?
                   </span>
                 </h1>
-                
+
                 {/* Subtle background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-200 via-pink-200 to-purple-200 blur-3xl opacity-10 scale-110"></div>
               </div>
             </div>
-            
+
             {/* Enhanced Subtitle with Animation */}
             <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-              <span className="inline-block animate-fade-in-up">Discover the </span>{' '}
-              <span className="inline-block animate-fade-in-up text-transparent bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text font-semibold" style={{ animationDelay: '0.2s' }}>best emerging brands </span>{' '}
-              <span className="inline-block animate-fade-in-up" style={{ animationDelay: '0.4s' }}>across the country</span>{' '}
+              <span className="inline-block animate-fade-in-up">
+                Discover the{" "}
+              </span>{" "}
+              <span
+                className="inline-block animate-fade-in-up text-transparent bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text font-semibold"
+                style={{ animationDelay: "0.2s" }}
+              >
+                best emerging brands{" "}
+              </span>{" "}
+              <span
+                className="inline-block animate-fade-in-up"
+                style={{ animationDelay: "0.4s" }}
+              >
+                across the country
+              </span>{" "}
             </p>
-            
+
             {/* Premium Search Bar */}
-            <form onSubmit={handleSearch} className="relative inline-block group w-full max-w-2xl mx-auto">
+            <form
+              onSubmit={handleSearch}
+              className="relative inline-block group w-full max-w-2xl mx-auto"
+            >
               <div className="relative">
                 {/* Animated background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-full blur-xl opacity-20 scale-105 group-hover:opacity-30 transition-all duration-500"></div>
-                
+
                 {/* Main search input */}
                 <div className="relative bg-white rounded-full shadow-2xl group-hover:shadow-3xl transition-all duration-500 border border-gray-100 group-hover:border-orange-200">
                   <input
@@ -248,18 +301,18 @@ const Homepage = () => {
                     placeholder="Search for food, services, products..."
                     className="w-full px-4 sm:px-6 md:px-8 py-4 md:py-5 pr-16 sm:pr-20 md:pr-24 rounded-full focus:outline-none text-gray-900 placeholder-gray-400 bg-transparent text-sm sm:text-base md:text-lg font-medium"
                   />
-                  
+
                   {/* Globe Icon - Always visible, responsive positioning */}
                   <div className="absolute right-12 sm:right-16 md:right-20 top-1/2 transform -translate-y-1/2">
-                    <Link 
-                      to="/map" 
+                    <Link
+                      to="/map"
                       className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:scale-110 transform shadow-lg hover:shadow-xl"
                       title="View on Map"
                     >
                       <i className="fas fa-globe text-xs md:text-sm"></i>
                     </Link>
                   </div>
-                  
+
                   {/* Search Icon with Animation */}
                   <div className="absolute right-3 sm:right-4 md:right-6 top-1/2 transform -translate-y-1/2 group-hover:scale-110 transition-transform duration-300">
                     <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg">
@@ -267,25 +320,29 @@ const Homepage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Floating suggestion pills - Hidden on mobile */}
                 <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 hidden md:flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                  {['Wellness', 'Lifestyle', 'Accessories'].map((category, index) => (
-                    <button
-                      key={category}
-                      onClick={() => navigate(`/map?category=${category.toLowerCase()}`)}
-                      className="px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-600 text-sm rounded-full shadow-lg border border-gray-200 animate-fade-in-up hover:bg-white hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      {category}
-                    </button>
-                  ))}
+                  {["Wellness", "Lifestyle", "Accessories"].map(
+                    (category, index) => (
+                      <button
+                        key={category}
+                        onClick={() =>
+                          navigate(`/map?category=${category.toLowerCase()}`)
+                        }
+                        className="px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-600 text-sm rounded-full shadow-lg border border-gray-200 animate-fade-in-up hover:bg-white hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        {category}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
             </form>
           </div>
 
-          <style jsx>{`
+          <style>{`
             @keyframes fade-in-up {
               from {
                 opacity: 0;
@@ -327,7 +384,7 @@ const Homepage = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
               Featured Products
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {popularProducts.map((product) => (
                 <div
@@ -336,16 +393,20 @@ const Homepage = () => {
                   className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 overflow-hidden"
                 >
                   {/* Product Image/Icon */}
-                  <div className={`h-48 bg-gradient-to-br ${product.bgColor} flex items-center justify-center text-6xl relative overflow-hidden`}>
+                  <div
+                    className={`h-48 bg-gradient-to-br ${product.bgColor} flex items-center justify-center text-6xl relative overflow-hidden`}
+                  >
                     <div className="absolute inset-0 bg-black/10"></div>
-                    <span className="relative z-10 drop-shadow-lg">{product.image}</span>
+                    <span className="relative z-10 drop-shadow-lg">
+                      {product.image}
+                    </span>
                     <div className="absolute top-4 right-4">
                       <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
                         <i className="fas fa-heart text-white text-sm opacity-70 hover:opacity-100 transition-opacity"></i>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Product Info */}
                   <div className="p-6">
                     <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-orange-600 transition-colors">
@@ -354,7 +415,7 @@ const Homepage = () => {
                     <p className="text-gray-600 text-sm mb-4 leading-relaxed">
                       {product.description}
                     </p>
-                    
+
                     {/* Price and Action */}
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-orange-600">
@@ -378,25 +439,32 @@ const Homepage = () => {
             {/* Animated background elements */}
             <div className="absolute inset-0">
               <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-              <div className="absolute bottom-10 right-10 w-16 h-16 bg-white/10 rounded-full blur-lg animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-              <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white/5 rounded-full blur-md animate-pulse" style={{ animationDelay: '1s' }}></div>
+              <div
+                className="absolute bottom-10 right-10 w-16 h-16 bg-white/10 rounded-full blur-lg animate-pulse"
+                style={{ animationDelay: "0.5s" }}
+              ></div>
+              <div
+                className="absolute top-1/2 left-1/4 w-12 h-12 bg-white/5 rounded-full blur-md animate-pulse"
+                style={{ animationDelay: "1s" }}
+              ></div>
             </div>
-            
+
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-6">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                 Limited Beta Access
               </div>
-              
-              <h3 className="text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
-                 Reserve your spot, Sign up for our Beta
 
+              <h3 className="text-3xl md:text-4xl font-black mb-4 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                Reserve your spot, Sign up for our Beta
               </h3>
-              
+
               <p className="text-lg md:text-xl mb-8 opacity-90 max-w-2xl mx-auto leading-relaxed">
-                Be one of the first to explore the future of local discovery. Gain exclusive early access and help shape Locarto the way you want it
+                Be one of the first to explore the future of local discovery.
+                Gain exclusive early access and help shape Locarto the way you
+                want it
               </p>
-              
+
               <form className="max-w-lg mx-auto space-y-4">
                 <div className="relative group">
                   <input
@@ -406,7 +474,7 @@ const Homepage = () => {
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
-                
+
                 <div className="relative group">
                   <input
                     type="email"
@@ -415,8 +483,8 @@ const Homepage = () => {
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
-                
-                <button 
+
+                <button
                   type="submit"
                   className="w-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-yellow-300 hover:via-orange-400 hover:to-red-400 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1"
                 >
@@ -426,7 +494,7 @@ const Homepage = () => {
                   </span>
                 </button>
               </form>
-              
+
               <div className="mt-6 flex items-center justify-center gap-6 text-sm opacity-80">
                 <div className="flex items-center gap-2">
                   <i className="fas fa-check text-green-300"></i>
@@ -466,10 +534,12 @@ const Homepage = () => {
       <footer className="bg-white border-t border-gray-200 py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            
             {/* Locarto Brand Section */}
             <div className="md:col-span-1">
-              <Link to="/" className="text-2xl font-bold text-orange-500 mb-4 block hover:text-orange-600 transition-colors">
+              <Link
+                to="/"
+                className="text-2xl font-bold text-orange-500 mb-4 block hover:text-orange-600 transition-colors"
+              >
                 Locarto
               </Link>
               <p className="text-gray-600 text-sm leading-relaxed">
@@ -482,22 +552,34 @@ const Homepage = () => {
               <h3 className="font-bold text-gray-800 mb-4">Quick Links</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/landing" className="text-gray-600 hover:text-orange-500 transition-colors text-sm">
+                  <Link
+                    to="/landing"
+                    className="text-gray-600 hover:text-orange-500 transition-colors text-sm"
+                  >
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-gray-600 hover:text-orange-500 transition-colors text-sm">
+                  <Link
+                    to="/contact"
+                    className="text-gray-600 hover:text-orange-500 transition-colors text-sm"
+                  >
                     Contact
                   </Link>
                 </li>
                 <li>
-                  <Link to="/faq" className="text-gray-600 hover:text-orange-500 transition-colors text-sm">
+                  <Link
+                    to="/faq"
+                    className="text-gray-600 hover:text-orange-500 transition-colors text-sm"
+                  >
                     FAQ
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy" className="text-gray-600 hover:text-orange-500 transition-colors text-sm">
+                  <Link
+                    to="/privacy"
+                    className="text-gray-600 hover:text-orange-500 transition-colors text-sm"
+                  >
                     Privacy Policy
                   </Link>
                 </li>
@@ -508,25 +590,25 @@ const Homepage = () => {
             <div>
               <h3 className="font-bold text-gray-800 mb-4">Connect With Us</h3>
               <div className="flex space-x-4">
-                <a 
-                  href="https://twitter.com" 
-                  target="_blank" 
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 bg-blue-400 text-white rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors"
                 >
                   <i className="fab fa-twitter text-sm"></i>
                 </a>
-                <a 
-                  href="https://facebook.com" 
-                  target="_blank" 
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
                 >
                   <i className="fab fa-facebook-f text-sm"></i>
                 </a>
-                <a 
-                  href="https://instagram.com" 
-                  target="_blank" 
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors"
                 >
@@ -562,7 +644,7 @@ const Homepage = () => {
           </div>
         </div>
       </footer>
-      
+
       {/* Error Message Modal */}
       {showError && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -574,7 +656,7 @@ const Homepage = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800">Oops!</h3>
               </div>
-              <button 
+              <button
                 onClick={closeError}
                 className="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
               >
@@ -582,9 +664,13 @@ const Homepage = () => {
               </button>
             </div>
             <p className="text-gray-700 mb-4">
-              The category "<span className="font-semibold text-red-600">{searchQuery}</span>" is not available yet.
+              The category "
+              <span className="font-semibold text-red-600">{searchQuery}</span>"
+              is not available yet.
             </p>
-            <p className="text-gray-600 mb-6">Try one of these popular categories:</p>
+            <p className="text-gray-600 mb-6">
+              Try one of these popular categories:
+            </p>
             <div className="flex flex-wrap gap-3 justify-center">
               {availableCategories.map((category) => (
                 <button

@@ -81,7 +81,9 @@ const SideCart = ({ isOpen, onClose }) => {
   return (
     <div
       className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${
-        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        isOpen
+          ? "opacity-100 pointer-events-auto"
+          : "opacity-0 pointer-events-none"
       }`}
       onClick={onClose}
     >
@@ -128,7 +130,11 @@ const SideCart = ({ isOpen, onClose }) => {
               }`}
             >
               <div className="flex items-center">
-                <i className={`fas ${couponApplied ? 'fa-check-circle' : 'fa-info-circle'} mr-2`}></i>
+                <i
+                  className={`fas ${
+                    couponApplied ? "fa-check-circle" : "fa-info-circle"
+                  } mr-2`}
+                ></i>
                 {couponMessage}
               </div>
             </div>
@@ -140,8 +146,12 @@ const SideCart = ({ isOpen, onClose }) => {
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="fas fa-shopping-cart text-3xl text-gray-400"></i>
               </div>
-              <h3 className="text-lg font-medium text-gray-600 mb-2">Your cart is empty</h3>
-              <p className="text-gray-400 text-sm mb-6">Start adding items to see them here</p>
+              <h3 className="text-lg font-medium text-gray-600 mb-2">
+                Your cart is empty
+              </h3>
+              <p className="text-gray-400 text-sm mb-6">
+                Start adding items to see them here
+              </p>
               <button
                 onClick={onClose}
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
@@ -152,11 +162,11 @@ const SideCart = ({ isOpen, onClose }) => {
           ) : (
             <div className="space-y-4">
               {cartItems.map((item, index) => (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="group bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200 border border-gray-100"
                   style={{
-                    animation: `slideIn 0.3s ease-out ${index * 0.1}s both`
+                    animation: `slideIn 0.3s ease-out ${index * 0.1}s both`,
                   }}
                 >
                   <div className="flex items-center space-x-4">
@@ -171,7 +181,9 @@ const SideCart = ({ isOpen, onClose }) => {
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-800 truncate">{item.name}</h3>
+                      <h3 className="font-semibold text-gray-800 truncate">
+                        {item.name}
+                      </h3>
                       <p className="text-blue-600 font-medium">
                         ₹{item.price.toFixed(2)}
                       </p>
@@ -183,7 +195,9 @@ const SideCart = ({ isOpen, onClose }) => {
                       >
                         <i className="fas fa-minus text-xs"></i>
                       </button>
-                      <span className="w-10 text-center font-medium text-gray-800">{item.quantity}</span>
+                      <span className="w-10 text-center font-medium text-gray-800">
+                        {item.quantity}
+                      </span>
                       <button
                         className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-r-lg transition-colors duration-200"
                         onClick={() => updateQuantity(item.id, 1)}
@@ -211,7 +225,9 @@ const SideCart = ({ isOpen, onClose }) => {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center">
                     <i className="fas fa-tag text-blue-600 mr-2"></i>
-                    <span className="text-sm font-medium text-gray-700">Have a coupon?</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Have a coupon?
+                    </span>
                   </div>
                   {couponApplied && (
                     <button className="text-sm text-red-500 hover:text-red-600 transition-colors duration-200">
@@ -245,26 +261,40 @@ const SideCart = ({ isOpen, onClose }) => {
                 <div className="space-y-3">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span className="font-medium">₹{prices.subtotal.toFixed(2)}</span>
+                    <span className="font-medium">
+                      ₹{prices.subtotal.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span className="font-medium">₹{prices.shipping.toFixed(2)}</span>
+                    <span className="font-medium">
+                      ₹{prices.shipping.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Tax</span>
-                    <span className="font-medium">₹{prices.tax.toFixed(2)}</span>
+                    <span className="font-medium">
+                      ₹{prices.tax.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Discount</span>
                     <span className="text-emerald-600 font-medium">
-                      -₹{(prices.total - prices.subtotal - prices.shipping - prices.tax).toFixed(2)}
+                      -₹
+                      {(
+                        prices.total -
+                        prices.subtotal -
+                        prices.shipping -
+                        prices.tax
+                      ).toFixed(2)}
                     </span>
                   </div>
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between font-bold text-lg text-gray-800">
                       <span>Total</span>
-                      <span className="text-blue-600">₹{prices.total.toFixed(2)}</span>
+                      <span className="text-blue-600">
+                        ₹{prices.total.toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -295,7 +325,7 @@ const SideCart = ({ isOpen, onClose }) => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes slideIn {
           from {
             opacity: 0;
@@ -306,26 +336,26 @@ const SideCart = ({ isOpen, onClose }) => {
             transform: translateY(0);
           }
         }
-        
+
         .custom-scrollbar {
           scrollbar-width: thin;
           scrollbar-color: #cbd5e1 #f1f5f9;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-track {
           background: #f1f5f9;
           border-radius: 3px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: #cbd5e1;
           border-radius: 3px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #94a3b8;
         }

@@ -4,7 +4,6 @@ import {
   getProfile,
   updateProfile,
   deleteProfile,
-  getDocUploadUrl,
 } from "../../controllers/vendor/profile.controller.js";
 
 const router = Router();

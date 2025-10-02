@@ -1,6 +1,9 @@
 import db from "../../lib/db.js";
 import logger from "../../lib/logger.js";
-import { getImgUploadUrl } from "../../services/vendor/imgUpload.service.js";
+import {
+  getImgUploadUrl,
+  deleteFolder,
+} from "../../services/vendor/file.service.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -99,6 +102,8 @@ export const removeProduct = async (req, res) => {
       .from("products")
       .delete()
       .eq("id", productId);
+
+    await deleteFolder("product-images", productId);
 
     res.status(200).json({ message: "Product Removed Successfully" });
   } catch (error) {

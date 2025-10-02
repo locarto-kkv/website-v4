@@ -1,7 +1,10 @@
 import db from "../../lib/db.js";
 import logger from "../../lib/logger.js";
 
-import { getImgUploadUrl } from "../../services/admin/imgUpload.service.js";
+import {
+  getImgUploadUrl,
+  deleteImgFolder,
+} from "../../services/admin/img.service.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
@@ -140,7 +143,7 @@ export const deleteBlog = async (req, res) => {
     const blogId = req.params.id;
 
     const { data: blog } = await db.from("blogs").delete().eq("id", blogId);
-
+    await deleteImgFolder(blogId);
     res.status(200);
   } catch (error) {
     console.log("Error in deleteBlog controller: ", error.message);

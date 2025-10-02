@@ -112,7 +112,7 @@ const DiscoverPage = () => {
       {/* Main Content */}
       <main className="flex-1 pt-24 pb-16 px-4 md:px-8 relative z-10">
         {/* All Brand Images Loop Box */}
-        <div className="mb-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-[#0D1539]/40 overflow-hidden flex justify-center items-center max-w-3xl mx-auto h-56 md:h-72 relative animate-[fadeIn_0.8s_ease-in]">
+        <div className="mb-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-[#0D1539]/40 overflow-hidden flex justify-center items-center max-w-3xl mx-auto h-56 md:h-72 relative">
           {brandData.map((brand, index) => {
             const opacity = index === currentLogoIndex ? 1 : 0;
             const zIndex = index === currentLogoIndex ? 10 : 0;
@@ -159,9 +159,9 @@ const DiscoverPage = () => {
           {brandCards.map((brand, index) => (
             <div
               key={brand.id} // Ensure key is based on the brand's unique ID
-              className="transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
+              className=""
               style={{
-                animation: `fadeIn 0.6s ease-in ${1.2 + index * 0.1}s both`,
+                animation: `fadeIn 0.6s ease-in ${1 + index * 0.1}s both`,
               }}
             >
               {/* Pass the brand data (with resolved image) to the card component */}

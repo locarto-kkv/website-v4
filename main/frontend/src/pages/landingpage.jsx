@@ -175,15 +175,7 @@ const LandingPage = () => {
                 >
                   {blogs &&
                     blogs.slice(0, 3).map((brand, idx) => (
-                      <div
-                        key={brand.id}
-                        className="flex justify-center transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
-                        style={{
-                          animation: `fadeIn 0.1s ease-in ${
-                            2.6 + idx * 0.2
-                          }s both`,
-                        }}
-                      >
+                      <div key={brand.id} className="flex justify-center">
                         <BrandIdentityCard brand={brand} />
                       </div>
                     ))}
@@ -192,7 +184,7 @@ const LandingPage = () => {
             </div>
 
             {/* Discover More Button */}
-            <div className="mt-12 flex justify-center relative z-10 animate-[fadeIn_3.2s_ease-in]">
+            <div className="mt-12 flex justify-center relative z-10">
               <Link
                 to="/discover"
                 className="bg-[#0D1539] hover:bg-[#1A244C] text-white font-medium py-4 px-8 rounded-[12px] transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-105 text-xl flex items-center gap-2 cursor-pointer group"
@@ -313,7 +305,7 @@ const LandingPage = () => {
         </div>
       </section>
       <Footer />
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

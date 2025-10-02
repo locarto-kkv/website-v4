@@ -36,3 +36,13 @@ export const getImgUploadUrl = async (blogId, file) => {
     });
   }
 };
+
+export const deleteImgFolder = async (blogId) => {
+  const { data: files } = await db.storage
+    .from("brand-logos")
+    .list(blogId, { limit: 100 });
+
+  const filePaths = files.map((file) => `${blogId}/${file.name}`);
+
+  await db.storage.from("brand-logos").remove(filePaths);
+};

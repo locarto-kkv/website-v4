@@ -67,7 +67,7 @@ const Navbar = ({ pageType = "landing" }) => {
 
   // Toggle cart open/close
   const toggleCart = () => {
-    setIsCartOpen(!isCartOpen);
+    setIsCartOpen((prev) => !prev);
   };
 
   // Handle navigation to sections
