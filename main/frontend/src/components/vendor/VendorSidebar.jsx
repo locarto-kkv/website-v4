@@ -103,19 +103,6 @@ const VendorSidebar = ({ onNavigate }) => {
           ))}
         </ul>
       </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-100">
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <i className="fas fa-lightbulb text-orange-500"></i>
-            <span className="text-sm font-semibold text-gray-700">Pro Tip</span>
-          </div>
-          <p className="text-xs text-gray-600 leading-relaxed">
-            Check your analytics daily to track performance and optimize your listings.
-          </p>
-        </div>
-      </div>
     </div>
   );
 };
