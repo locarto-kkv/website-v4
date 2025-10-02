@@ -1,6 +1,6 @@
 // src/pages/CustomerDashboard.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../../components/DashboardNavbar";
 import { ConsumerOrderService } from "../../services/consumer/consumerOrderService";
 import { DateTimeDisplay } from "../../lib/utils";
@@ -30,6 +30,13 @@ const CustomerDashboard = () => {
   const { getOrders } = ConsumerOrderService;
   const { getList, updateList, removeFromList } = ConsumerListService;
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Scroll to top on navigation
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
 
   // Check for URL parameter to auto-select cart tab
   useEffect(() => {
@@ -575,7 +582,7 @@ const CustomerDashboard = () => {
         onCartIconClick={() => setActiveTab("cart")}
       />
 
-      <div className=" mx-auto flex">
+      <div className="mx-auto flex pt-[70px]">
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-md p-4 h-screen sticky top-0">
           <ul className="space-y-3 pt-4">
