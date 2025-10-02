@@ -1,5 +1,5 @@
 // src/pages/BrandInfoPage.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useBlogs } from "../context/blogContext.jsx";
 
@@ -30,17 +30,21 @@ const BrandInfoPage = () => {
   useEffect(() => {
     const foundBrand = brandData.find((b) => b.title === brandTitle);
     setBrand(foundBrand || null);
-  }, [brandTitle]);
+  }, [brandTitle, brandData]); // FIX: Added brandData as a dependency
 
-  // Shuffle + get random brands (excluding current one)
-  const getRandomBrands = (currentId, allBrands) => {
-    const otherBrands = allBrands.filter((brand) => brand.id !== currentId);
+  // FIX: Memoize the random brands so they don't change on every render
+  const randomBrands = useMemo(() => {
+    if (!brand || !brandData) {
+      return [];
+    }
+    // Shuffle + get random brands (excluding current one)
+    const otherBrands = brandData.filter((b) => b.title !== brand.title);
     for (let i = otherBrands.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [otherBrands[i], otherBrands[j]] = [otherBrands[j], otherBrands[i]];
     }
     return otherBrands.slice(0, 3);
-  };
+  }, [brand, brandData]);
 
   if (!brand) {
     return (
@@ -49,8 +53,6 @@ const BrandInfoPage = () => {
       </div>
     );
   }
-
-  const randomBrands = getRandomBrands(brand.title, brandData);
 
   return (
     <div className="font-sans text-[#0D1539] min-h-screen bg-white relative overflow-hidden">

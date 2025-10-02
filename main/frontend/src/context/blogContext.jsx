@@ -14,7 +14,7 @@ export function DataProvider({ children }) {
     };
 
     fetchData();
-  }, [blogs]);
+  }, []); // FIX: Changed [blogs] to an empty array [] to fetch only once.
 
   return (
     <DataContext.Provider value={{ blogs }}>{children}</DataContext.Provider>
