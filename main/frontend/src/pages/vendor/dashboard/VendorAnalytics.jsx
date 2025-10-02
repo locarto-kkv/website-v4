@@ -4,7 +4,7 @@ import { useAnalytic } from "../../../context/vendorAnalyticContext";
 const VendorAnalytics = () => {
   const [activeTab, setActiveTab] = useState("sales");
   const [viewMode, setViewMode] = useState("chart");
-
+  const [timePeriod, setTimePeriod] = useState("month");
   const { products, vendor, analyticData } = useAnalytic();
 
   function transformToMonthlyData(data, valueKey) {
@@ -44,20 +44,22 @@ const VendorAnalytics = () => {
     return Math.floor(pastDaysOfYear / 7); // week index 0–52
   }
 
-  function transformToWeeklySales(data) {
+  function transformToWeeklySales(data, valueKey) {
     if (!data?.vendors?.weekly) return [];
 
     return data.vendors.weekly.map((entry) => {
       return {
         week: getWeekNumber(entry.order_week),
-        sales: entry.total_amount || 0,
+        sales: entry[valueKey] || 0,
       };
     });
   }
 
-  // Enhanced mock data for different tabs
   const salesData = {
-    title: "Monthly Sales Performance",
+    title:
+      timePeriod === "month"
+        ? "Monthly Sales Performance"
+        : "Weekly Sales Performance",
     metrics: [
       {
         label: "Total Revenue",
@@ -92,7 +94,10 @@ const VendorAnalytics = () => {
         color: "from-orange-500 to-red-500",
       },
     ],
-    chartData: transformToMonthlyData(analyticData, "total_amount"),
+    chartData:
+      timePeriod === "month"
+        ? transformToMonthlyData(analyticData, "total_amount")
+        : transformToWeeklySales(analyticData, "total_amount"),
     insights: [
       {
         title: "Best Day for Sales",
@@ -120,7 +125,10 @@ const VendorAnalytics = () => {
   };
 
   const ordersData = {
-    title: "Monthly Order Frequency",
+    title:
+      timePeriod === "month"
+        ? "Monthly Order Frequency"
+        : "Weekly Order Frequency",
     metrics: [
       {
         label: "Total Orders",
@@ -155,7 +163,10 @@ const VendorAnalytics = () => {
         color: "from-red-500 to-rose-600",
       },
     ],
-    chartData: transformToMonthlyData(analyticData, "orders_count"),
+    chartData:
+      timePeriod === "month"
+        ? transformToMonthlyData(analyticData, "orders_count")
+        : transformToWeeklySales(analyticData, "orders_count"),
     insights: [
       {
         title: "Peak Order Day",
@@ -217,7 +228,10 @@ const VendorAnalytics = () => {
         color: "from-pink-500 to-rose-600",
       },
     ],
-    chartData: transformToMonthlyData(analyticData, "consumers_count"),
+    chartData:
+      timePeriod === "month"
+        ? transformToMonthlyData(analyticData, "consumers_count")
+        : transformToWeeklySales(analyticData, "consumers_count"),
     insights: [
       {
         title: "Highest Traffic Day",
@@ -412,7 +426,7 @@ const VendorAnalytics = () => {
         <div className="flex items-center gap-4 mt-4 lg:mt-0">
           {/* Time Range Selector */}
           <select
-            onChange={(e) => changeDataRange(e.target.value)}
+            onChange={(e) => setTimePeriod(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white font-medium"
           >
             {timeRanges.map((range) => (
