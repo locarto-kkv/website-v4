@@ -20,7 +20,7 @@ const BrandIdentityCard = ({
         button: "text-sm",
         imageTop: "top-[10%]",
         textTop: "top-[40%]",
-        buttonBottom: "bottom-[10%]",
+        buttonBottom: "bottom-[18%]", // raised from 10%
         textPadding: "px-2",
       };
     } else if (width <= 640) {
@@ -30,7 +30,7 @@ const BrandIdentityCard = ({
         button: "text-sm",
         imageTop: "top-[10%]",
         textTop: "top-[42%]",
-        buttonBottom: "bottom-[10%]",
+        buttonBottom: "bottom-[18%]", // raised
         textPadding: "px-3",
       };
     } else if (width <= 768) {
@@ -40,7 +40,7 @@ const BrandIdentityCard = ({
         button: "text-base",
         imageTop: "top-[10%]",
         textTop: "top-[45%]",
-        buttonBottom: "bottom-[10%]",
+        buttonBottom: "bottom-[18%]", // raised
         textPadding: "px-4",
       };
     } else if (width <= 1024) {
@@ -50,7 +50,7 @@ const BrandIdentityCard = ({
         button: "text-base",
         imageTop: "top-[10%]",
         textTop: "top-[150px]",
-        buttonBottom: "bottom-[10%]",
+        buttonBottom: "bottom-[18%]", // raised
         textPadding: "px-4",
       };
     } else {
@@ -60,7 +60,7 @@ const BrandIdentityCard = ({
         button: "text-lg",
         imageTop: "top-[10%]",
         textTop: "top-[180px]",
-        buttonBottom: "bottom-[10%]",
+        buttonBottom: "bottom-[18%]", // raised
         textPadding: "px-6",
       };
     }
