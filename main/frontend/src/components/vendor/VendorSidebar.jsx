@@ -4,57 +4,58 @@ import { useLocation } from "react-router-dom";
 const VendorSidebar = ({ onNavigate }) => {
   const location = useLocation();
   const activePath = location.pathname;
-  
+
   const menuItems = [
     {
       id: "dashboard",
       label: "Dashboard",
       icon: "fas fa-chart-line",
       path: "/vendor/dashboard",
-      isActive: activePath.endsWith("/vendor/dashboard") || activePath === "/vendor"
+      isActive:
+        activePath.endsWith("/vendor/dashboard") || activePath === "/vendor",
     },
     {
       id: "analytics",
-      label: "Analytics", 
+      label: "Analytics",
       icon: "fas fa-chart-bar",
       path: "/vendor/analytics",
-      isActive: activePath.endsWith("/analytics")
+      isActive: activePath.endsWith("/analytics"),
     },
     {
       id: "products",
       label: "Products",
       icon: "fas fa-box",
-      path: "/vendor/products", 
-      isActive: activePath.endsWith("/products")
+      path: "/vendor/products",
+      isActive: activePath.endsWith("/products"),
     },
     {
       id: "members-hub",
       label: "Members Hub",
       icon: "fas fa-users",
       path: "/vendor/members-hub",
-      isActive: activePath.endsWith("/members-hub")
+      isActive: activePath.endsWith("/members-hub"),
     },
     {
       id: "support",
       label: "Support",
       icon: "fas fa-headset",
       path: "/vendor/support",
-      isActive: activePath.endsWith("/support")
+      isActive: activePath.endsWith("/support"),
     },
     {
       id: "settings",
       label: "Settings",
       icon: "fas fa-cog",
       path: "/vendor/settings",
-      isActive: activePath.endsWith("/settings")
+      isActive: activePath.endsWith("/settings"),
     },
     {
       id: "profile",
       label: "Profile",
-      icon: "fas fa-user-circle", 
+      icon: "fas fa-user-circle",
       path: "/vendor/profile",
-      isActive: activePath.endsWith("/profile")
-    }
+      isActive: activePath.endsWith("/profile"),
+    },
   ];
 
   return (
@@ -67,7 +68,6 @@ const VendorSidebar = ({ onNavigate }) => {
           </div>
           <div>
             <h2 className="font-bold text-gray-900 text-lg">Vendor Portal</h2>
-            <p className="text-sm text-gray-500">Manage your business</p>
           </div>
         </div>
       </div>
@@ -85,13 +85,15 @@ const VendorSidebar = ({ onNavigate }) => {
                     : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 hover:shadow-md hover:scale-105"
                 }`}
               >
-                <i className={`${item.icon} text-lg ${
-                  item.isActive 
-                    ? "text-white" 
-                    : "text-gray-500 group-hover:text-orange-500"
-                } transition-colors duration-300`}></i>
+                <i
+                  className={`${item.icon} text-lg ${
+                    item.isActive
+                      ? "text-white"
+                      : "text-gray-500 group-hover:text-orange-500"
+                  } transition-colors duration-300`}
+                ></i>
                 <span className="font-semibold">{item.label}</span>
-                
+
                 {/* Active indicator */}
                 {item.isActive && (
                   <div className="ml-auto">

@@ -34,10 +34,10 @@ function BlogPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors({ ...errors, [name]: '' });
+      setErrors({ ...errors, [name]: "" });
     }
   };
 
@@ -46,10 +46,10 @@ function BlogPage() {
     const updatedSections = [...formData.sections];
     updatedSections[index][name] = value;
     setFormData({ ...formData, sections: updatedSections });
-    
+
     // Clear section error when user starts typing
     if (errors[`section-${index}-${name}`]) {
-      setErrors({ ...errors, [`section-${index}-${name}`]: '' });
+      setErrors({ ...errors, [`section-${index}-${name}`]: "" });
     }
   };
 
@@ -71,14 +71,15 @@ function BlogPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.title.trim()) newErrors.title = "Title is required";
     if (!formData.subtitle.trim()) newErrors.subtitle = "Subtitle is required";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (!formData.description.trim())
+      newErrors.description = "Description is required";
     if (!formData.rating || formData.rating < 0 || formData.rating > 5) {
       newErrors.rating = "Rating must be between 0 and 5";
     }
-    
+
     formData.sections.forEach((section, index) => {
       if (!section.title.trim()) {
         newErrors[`section-${index}-title`] = "Section title is required";
@@ -87,16 +88,16 @@ function BlogPage() {
         newErrors[`section-${index}-content`] = "Section content is required";
       }
     });
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     try {
       if (editingBlog) {
         await editBlog(formData.id, formData);
@@ -104,7 +105,7 @@ function BlogPage() {
       } else {
         await addBlog(formData);
       }
-      
+
       setFormData({
         title: "",
         subtitle: "",
@@ -129,10 +130,11 @@ function BlogPage() {
               Manage Your Blogs
             </h1>
             <p className="text-gray-600 mt-2">
-              {blogs?.length || 0} blog{blogs?.length !== 1 ? 's' : ''} available
+              {blogs?.length || 0} blog{blogs?.length !== 1 ? "s" : ""}{" "}
+              available
             </p>
           </div>
-          
+
           <button
             onClick={() => {
               setShowBlogForm((prev) => !prev);
@@ -163,7 +165,8 @@ function BlogPage() {
 
         {/* Grid for cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogs && !showBlogForm && (
+          {blogs &&
+            !showBlogForm &&
             blogs.map((brand) => (
               <div key={brand.id} className="flex justify-center">
                 <BrandIdentityCard
@@ -174,8 +177,7 @@ function BlogPage() {
                   buttonPosition="higher"
                 />
               </div>
-            ))
-          )}
+            ))}
         </div>
 
         {/* Blog Form */}
@@ -200,36 +202,48 @@ function BlogPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-gray-700 mb-2 font-medium">Title *</label>
+                  <label className="block text-gray-700 mb-2 font-medium">
+                    Title *
+                  </label>
                   <input
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
                     placeholder="Blog Title"
                     className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                      errors.title ? 'border-red-500' : 'border-gray-300'
+                      errors.title ? "border-red-500" : "border-gray-300"
                     }`}
                   />
-                  {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+                  {errors.title && (
+                    <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                  )}
                 </div>
-                
+
                 <div>
-                  <label className="block text-gray-700 mb-2 font-medium">Subtitle *</label>
+                  <label className="block text-gray-700 mb-2 font-medium">
+                    Subtitle *
+                  </label>
                   <input
                     name="subtitle"
                     value={formData.subtitle}
                     onChange={handleChange}
                     placeholder="Blog Subtitle"
                     className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                      errors.subtitle ? 'border-red-500' : 'border-gray-300'
+                      errors.subtitle ? "border-red-500" : "border-gray-300"
                     }`}
                   />
-                  {errors.subtitle && <p className="text-red-500 text-sm mt-1">{errors.subtitle}</p>}
+                  {errors.subtitle && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.subtitle}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-medium">Description *</label>
+                <label className="block text-gray-700 mb-2 font-medium">
+                  Description *
+                </label>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -237,15 +251,21 @@ function BlogPage() {
                   placeholder="Blog Description"
                   rows={4}
                   className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                    errors.description ? 'border-red-500' : 'border-gray-300'
+                    errors.description ? "border-red-500" : "border-gray-300"
                   }`}
                 />
-                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+                {errors.description && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.description}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-gray-700 mb-2 font-medium">Rating *</label>
+                  <label className="block text-gray-700 mb-2 font-medium">
+                    Rating *
+                  </label>
                   <input
                     name="rating"
                     value={formData.rating}
@@ -256,14 +276,18 @@ function BlogPage() {
                     max="5"
                     step="0.1"
                     className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                      errors.rating ? 'border-red-500' : 'border-gray-300'
+                      errors.rating ? "border-red-500" : "border-gray-300"
                     }`}
                   />
-                  {errors.rating && <p className="text-red-500 text-sm mt-1">{errors.rating}</p>}
+                  {errors.rating && (
+                    <p className="text-red-500 text-sm mt-1">{errors.rating}</p>
+                  )}
                 </div>
-                
+
                 <div>
-                  <label className="block text-gray-700 mb-2 font-medium">Logo/Image</label>
+                  <label className="block text-gray-700 mb-2 font-medium">
+                    Logo/Image
+                  </label>
                   <input
                     type="file"
                     name="image"
@@ -282,7 +306,9 @@ function BlogPage() {
               {/* Sections */}
               <div className="pt-4">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold text-gray-800">Sections</h3>
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Sections
+                  </h3>
                   <button
                     type="button"
                     onClick={addSection}
@@ -298,7 +324,9 @@ function BlogPage() {
                     className="border border-gray-200 rounded-xl p-5 mb-4 bg-gradient-to-br from-gray-50 to-white shadow-sm"
                   >
                     <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium text-gray-700">Section {index + 1}</h4>
+                      <h4 className="font-medium text-gray-700">
+                        Section {index + 1}
+                      </h4>
                       <button
                         type="button"
                         onClick={() => removeSection(index)}
@@ -308,7 +336,7 @@ function BlogPage() {
                         <i className="fas fa-trash"></i>
                       </button>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <input
@@ -317,14 +345,18 @@ function BlogPage() {
                           onChange={(e) => handleSectionChange(index, e)}
                           placeholder="Section Title"
                           className={`w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                            errors[`section-${index}-title`] ? 'border-red-500' : 'border-gray-300'
+                            errors[`section-${index}-title`]
+                              ? "border-red-500"
+                              : "border-gray-300"
                           }`}
                         />
                         {errors[`section-${index}-title`] && (
-                          <p className="text-red-500 text-sm mt-1">{errors[`section-${index}-title`]}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors[`section-${index}-title`]}
+                          </p>
                         )}
                       </div>
-                      
+
                       <div>
                         <input
                           name="icon"
@@ -335,7 +367,7 @@ function BlogPage() {
                         />
                       </div>
                     </div>
-                    
+
                     <textarea
                       name="content"
                       value={section.content}
@@ -343,11 +375,15 @@ function BlogPage() {
                       placeholder="Section Content"
                       rows={3}
                       className={`w-full mt-3 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                        errors[`section-${index}-content`] ? 'border-red-500' : 'border-gray-300'
+                        errors[`section-${index}-content`]
+                          ? "border-red-500"
+                          : "border-gray-300"
                       }`}
                     />
                     {errors[`section-${index}-content`] && (
-                      <p className="text-red-500 text-sm mt-1">{errors[`section-${index}-content`]}</p>
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors[`section-${index}-content`]}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -368,8 +404,12 @@ function BlogPage() {
         {blogs?.length === 0 && !showBlogForm && (
           <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200 max-w-2xl mx-auto">
             <div className="text-6xl mb-6 text-gray-300">📝</div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">No blogs yet</h3>
-            <p className="text-gray-600 mb-6">Create your first blog to get started</p>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              No blogs yet
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Create your first blog to get started
+            </p>
             <button
               onClick={() => {
                 setShowBlogForm(true);

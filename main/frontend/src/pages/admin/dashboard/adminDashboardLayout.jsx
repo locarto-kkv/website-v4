@@ -18,7 +18,7 @@ const VendorDashboardLayout = () => {
       <DashboardNavbar />
       <div className="flex pt-[70px]">
         <VendorSidebar onNavigate={(path) => navigate(path)} />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 h-[calc(100vh-70px)] overflow-y-auto">
           <Outlet />
         </main>
       </div>

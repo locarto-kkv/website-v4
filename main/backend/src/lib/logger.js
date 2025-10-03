@@ -3,24 +3,18 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
 const logToSupabase = async (log) => {
-  try {
-    const { data, error } = await db.from("logs").insert([
-      {
-        level: log.level,
-        message: log.message,
-        function: log.function || null,
-        location: log.location,
-        timestamp: log.timestamp,
-      },
-    ]);
-  } catch (err) {
-    console.error("Supabase insert failed:", err);
-  }
-
-  callback();
+  const { data, error } = await db.from("logs").insert([
+    {
+      level: log.level,
+      message: log.message,
+      function: log.function || null,
+      location: log.location,
+      timestamp: log.timestamp,
+    },
+  ]);
 };
 
-function logger(error) {
+async function logger(error) {
   const { level, message, func, location } = error;
   const log = {
     timestamp: new Date().toISOString(),
@@ -31,7 +25,7 @@ function logger(error) {
   };
   console.log(log);
 
-  return log;
+  // await logToSupabase(log);
 }
 
 export default logger;
