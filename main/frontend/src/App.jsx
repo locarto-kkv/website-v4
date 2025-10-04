@@ -38,7 +38,7 @@ function App() {
       <DataProvider>
         <Routes>
           {/* --- PUBLIC ROUTES --- */}
-          <Route path="/" element={<Homepage />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/map" element={<MapView />} />
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/discover" element={<DiscoverPage />} />

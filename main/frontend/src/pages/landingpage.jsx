@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useBlogs } from "../context/blogContext.jsx";
 
 // Components
@@ -7,15 +7,12 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import WhatInItForYou from "../components/landing/WhatInItForYou.jsx";
+import RegisterSocial from "../components/RegisterSocial.jsx";
 
 // Assets
 import tagImg from "../assets/tag.png";
 import locartoImg from "../assets/locarto.png";
-import snabbitImg from "../assets/snabbitimage.png";
 import landingVid from "../assets/landing_vid.mp4";
-import Insta from "../../src/assets/insta.png";
-import Youtube from "../../src/assets/yt.png";
-import Whatsapp from "../../src/assets/whatsapp.png";
 
 // Background Assets
 import asset1 from "../../src/assets/1.png";
@@ -216,82 +213,7 @@ const LandingPage = () => {
           <WhatInItForYou />
         </div>
 
-        {/* New Banner Section */}
-        <div className="mt-24 bg-white py-12 md:py-16 px-4 text-center relative z-10">
-          <h2 className="text-4xl md:text-6xl text-[#0D1539] mb-4">
-            This is just the Beginning
-          </h2>
-          <p className="text-xl md:text-2xl text-[#0D1539] opacity-90">
-            The best is yet to come!
-          </p>
-        </div>
-
-        {/* Email Subscription Section */}
-        <div className="bg-white py-8 px-4 text-center relative z-10">
-          <div className="max-w-xl mx-auto">
-            <div className="flex items-stretch border border-[#0D1539]/30 rounded-full overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:border-[#0D1539]/50">
-              <input
-                type="email"
-                placeholder="emailaddress@gmail.com"
-                className="flex-1 px-4 py-2 text-sm text-[#0D1539] bg-transparent focus:outline-none placeholder:text-[#0D1539]/70"
-              />
-              <button className="px-4 py-2 text-sm font-medium bg-[#0D1539] text-white hover:bg-[#1A244C] transition-all duration-300 whitespace-nowrap rounded-full hover:scale-105">
-                Plug into the rhythm
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Social Media Buttons */}
-        <div className="bg-white py-8 px-4 text-center relative z-10">
-          <div className="max-w-xl mx-auto flex justify-center gap-1">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group transition-transform duration-300 hover:scale-110"
-            >
-              <img
-                src={Insta}
-                alt="Instagram"
-                className="w-16 h-16 object-contain cursor-pointer"
-              />
-            </a>
-
-            <a
-              href="https://youtube.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group transition-transform duration-300 hover:scale-110"
-            >
-              <img
-                src={Youtube}
-                alt="YouTube"
-                className="w-16 h-16 object-contain cursor-pointer"
-              />
-            </a>
-
-            <a
-              href="https://wa.me/yournumber"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group transition-transform duration-300 hover:scale-110"
-            >
-              <img
-                src={Whatsapp}
-                alt="WhatsApp"
-                className="w-16 h-16 object-contain cursor-pointer"
-              />
-            </a>
-          </div>
-        </div>
-
-        {/* Bottom Banner */}
-        <div className="-mt-8 bg-white py-6 px-4 text-center relative z-10">
-          <h3 className="text-lg md:text-xl font-light text-[#0D1539]/70 inline-block">
-            Making it worthwhile.
-          </h3>
-        </div>
+        <RegisterSocial />
 
         {/* Locarto Logo Banner - Bottom */}
         <div className="bg-white w-full overflow-hidden relative z-10">
