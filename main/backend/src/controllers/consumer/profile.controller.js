@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
 import bcrypt from "bcryptjs";

@@ -4,9 +4,7 @@ import {
   getImgUploadUrl,
   deleteFolder,
 } from "../../services/vendor/file.service.js";
-
-import dotenv from "dotenv";
-dotenv.config();
+import { env } from "../../lib/env.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
@@ -68,7 +66,7 @@ export const addProduct = async (req, res) => {
       );
       const imgPublicUrls = imgUploadUrls.map(
         (image) =>
-          `${process.env.SUPABASE_PROJECT_URL}/storage/v1/object/public/product-images/${image.filePath}`
+          `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/product-images/${image.filePath}`
       );
 
       const { data: updatedProduct } = await db

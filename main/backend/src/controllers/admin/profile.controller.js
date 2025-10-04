@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import db from "../../lib/db.js";
 
 export const getProfile = async (req, res) => {
