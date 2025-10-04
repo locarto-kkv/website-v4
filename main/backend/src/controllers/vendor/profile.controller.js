@@ -1,6 +1,4 @@
 import logger from "../../lib/logger.js";
-import dotenv from "dotenv";
-dotenv.config();
 
 import {
   getDocUploadUrl,

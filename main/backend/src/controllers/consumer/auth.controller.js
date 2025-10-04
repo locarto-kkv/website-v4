@@ -1,20 +1,16 @@
 import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
 import logger from "../../lib/logger.js";
-import dotenv from "dotenv";
-dotenv.config();
-
-import { fileURLToPath } from "url";
-const __filename = fileURLToPath(import.meta.url);
+import { env } from "../../lib/env.js";
 
 import db from "../../lib/db.js";
 import { generateToken } from "../../lib/utils.js";
 import { sendOtp, verifyOtp } from "../../services/consumer/otp.service.js";
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
-const FRONTEND_URL = process.env.FRONTEND_URL;
+const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_REDIRECT_URI = env.GOOGLE_REDIRECT_URI;
+const FRONTEND_URL = env.FRONTEND_URL;
 
 const client = new OAuth2Client(
   GOOGLE_CLIENT_ID,

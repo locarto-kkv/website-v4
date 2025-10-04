@@ -23,6 +23,7 @@ import asset5 from "../../src/assets/5.png";
 
 const LandingPage = () => {
   const { blogs } = useBlogs();
+  console.log(blogs);
 
   return (
     <div className="font-sans flex flex-col text-[#0D1539] min-h-screen bg-white relative overflow-hidden">

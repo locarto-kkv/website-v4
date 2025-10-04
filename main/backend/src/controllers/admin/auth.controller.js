@@ -1,7 +1,5 @@
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
 import logger from "../../lib/logger.js";
-dotenv.config();
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
