@@ -117,8 +117,7 @@ const LandingPage = () => {
               A Community where
             </p>
 
-            {/* REVISED: Smaller base font size for "EMERGING BRANDS", etc., to prevent overflow on small screens. */}
-            <div className="mt-32 text-center space-y-8 relative z-10 animate-[fadeIn_1.8s_ease-in]">
+            <div className="mt-20 sm:mt-24 md:mt-28 text-center space-y-4 sm:space-y-6 md:space-y-8 relative z-10 animate-[fadeIn_1.8s_ease-in]">
               <p className="[color:#f15b28] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-wider">
                 EMERGING BRANDS
               </p>
@@ -129,7 +128,6 @@ const LandingPage = () => {
                 SMART CUSTOMERS
               </p>
             </div>
-
             {/* Video Section */}
             <div className="mt-28 w-full px-4 flex justify-center relative z-10 animate-[fadeIn_2s_ease-in]">
               <div className="relative group">

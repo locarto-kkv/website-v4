@@ -5,6 +5,9 @@ import { useBlogs } from "../context/blogContext.jsx";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Insta from "../assets/insta.png";
+import Youtube from "../assets/yt.png";
+import Whatsapp from "../assets/whatsapp.png";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import locartoImg from "../assets/locarto.png";
 
@@ -217,14 +220,12 @@ const BrandInfoPage = () => {
 
       <Footer />
 
-      <style>
-        {`
+      <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
-      `}
-      </style>
+      `}</style>
     </div>
   );
 };

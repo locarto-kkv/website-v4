@@ -42,7 +42,9 @@ function RegisterSocial() {
               className="px-4 sm:px-6 py-2 text-sm sm:text-base font-medium bg-[#0D1539] text-white hover:bg-[#1A244C] transition-all duration-300 whitespace-nowrap rounded-full hover:scale-105 shrink-0"
               type="submit"
             >
-              Plug into the rhythm
+              {/* REVISED: Responsive button text */}
+              <span className="sm:hidden">Subscribe</span>
+              <span className="hidden sm:inline">Plug into the rhythm</span>
             </button>
           </form>
         </div>
