@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useBlogs } from "../context/blogContext.jsx";
 
 // Components
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import WhatInItForYou from "../components/landing/WhatInItForYou.jsx";
 import RegisterSocial from "../components/RegisterSocial.jsx";

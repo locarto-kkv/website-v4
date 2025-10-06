@@ -6,8 +6,8 @@ import { useAuthStore } from "./store/useAuthStore";
 import { DataProvider } from "./context/blogContext";
 
 // Public Pages
-import Homepage from "./pages/homepage";
-import LandingPage from "./pages/landingpage";
+import Homepage from "./pages/Homepage";
+import LandingPage from "./pages/Landingpage";
 import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";

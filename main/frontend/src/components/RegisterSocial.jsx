@@ -52,7 +52,7 @@ function RegisterSocial() {
       <div className="bg-transparent py-8 px-4 text-center relative z-10">
         <div className="max-w-xl mx-auto flex justify-center gap-1">
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/locarto.in/"
             target="_blank"
             rel="noopener noreferrer"
             className="group transition-transform duration-300 hover:scale-110"
@@ -60,32 +60,6 @@ function RegisterSocial() {
             <img
               src={Insta}
               alt="Instagram"
-              className="w-16 h-16 object-contain cursor-pointer"
-            />
-          </a>
-
-          <a
-            href="https://youtube.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group transition-transform duration-300 hover:scale-110"
-          >
-            <img
-              src={Youtube}
-              alt="YouTube"
-              className="w-16 h-16 object-contain cursor-pointer"
-            />
-          </a>
-
-          <a
-            href="https://wa.me/yournumber"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group transition-transform duration-300 hover:scale-110"
-          >
-            <img
-              src={Whatsapp}
-              alt="WhatsApp"
               className="w-16 h-16 object-contain cursor-pointer"
             />
           </a>

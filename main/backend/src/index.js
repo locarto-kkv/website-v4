@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
 import { env } from "./lib/env.js";
 
 import vendorRoutes from "./routes/vendor/index.js";
@@ -12,6 +13,7 @@ import { checkAuth, protectRoute } from "./middleware/auth.middleware.js";
 const { PORT: port, FRONTEND_URL: frontendURL } = env;
 
 const app = express();
+const __dirname = path.resolve();
 
 app.use(express.json());
 app.use(cookieParser());
