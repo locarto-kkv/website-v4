@@ -5,9 +5,6 @@ import { useBlogs } from "../context/blogContext.jsx";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Insta from "../assets/insta.png";
-import Youtube from "../assets/yt.png";
-import Whatsapp from "../assets/whatsapp.png";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import locartoImg from "../assets/locarto.png";
 
@@ -110,25 +107,28 @@ const BrandInfoPage = () => {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-12 relative z-10">
-        {/* Rating */}
+        {/* REVISED: Made rating section responsive */}
         {brand.rating && (
-          <div className="mt-8 flex items-center gap-3 text-3xl text-[#0D1539]">
+          <div className="mt-8 flex flex-wrap items-center gap-2 sm:gap-3 text-xl sm:text-2xl md:text-3xl text-[#0D1539]">
             <span className="font-medium">
               <span className="text-orange-400 font-bold">LETY</span> Rating:
             </span>
-            <div className="flex text-5xl text-purple-900">
+            <div className="flex text-3xl sm:text-4xl md:text-5xl text-purple-900">
               {"★".repeat(Math.floor(brand.rating))}
               {"☆".repeat(5 - Math.floor(brand.rating))}
             </div>
-            <span className="text-2xl">({brand.rating}/5)</span>
+            <span className="text-lg sm:text-xl md:text-2xl">
+              ({brand.rating}/5)
+            </span>
           </div>
         )}
 
-        <h2 className="text-2xl md:text-5xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
+        {/* REVISED: Smoother font scaling for brand title and subtitle */}
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
           {brand.title}
         </h2>
 
-        <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
           {brand.subtitle}
         </h2>
 
@@ -142,7 +142,7 @@ const BrandInfoPage = () => {
             key={idx}
             className="mb-8"
             style={{
-              animation: `fadeIn 0.6s ease-in ${1.6 + idx * 0.2}s both`,
+              animation: "fadeIn 0.6s ease-in ${1.6 + idx * 0.2}s both",
             }}
           >
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#0D1539]">
@@ -217,12 +217,14 @@ const BrandInfoPage = () => {
 
       <Footer />
 
-      <style>{`
+      <style>
+        {`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
-      `}</style>
+      `}
+      </style>
     </div>
   );
 };

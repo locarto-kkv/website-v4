@@ -26,7 +26,7 @@ const LandingPage = () => {
 
   return (
     <div className="font-sans flex flex-col text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
-      {/* Background Assets */}{" "}
+      {/* Background Assets */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <img
           src={asset1}
@@ -75,17 +75,19 @@ const LandingPage = () => {
           alt=""
           className="absolute top-[2800px] md:top-[4000px] -right-28 md:-right-44 w-[350px] h-[350px] md:w-[590px] md:h-[590px] opacity-[0.18] animate-[spin_46s_linear_infinite]"
           style={{ filter: "blur(1px)" }}
-        />{" "}
+        />
       </div>
       <Navbar pageType="landing" />
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center relative">
         <div className="w-full max-w-7xl px-4 md:px-6">
-          <h1 className="mb-2 pt-32 pb-12 text-3xl font-extrabold text-left md:text-5xl lg:text-7xl relative z-10 animate-[fadeIn_0.8s_ease-in]">
+          {/* REVISED: Smaller base font and padding for mobile, with more steps for smooth scaling. */}
+          <h1 className="mb-2 pt-20 sm:pt-24 md:pt-32 pb-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-left relative z-10 animate-[fadeIn_0.8s_ease-in]">
             THE PLATFORM THAT GETS IT...
           </h1>
 
-          <p className="-mt-2 text-xl leading-relaxed text-left md:text-3xl lg:text-4xl relative z-10 animate-[fadeIn_1s_ease-in]">
+          {/* REVISED: Reduced base text size for mobile. */}
+          <p className="-mt-2 text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl leading-relaxed text-left relative z-10 animate-[fadeIn_1s_ease-in]">
             <span className="[color:#f15b28]">For brands</span> with something
             to say and <br />
             <span className="[color:#f15b28]">For people</span> who want to
@@ -100,7 +102,8 @@ const LandingPage = () => {
                 alt="Tag"
                 className="col-start-1 row-start-1 h-[700px] w-full max-w-[1800px] object-contain md:h-[850px]"
               />
-              <p className="col-start-1 row-start-1 translate-y-2 font-bold text-center text-sm sm:text-base md:text-5xl text-[#FBF5E5] whitespace-nowrap [text-shadow:3px_3px_6px_rgba(0,0,0,0.7)]">
+              {/* REVISED: Smoother font scaling for the text on the tag image. */}
+              <p className="col-start-1 row-start-1 translate-y-2 font-bold text-center text-xs sm:text-sm md:text-2xl lg:text-4xl xl:text-5xl text-[#FBF5E5] whitespace-nowrap [text-shadow:3px_3px_6px_rgba(0,0,0,0.7)]">
                 We get what's missing. so we made.
               </p>
             </div>
@@ -114,14 +117,15 @@ const LandingPage = () => {
               A Community where
             </p>
 
+            {/* REVISED: Smaller base font size for "EMERGING BRANDS", etc., to prevent overflow on small screens. */}
             <div className="mt-32 text-center space-y-8 relative z-10 animate-[fadeIn_1.8s_ease-in]">
-              <p className="[color:#f15b28] text-6xl font-extrabold md:text-7xl tracking-wider">
+              <p className="[color:#f15b28] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-wider">
                 EMERGING BRANDS
               </p>
-              <p className="[color:#f15b28] text-5xl font-extrabold md:text-6xl tracking-wider">
+              <p className="[color:#f15b28] text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-wider">
                 MEET
               </p>
-              <p className="[color:#f15b28] text-6xl font-extrabold md:text-7xl tracking-wider">
+              <p className="[color:#f15b28] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-wider">
                 SMART CUSTOMERS
               </p>
             </div>
@@ -143,11 +147,12 @@ const LandingPage = () => {
               </div>
             </div>
 
+            {/* REVISED: Smoother font scaling for this section. */}
             <div className="mt-28 text-center px-8 relative z-10 animate-[fadeIn_2.2s_ease-in]">
-              <h2 className="text-4xl font-extrabold md:text-6xl">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold">
                 Every Big Brand Started Somewhere
               </h2>
-              <p className="mt-6 text-2xl md:text-3xl leading-relaxed">
+              <p className="mt-6 text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed">
                 But Usually Not On Platforms Designed For Big Brands. So We're
                 Building <br />
                 The Place They Should Have Had From{" "}
@@ -155,8 +160,9 @@ const LandingPage = () => {
               </p>
             </div>
 
+            {/* REVISED: Smoother font scaling. */}
             <div className="mt-24 text-center px-6 relative z-10 animate-[fadeIn_2.4s_ease-in]">
-              <h2 className="text-3xl font-bold md:text-5xl">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
                 Brands You've been searching for
               </h2>
             </div>
