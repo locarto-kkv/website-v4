@@ -8,8 +8,8 @@ import { protectRoute } from "../../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.get("/", protectRoute, getOrderHistory);
-router.post("/place-order", protectRoute, placeOrder);
-router.patch("/cancel-order/:id", protectRoute, cancelOrder);
+router.get("/", protectRoute("consumer"), getOrderHistory);
+router.post("/place-order", protectRoute("consumer"), placeOrder);
+router.patch("/cancel-order/:id", protectRoute("consumer"), cancelOrder);
 
 export default router;

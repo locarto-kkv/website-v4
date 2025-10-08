@@ -4,6 +4,6 @@ import { getTransactions } from "../../controllers/vendor/transaction.controller
 
 const router = Router();
 
-router.get("/", protectRoute, getTransactions);
+router.get("/", protectRoute("vendor"), getTransactions);
 
 export default router;

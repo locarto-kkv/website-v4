@@ -4,7 +4,7 @@ import { getTransactions } from "../../controllers/admin/transaction.controller.
 
 const router = Router();
 
-router.get("/", getTransactions);
+router.get("/", protectRoute("admin"), getTransactions);
 // router.post("/add", protectRoute, addProduct);
 // router.delete("/:id", protectRoute, removeProduct);
 // router.put("/:id", protectRoute, editProduct);
