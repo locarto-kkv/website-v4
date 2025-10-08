@@ -1,93 +1,50 @@
 import db from "../../lib/db.js";
+import logger from "../../lib/logger.js";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
-export const getOrders = async (req, res) => {
+export const getOrderById = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { data: orders, error } = await db
+    const { orderId } = req.params;
+
+    const { data: order } = await db
       .from("orders")
       .select()
-      .eq("vendor_id", userId);
+      .eq("id", orderId)
+      .single();
 
-    res.status(200).json(orders);
+    res.status(200).json(order);
   } catch (error) {
-    console.log("Error in getOrders controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const cancelOrder = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { data: orders, error } = await db
-      .from("orders")
-      .select()
-      .eq("vendor_id", userId);
-
-    res.status(200).json(orders);
-  } catch (error) {
-    console.log("Error in cancelOrder controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const updateOrderStatus = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { data: orders, error } = await db
-      .from("orders")
-      .select()
-      .eq("vendor_id", userId);
-
-    res.status(200).json(orders);
-  } catch (error) {
-    console.log("Error in updateOrderStatus controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const updateSupportStatus = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { data: orders, error } = await db
-      .from("orders")
-      .select()
-      .eq("vendor_id", userId);
-
-    res.status(200).json(orders);
-  } catch (error) {
-    console.log("Error in updateOrderStatus controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getOrderById",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const editOrder = async (req, res) => {
   try {
-    const { id: orderId } = req.params;
-    const { name, price, quantity } = req.body;
+    const { orderId } = req.params;
+    const { order } = req.body;
 
     const { data: updatedOrder } = await db
       .from("order")
-      .update({ name, price, quantity })
+      .update(order)
       .eq("id", orderId)
       .select()
       .single();
 
     res.status(200).json(updatedOrder);
   } catch (error) {
-    console.log("Error in editOrder controller: ", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const deleteOrder = async (req, res) => {
-  try {
-    const { id: orderId } = req.params;
-
-    const { data, error } = await db.from("orders").delete().eq("id", orderId);
-
-    res.status(200).json({ message: "Order Removed Successfully" });
-  } catch (error) {
-    console.log("Error in removeOrder controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "editOrder",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

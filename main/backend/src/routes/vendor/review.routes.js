@@ -7,7 +7,7 @@ import {
 
 const router = Router();
 
-router.put("/reply/:id", protectRoute("vendor"), replyToReview);
-router.delete("/delete/:id", protectRoute("vendor"), removeReply);
+router.put("/reply/:reviewId", protectRoute("vendor"), replyToReview);
+router.delete("/delete/:reviewId", protectRoute("vendor"), removeReply);
 
 export default router;

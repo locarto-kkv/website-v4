@@ -11,9 +11,9 @@ import {
 const router = Router();
 
 router.get("/", protectRoute("consumer"), getReviews);
-router.get("/:id", getReviewsByProduct); //id = product.id
-router.post("/add/:id", protectRoute("consumer"), addReview); //id = review.id
-router.put("/edit/:id", protectRoute("consumer"), editReview); //id = review.id
-router.delete("/delete/:id", protectRoute("consumer"), removeReview); //id = review.id
+router.get("/:productId", getReviewsByProduct);
+router.post("/add/:productId", protectRoute("consumer"), addReview);
+router.put("/edit/:reviewId", protectRoute("consumer"), editReview);
+router.delete("/delete/:reviewId", protectRoute("consumer"), removeReview);
 
 export default router;

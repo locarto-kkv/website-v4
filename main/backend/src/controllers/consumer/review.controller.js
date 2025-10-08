@@ -29,7 +29,7 @@ export const getReviews = async (req, res) => {
 
 export const getReviewsByProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const { productId } = req.params;
 
     const { data: reviews } = await db
       .from("reviews")
@@ -53,7 +53,8 @@ export const addReview = async (req, res) => {
     const { stars, title, content, review_images = null } = req.body;
 
     const userId = req.user.id;
-    const productId = req.params.id;
+    const { productId } = req.params;
+
     const imgUploadUrls = [];
     const imgPublicUrls = [];
 
@@ -111,7 +112,7 @@ export const addReview = async (req, res) => {
 
 export const editReview = async (req, res) => {
   try {
-    const reviewId = req.params.id;
+    const { reviewId } = req.params;
 
     const { stars, title, content, review_images = null } = req.body;
 
@@ -161,7 +162,7 @@ export const editReview = async (req, res) => {
 
 export const removeReview = async (req, res) => {
   try {
-    const reviewId = req.params.id;
+    const { reviewId } = req.params;
 
     await db.from("reviews").delete().eq("id", reviewId);
 

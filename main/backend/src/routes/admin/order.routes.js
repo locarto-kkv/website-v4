@@ -1,17 +1,13 @@
 import { Router } from "express";
 import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
-  getProducts,
-  addProduct,
-  removeProduct,
-  editProduct,
+  getOrderById,
+  editOrder,
 } from "../../controllers/admin/order.controller.js";
 
 const router = Router();
 
-router.get("/", getProducts);
-router.post("/add", protectRoute("admin"), addProduct);
-router.delete("/:id", protectRoute("admin"), removeProduct);
-router.put("/:id", protectRoute("admin"), editProduct);
+router.get("/:orderId", protectRoute("admin"), getOrderById);
+router.put("/edit/:orderId", protectRoute("admin"), editOrder);
 
 export default router;

@@ -11,6 +11,7 @@ export const addProduct = async (req, res) => {
     const { name, quantity, price, category, product_images = null } = req.body;
 
     const userId = req.user.id;
+
     const imgUploadUrls = [];
     const imgPublicUrls = [];
 
@@ -78,7 +79,7 @@ export const addProduct = async (req, res) => {
 
 export const editProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const { productId } = req.params;
 
     const { name, quantity, price, category, product_images = null } = req.body;
 
@@ -132,8 +133,7 @@ export const editProduct = async (req, res) => {
 
 export const removeProduct = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const productId = req.params.id;
+    const { productId } = req.params;
 
     await db.from("products").delete().eq("id", productId);
 

@@ -5,7 +5,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const replyToReview = async (req, res) => {
   try {
-    const reviewId = req.params.id;
+    const { reviewId } = req.params;
     const { reply: vendor_reply } = req.body;
 
     const { data: updatedReview } = await db
@@ -29,7 +29,7 @@ export const replyToReview = async (req, res) => {
 
 export const removeReply = async (req, res) => {
   try {
-    const reviewId = req.params.id;
+    const { reviewId } = req.params;
 
     const { data } = await db
       .from("reviews")

@@ -7,21 +7,17 @@ export const getListItems = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const { data: listItems, error } = await db
+    const { data: listItems } = await db
       .from("consumer_lists")
-      .select(
-        "list_type, quantity, products(id, name, price, category, product_images)"
-      )
+      .select("list_type, quantity, product_id")
       .eq("consumer_id", userId);
 
-    if (error) throw error;
-
     const groupedList = listItems.reduce((acc, item) => {
-      const { list_type, quantity, products } = item;
+      const { list_type, quantity, product_id } = item;
       if (!acc[list_type]) {
         acc[list_type] = [];
       }
-      acc[list_type].push({ ...products, quantity });
+      acc[list_type].push({ product_id, quantity });
       return acc;
     }, {});
 
@@ -41,7 +37,7 @@ export const updateList = async (req, res) => {
   try {
     const userId = req.user.id;
     const { type: list_type, quantity } = req.body;
-    const productId = req.params.id;
+    const { productId } = req.params;
 
     const { data: updatedList, error } = await db.from("consumer_lists").upsert(
       {
@@ -71,7 +67,7 @@ export const removeFromList = async (req, res) => {
   try {
     const userId = req.user.id;
     const { type: list_type } = req.query;
-    const productId = req.params.id;
+    const { productId } = req.params;
 
     const { data } = await db
       .from("consumer_lists")

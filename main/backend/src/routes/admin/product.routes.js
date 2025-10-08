@@ -4,6 +4,6 @@ import { restrictProduct } from "../../controllers/admin/product.controller.js";
 
 const router = Router();
 
-router.patch("/restrict/:id", protectRoute("admin"), restrictProduct);
+router.patch("/restrict/:productId", protectRoute("admin"), restrictProduct);
 
 export default router;

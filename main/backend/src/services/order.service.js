@@ -1,24 +1,4 @@
-import db from "../../lib/db.js";
-
-export const addOrderService = async (userId, productId, order) => {
-  try {
-    const orderData = {
-      ...order,
-      product_id: productId,
-      consumer_id: userId,
-    };
-
-    const { data: newOrder } = await db
-      .from("orders")
-      .insert(orderData)
-      .select()
-      .single();
-
-    return newOrder;
-  } catch (error) {
-    throw error;
-  }
-};
+import db from "../lib/db.js";
 
 export const cancelOrderService = async (orderId) => {
   try {

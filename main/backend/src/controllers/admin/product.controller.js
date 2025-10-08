@@ -1,8 +1,11 @@
 import db from "../../lib/db.js";
+import logger from "../../lib/logger.js";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 export const restrictProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const { productId } = req.params;
     const { status } = req.body;
 
     const { data: products } = await db
@@ -12,7 +15,12 @@ export const restrictProduct = async (req, res) => {
 
     res.status(200).json(products);
   } catch (error) {
-    console.log("Error in restrictProduct controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "restrictProduct",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
