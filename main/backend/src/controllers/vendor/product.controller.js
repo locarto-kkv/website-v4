@@ -81,22 +81,16 @@ export const editProduct = async (req, res) => {
   try {
     const { productId } = req.params;
 
-    const { name, quantity, price, category, product_images = null } = req.body;
+    const productData = req.body;
 
     const userId = req.user.id;
     const imgUploadUrls = [];
     const imgPublicUrls = [];
 
-    const productData = {
-      name,
-      quantity,
-      price,
-      vendor_id: userId,
-      category,
-    };
+    productData.vendor_id = userId;
 
-    if (product_images) {
-      for (const image of product_images) {
+    if (productData.product_images) {
+      for (const image of productData.product_images) {
         const imgUploadUrl = await getFileUploadUrl(
           productId,
           image,

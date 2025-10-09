@@ -9,22 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const addBlog = async (req, res) => {
   try {
-    const {
-      title,
-      subtitle,
-      description,
-      rating,
-      sections,
-      brand_logo_metadata = null,
-    } = req.body;
-
-    const blogData = {
-      title,
-      subtitle,
-      description,
-      rating,
-      sections,
-    };
+    const blogData = req.body;
 
     const { data: newBlog, error } = await db
       .from("blogs")
@@ -34,10 +19,10 @@ export const addBlog = async (req, res) => {
 
     if (error) throw error;
 
-    if (brand_logo_metadata) {
+    if (blogData.brand_logo) {
       const imgUploadUrl = await getFileUploadUrl(
         newBlog.id,
-        brand_logo_metadata,
+        blogData.brand_logo,
         "brand-logos"
       );
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
@@ -69,30 +54,15 @@ export const addBlog = async (req, res) => {
 export const editBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const {
-      title,
-      subtitle,
-      description,
-      rating,
-      sections,
-      brand_logo_metadata = null,
-    } = req.body;
-
-    const blogData = {
-      title,
-      subtitle,
-      description,
-      rating,
-      sections,
-    };
+    const blogData = req.body;
 
     let imgUploadUrl = null;
 
-    if (brand_logo_metadata) {
+    if (blogData.brand_logo) {
       imgUploadUrl = await getFileUploadUrl(
         blogId,
-        brand_logo_metadata,
-        "brand_logos"
+        blogData.brand_logo,
+        "brand-logos"
       );
 
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
@@ -109,7 +79,12 @@ export const editBlog = async (req, res) => {
 
     res.status(200).json({ blog: updatedBlog, imgUploadUrl });
   } catch (error) {
-    console.log("Error in editBlog controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "editBlog",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -122,7 +97,12 @@ export const deleteBlog = async (req, res) => {
     await deleteFolder(blogId, "brand-logos");
     res.status(200);
   } catch (error) {
-    console.log("Error in deleteBlog controller: ", error.message);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "deleteBlog",
+    });
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

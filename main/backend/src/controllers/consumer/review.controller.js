@@ -50,7 +50,7 @@ export const getReviewsByProduct = async (req, res) => {
 
 export const addReview = async (req, res) => {
   try {
-    const { stars, title, content, review_images = null } = req.body;
+    const reviewData = req.body;
 
     const userId = req.user.id;
     const { productId } = req.params;
@@ -58,13 +58,8 @@ export const addReview = async (req, res) => {
     const imgUploadUrls = [];
     const imgPublicUrls = [];
 
-    const reviewData = {
-      consumer_id: userId,
-      product_id: productId,
-      stars,
-      title,
-      content,
-    };
+    reviewData.consumer_id = userId;
+    reviewData.product_id = productId;
 
     const { data: newReview } = await db
       .from("review")
@@ -72,8 +67,8 @@ export const addReview = async (req, res) => {
       .select()
       .single();
 
-    if (review_images) {
-      for (const image of review_images) {
+    if (reviewData.review_images) {
+      for (const image of reviewData.review_images) {
         const imgUploadUrl = await getFileUploadUrl(
           newReview.id,
           image,
@@ -114,19 +109,13 @@ export const editReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
 
-    const { stars, title, content, review_images = null } = req.body;
+    const reviewData = req.body;
 
     const imgUploadUrls = [];
     const imgPublicUrls = [];
 
-    const reviewData = {
-      stars,
-      title,
-      content,
-    };
-
-    if (review_images) {
-      for (const image of review_images) {
+    if (reviewData.review_images) {
+      for (const image of reviewData.review_images) {
         const imgUploadUrl = await getFileUploadUrl(
           reviewId,
           image,
