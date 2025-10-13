@@ -80,13 +80,14 @@ export const useAuthStore = create(
         try {
           await axiosInstance.post(`/${type}/auth/logout`);
           set({ currentUser: null });
+
           toast.success("Logout Successful");
-          
+
           // Redirect to main home page after logout
-          window.location.href = '/';
+          window.location.href = "/";
         } catch (error) {
           toast.error(error.response?.data?.message || "Logout failed");
-          console.log("Error in logout:", error.response?.data?.message);
+          console.log("Error in logout:", error);
         } finally {
           set({ logoutLoading: false });
         }

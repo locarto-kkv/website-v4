@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useVendorData } from "../../context/vendor/vendorDataContext";
 
 import AuthVendor from "./authVendor";
 import VendorDashboardLayout from "./dashboard/VendorDashboardLayout";
@@ -11,15 +12,17 @@ import VendorProducts from "./dashboard/VendorProducts";
 import VendorSupport from "./dashboard/VendorSupport";
 import VendorSetup from "./dashboard/VendorSetupWizard";
 import VendorsMemberHub from "./dashboard/VendorsMemberHub"; // Add this import
-import { AnalyticProvider } from "../../context/vendorAnalyticContext";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
-  return currentUser?.type === "vendor" ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/vendor/login" replace />
-  );
+  const { clearCache } = useVendorData();
+
+  if (currentUser?.type !== "vendor") {
+    clearCache();
+    return <Navigate to="/vendor/login" replace />;
+  } else {
+    return <Outlet />;
+  }
 };
 
 const VendorRoutes = () => {
@@ -40,13 +43,7 @@ const VendorRoutes = () => {
         }
       />
 
-      <Route
-        element={
-          <AnalyticProvider>
-            <ProtectedRoute />
-          </AnalyticProvider>
-        }
-      >
+      <Route element={<ProtectedRoute />}>
         <Route element={<VendorDashboardLayout />}>
           <Route index element={<VendorDashboard />} />
           <Route path="dashboard" element={<VendorDashboard />} />

@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import DashboardNavbar from "../../../components/DashboardNavbar";
 import VendorSidebar from "../../../components/vendor/VendorSidebar";
-import { useAnalytic } from "../../../context/vendorAnalyticContext";
+import { useVendorData } from "../../../context/vendor/vendorDataContext";
 
 const VendorDashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { dataLoading } = useAnalytic();
+  const { dataLoading } = useVendorData();
 
   // Scrolls to the top of the page on route change
   useEffect(() => {

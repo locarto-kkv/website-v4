@@ -131,7 +131,7 @@ const Navbar = ({ pageType = "landing" }) => {
       </button>
 
       {/* Navigation Links */}
-      {/* <div
+      <div
         className={`absolute md:static top-16 left-0 w-full md:w-auto bg-white md:bg-transparent shadow-md md:shadow-none z-40 ${
           mobileMenuOpen ? "block" : "hidden"
         } md:block`}
@@ -166,10 +166,10 @@ const Navbar = ({ pageType = "landing" }) => {
             Testimonials
           </button>
         </div>
-      </div> */}
+      </div>
 
       {/* Right Side Elements */}
-      {/* <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3">
         <button
           onClick={toggleCart}
           className="text-gray-700 hover:text-orange-500 transition-colors relative"
@@ -235,7 +235,7 @@ const Navbar = ({ pageType = "landing" }) => {
               </div>
             ))}
         </div>
-      </div> */}
+      </div>
 
       {/* Side Cart */}
       <SideCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

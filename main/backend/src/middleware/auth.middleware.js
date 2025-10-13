@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import db from "../lib/db.js";
+import { exit } from "process";
 
 export const protectRoute = (requiredRole) => {
   return async (req, res, next) => {
@@ -21,7 +22,9 @@ export const protectRoute = (requiredRole) => {
       }
 
       if (requiredRole !== "admin") {
-        if (decoded.userType !== requiredRole) {
+        if (!requiredRole) {
+          exit;
+        } else if (decoded.userType !== requiredRole) {
           return res.status(403).json({ message: "Unauthorized" });
         }
       }
@@ -50,7 +53,6 @@ export const protectRoute = (requiredRole) => {
 export const checkAuth = (req, res) => {
   try {
     res.status(200).json({ ...req.user, type: req.userType });
-    // console.log(req.user);
   } catch (error) {
     console.log("Error in checkAuth controller: ", error.message);
     res.status(500).json({ message: "Internal Server Error" });

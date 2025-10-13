@@ -23,7 +23,7 @@ app.use("/api/vendor", vendorRoutes);
 app.use("/api/consumer", consumerRoutes);
 app.use("/api/admin", adminRoutes);
 
-app.get("/api/auth/check", protectRoute, checkAuth);
+app.get("/api/auth/check", protectRoute(null), checkAuth);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

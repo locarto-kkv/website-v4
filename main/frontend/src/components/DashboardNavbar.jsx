@@ -13,8 +13,9 @@ const Navbar = ({ cartItems = [] }) => {
   const handleLogout = async (e) => {
     e.preventDefault();
     await logout(currentUser?.type);
+
     // Redirect to home page after logout
-    navigate('/');
+    navigate("/");
   };
 
   const isVendor = currentUser?.type === "vendor";
@@ -47,7 +48,7 @@ const Navbar = ({ cartItems = [] }) => {
           <img
             src={locartoImg}
             alt="Locarto"
-            className="h-14 w-auto object-contain scale-125 translate-y-[2px]" 
+            className="h-14 w-auto object-contain scale-125 translate-y-[2px]"
           />
         </Link>
         <span className="ml-4 bg-orange-100 text-sm font-medium px-3 py-1 rounded-full">

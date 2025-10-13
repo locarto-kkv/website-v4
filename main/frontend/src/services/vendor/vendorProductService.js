@@ -4,19 +4,6 @@ import { axiosInstance } from "../../lib/axios.js";
 const BASE_URL = "/vendor/product";
 
 export const VendorProductService = {
-  getProducts: async (userId) => {
-    const response = userId
-      ? await axiosInstance.get(`${BASE_URL}/${userId}`)
-      : await axiosInstance.get(`${BASE_URL}/`);
-
-    return response.data;
-  },
-
-  getProductById: async (productId) => {
-    const response = await axiosInstance.get(`${BASE_URL}/${id}`);
-    return response.data;
-  },
-
   uploadImage: async (files, imgUploadUrls) => {
     await Promise.all(
       imgUploadUrls.map(async (url, i) => {

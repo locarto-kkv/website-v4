@@ -1,12 +1,12 @@
 import DashboardStats from "../../components/vendor/DashboardStats";
 import RecentOrdersTable from "../../components/vendor/RecentOrdersTable";
 import TopSellingProducts from "../../components/vendor/TopSellingProducts";
-import { useAnalytic } from "../../context/vendorAnalyticContext";
+import { useVendorData } from "../../context/vendor/vendorDataContext";
 
 const VendorDashboard = () => {
-  const { products, vendor } = useAnalytic();
+  const { products, vendor } = useVendorData();
 
-  console.log(products, vendor);
+  // console.log(products, vendor);
 
   return (
     <div className="max-w-6xl mx-auto">

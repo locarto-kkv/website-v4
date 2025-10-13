@@ -3,22 +3,23 @@ import { ConsumerBlogService } from "../services/consumer/consumerBlogService";
 
 const DataContext = createContext();
 const CACHE_KEY = "blogs";
-const CACHE_TTL = 1000 * 60 * 60;
 
-export function DataProvider({ children }) {
+export function BlogsProvider({ children }) {
   const [blogs, setBlogs] = useState([]);
+
+  const clearBlogs = () => {
+    localStorage.removeItem(CACHE_KEY);
+    setBlogs([]);
+  };
 
   useEffect(() => {
     const cached = localStorage.getItem(CACHE_KEY);
+
     if (cached) {
-      const { data, timestamp } = JSON.parse(cached);
-
-      if (Date.now() - timestamp < CACHE_TTL) {
-        setBlogs(data);
-        return;
-      }
+      const parsed = JSON.parse(cached);
+      setBlogs(parsed.data);
+      return;
     }
-
     const fetchData = async () => {
       const { getBlogs } = ConsumerBlogService;
       const data = await getBlogs();
@@ -33,7 +34,9 @@ export function DataProvider({ children }) {
   }, []);
 
   return (
-    <DataContext.Provider value={{ blogs }}>{children}</DataContext.Provider>
+    <DataContext.Provider value={{ blogs, clearBlogs }}>
+      {children}
+    </DataContext.Provider>
   );
 }
 

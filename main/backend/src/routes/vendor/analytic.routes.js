@@ -4,6 +4,6 @@ import { getAnalytics } from "../../controllers/vendor/analytic.controller.js";
 
 const router = Router();
 
-router.get("/", protectRoute, getAnalytics);
+router.get("/", protectRoute("vendor"), getAnalytics);
 
 export default router;
