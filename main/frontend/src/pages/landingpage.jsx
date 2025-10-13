@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useBlogs } from "../context/blogContext.jsx";
 
@@ -8,6 +8,7 @@ import Footer from "../components/Footer.jsx";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import WhatInItForYou from "../components/landing/WhatInItForYou.jsx";
 import RegisterSocial from "../components/RegisterSocial.jsx";
+import WaitlistPopup from "../components/landing/WaitlistPopup.jsx"; // Import the new component
 
 // Assets
 import tagImg from "../assets/tag.png";
@@ -23,6 +24,23 @@ import asset5 from "../../src/assets/5.png";
 
 const LandingPage = () => {
   const { blogs } = useBlogs();
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowPopup(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleYes = () => {
+    document.getElementById("register-social").scrollIntoView({ behavior: "smooth" });
+    setShowPopup(false);
+  };
+
+  const handleNo = () => {
+    setShowPopup(false);
+  };
 
   return (
     <div className="font-sans flex flex-col text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
@@ -77,6 +95,7 @@ const LandingPage = () => {
           style={{ filter: "blur(1px)" }}
         />
       </div>
+      {showPopup && <WaitlistPopup onYes={handleYes} onNo={handleNo} />}
       <Navbar pageType="landing" />
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center relative">
