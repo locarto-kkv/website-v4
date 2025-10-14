@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import locartoImg from "../assets/locarto.png";
@@ -8,6 +8,7 @@ const MapView = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const categoryParam = queryParams.get("category");
+  const navigate = useNavigate();
 
   // Available categories
   const categories = [
@@ -66,14 +67,14 @@ const MapView = () => {
   const businessData = {
     wellness: [
       {
-        id: 1,
+        id: 'serenity-yoga-studio',  // Changed from 1
         name: "Serenity Yoga Studio",
         location: "Bandra West, Mumbai",
         position: [19.076, 72.8777],
         address: "123 Carter Road, Bandra West, Mumbai 400050",
       },
       {
-        id: 2,
+        id: 'mindful-fitness-center',  // Changed from 2
         name: "Mindful Fitness Center",
         location: "Juhu, Mumbai",
         position: [19.1075, 72.8263],
@@ -82,14 +83,14 @@ const MapView = () => {
     ],
     lifestyle: [
       {
-        id: 1,
+        id: 'urban-style-boutique',  // Changed from 1
         name: "Urban Style Boutique",
         location: "Andheri West, Mumbai",
         position: [19.1136, 72.8697],
         address: "789 Link Road, Andheri West, Mumbai 400053",
       },
       {
-        id: 2,
+        id: 'casa-living',  // Changed from 2
         name: "Casa Living",
         location: "Bandra East, Mumbai",
         position: [19.05, 72.8333],
@@ -98,14 +99,14 @@ const MapView = () => {
     ],
     accessories: [
       {
-        id: 1,
+        id: 'golden-crown-jewellers',  // Changed from 1
         name: "Golden Crown Jewellers",
         location: "Colaba, Mumbai",
         position: [18.922, 72.834],
         address: "654 Colaba Causeway, Mumbai 400001",
       },
       {
-        id: 2,
+        id: 'timepiece-gallery',  // Changed from 2
         name: "Timepiece Gallery",
         location: "Fort, Mumbai",
         position: [18.9322, 72.8311],
@@ -226,7 +227,7 @@ const MapView = () => {
                 <i class="fas fa-map-marker-alt"></i>
                 <span>${marker.address}</span>
               </div>
-              <button class="view-products-btn" onclick="alert('Products page coming soon!')">
+              <button class="view-products-btn" data-shop-id="${marker.id}">
                 <i class="fas fa-eye"></i>
                 View Products
               </button>
@@ -238,6 +239,12 @@ const MapView = () => {
             className: "modern-popup",
           }
         );
+        mapMarker.on('popupopen', () => {
+            const button = document.querySelector(`.view-products-btn[data-shop-id="${marker.id}"]`);
+            if (button) {
+                button.onclick = () => navigate(`/consumer/shops/${marker.id}/products`);
+            }
+        });
       });
     }
   }, [currentCategoryIndex, map, showOverlay]);
@@ -252,10 +259,10 @@ const MapView = () => {
           to="/"
           className="group hover:scale-105 transform transition-transform duration-300"
         >
-          <img 
-            src={locartoImg} 
-            alt="Locarto" 
-            className="h-8 w-auto" // Adjust size as needed
+          <img
+            src={locartoImg}
+            alt="Locarto"
+            className="h-12 w-auto md:h-14 lg:h-16" // Adjust size as needed
           />
         </Link>
       </div>

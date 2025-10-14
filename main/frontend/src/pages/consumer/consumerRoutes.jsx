@@ -8,6 +8,7 @@ import ConsumerDashboard from "./consumerDashboard";
 // import ConsumerProfile from "../../components/consumer/ConsumerProfile";
 // import ConsumerAnalytics from "../../components/consumer/ConsumerAnalytics";
 // import ConsumerSettings from "../../components/consumer/ConsumerSettings";
+import ShopProducts from "./ShopProducts";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
@@ -46,6 +47,7 @@ const ConsumerRoutes = () => {
           <Route path="settings" element={<ConsumerSettings />} /> */}
         </Route>
       </Route>
+      <Route path="shops/:shopId/products" element={<ShopProducts />} />
     </Routes>
   );
 };
