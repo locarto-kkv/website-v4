@@ -8,7 +8,7 @@ import Footer from "../components/Footer.jsx";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import WhatInItForYou from "../components/landing/WhatInItForYou.jsx";
 import RegisterSocial from "../components/RegisterSocial.jsx";
-import WaitlistPopup from "../components/landing/WaitlistPopup.jsx"; // Import the new component
+import WaitlistPopup from "../components/landing/WaitListPopup.jsx"; // Import the new component
 
 // Assets
 import tagImg from "../assets/tag.png";
