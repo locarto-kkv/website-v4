@@ -448,7 +448,7 @@ const VendorLocationSetup = () => {
                 id="map-container"
                 className="w-full h-full"
               ></div>
-              <div className="absolute top-4 left-4 bg-white px-4 py-2 rounded-lg shadow-md border border-gray-200 z-[1000]">
+              <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded-lg shadow-md border border-gray-200 z-[1000]">
                 <p className="text-sm text-gray-600">
                   <span className="font-semibold">Click on map</span> to place pin
                 </p>
