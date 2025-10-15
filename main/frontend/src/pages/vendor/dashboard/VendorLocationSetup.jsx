@@ -12,6 +12,7 @@ const VendorLocationSetup = () => {
   const [category, setCategory] = useState("");
   const [coords, setCoords] = useState({ lat: "", lng: "" });
   const [loading, setLoading] = useState(false);
+  const [shopName, setShopName] = useState("");
 
   // Effect to initialize the map instance. Runs only once on mount.
   useEffect(() => {
@@ -171,14 +172,15 @@ const VendorLocationSetup = () => {
       setPincode("");
       setAddress("");
       setCategory("");
+      setShopName("");
     }
   };
 
   const handleSave = () => {
-    if (coords.lat && coords.lng && category && address) {
+    if (coords.lat && coords.lng && category && address && shopName) {
       const newShop = {
         id: `new-shop-${Date.now()}`,
-        name: "My New Shop",
+        name: shopName,
         location: address,
         position: [parseFloat(coords.lat), parseFloat(coords.lng)],
         address: address,
@@ -195,7 +197,7 @@ const VendorLocationSetup = () => {
       alert("Shop location saved!");
       navigate("/map");
     } else {
-      alert("Please set a location and choose a category.");
+      alert("Please enter shop name, set a location, and choose a category.");
     }
   };
 
@@ -243,6 +245,42 @@ const VendorLocationSetup = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
             <div className="lg:col-span-1 p-6 bg-gray-50 border-r border-gray-200">
               <div className="space-y-6">
+                {/* Shop Name Section */}
+                <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <svg 
+                      className="w-5 h-5 text-orange-500" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" 
+                      />
+                    </svg>
+                    Shop Name
+                  </h3>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Enter your shop name
+                    </label>
+                    <input
+                      type="text"
+                      value={shopName}
+                      onChange={(e) => setShopName(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                      placeholder="e.g., Raj Electronics"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">
+                      This name will be displayed on the map
+                    </p>
+                  </div>
+                </div>
+
                 {/* Current Location Button */}
                 <button
                   onClick={handleSetCurrentLocation}
