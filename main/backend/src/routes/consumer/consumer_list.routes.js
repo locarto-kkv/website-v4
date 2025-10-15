@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 router.get("/", protectRoute("consumer"), getListItems);
-router.patch("/update/:productId", protectRoute("consumer"), updateList);
+router.put("/update/:productId", protectRoute("consumer"), updateList);
 router.delete("/delete/:productId", protectRoute("consumer"), removeFromList);
 
 export default router;

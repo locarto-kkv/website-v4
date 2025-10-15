@@ -9,10 +9,10 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const addBlog = async (req, res) => {
   try {
-    const blogData = req.body;
+    const { vendor_id, ...blogData } = req.body;
 
     const { data: newBlog, error } = await db
-      .from("blogs")
+      .from("brands")
       .insert(blogData)
       .select()
       .single();
@@ -22,19 +22,27 @@ export const addBlog = async (req, res) => {
     if (blogData.brand_logo) {
       const imgUploadUrl = await getFileUploadUrl(
         newBlog.id,
+        "brand_logo",
         blogData.brand_logo,
         "brand-logos"
       );
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
 
       const { data: updatedBlog, error } = await db
-        .from("blogs")
+        .from("brands")
         .update({ brand_logo: imgPublicUrl })
         .eq("id", newBlog.id)
         .select()
         .single();
 
       if (error) throw error;
+
+      const { data } = await db
+        .from("vendors")
+        .update({ blog_id: updatedBlog.id })
+        .eq("id", vendor_id)
+        .select()
+        .single();
 
       res.status(201).json({ blog: updatedBlog, imgUploadUrl });
     } else {
@@ -54,13 +62,14 @@ export const addBlog = async (req, res) => {
 export const editBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const blogData = req.body;
+    const { vendor_id, ...blogData } = req.body;
 
     let imgUploadUrl = null;
 
     if (blogData.brand_logo) {
       imgUploadUrl = await getFileUploadUrl(
         blogId,
+        "brand_logo",
         blogData.brand_logo,
         "brand-logos"
       );
@@ -70,12 +79,14 @@ export const editBlog = async (req, res) => {
       blogData.brand_logo = imgPublicUrl;
     }
 
-    const { data: updatedBlog } = await db
-      .from("blogs")
+    const { data: updatedBlog, error } = await db
+      .from("brands")
       .update(blogData)
       .eq("id", blogId)
       .select()
       .single();
+
+    console.log(error);
 
     res.status(200).json({ blog: updatedBlog, imgUploadUrl });
   } catch (error) {
@@ -92,10 +103,14 @@ export const editBlog = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
+    const { vendorId } = req.query;
 
-    await db.from("blogs").delete().eq("id", blogId);
+    await db.from("vendors").update({ blog_id: null }).eq("id", vendorId);
+
+    const { data, error } = await db.from("brands").delete().eq("id", blogId);
+
     await deleteFolder(blogId, "brand-logos");
-    res.status(200);
+    res.status(200).json({ message: "Blog Deleted Successfully" });
   } catch (error) {
     logger({
       level: "error",

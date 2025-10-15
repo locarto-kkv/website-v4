@@ -4,24 +4,18 @@ import { axiosInstance } from "../../lib/axios.js";
 const BASE_URL = "/admin/blog";
 
 export const AdminBlogService = {
-  uploadImage: async (file, imgUploadUrl) => {
-    await fetch(imgUploadUrl.uploadUrl, {
-      method: "PUT",
-      headers: { "Content-Type": imgUploadUrl.fileType },
-      body: file,
-    });
-  },
-
   addBlog: async (blogData) => {
     try {
       if (blogData.brand_logo) {
+        var brand_logo_file = blogData.brand_logo;
+
         const brand_logo_metadata = {
           type: blogData.brand_logo.type,
           name: blogData.brand_logo.name,
           size: blogData.brand_logo.size,
         };
 
-        blogData = { ...blogData, brand_logo_metadata };
+        blogData = { ...blogData, brand_logo: brand_logo_metadata };
       }
 
       const { data } = await axiosInstance.post(`${BASE_URL}/add`, blogData);
@@ -29,13 +23,11 @@ export const AdminBlogService = {
       // console.log(response.blog);
 
       if (data.imgUploadUrl) {
-        await AdminBlogService.uploadImage(
-          blogData.brand_logo,
-          data.imgUploadUrl
-        );
+        await AdminBlogService.uploadImage(brand_logo_file, data.imgUploadUrl);
       }
 
       toast.success("Blog Added");
+      return data.blog;
     } catch (error) {
       toast.error(error.response?.data?.message || "Add blog failed");
       console.log("Error in addBlog:", error);
@@ -44,13 +36,15 @@ export const AdminBlogService = {
 
   editBlog: async (blogId, blogData) => {
     if (blogData.brand_logo) {
+      var brand_logo_file = blogData.brand_logo;
+
       const brand_logo_metadata = {
         type: blogData.brand_logo.type,
         name: blogData.brand_logo.name,
         size: blogData.brand_logo.size,
       };
 
-      blogData = { ...blogData, brand_logo_metadata };
+      blogData = { ...blogData, brand_logo: brand_logo_metadata };
     }
 
     const { data } = await axiosInstance.put(
@@ -59,17 +53,24 @@ export const AdminBlogService = {
     );
 
     if (data.imgUploadUrl) {
-      await AdminBlogService.uploadImage(
-        blogData.brand_logo,
-        data.imgUploadUrl
-      );
+      await AdminBlogService.uploadImage(brand_logo_file, data.imgUploadUrl);
     }
 
     toast.success("Blog Updated");
   },
 
-  deleteBlog: async (blogId) => {
-    await axiosInstance.delete(`${BASE_URL}/delete/${blogId}`);
+  deleteBlog: async (blogId, vendorId) => {
+    await axiosInstance.delete(`${BASE_URL}/delete/${blogId}`, {
+      params: { vendorId },
+    });
     toast.success("Blog Deleted");
+  },
+
+  uploadImage: async (file, imgUploadUrl) => {
+    await fetch(imgUploadUrl.uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": imgUploadUrl.fileType },
+      body: file,
+    });
   },
 };

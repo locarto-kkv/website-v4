@@ -9,17 +9,23 @@ export const ConsumerListService = {
   },
 
   updateList: async (type, quantity, productId) => {
-    const response = await axiosInstance.patch(`${BASE_URL}/${productId}`, {
-      type,
-      quantity,
-    });
+    const response = await axiosInstance.patch(
+      `${BASE_URL}/update/${productId}`,
+      {
+        type,
+        quantity,
+      }
+    );
     return response.data;
   },
 
   removeFromList: async (type, productId) => {
-    const response = await axiosInstance.delete(`${BASE_URL}/${productId}`, {
-      params: { type },
-    });
+    const response = await axiosInstance.delete(
+      `${BASE_URL}/delete/${productId}`,
+      {
+        type,
+      }
+    );
     return response.data;
   },
 };

@@ -10,6 +10,6 @@ const router = Router();
 
 router.get("/", protectRoute("consumer"), getOrderHistory);
 router.post("/place-order/:productId", protectRoute("consumer"), placeOrder);
-router.patch("/cancel-order/:orderId", protectRoute("consumer"), cancelOrder);
+router.put("/cancel-order/:orderId", protectRoute("consumer"), cancelOrder);
 
 export default router;

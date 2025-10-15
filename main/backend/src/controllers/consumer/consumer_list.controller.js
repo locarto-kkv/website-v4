@@ -66,7 +66,7 @@ export const updateList = async (req, res) => {
 export const removeFromList = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { type: list_type } = req.query;
+    const { type: list_type } = req.body;
     const { productId } = req.params;
 
     const { data } = await db

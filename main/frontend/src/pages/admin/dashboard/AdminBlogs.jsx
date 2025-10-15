@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { AdminBlogService } from "../../../services/admin/adminBlogService";
-import { useBlogs } from "../../../context/blogContext";
+import { useData } from "../../../context/dataContext";
 import BrandIdentityCard from "../../../components/landing/card";
 
 function BlogPage() {
   const [formData, setFormData] = useState({
+    vendor_id: "",
     title: "",
     subtitle: "",
     description: "",
@@ -14,31 +15,32 @@ function BlogPage() {
   });
   const [showBlogForm, setShowBlogForm] = useState(false);
   const [editingBlog, setEditingBlog] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const { blogs } = useBlogs();
+  const { blogs, fetchBlogs } = useData();
   const { editBlog, addBlog, deleteBlog } = AdminBlogService;
 
   const handleEdit = async (brand) => {
     setEditingBlog(true);
     setShowBlogForm(true);
-    setFormData({ ...brand, brand_logo: null });
+
+    setFormData({ ...brand.blog, vendor_id: brand.id, brand_logo: null });
   };
 
   const handleDelete = async (brand) => {
-    if (window.confirm(`Are you sure you want to delete "${brand.title}"?`)) {
-      await deleteBlog(brand.id);
+    if (
+      window.confirm(`Are you sure you want to delete "${brand.blog.title}"?`)
+    ) {
+      setLoading(true);
+      await deleteBlog(brand.blog.id, brand.id);
+      await fetchBlogs();
+      setLoading(false);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
-    }
   };
 
   const handleSectionChange = (index, e) => {
@@ -46,11 +48,6 @@ function BlogPage() {
     const updatedSections = [...formData.sections];
     updatedSections[index][name] = value;
     setFormData({ ...formData, sections: updatedSections });
-
-    // Clear section error when user starts typing
-    if (errors[`section-${index}-${name}`]) {
-      setErrors({ ...errors, [`section-${index}-${name}`]: "" });
-    }
   };
 
   const addSection = () => {
@@ -61,64 +58,35 @@ function BlogPage() {
   };
 
   const removeSection = (index) => {
-    if (formData.sections.length <= 1) {
-      alert("At least one section is required");
-      return;
-    }
     const updatedSections = formData.sections.filter((_, i) => i !== index);
     setFormData({ ...formData, sections: updatedSections });
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.subtitle.trim()) newErrors.subtitle = "Subtitle is required";
-    if (!formData.description.trim())
-      newErrors.description = "Description is required";
-    if (!formData.rating || formData.rating < 0 || formData.rating > 5) {
-      newErrors.rating = "Rating must be between 0 and 5";
-    }
-
-    formData.sections.forEach((section, index) => {
-      if (!section.title.trim()) {
-        newErrors[`section-${index}-title`] = "Section title is required";
-      }
-      if (!section.content.trim()) {
-        newErrors[`section-${index}-content`] = "Section content is required";
-      }
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
-
-    try {
-      if (editingBlog) {
-        await editBlog(formData.id, formData);
-        setEditingBlog(false);
-      } else {
-        await addBlog(formData);
-      }
-
-      setFormData({
-        title: "",
-        subtitle: "",
-        description: "",
-        brand_logo: "",
-        rating: "",
-        sections: [{ title: "", icon: "", content: "" }],
-      });
-      setShowBlogForm(false);
-    } catch (error) {
-      console.error("Error saving blog:", error);
-      alert("An error occurred while saving the blog. Please try again.");
+    if (editingBlog) {
+      setLoading(true);
+      await editBlog(formData.id, formData);
+      await fetchBlogs();
+      setEditingBlog(false);
+    } else {
+      setLoading(true);
+      await addBlog(formData);
+      await fetchBlogs();
     }
+
+    setFormData({
+      vendor_id: "",
+      title: "",
+      subtitle: "",
+      description: "",
+      brand_logo: "",
+      rating: "",
+      sections: [{ title: "", icon: "", content: "" }],
+    });
+    setShowBlogForm(false);
+    setLoading(false);
   };
 
   return (
@@ -130,8 +98,8 @@ function BlogPage() {
               Manage Your Blogs
             </h1>
             <p className="text-gray-600 mt-2">
-              {blogs?.length || 0} blog{blogs?.length !== 1 ? "s" : ""}{" "}
-              available
+              {blogs.filter((b) => b.blog).length} blog
+              {blogs.filter((b) => b.blog).length !== 1 ? "s" : ""} available
             </p>
           </div>
 
@@ -140,6 +108,7 @@ function BlogPage() {
               setShowBlogForm((prev) => !prev);
               setEditingBlog(false);
               setFormData({
+                vendor_id: "",
                 title: "",
                 subtitle: "",
                 description: "",
@@ -147,7 +116,6 @@ function BlogPage() {
                 rating: "",
                 sections: [{ title: "", icon: "", content: "" }],
               });
-              setErrors({});
             }}
             className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
@@ -167,17 +135,20 @@ function BlogPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogs &&
             !showBlogForm &&
-            blogs.map((brand) => (
-              <div key={brand.id} className="flex justify-center">
-                <BrandIdentityCard
-                  brand={brand}
-                  showAdminButtons={true}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  buttonPosition="higher"
-                />
-              </div>
-            ))}
+            blogs.map((brand) => {
+              if (brand.blog) {
+                return (
+                  <div key={brand.id} className="flex justify-center">
+                    <BrandIdentityCard
+                      brand={brand}
+                      showAdminButtons={true}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
+                  </div>
+                );
+              }
+            })}
         </div>
 
         {/* Blog Form */}
@@ -191,7 +162,6 @@ function BlogPage() {
                 onClick={() => {
                   setShowBlogForm(false);
                   setEditingBlog(false);
-                  setErrors({});
                 }}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -203,6 +173,19 @@ function BlogPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-gray-700 mb-2 font-medium">
+                    Vendor id
+                  </label>
+                  <input
+                    name="vendor_id"
+                    value={formData.vendor_id}
+                    onChange={handleChange}
+                    placeholder="Vendor Id"
+                    className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 mb-2 font-medium">
                     Title *
                   </label>
                   <input
@@ -210,39 +193,29 @@ function BlogPage() {
                     value={formData.title}
                     onChange={handleChange}
                     placeholder="Blog Title"
-                    className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                      errors.title ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
+                    required
                   />
-                  {errors.title && (
-                    <p className="text-red-500 text-sm mt-1">{errors.title}</p>
-                  )}
                 </div>
 
                 <div>
                   <label className="block text-gray-700 mb-2 font-medium">
-                    Subtitle *
+                    Subtitle
                   </label>
                   <input
                     name="subtitle"
                     value={formData.subtitle}
                     onChange={handleChange}
                     placeholder="Blog Subtitle"
-                    className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                      errors.subtitle ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
+                    required
                   />
-                  {errors.subtitle && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.subtitle}
-                    </p>
-                  )}
                 </div>
               </div>
 
               <div>
                 <label className="block text-gray-700 mb-2 font-medium">
-                  Description *
+                  Description
                 </label>
                 <textarea
                   name="description"
@@ -250,21 +223,15 @@ function BlogPage() {
                   onChange={handleChange}
                   placeholder="Blog Description"
                   rows={4}
-                  className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                    errors.description ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
+                  required
                 />
-                {errors.description && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.description}
-                  </p>
-                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-gray-700 mb-2 font-medium">
-                    Rating *
+                    Rating
                   </label>
                   <input
                     name="rating"
@@ -275,13 +242,9 @@ function BlogPage() {
                     min="0"
                     max="5"
                     step="0.1"
-                    className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                      errors.rating ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
+                    required
                   />
-                  {errors.rating && (
-                    <p className="text-red-500 text-sm mt-1">{errors.rating}</p>
-                  )}
                 </div>
 
                 <div>
@@ -344,17 +307,9 @@ function BlogPage() {
                           value={section.title}
                           onChange={(e) => handleSectionChange(index, e)}
                           placeholder="Section Title"
-                          className={`w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                            errors[`section-${index}-title`]
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          }`}
+                          className={`w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
+                          required
                         />
-                        {errors[`section-${index}-title`] && (
-                          <p className="text-red-500 text-sm mt-1">
-                            {errors[`section-${index}-title`]}
-                          </p>
-                        )}
                       </div>
 
                       <div>
@@ -374,17 +329,9 @@ function BlogPage() {
                       onChange={(e) => handleSectionChange(index, e)}
                       placeholder="Section Content"
                       rows={3}
-                      className={`w-full mt-3 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                        errors[`section-${index}-content`]
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      }`}
+                      className={`w-full mt-3 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
+                      required
                     />
-                    {errors[`section-${index}-content`] && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors[`section-${index}-content`]}
-                      </p>
-                    )}
                   </div>
                 ))}
               </div>
@@ -394,7 +341,13 @@ function BlogPage() {
                   type="submit"
                   className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg"
                 >
-                  {editingBlog ? "Update Blog" : "Create Blog"}
+                  {editingBlog
+                    ? loading
+                      ? "Loading..."
+                      : "Update Blog"
+                    : loading
+                    ? "Loading..."
+                    : "Add Blog"}
                 </button>
               </div>
             </form>
@@ -414,6 +367,7 @@ function BlogPage() {
               onClick={() => {
                 setShowBlogForm(true);
                 setFormData({
+                  vendor_id: "",
                   title: "",
                   subtitle: "",
                   description: "",

@@ -149,7 +149,7 @@ export const editReview = async (req, res) => {
   }
 };
 
-export const removeReview = async (req, res) => {
+export const deleteReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
 
@@ -163,7 +163,7 @@ export const removeReview = async (req, res) => {
       level: "error",
       message: error.message,
       location: __filename,
-      func: "removeReview",
+      func: "deleteReview",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }

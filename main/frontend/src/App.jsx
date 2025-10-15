@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
-import { BlogsProvider } from "./context/blogContext";
+import { DataProvider } from "./context/dataContext";
 
 // Public Pages
 import Homepage from "./pages/Homepage";
@@ -38,7 +38,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <BlogsProvider>
+      <DataProvider>
         <Routes>
           {/* --- PUBLIC ROUTES --- */}
           <Route path="/" element={<Homepage />} />
@@ -67,7 +67,7 @@ function App() {
             }
           />
         </Routes>
-      </BlogsProvider>
+      </DataProvider>
 
       <Toaster />
     </div>

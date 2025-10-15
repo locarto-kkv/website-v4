@@ -8,17 +8,17 @@ export const VendorOrderService = {
     return response.data;
   },
 
-  updateOrderStatus: async (orderId, statusData) => {
+  updateOrderStatus: async (orderId, order_status) => {
     const response = await axiosInstance.put(
       `${BASE_URL}/update-status/${orderId}`,
-      statusData
+      order_status
     );
     return response.data;
   },
 
   cancelOrder: async (orderId) => {
     const response = await axiosInstance.put(
-      `${BASE_URL}/cancel-status/${orderId}`
+      `${BASE_URL}/cancel-order/${orderId}`
     );
     return response.data;
   },

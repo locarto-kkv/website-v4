@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../../lib/axios.js";
 import { VendorOrderService } from "../../services/vendor/vendorOrderService.js";
+import { VendorAnalyticService } from "../../services/vendor/vendorAnalyticService.js";
+
 import { useAuthStore } from "../../store/useAuthStore.jsx";
 
 const DataContext = createContext();
@@ -63,8 +64,9 @@ export const VendorDataProvider = ({ children }) => {
           console.log("NOT CACHE");
 
           const { getOrders } = VendorOrderService;
+          const { getAnalytics } = VendorAnalyticService;
 
-          const analyticResponse = await axiosInstance.get("/vendor/analytic/");
+          const analyticResponse = await getAnalytics();
           const ordersResponse = await getOrders();
 
           setAnalyticData(analyticResponse.data);

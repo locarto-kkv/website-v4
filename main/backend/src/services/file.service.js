@@ -4,18 +4,17 @@ import db from "../lib/db.js";
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
-export const getFileUploadUrl = async (id, file, bucket) => {
+export const getFileUploadUrl = async (id, name, file, bucket) => {
   try {
-    const imgUploadUrls = [];
-
     const fileType = file.type;
     const fileName = file.name;
     const fileSize = file.size;
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const formattedFileName = `${id}_${timestamp}_${fileName}`;
+    const formattedFileName = `${id}_${name}`;
 
     const filePath = `${id}/${formattedFileName}`;
+
+    await db.storage.from(bucket).remove([filePath]);
 
     const { data, error } = await db.storage
       .from(bucket)
@@ -23,20 +22,18 @@ export const getFileUploadUrl = async (id, file, bucket) => {
 
     if (error) throw error;
 
-    imgUploadUrls.push({
+    return {
       uploadUrl: data.signedUrl,
       filePath,
       fileType,
       fileSize,
-    });
-
-    return imgUploadUrls;
+    };
   } catch (error) {
     logger({
       level: "error",
       message: error.message,
       location: __filename,
-      func: "getImgUploadUrl",
+      func: "getFileUploadUrl",
     });
   }
 };

@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 export const replyToReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
-    const { reply: vendor_reply } = req.body;
+    const vendor_reply = req.body;
 
     const { data: updatedReview } = await db
       .from("reviews")

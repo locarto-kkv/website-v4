@@ -1,7 +1,7 @@
 // src/pages/DiscoverPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useBlogs } from "../context/blogContext.jsx";
+import { useData } from "../context/dataContext.jsx";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -21,7 +21,8 @@ const DiscoverPage = () => {
   const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
   const [logoAnimationKey, setLogoAnimationKey] = useState(0);
 
-  const { blogs: brandData } = useBlogs();
+  const { blogs } = useData();
+  const brandData = blogs.filter((b) => b.blog);
 
   // Scroll to top when component mounts
   useEffect(() => {

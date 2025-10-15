@@ -9,8 +9,8 @@ import {
 const router = Router();
 
 router.get("/", protectRoute("vendor"), getOrders);
-router.patch("/cancel-order/:orderId", protectRoute("vendor"), cancelOrder);
-router.put(
+router.put("/cancel-order/:orderId", protectRoute("vendor"), cancelOrder);
+router.patch(
   "/update-status/:orderId",
   protectRoute("vendor"),
   updateOrderStatus

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import borderElementImg from "../../assets/border_element.png";
-import { AdminBlogService } from "../../services/admin/adminBlogService";
 
 const BrandIdentityCard = ({
   brand,
@@ -10,7 +9,7 @@ const BrandIdentityCard = ({
   onDelete,
 }) => {
   const [containerWidth, setContainerWidth] = useState(0);
-  const brandDetails = brand || {};
+  const brandDetails = brand.blog || {};
 
   const calculateResponsiveStyles = useCallback((width) => {
     if (width <= 480) {
@@ -136,13 +135,13 @@ const BrandIdentityCard = ({
           {showAdminButtons ? (
             <div className="flex space-x-3">
               <button
-                onClick={() => onEdit?.(brandDetails)}
+                onClick={() => onEdit?.(brand)}
                 className="bg-gray-300 hover:bg-gray-500 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 shadow-md"
               >
                 <span className={responsiveStyles.button}>Edit</span>
               </button>
               <button
-                onClick={() => onDelete?.(brandDetails)}
+                onClick={() => onDelete?.(brand)}
                 className="bg-orange-600 hover:bg-orange-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-md"
               >
                 <span className={responsiveStyles.button}>Delete</span>

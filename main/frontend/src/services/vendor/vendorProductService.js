@@ -4,7 +4,7 @@ import { axiosInstance } from "../../lib/axios.js";
 const BASE_URL = "/vendor/product";
 
 export const VendorProductService = {
-  uploadImage: async (files, imgUploadUrls) => {
+  uploadImages: async (files, imgUploadUrls) => {
     await Promise.all(
       imgUploadUrls.map(async (url, i) => {
         const { uploadUrl, fileType } = url;
@@ -40,12 +40,12 @@ export const VendorProductService = {
       // console.log(response.product);
 
       if (response.imgUploadUrls) {
-        await VendorProductService.uploadImage(
+        await VendorProductService.uploadImages(
           productData.product_images,
           response.imgUploadUrls
         );
       }
-      return response;
+      return response.product;
     } catch (error) {
       toast.error(error.response?.data?.message || "Add Product failed");
       console.log("Error in addProduct:", error.response?.data?.message);
@@ -53,14 +53,25 @@ export const VendorProductService = {
   },
 
   editProduct: async (productId, productData) => {
-    const response = await axiosInstance.put(`${BASE_URL}/${productId}`, {
-      productData,
-    });
-    return response.data;
+    const { data: response } = await axiosInstance.put(
+      `${BASE_URL}/edit/${productId}`,
+      {
+        productData,
+      }
+    );
+    if (response.imgUploadUrls) {
+      await VendorProductService.uploadImages(
+        productData.product_images,
+        response.imgUploadUrls
+      );
+    }
+    return response.product;
   },
 
   removeProduct: async (productId) => {
-    const response = await axiosInstance.delete(`${BASE_URL}/${productId}`);
+    const response = await axiosInstance.delete(
+      `${BASE_URL}/delete/${productId}`
+    );
     return response.data;
   },
 };

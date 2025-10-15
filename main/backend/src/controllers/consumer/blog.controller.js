@@ -10,11 +10,11 @@ export const getBlogs = async (req, res) => {
     const { start } = req.query;
     const start_index = parseInt(start, 10);
 
-    const { data: blogs } = await db
-      .from("blogs")
+    const { data: blogs, error } = await db
+      .from("vendors")
       .select(
-        `title,
-      vendor: vendors(*)`
+        `*,
+      blog: brands(*)`
       )
       .range(start_index, start_index + batchSize)
       .order("id", { ascending: true });

@@ -4,7 +4,7 @@ import {
   getReviewsByProduct,
   getReviews,
   addReview,
-  removeReview,
+  deleteReview,
   editReview,
 } from "../../controllers/consumer/review.controller.js";
 
@@ -14,6 +14,6 @@ router.get("/", protectRoute("consumer"), getReviews);
 router.get("/:productId", getReviewsByProduct);
 router.post("/add/:productId", protectRoute("consumer"), addReview);
 router.put("/edit/:reviewId", protectRoute("consumer"), editReview);
-router.delete("/delete/:reviewId", protectRoute("consumer"), removeReview);
+router.delete("/delete/:reviewId", protectRoute("consumer"), deleteReview);
 
 export default router;

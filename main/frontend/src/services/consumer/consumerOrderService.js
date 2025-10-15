@@ -8,12 +8,11 @@ export const ConsumerOrderService = {
     return response.data;
   },
 
-  placeOrder: async (productId, product, transaction) => {
-    const response = await axiosInstance.post(`${BASE_URL}/place-order`, {
-      productId,
-      product,
-      transaction,
-    });
+  placeOrder: async (productId, orderData) => {
+    const response = await axiosInstance.post(
+      `${BASE_URL}/place-order/${productId}`,
+      orderData
+    );
     return response.data;
   },
 

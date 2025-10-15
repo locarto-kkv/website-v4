@@ -1,7 +1,7 @@
 // src/pages/BrandInfoPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useBlogs } from "../context/blogContext.jsx";
+import { useData } from "../context/dataContext.jsx";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -20,7 +20,8 @@ import asset4 from "../../src/assets/4.png";
 const BrandInfoPage = () => {
   const { brandTitle } = useParams();
   const [brand, setBrand] = useState();
-  const { blogs: brandData } = useBlogs();
+  const { blogs } = useData();
+  const brandData = blogs.filter((b) => b.blog);
 
   // Scroll to top whenever brandId changes
   useEffect(() => {
@@ -28,8 +29,9 @@ const BrandInfoPage = () => {
   }, [brandTitle]);
 
   useEffect(() => {
-    const foundBrand = brandData.find((b) => b.title === brandTitle);
-    setBrand(foundBrand || null);
+    const foundBrand = brandData.find((b) => b.blog.title === brandTitle);
+
+    setBrand(foundBrand.blog || null);
   }, [brandTitle, brandData]); // FIX: Added brandData as a dependency
 
   // FIX: Memoize the random brands so they don't change on every render

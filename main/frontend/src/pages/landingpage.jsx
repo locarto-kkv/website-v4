@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useBlogs } from "../context/blogContext.jsx";
+import { useData } from "../context/dataContext.jsx";
 
 // Components
 import Navbar from "../components/Navbar.jsx";
@@ -22,7 +22,7 @@ import asset4 from "../../src/assets/4.png";
 import asset5 from "../../src/assets/5.png";
 
 const LandingPage = () => {
-  const { blogs } = useBlogs();
+  const { blogs } = useData();
 
   return (
     <div className="font-sans flex flex-col text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
@@ -175,11 +175,14 @@ const LandingPage = () => {
               "
                 >
                   {blogs &&
-                    blogs.slice(0, 3).map((brand, idx) => (
-                      <div key={brand.id} className="flex justify-center">
-                        <BrandIdentityCard brand={brand} />
-                      </div>
-                    ))}
+                    blogs
+                      .filter((b) => b.blog)
+                      .slice(0, 3)
+                      .map((brand, idx) => (
+                        <div key={brand.id} className="flex justify-center">
+                          <BrandIdentityCard brand={brand} />
+                        </div>
+                      ))}
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { ConsumerOrderService } from "../../services/consumer/consumerOrderService";
-import { ConsumerListService } from "../../services/consumer/consumerListService";
-import { useAuthStore } from "../../store/useAuthStore.jsx";
+import { ConsumerOrderService } from "../../services/consumer/consumerOrderService.js";
+import { ConsumerListService } from "../../services/consumer/consumerListService.js";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const DataContext = createContext();
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { VendorProductService } from "../../../services/vendor/vendorProductService";
+import { VendorProductService } from "../../../services/vendor/vendorProductService.js";
 
 const VendorProducts = () => {
   const [products, setProducts] = useState([]);

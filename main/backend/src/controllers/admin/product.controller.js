@@ -8,12 +8,12 @@ export const restrictProduct = async (req, res) => {
     const { productId } = req.params;
     const { status } = req.body;
 
-    const { data: products } = await db
+    const { data: product } = await db
       .from("products")
       .update({ status })
       .eq("id", productId);
 
-    res.status(200).json(products);
+    res.status(200).json(product);
   } catch (error) {
     logger({
       level: "error",
