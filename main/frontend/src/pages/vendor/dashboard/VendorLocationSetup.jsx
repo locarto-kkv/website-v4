@@ -7,8 +7,11 @@ const VendorLocationSetup = () => {
   const navigate = useNavigate();
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
-  const [coords, setCoords] = useState({ lat: "", lng: "" });
+  const [pincode, setPincode] = useState("");
+  const [address, setAddress] = useState("");
   const [category, setCategory] = useState("");
+  const [coords, setCoords] = useState({ lat: "", lng: "" });
+  const [loading, setLoading] = useState(false);
 
   // Effect to initialize the map instance. Runs only once on mount.
   useEffect(() => {
@@ -19,53 +22,145 @@ const VendorLocationSetup = () => {
     }).addTo(mapInstance);
     setMap(mapInstance);
 
-    // Cleanup function to remove the map instance when the component unmounts
     return () => {
       mapInstance.remove();
     };
-  }, []); // Empty dependency array ensures this runs only once.
+  }, []);
+
+  // Function to fetch address from coordinates using reverse geocoding
+  const fetchAddress = async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
+      );
+      const data = await response.json();
+      
+      if (data && data.address) {
+        const addr = data.address;
+        const addressParts = [
+          addr.house_number,
+          addr.road,
+          addr.suburb || addr.neighbourhood,
+          addr.city || addr.town || addr.village,
+          addr.state,
+        ].filter(Boolean);
+        
+        const formattedAddress = addressParts.join(", ");
+        setAddress(formattedAddress);
+        setPincode(addr.postcode || "");
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      setAddress("Address not available");
+    }
+  };
 
   // Effect to handle map clicks. Runs whenever the 'map' object is ready.
   useEffect(() => {
     if (!map) return;
 
-    const handleClick = (e) => {
+    const handleClick = async (e) => {
       const { lat, lng } = e.latlng;
       setCoords({ lat: lat.toFixed(6), lng: lng.toFixed(6) });
+      setLoading(true);
 
       setMarker((prevMarker) => {
-        // If a marker already exists, update its position
         if (prevMarker) {
           prevMarker.setLatLng(e.latlng);
           return prevMarker;
         }
-        // Otherwise, create a new marker and add it to the map
         return L.marker(e.latlng).addTo(map);
       });
+
+      await fetchAddress(lat, lng);
+      setLoading(false);
     };
 
     map.on("click", handleClick);
 
-    // Cleanup: remove the event listener when the component unmounts or map changes
     return () => {
       map.off("click", handleClick);
     };
   }, [map]);
 
-  const handleSetLocation = () => {
-    const { lat, lng } = coords;
-    if (lat && lng && map) {
-      const newLatLng = [parseFloat(lat), parseFloat(lng)];
-      map.setView(newLatLng, 15);
-      
-      setMarker((prevMarker) => {
-        if (prevMarker) {
-          prevMarker.setLatLng(newLatLng);
-          return prevMarker;
-        }
-        return L.marker(newLatLng).addTo(map);
-      });
+  const handleSetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
     }
+
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        const newLatLng = [latitude, longitude];
+        
+        setCoords({ lat: latitude.toFixed(6), lng: longitude.toFixed(6) });
+        
+        if (map) {
+          map.setView(newLatLng, 15);
+          
+          setMarker((prevMarker) => {
+            if (prevMarker) {
+              prevMarker.setLatLng(newLatLng);
+              return prevMarker;
+            }
+            return L.marker(newLatLng).addTo(map);
+          });
+        }
+        
+        await fetchAddress(latitude, longitude);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        alert("Unable to retrieve your location");
+        setLoading(false);
+      }
+    );
+  };
+
+  const handleSetLocationByPincode = async () => {
+    if (!pincode) {
+      alert("Please enter a pincode");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&postalcode=${pincode}&country=India`
+      );
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        const newLatLng = [lat, lng];
+        
+        setCoords({ lat: lat.toFixed(6), lng: lng.toFixed(6) });
+        
+        if (map) {
+          map.setView(newLatLng, 15);
+          
+          setMarker((prevMarker) => {
+            if (prevMarker) {
+              prevMarker.setLatLng(newLatLng);
+              return prevMarker;
+            }
+            return L.marker(newLatLng).addTo(map);
+          });
+        }
+        
+        await fetchAddress(lat, lng);
+      } else {
+        alert("Pincode not found");
+      }
+    } catch (error) {
+      console.error("Error fetching location:", error);
+      alert("Error finding location for pincode");
+    }
+    setLoading(false);
   };
 
   const handleRemovePin = () => {
@@ -73,18 +168,21 @@ const VendorLocationSetup = () => {
       map.removeLayer(marker);
       setMarker(null);
       setCoords({ lat: "", lng: "" });
-      setCategory(""); // Also clear the category selection
+      setPincode("");
+      setAddress("");
+      setCategory("");
     }
   };
 
   const handleSave = () => {
-    if (coords.lat && coords.lng && category) {
+    if (coords.lat && coords.lng && category && address) {
       const newShop = {
         id: `new-shop-${Date.now()}`,
         name: "My New Shop",
-        location: "Custom Location",
+        location: address,
         position: [parseFloat(coords.lat), parseFloat(coords.lng)],
-        address: "User-defined address",
+        address: address,
+        pincode: pincode,
         category: category,
       };
 
@@ -104,7 +202,6 @@ const VendorLocationSetup = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             Set Your Shop Location
@@ -114,7 +211,6 @@ const VendorLocationSetup = () => {
           </p>
         </div>
 
-        {/* Instructions Box */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 mt-1">
@@ -137,19 +233,39 @@ const VendorLocationSetup = () => {
                 Location Setup Instructions
               </h3>
               <p className="text-blue-800 leading-relaxed">
-                To establish your shop location, click anywhere on the interactive map to place a location pin, or manually enter the geographic coordinates in the latitude and longitude fields provided. After positioning your pin, select your business category from the dropdown menu and click "Save Shop & Continue" to proceed. If you need to adjust your selection, use the "Remove Pin" button to clear both the map marker and coordinate values, allowing you to start fresh.
+                To establish your shop location, you can either use your current location, enter a pincode, or click anywhere on the interactive map to place a location pin. The address will be automatically fetched and displayed. After positioning your pin, select your business category from the dropdown menu and click "Save Shop & Continue" to proceed.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
-            {/* Control Panel */}
             <div className="lg:col-span-1 p-6 bg-gray-50 border-r border-gray-200">
               <div className="space-y-6">
-                {/* Coordinates Section */}
+                {/* Current Location Button */}
+                <button
+                  onClick={handleSetCurrentLocation}
+                  disabled={loading}
+                  className="w-full bg-purple-500 hover:bg-purple-600 disabled:bg-purple-300 text-white py-3 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                >
+                  <svg 
+                    className="w-5 h-5" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" 
+                    />
+                  </svg>
+                  {loading ? "Getting Location..." : "Use Current Location"}
+                </button>
+
+                {/* Pincode Section */}
                 <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                     <svg 
@@ -171,39 +287,27 @@ const VendorLocationSetup = () => {
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
                       />
                     </svg>
-                    Coordinates
+                    Pincode
                   </h3>
                   
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Latitude
+                        Enter Pincode
                       </label>
                       <input
                         type="text"
-                        value={coords.lat}
-                        onChange={(e) => setCoords({ ...coords, lat: e.target.value })}
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value)}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                        placeholder="e.g., 19.076000"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Longitude
-                      </label>
-                      <input
-                        type="text"
-                        value={coords.lng}
-                        onChange={(e) => setCoords({ ...coords, lng: e.target.value })}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                        placeholder="e.g., 72.877700"
+                        placeholder="e.g., 400050"
                       />
                     </div>
                     
                     <button
-                      onClick={handleSetLocation}
-                      className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                      onClick={handleSetLocationByPincode}
+                      disabled={loading}
+                      className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white py-3 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
                     >
                       <svg 
                         className="w-4 h-4" 
@@ -215,13 +319,30 @@ const VendorLocationSetup = () => {
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
                           strokeWidth={2} 
-                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
                         />
                       </svg>
-                      Set Location from Coordinates
+                      Find Location by Pincode
                     </button>
                   </div>
                 </div>
+
+                {/* Address Display */}
+                {address && (
+                  <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                      Address
+                    </h3>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      {address}
+                    </p>
+                    {pincode && (
+                      <p className="text-gray-600 text-sm mt-2">
+                        <span className="font-medium">Pincode:</span> {pincode}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 {/* Remove Pin Button */}
                 {marker && (
@@ -265,13 +386,14 @@ const VendorLocationSetup = () => {
                 {/* Save Button */}
                 <button
                   onClick={handleSave}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 rounded-lg transition-all duration-200 font-bold text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-green-300 disabled:to-green-400 text-white py-4 rounded-lg transition-all duration-200 font-bold text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 >
                   Save Shop & Continue
                 </button>
 
                 {/* Status Indicator */}
-                {marker && coords.lat && coords.lng && (
+                {marker && address && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <p className="text-green-800 text-sm font-medium flex items-center gap-2">
                       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
@@ -293,6 +415,14 @@ const VendorLocationSetup = () => {
                   <span className="font-semibold">Click on map</span> to place pin
                 </p>
               </div>
+              {loading && (
+                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-[1001]">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-3 text-gray-600">Loading address...</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
