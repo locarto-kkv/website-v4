@@ -12,6 +12,7 @@ import VendorProducts from "./dashboard/VendorProducts";
 import VendorSupport from "./dashboard/VendorSupport";
 import VendorSetup from "./dashboard/VendorSetupWizard";
 import VendorsMemberHub from "./dashboard/VendorsMemberHub"; // Add this import
+import VendorLocationSetup from "./dashboard/VendorLocationSetup"; // Import the new component
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
@@ -54,6 +55,7 @@ const VendorRoutes = () => {
           <Route path="settings" element={<VendorSettings />} />
           <Route path="support" element={<VendorSupport />} />
           <Route path="setup" element={<VendorSetup />} />
+          <Route path="setup/location" element={<VendorLocationSetup />} /> {/* Add new route */}
         </Route>
       </Route>
     </Routes>

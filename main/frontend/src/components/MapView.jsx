@@ -64,17 +64,17 @@ const MapView = () => {
   };
 
   // Business data
-  const businessData = {
+  const [businessData, setBusinessData] = useState({
     wellness: [
       {
-        id: 'serenity-yoga-studio',  // Changed from 1
+        id: 'serenity-yoga-studio',
         name: "Serenity Yoga Studio",
         location: "Bandra West, Mumbai",
         position: [19.076, 72.8777],
         address: "123 Carter Road, Bandra West, Mumbai 400050",
       },
       {
-        id: 'mindful-fitness-center',  // Changed from 2
+        id: 'mindful-fitness-center',
         name: "Mindful Fitness Center",
         location: "Juhu, Mumbai",
         position: [19.1075, 72.8263],
@@ -83,14 +83,14 @@ const MapView = () => {
     ],
     lifestyle: [
       {
-        id: 'urban-style-boutique',  // Changed from 1
+        id: 'urban-style-boutique',
         name: "Urban Style Boutique",
         location: "Andheri West, Mumbai",
         position: [19.1136, 72.8697],
         address: "789 Link Road, Andheri West, Mumbai 400053",
       },
       {
-        id: 'casa-living',  // Changed from 2
+        id: 'casa-living',
         name: "Casa Living",
         location: "Bandra East, Mumbai",
         position: [19.05, 72.8333],
@@ -99,21 +99,39 @@ const MapView = () => {
     ],
     accessories: [
       {
-        id: 'golden-crown-jewellers',  // Changed from 1
+        id: 'golden-crown-jewellers',
         name: "Golden Crown Jewellers",
         location: "Colaba, Mumbai",
         position: [18.922, 72.834],
         address: "654 Colaba Causeway, Mumbai 400001",
       },
       {
-        id: 'timepiece-gallery',  // Changed from 2
+        id: 'timepiece-gallery',
         name: "Timepiece Gallery",
         location: "Fort, Mumbai",
         position: [18.9322, 72.8311],
         address: "987 Horniman Circle, Fort, Mumbai 400001",
       },
     ],
-  };
+  });
+
+  useEffect(() => {
+    const newShops = JSON.parse(localStorage.getItem("newShops")) || [];
+    if (newShops.length > 0) {
+      const newBusinessData = { ...businessData };
+      newShops.forEach(shop => {
+        const category = shop.category.toLowerCase();
+        if (!newBusinessData[category]) {
+          newBusinessData[category] = [];
+        }
+        // Avoid adding duplicates
+        if (!newBusinessData[category].some(s => s.id === shop.id)) {
+          newBusinessData[category].push(shop);
+        }
+      });
+      setBusinessData(newBusinessData);
+    }
+  }, []);
 
   // Create custom marker icons
   const createCustomIcon = (category) => {
@@ -247,7 +265,7 @@ const MapView = () => {
         });
       });
     }
-  }, [currentCategoryIndex, map, showOverlay]);
+  }, [currentCategoryIndex, map, showOverlay, businessData]);
 
   const currentCategory = categories[currentCategoryIndex];
 

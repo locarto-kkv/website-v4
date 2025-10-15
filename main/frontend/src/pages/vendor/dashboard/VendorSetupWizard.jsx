@@ -9,6 +9,11 @@ const VendorSetupWizard = ({ onSubmit }) => {
   const closeSetup = () => {
     navigate("/vendor/profile");
   };
+
+  const handleNextStep = () => {
+    navigate("/vendor/setup/location");
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       <div className="flex justify-between items-center mb-6">
@@ -32,6 +37,7 @@ const VendorSetupWizard = ({ onSubmit }) => {
         </div>
 
         <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          {/* Form fields... */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-gray-700 mb-2">
@@ -153,7 +159,7 @@ const VendorSetupWizard = ({ onSubmit }) => {
             </button>
             <button
               type="button"
-              onClick={onSubmit}
+              onClick={handleNextStep}
               className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-orange-600 transition"
             >
               Next Step
