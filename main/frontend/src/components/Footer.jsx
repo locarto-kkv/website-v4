@@ -1,58 +1,94 @@
-import React from 'react';
+import React, { useState } from 'react';
+import FAQModal from './FAQModal';
 
 const Footer = () => {
+  const [isFaqModalOpen, setIsFaqModalOpen] = useState(false);
+
   return (
-    <footer className="bg-secondary text-gray-400 py-8 px-4 mt-auto">
-      <div className="max-w-6xl mx-auto">
-        <div className="border-t border-gray-800 mb-6"></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          <div>
-            <h3 className="text-xl font-bold mb-3">Locarto</h3>
-            <p className="text-gray-400 mb-3 text-sm">Your local marketplace for unique finds and services.</p>
-            <div className="flex space-x-3">
-              <a href="#" className="text-gray-400 hover:text-white"><i className="fab fa-facebook-f"></i></a>
-              <a href="#" className="text-gray-400 hover:text-white"><i className="fab fa-twitter"></i></a>
-              <a href="#" className="text-gray-400 hover:text-white"><i className="fab fa-instagram"></i></a>
-              <a href="#" className="text-gray-400 hover:text-white"><i className="fab fa-linkedin-in"></i></a>
+    <>
+      <footer className="bg-secondary text-gray-400 py-8 sm:py-12 px-4 mt-auto">
+        <div className="max-w-6xl mx-auto">
+          {/* Decorative top border */}
+          <div className="border-t border-gray-700 mb-6 sm:mb-8"></div>
+          
+          {/* Footer content grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
+            {/* Brand section */}
+            <div className="space-y-3 sm:space-y-4 text-center sm:text-left">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Locarto</h3>
+              <p className="text-gray-400 leading-relaxed text-sm">
+                Your local marketplace for unique finds and services.
+              </p>
+              <div className="flex space-x-4 pt-2 justify-center sm:justify-start">
+                <a
+                  href="https://www.instagram.com/locarto.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors duration-200"
+                  aria-label="Follow us on Instagram"
+                >
+                  <i className="fab fa-instagram text-xl sm:text-2xl"></i>
+                </a>
+              </div>
             </div>
+
+            {/* Support section */}
+            <div className="text-center sm:text-left">
+              <h4 className="font-bold text-white text-base mb-3 sm:mb-4">Support</h4>
+              <ul className="space-y-2 sm:space-y-3">
+                <li>
+                  <button
+                    onClick={() => setIsFaqModalOpen(true)}
+                    className="text-gray-400 hover:text-white text-sm transition-colors duration-200"
+                  >
+                    FAQs
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Company section */}
+            <div className="text-center sm:text-left">
+              <h4 className="font-bold text-white text-base mb-3 sm:mb-4">Company</h4>
+              <ul className="space-y-2 sm:space-y-3">
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white text-sm transition-colors duration-200"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-400 hover:text-white text-sm transition-colors duration-200"
+                  >
+                    Terms of Service
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Placeholder for future section */}
+            <div className="hidden lg:block"></div>
           </div>
-          
-          <div>
-            <h4 className="font-bold text-base mb-3">For Customers</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">How to Buy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">Returns & Refunds</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">Customer Service</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">FAQs</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-bold text-base mb-3">For Vendors</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">How to Sell</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">Vendor Fees</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">Vendor Resources</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">Success Stories</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-bold text-base mb-3">Company</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">About Us</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">Careers</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white text-sm">Terms of Service</a></li>
-            </ul>
+
+          {/* Bottom copyright section */}
+          <div className="border-t border-gray-700 pt-4 sm:pt-6 text-center">
+            <p className="text-xs sm:text-sm text-gray-500">
+              &copy; {new Date().getFullYear()} Locarto. All rights reserved.
+            </p>
           </div>
         </div>
-        
-        <div className="border-t border-gray-800 mt-8 pt-4 text-center text-gray-400">
-          <p className="text-sm">&copy; 2025 Locarto. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
+      </footer>
+
+      {/* FAQ Modal */}
+      <FAQModal 
+        isOpen={isFaqModalOpen} 
+        onClose={() => setIsFaqModalOpen(false)} 
+      />
+    </>
   );
 };
 

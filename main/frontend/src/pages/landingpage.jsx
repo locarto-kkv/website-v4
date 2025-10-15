@@ -8,6 +8,7 @@ import Footer from "../components/Footer.jsx";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import WhatInItForYou from "../components/landing/WhatInItForYou.jsx";
 import RegisterSocial from "../components/RegisterSocial.jsx";
+import TestimonialSlider from "../components/landing/TestimonialSlider.jsx"; 
 
 // Assets
 import tagImg from "../assets/tag.png";
@@ -128,6 +129,11 @@ const LandingPage = () => {
                 SMART CUSTOMERS
               </p>
             </div>
+            
+            <div className="mt-16 w-full max-w-full relative z-10 animate-[fadeIn_2s_ease-in]">
+              <TestimonialSlider />
+            </div>
+
             {/* Video Section */}
             <div className="mt-28 w-full px-4 flex justify-center relative z-10 animate-[fadeIn_2s_ease-in]">
               <div className="relative group">
