@@ -72,7 +72,7 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
   const statsData = [
     {
       title: "Total Products",
-      value: formatNumber(vendor.products_count),
+      value: formatNumber(vendor.products_count) || 0,
       iconClass: "fas fa-cube",
       gradient: "bg-gradient-to-br from-blue-500 to-blue-600",
       ...getTrendData("products"),

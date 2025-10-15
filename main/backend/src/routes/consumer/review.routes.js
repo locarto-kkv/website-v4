@@ -1,15 +1,19 @@
 import { Router } from "express";
 import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
+  getReviewsByProduct,
   getReviews,
   addReview,
-  deleteReview,
-  uploadReviewImages,
+  removeReview,
   editReview,
 } from "../../controllers/consumer/review.controller.js";
 
 const router = Router();
 
-router.get("/:id", getReviews);
+router.get("/", protectRoute("consumer"), getReviews);
+router.get("/:productId", getReviewsByProduct);
+router.post("/add/:productId", protectRoute("consumer"), addReview);
+router.put("/edit/:reviewId", protectRoute("consumer"), editReview);
+router.delete("/delete/:reviewId", protectRoute("consumer"), removeReview);
 
 export default router;

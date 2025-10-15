@@ -1,21 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useBlogs } from "../context/blogContext.jsx";
 
 // Components
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import WhatInItForYou from "../components/landing/WhatInItForYou.jsx";
+import RegisterSocial from "../components/RegisterSocial.jsx";
 
 // Assets
 import tagImg from "../assets/tag.png";
 import locartoImg from "../assets/locarto.png";
-import snabbitImg from "../assets/snabbitimage.png";
 import landingVid from "../assets/landing_vid.mp4";
-import Insta from "../../src/assets/insta.png";
-import Youtube from "../../src/assets/yt.png";
-import Whatsapp from "../../src/assets/whatsapp.png";
 
 // Background Assets
 import asset1 from "../../src/assets/1.png";
@@ -29,7 +26,7 @@ const LandingPage = () => {
 
   return (
     <div className="font-sans flex flex-col text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
-      {/* Background Assets */}{" "}
+      {/* Background Assets */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <img
           src={asset1}
@@ -78,17 +75,19 @@ const LandingPage = () => {
           alt=""
           className="absolute top-[2800px] md:top-[4000px] -right-28 md:-right-44 w-[350px] h-[350px] md:w-[590px] md:h-[590px] opacity-[0.18] animate-[spin_46s_linear_infinite]"
           style={{ filter: "blur(1px)" }}
-        />{" "}
+        />
       </div>
       <Navbar pageType="landing" />
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center relative">
         <div className="w-full max-w-7xl px-4 md:px-6">
-          <h1 className="mb-2 pt-32 pb-12 text-3xl font-extrabold text-left md:text-5xl lg:text-7xl relative z-10 animate-[fadeIn_0.8s_ease-in]">
+          {/* REVISED: Smaller base font and padding for mobile, with more steps for smooth scaling. */}
+          <h1 className="mb-2 pt-20 sm:pt-24 md:pt-32 pb-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-left relative z-10 animate-[fadeIn_0.8s_ease-in]">
             THE PLATFORM THAT GETS IT...
           </h1>
 
-          <p className="-mt-2 text-xl leading-relaxed text-left md:text-3xl lg:text-4xl relative z-10 animate-[fadeIn_1s_ease-in]">
+          {/* REVISED: Reduced base text size for mobile. */}
+          <p className="-mt-2 text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl leading-relaxed text-left relative z-10 animate-[fadeIn_1s_ease-in]">
             <span className="[color:#f15b28]">For brands</span> with something
             to say and <br />
             <span className="[color:#f15b28]">For people</span> who want to
@@ -103,7 +102,8 @@ const LandingPage = () => {
                 alt="Tag"
                 className="col-start-1 row-start-1 h-[700px] w-full max-w-[1800px] object-contain md:h-[850px]"
               />
-              <p className="col-start-1 row-start-1 translate-y-2 font-bold text-center text-sm sm:text-base md:text-5xl text-[#FBF5E5] whitespace-nowrap [text-shadow:3px_3px_6px_rgba(0,0,0,0.7)]">
+              {/* REVISED: Smoother font scaling for the text on the tag image. */}
+              <p className="col-start-1 row-start-1 translate-y-2 font-bold text-center text-xs sm:text-sm md:text-2xl lg:text-4xl xl:text-5xl text-[#FBF5E5] whitespace-nowrap [text-shadow:3px_3px_6px_rgba(0,0,0,0.7)]">
                 We get what's missing. so we made.
               </p>
             </div>
@@ -117,18 +117,17 @@ const LandingPage = () => {
               A Community where
             </p>
 
-            <div className="mt-32 text-center space-y-8 relative z-10 animate-[fadeIn_1.8s_ease-in]">
-              <p className="[color:#f15b28] text-6xl font-extrabold md:text-7xl tracking-wider">
+            <div className="mt-20 sm:mt-24 md:mt-28 text-center space-y-4 sm:space-y-6 md:space-y-8 relative z-10 animate-[fadeIn_1.8s_ease-in]">
+              <p className="[color:#f15b28] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-wider">
                 EMERGING BRANDS
               </p>
-              <p className="[color:#f15b28] text-5xl font-extrabold md:text-6xl tracking-wider">
+              <p className="[color:#f15b28] text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-wider">
                 MEET
               </p>
-              <p className="[color:#f15b28] text-6xl font-extrabold md:text-7xl tracking-wider">
+              <p className="[color:#f15b28] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-wider">
                 SMART CUSTOMERS
               </p>
             </div>
-
             {/* Video Section */}
             <div className="mt-28 w-full px-4 flex justify-center relative z-10 animate-[fadeIn_2s_ease-in]">
               <div className="relative group">
@@ -146,11 +145,12 @@ const LandingPage = () => {
               </div>
             </div>
 
+            {/* REVISED: Smoother font scaling for this section. */}
             <div className="mt-28 text-center px-8 relative z-10 animate-[fadeIn_2.2s_ease-in]">
-              <h2 className="text-4xl font-extrabold md:text-6xl">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold">
                 Every Big Brand Started Somewhere
               </h2>
-              <p className="mt-6 text-2xl md:text-3xl leading-relaxed">
+              <p className="mt-6 text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed">
                 But Usually Not On Platforms Designed For Big Brands. So We're
                 Building <br />
                 The Place They Should Have Had From{" "}
@@ -158,8 +158,9 @@ const LandingPage = () => {
               </p>
             </div>
 
+            {/* REVISED: Smoother font scaling. */}
             <div className="mt-24 text-center px-6 relative z-10 animate-[fadeIn_2.4s_ease-in]">
-              <h2 className="text-3xl font-bold md:text-5xl">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
                 Brands You've been searching for
               </h2>
             </div>
@@ -216,82 +217,7 @@ const LandingPage = () => {
           <WhatInItForYou />
         </div>
 
-        {/* New Banner Section */}
-        <div className="mt-24 bg-white py-12 md:py-16 px-4 text-center relative z-10">
-          <h2 className="text-4xl md:text-6xl text-[#0D1539] mb-4">
-            This is just the Beginning
-          </h2>
-          <p className="text-xl md:text-2xl text-[#0D1539] opacity-90">
-            The best is yet to come!
-          </p>
-        </div>
-
-        {/* Email Subscription Section */}
-        <div className="bg-white py-8 px-4 text-center relative z-10">
-          <div className="max-w-xl mx-auto">
-            <div className="flex items-stretch border border-[#0D1539]/30 rounded-full overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:border-[#0D1539]/50">
-              <input
-                type="email"
-                placeholder="emailaddress@gmail.com"
-                className="flex-1 px-4 py-2 text-sm text-[#0D1539] bg-transparent focus:outline-none placeholder:text-[#0D1539]/70"
-              />
-              <button className="px-4 py-2 text-sm font-medium bg-[#0D1539] text-white hover:bg-[#1A244C] transition-all duration-300 whitespace-nowrap rounded-full hover:scale-105">
-                Plug into the rhythm
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Social Media Buttons */}
-        <div className="bg-white py-8 px-4 text-center relative z-10">
-          <div className="max-w-xl mx-auto flex justify-center gap-1">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group transition-transform duration-300 hover:scale-110"
-            >
-              <img
-                src={Insta}
-                alt="Instagram"
-                className="w-16 h-16 object-contain cursor-pointer"
-              />
-            </a>
-
-            <a
-              href="https://youtube.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group transition-transform duration-300 hover:scale-110"
-            >
-              <img
-                src={Youtube}
-                alt="YouTube"
-                className="w-16 h-16 object-contain cursor-pointer"
-              />
-            </a>
-
-            <a
-              href="https://wa.me/yournumber"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group transition-transform duration-300 hover:scale-110"
-            >
-              <img
-                src={Whatsapp}
-                alt="WhatsApp"
-                className="w-16 h-16 object-contain cursor-pointer"
-              />
-            </a>
-          </div>
-        </div>
-
-        {/* Bottom Banner */}
-        <div className="-mt-8 bg-white py-6 px-4 text-center relative z-10">
-          <h3 className="text-lg md:text-xl font-light text-[#0D1539]/70 inline-block">
-            Making it worthwhile.
-          </h3>
-        </div>
+        <RegisterSocial />
 
         {/* Locarto Logo Banner - Bottom */}
         <div className="bg-white w-full overflow-hidden relative z-10">

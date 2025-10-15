@@ -3,12 +3,17 @@ import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
   getOrders,
   updateOrderStatus,
+  cancelOrder,
 } from "../../controllers/vendor/order.controller.js";
 
 const router = Router();
 
-// router.patch("/cancel-order/:id", protectRoute, cancelOrderTransaction);
-router.get("/", protectRoute, getOrders);
-router.put("/update-status/:id", protectRoute, updateOrderStatus);
+router.get("/", protectRoute("vendor"), getOrders);
+router.patch("/cancel-order/:orderId", protectRoute("vendor"), cancelOrder);
+router.put(
+  "/update-status/:orderId",
+  protectRoute("vendor"),
+  updateOrderStatus
+);
 
 export default router;

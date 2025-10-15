@@ -145,7 +145,6 @@ const Navbar = ({ pageType = "landing" }) => {
             {pageType === "homepage" ? "About Us" : "Home"}
           </Link>
 
-          {/* Categories Button */}
           <button
             onClick={() => handleSectionNavigation("categories")}
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
@@ -153,7 +152,6 @@ const Navbar = ({ pageType = "landing" }) => {
             Categories
           </button>
 
-          {/* How It Works Button */}
           <button
             onClick={() => handleSectionNavigation("how-it-works")}
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
@@ -161,7 +159,6 @@ const Navbar = ({ pageType = "landing" }) => {
             How It Works
           </button>
 
-          {/* Testimonials Button */}
           <button
             onClick={() => handleSectionNavigation("testimonials")}
             className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
@@ -173,7 +170,6 @@ const Navbar = ({ pageType = "landing" }) => {
 
       {/* Right Side Elements */}
       <div className="flex items-center space-x-3">
-        {/* Cart Icon - Click to open side cart */}
         <button
           onClick={toggleCart}
           className="text-gray-700 hover:text-orange-500 transition-colors relative"
@@ -186,7 +182,6 @@ const Navbar = ({ pageType = "landing" }) => {
           )}
         </button>
 
-        {/* Circular Login Button */}
         <div className="relative">
           <button
             ref={buttonRef}
@@ -196,7 +191,6 @@ const Navbar = ({ pageType = "landing" }) => {
             <span className="text-sm">👤</span>
           </button>
 
-          {/* Dropdown Menu */}
           {dropdownOpen &&
             (currentUser ? (
               <div

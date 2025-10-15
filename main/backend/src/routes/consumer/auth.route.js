@@ -13,6 +13,6 @@ router.post("/verify", sendVerification);
 router.post("/signup", signup);
 router.post("/login", login);
 router.get("/login-google", loginGoogle);
-router.post("/logout", protectRoute, logout);
+router.post("/logout", protectRoute("consumer"), logout);
 
 export default router;

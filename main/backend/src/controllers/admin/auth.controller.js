@@ -1,56 +1,11 @@
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
 import logger from "../../lib/logger.js";
-dotenv.config();
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
 import db from "../../lib/db.js";
 import { generateToken } from "../../lib/utils.js";
-
-export const signup = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    } else if (password.length < 8) {
-      return res
-        .status(400)
-        .json({ message: "Password must be atleast 8 characters" });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = {
-      name,
-      email,
-      password: hashedPassword,
-    };
-
-    const { data: user, error } = await db
-      .from("admins")
-      .insert(newUser)
-      .select()
-      .single();
-
-    if (error) return res.status(400).json({ message: "User already exists" });
-
-    generateToken(user.id, "admin", res);
-
-    res.status(201).json({ id: user.id, type: "admin" });
-  } catch (error) {
-    logger({
-      level: "error",
-      message: error.message,
-      location: __filename,
-      func: "signup",
-    });
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
 
 export const login = async (req, res) => {
   try {

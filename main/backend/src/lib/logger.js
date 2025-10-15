@@ -25,7 +25,7 @@ async function logger(error) {
   };
   console.log(log);
 
-  // await logToSupabase(log);
+  await logToSupabase(log);
 }
 
 export default logger;

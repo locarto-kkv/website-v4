@@ -3,11 +3,11 @@ import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
-import { DataProvider } from "./context/blogContext";
+import { BlogsProvider } from "./context/blogContext";
 
 // Public Pages
-import Homepage from "./pages/homepage";
-import LandingPage from "./pages/landingpage";
+import Homepage from "./pages/Homepage";
+import LandingPage from "./pages/Landingpage";
 import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";
@@ -17,6 +17,9 @@ import VendorRoutes from "./pages/vendor/vendorRoutes";
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
 
 import AdminRoutes from "./pages/admin/adminRoutes";
+
+import { ConsumerDataProvider } from "./context/consumer/consumerDataContext";
+import { VendorDataProvider } from "./context/vendor/vendorDataContext";
 
 function App() {
   const { authLoading, checkAuth } = useAuthStore();
@@ -35,7 +38,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <DataProvider>
+      <BlogsProvider>
         <Routes>
           {/* --- PUBLIC ROUTES --- */}
           <Route path="/" element={<Homepage />} />
@@ -46,11 +49,25 @@ function App() {
           {/* --- ADMIN ROUTES --- */}
           <Route path="admin/*" element={<AdminRoutes />} />
           {/* --- VENDOR ROUTES --- */}
-          <Route path="vendor/*" element={<VendorRoutes />} />
+          <Route
+            path="vendor/*"
+            element={
+              <VendorDataProvider>
+                <VendorRoutes />
+              </VendorDataProvider>
+            }
+          />
           {/* --- CONSUMER ROUTES --- */}
-          <Route path="consumer/*" element={<ConsumerRoutes />} />
+          <Route
+            path="consumer/*"
+            element={
+              <ConsumerDataProvider>
+                <ConsumerRoutes />
+              </ConsumerDataProvider>
+            }
+          />
         </Routes>
-      </DataProvider>
+      </BlogsProvider>
 
       <Toaster />
     </div>

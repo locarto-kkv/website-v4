@@ -98,7 +98,7 @@ const BrandInfoPage = () => {
       <Navbar pageType="brand-info" />
 
       {/* Brand Image */}
-      <div className="mt-16 mb-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-[#0D1539]/40 overflow-hidden flex justify-center items-center max-w-3xl mx-4 sm:mx-auto h-48 sm:h-56 md:h-72 relative z-10 animate-[fadeIn_0.8s_ease-in]">
+      <div className="mt-28 mb-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-[#0D1539]/40 overflow-hidden flex justify-center items-center max-w-3xl mx-4 sm:mx-auto h-48 sm:h-56 md:h-72 relative z-10 animate-[fadeIn_0.8s_ease-in]">
         {
           <img
             src={brand.brand_logo}
@@ -110,25 +110,28 @@ const BrandInfoPage = () => {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-12 relative z-10">
-        {/* Rating */}
+        {/* REVISED: Made rating section responsive */}
         {brand.rating && (
-          <div className="mt-8 flex items-center gap-3 text-3xl text-[#0D1539]">
+          <div className="mt-8 flex flex-wrap items-center gap-2 sm:gap-3 text-xl sm:text-2xl md:text-3xl text-[#0D1539]">
             <span className="font-medium">
               <span className="text-orange-400 font-bold">LETY</span> Rating:
             </span>
-            <div className="flex text-5xl text-purple-900">
+            <div className="flex text-3xl sm:text-4xl md:text-5xl text-purple-900">
               {"★".repeat(Math.floor(brand.rating))}
               {"☆".repeat(5 - Math.floor(brand.rating))}
             </div>
-            <span className="text-2xl">({brand.rating}/5)</span>
+            <span className="text-lg sm:text-xl md:text-2xl">
+              ({brand.rating}/5)
+            </span>
           </div>
         )}
 
-        <h2 className="text-2xl md:text-5xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
+        {/* REVISED: Smoother font scaling for brand title and subtitle */}
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
           {brand.title}
         </h2>
 
-        <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
           {brand.subtitle}
         </h2>
 
@@ -142,7 +145,7 @@ const BrandInfoPage = () => {
             key={idx}
             className="mb-8"
             style={{
-              animation: `fadeIn 0.6s ease-in ${1.6 + idx * 0.2}s both`,
+              animation: "fadeIn 0.6s ease-in ${1.6 + idx * 0.2}s both",
             }}
           >
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#0D1539]">
@@ -203,80 +206,6 @@ const BrandInfoPage = () => {
           </div>
         )}
       </main>
-
-      {/* Newsletter */}
-      <div className="mt-24 py-12 md:py-16 px-4 text-center relative z-10">
-        <h2 className="text-4xl md:text-6xl text-[#0D1539] mb-4">
-          This is just the Beginning
-        </h2>
-        <p className="text-xl md:text-2xl text-[#0D1539] opacity-90">
-          The best is yet to come!
-        </p>
-      </div>
-
-      {/* Subscribe */}
-      <div className="py-8 px-4 text-center relative z-10">
-        <div className="max-w-xl mx-auto">
-          <div className="flex items-stretch border-2 border-[#0D1539]/30 rounded-full overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:border-[#0D1539]/50">
-            <input
-              type="email"
-              placeholder="emailaddress@gmail.com"
-              className="flex-1 px-4 py-2 text-sm text-[#0D1539] bg-transparent focus:outline-none placeholder:text-[#0D1539]/70"
-            />
-            <button className="px-4 py-2 text-sm font-medium bg-[#0D1539] text-white hover:bg-[#1A244C] transition-all duration-300 whitespace-nowrap rounded-full hover:scale-110">
-              Plug into the rhythm
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Socials */}
-      <div className="py-8 px-4 text-center relative z-10">
-        <div className="max-w-xl mx-auto flex justify-center gap-1">
-          <a
-            href="https://instagram.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group transition-transform duration-300 hover:scale-110"
-          >
-            <img
-              src={Insta}
-              alt="Instagram"
-              className="w-16 h-16 object-contain cursor-pointer"
-            />
-          </a>
-          <a
-            href="https://youtube.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group transition-transform duration-300 hover:scale-110"
-          >
-            <img
-              src={Youtube}
-              alt="YouTube"
-              className="w-16 h-16 object-contain cursor-pointer"
-            />
-          </a>
-          <a
-            href="https://wa.me/yournumber"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group transition-transform duration-300 hover:scale-110"
-          >
-            <img
-              src={Whatsapp}
-              alt="WhatsApp"
-              className="w-16 h-16 object-contain cursor-pointer"
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="-mt-8 py-6 px-4 text-center relative z-10">
-        <h3 className="text-lg md:text-xl font-light text-[#0D1539]/70 inline-block">
-          Making it worthwhile.
-        </h3>
-      </div>
 
       {/* Locarto Logo Banner - Bottom */}
       <div className="bg-white w-full overflow-hidden relative z-10">

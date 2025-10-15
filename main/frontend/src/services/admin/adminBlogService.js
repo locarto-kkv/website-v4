@@ -4,11 +4,6 @@ import { axiosInstance } from "../../lib/axios.js";
 const BASE_URL = "/admin/blog";
 
 export const AdminBlogService = {
-  getBlogs: async () => {
-    const response = await axiosInstance.get(`${BASE_URL}/`);
-    return response.data;
-  },
-
   uploadImage: async (file, imgUploadUrl) => {
     await fetch(imgUploadUrl.uploadUrl, {
       method: "PUT",
@@ -58,7 +53,10 @@ export const AdminBlogService = {
       blogData = { ...blogData, brand_logo_metadata };
     }
 
-    const { data } = await axiosInstance.put(`${BASE_URL}/${blogId}`, blogData);
+    const { data } = await axiosInstance.put(
+      `${BASE_URL}/edit/${blogId}`,
+      blogData
+    );
 
     if (data.imgUploadUrl) {
       await AdminBlogService.uploadImage(
@@ -71,7 +69,7 @@ export const AdminBlogService = {
   },
 
   deleteBlog: async (blogId) => {
-    await axiosInstance.delete(`${BASE_URL}/${blogId}`);
+    await axiosInstance.delete(`${BASE_URL}/delete/${blogId}`);
     toast.success("Blog Deleted");
   },
 };

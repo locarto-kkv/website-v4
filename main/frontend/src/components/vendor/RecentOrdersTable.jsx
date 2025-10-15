@@ -4,7 +4,7 @@ import {
   formatDate,
   getOrderStatusConfig,
 } from "../../lib/utils.js";
-import { useAnalytic } from "../../context/vendorAnalyticContext.jsx";
+import { useVendorData } from "../../context/vendor/vendorDataContext";
 
 const StatusBadge = ({ status }) => {
   const config = getOrderStatusConfig(status);
@@ -20,7 +20,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const RecentOrdersTable = () => {
-  const { orders } = useAnalytic();
+  const { orders } = useVendorData();
 
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("desc");

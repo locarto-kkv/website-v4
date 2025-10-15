@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
-  getProducts,
   addProduct,
   removeProduct,
   editProduct,
@@ -9,10 +8,8 @@ import {
 
 const router = Router();
 
-router.get("/", protectRoute, getProducts);
-router.get("/:id", protectRoute, getProducts);
-router.post("/add", protectRoute, addProduct);
-router.put("/:id", protectRoute, editProduct);
-router.delete("/:id", protectRoute, removeProduct);
+router.post("/add", protectRoute("vendor"), addProduct);
+router.put("/edit/:productId", protectRoute("vendor"), editProduct);
+router.delete("/delete/:productId", protectRoute("vendor"), removeProduct);
 
 export default router;

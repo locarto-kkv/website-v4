@@ -16,6 +16,22 @@ SELECT
 
     -- dynamic order_status counts
     (
+      SELECT 
+        COUNT(r.product_id)
+        FROM public.reviews r
+        LEFT JOIN public.products p ON r.product_id = p.id
+        WHERE r.product_id = p.id
+    ) AS count_reviews,
+
+    (
+      SELECT 
+        AVG(r.stars)
+        FROM public.reviews r
+        LEFT JOIN public.products p ON r.product_id = p.id
+        WHERE r.product_id = p.id
+    ) AS avg_review,  
+
+    (
       SELECT jsonb_object_agg(order_status, count_status)
       FROM (
         SELECT COALESCE(o2.order_status, 'unknown') AS order_status, COUNT(*) AS count_status

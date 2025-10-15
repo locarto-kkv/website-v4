@@ -3,29 +3,9 @@ import db from "../../lib/db.js";
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
-export const getReviews = async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const { data: reviews } = await db
-      .from("reviews")
-      .select()
-      .eq("product_id", productId);
-
-    res.status(200).json(reviews);
-  } catch (error) {
-    logger({
-      level: "error",
-      message: error.message,
-      location: __filename,
-      func: "getReviews",
-    });
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 export const replyToReview = async (req, res) => {
   try {
-    const reviewId = req.params.id;
+    const { reviewId } = req.params;
     const { reply: vendor_reply } = req.body;
 
     const { data: updatedReview } = await db
@@ -47,9 +27,9 @@ export const replyToReview = async (req, res) => {
   }
 };
 
-export const deleteReply = async (req, res) => {
+export const removeReply = async (req, res) => {
   try {
-    const reviewId = req.params.id;
+    const { reviewId } = req.params;
 
     const { data } = await db
       .from("reviews")
@@ -58,7 +38,7 @@ export const deleteReply = async (req, res) => {
       .select()
       .single();
 
-    res.status(200).json("Reply Deleted");
+    res.status(200).json({ message: "Reply Deleted" });
   } catch (error) {
     logger({
       level: "error",

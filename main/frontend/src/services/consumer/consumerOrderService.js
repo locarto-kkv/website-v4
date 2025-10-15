@@ -4,7 +4,7 @@ const BASE_URL = "/consumer/order";
 
 export const ConsumerOrderService = {
   getOrders: async () => {
-    const response = await axiosInstance.get(`${BASE_URL}/get-orders`);
+    const response = await axiosInstance.get(`${BASE_URL}/`);
     return response.data;
   },
 

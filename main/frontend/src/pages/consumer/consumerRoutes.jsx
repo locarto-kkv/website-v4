@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useConsumerData } from "../../context/consumer/consumerDataContext";
 
 // Consumer pages/components
 import AuthConsumer from "./authConsumer";
@@ -8,24 +9,28 @@ import ConsumerDashboard from "./consumerDashboard";
 // import ConsumerProfile from "../../components/consumer/ConsumerProfile";
 // import ConsumerAnalytics from "../../components/consumer/ConsumerAnalytics";
 // import ConsumerSettings from "../../components/consumer/ConsumerSettings";
+import RuleChatbot from "../Chatbot";
 import ShopProducts from "./ShopProducts";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
-  return currentUser?.type === "consumer" ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/consumer/login" relplace />
-  );
+  const { clearCache } = useConsumerData();
+
+  if (currentUser?.type !== "consumer") {
+    clearCache();
+    return <Navigate to="/consumer/login" replace />;
+  } else {
+    return <Outlet />;
+  }
 };
 
 const ConsumerRoutes = () => {
   const { currentUser } = useAuthStore();
-  // console.log(currentUser);
 
   return (
     <Routes>
       {/* Public route */}
+      <Route path="chat" element={<RuleChatbot />} />
       <Route
         path="login"
         element={

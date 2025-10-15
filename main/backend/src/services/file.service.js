@@ -1,32 +1,36 @@
-import logger from "../../lib/logger.js";
-import db from "../../lib/db.js";
+import logger from "../lib/logger.js";
+import db from "../lib/db.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
-export const getImgUploadUrl = async (blogId, file) => {
+export const getFileUploadUrl = async (id, file, bucket) => {
   try {
+    const imgUploadUrls = [];
+
     const fileType = file.type;
     const fileName = file.name;
     const fileSize = file.size;
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const formattedFileName = `${blogId}_${timestamp}_${fileName}`;
+    const formattedFileName = `${id}_${timestamp}_${fileName}`;
 
-    const filePath = `${blogId}/${formattedFileName}`;
+    const filePath = `${id}/${formattedFileName}`;
 
     const { data, error } = await db.storage
-      .from("brand-logos")
+      .from(bucket)
       .createSignedUploadUrl(filePath);
 
     if (error) throw error;
 
-    return {
+    imgUploadUrls.push({
       uploadUrl: data.signedUrl,
       filePath,
       fileType,
       fileSize,
-    };
+    });
+
+    return imgUploadUrls;
   } catch (error) {
     logger({
       level: "error",
@@ -37,12 +41,12 @@ export const getImgUploadUrl = async (blogId, file) => {
   }
 };
 
-export const deleteImgFolder = async (blogId) => {
+export const deleteFolder = async (id, bucket) => {
   const { data: files } = await db.storage
-    .from("brand-logos")
-    .list(blogId, { limit: 100 });
+    .from(bucket)
+    .list(id, { limit: 100 });
 
-  const filePaths = files.map((file) => `${blogId}/${file.name}`);
+  const filePaths = files.map((file) => `${id}/${file.name}`);
 
-  await db.storage.from("brand-logos").remove(filePaths);
+  await db.storage.from(bucket).remove(filePaths);
 };

@@ -5,12 +5,12 @@ import {
   getOrderStatusConfig,
   getProductIcon,
 } from "../../lib/utils.js";
-import { useAnalytic } from "../../context/vendorAnalyticContext.jsx";
+import { useVendorData } from "../../context/vendor/vendorDataContext";
 
 const TopSellingProducts = () => {
   const [viewMode, setViewMode] = useState("grid");
 
-  const { products, changeDataRange } = useAnalytic();
+  const { products, changeDataRange } = useVendorData();
 
   const topProducts = products.slice(0, 3);
 

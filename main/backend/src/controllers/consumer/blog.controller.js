@@ -3,10 +3,21 @@ import logger from "../../lib/logger.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
+const batchSize = 10;
 
 export const getBlogs = async (req, res) => {
   try {
-    const { data: blogs } = await db.from("blogs").select();
+    const { start } = req.query;
+    const start_index = parseInt(start, 10);
+
+    const { data: blogs } = await db
+      .from("blogs")
+      .select(
+        `title,
+      vendor: vendors(*)`
+      )
+      .range(start_index, start_index + batchSize)
+      .order("id", { ascending: true });
 
     res.status(200).json(blogs);
   } catch (error) {

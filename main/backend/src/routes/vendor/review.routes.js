@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
-  getReviews,
   replyToReview,
+  removeReply,
 } from "../../controllers/vendor/review.controller.js";
 
 const router = Router();
 
-router.get("/:id", getReviews);
-router.put("/reply/:id", protectRoute, replyToReview);
+router.put("/reply/:reviewId", protectRoute("vendor"), replyToReview);
+router.delete("/delete/:reviewId", protectRoute("vendor"), removeReply);
 
 export default router;

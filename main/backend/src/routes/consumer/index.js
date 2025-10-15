@@ -18,4 +18,7 @@ router.use("/review", reviewRoutes);
 router.use("/list", listRoutes);
 router.use("/blog", blogRoutes);
 
+import { submitEmail } from "../../controllers/beta.controller.js";
+router.post("/submit-beta-email", submitEmail);
+
 export default router;

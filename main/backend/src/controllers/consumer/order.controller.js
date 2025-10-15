@@ -1,7 +1,4 @@
-import {
-  addOrderService,
-  cancelOrderService,
-} from "../../services/consumer/order.service.js";
+import { cancelOrderService } from "../../services/order.service.js";
 
 import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
@@ -16,10 +13,9 @@ export const getOrderHistory = async (req, res) => {
     const { data: orders, error } = await db
       .from("orders")
       .select(
+        `*,
+        product:products (*)
         `
-    *,
-    product:products (*)
-  `
       )
       .eq("consumer_id", userId);
 
@@ -48,9 +44,20 @@ export const getOrderHistory = async (req, res) => {
 export const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { productId, order } = req.body;
+    const { productId } = req.params;
+    const { order } = req.body;
 
-    const newOrder = await addOrderService(userId, productId, order);
+    const orderData = {
+      ...order,
+      product_id: productId,
+      consumer_id: userId,
+    };
+
+    const { data: newOrder } = await db
+      .from("orders")
+      .insert(orderData)
+      .select()
+      .single();
 
     res.status(200).json({ order: newOrder });
   } catch (error) {
@@ -66,7 +73,7 @@ export const placeOrder = async (req, res) => {
 
 export const cancelOrder = async (req, res) => {
   try {
-    const orderId = req.params.id;
+    const { orderId } = req.params;
 
     const updatedOrder = await cancelOrderService(orderId);
 

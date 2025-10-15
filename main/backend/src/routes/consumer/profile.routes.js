@@ -8,8 +8,8 @@ import {
 
 const router = Router();
 
-router.get("/", protectRoute, getProfile);
-router.delete("/delete", protectRoute, deleteProfile);
-router.put("/update", protectRoute, updateProfile);
+router.get("/", protectRoute("consumer"), getProfile);
+router.put("/update", protectRoute("consumer"), updateProfile);
+router.delete("/delete", protectRoute("consumer"), deleteProfile);
 
 export default router;

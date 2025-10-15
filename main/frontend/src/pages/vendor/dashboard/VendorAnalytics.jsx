@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useAnalytic } from "../../../context/vendorAnalyticContext";
+import { useVendorData } from "../../../context/vendor/vendorDataContext";
 
 const VendorAnalytics = () => {
   const [activeTab, setActiveTab] = useState("sales");
   const [viewMode, setViewMode] = useState("chart");
   const [timePeriod, setTimePeriod] = useState("month");
-  const { products, vendor, analyticData } = useAnalytic();
+  const { products, vendor, analyticData } = useVendorData();
 
   function transformToMonthlyData(data, valueKey) {
     const months = [

@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
 import bcrypt from "bcryptjs";
@@ -12,9 +9,9 @@ export const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const { data: userProfile, error } = await db
+    const { data: userProfile } = await db
       .from("consumers")
-      .select("id, created_at, name, email, phone_no, address")
+      .select()
       .eq("id", userId)
       .single();
 
@@ -30,44 +27,25 @@ export const getProfile = async (req, res) => {
   }
 };
 
-export const updatePassword = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { password } = req.body;
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const { data: updatedUser } = await db
-      .from("consumers")
-      .update({ password: hashedPassword })
-      .eq("id", userId)
-      .select()
-      .single();
-
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    logger({
-      level: "error",
-      message: error.message,
-      location: __filename,
-      func: "updatePassword",
-    });
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const newProfileData = req.body;
 
-    const { data: updatedUser } = await db
+    if (newProfileData.password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      newProfileData.password = hashedPassword;
+    }
+
+    const { data: updatedUser, error } = await db
       .from("consumers")
       .update(newProfileData)
       .eq("id", userId)
       .select()
       .single();
+
+    if (error) throw error;
 
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -85,10 +63,7 @@ export const deleteProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const { data, error } = await db
-      .from("consumers")
-      .delete()
-      .eq("id", userId);
+    await db.from("consumers").delete().eq("id", userId);
 
     res.status(200).json({ message: "Profile Deleted Successfully" });
   } catch (error) {

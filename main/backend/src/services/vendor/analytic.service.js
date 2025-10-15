@@ -38,7 +38,7 @@ export const getVendorData = async (userId) => {
       .eq("vendor_id", userId);
 
     return {
-      vendors: {
+      vendor: {
         total: vendorTotalData,
         monthly: vendorMonthlyData,
         weekly: vendorWeeklyData,

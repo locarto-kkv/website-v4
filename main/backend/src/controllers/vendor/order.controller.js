@@ -1,5 +1,5 @@
 import db from "../../lib/db.js";
-import { cancelOrderService } from "../../services/vendor/order.service.js";
+import { cancelOrderService } from "../../services/order.service.js";
 
 import logger from "../../lib/logger.js";
 import { fileURLToPath } from "url";
@@ -13,8 +13,8 @@ export const getOrders = async (req, res) => {
       .from("orders")
       .select(
         `*,
-      product:products (*)
-      `
+        product:products (*)
+        `
       )
       .eq("product.vendor_id", vendorId)
       .not("product", "is", null);
@@ -35,7 +35,7 @@ export const getOrders = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
   try {
-    const orderId = req.params.id;
+    const { orderId } = req.params;
     const { order_status } = req.body;
 
     const { data: updatedOrder } = await db
@@ -59,7 +59,7 @@ export const updateOrderStatus = async (req, res) => {
 
 export const cancelOrder = async (req, res) => {
   try {
-    const orderId = req.params.id;
+    const { orderId } = req.params;
 
     const updatedOrder = await cancelOrderService(orderId);
 
