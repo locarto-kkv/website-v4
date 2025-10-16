@@ -17,6 +17,48 @@ export function ConsumerDataProvider({ children }) {
     setLists([]);
   };
 
+  const fetchOrders = async () => {
+    try {
+      const { getOrders } = ConsumerOrderService;
+      const orderData = await getOrders();
+      setOrders(orderData);
+
+      localStorage.setItem(
+        "orders",
+        JSON.stringify({
+          order: orderData,
+          timestamp: Date.now(),
+        })
+      );
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to fetch orders");
+      console.error("Error in ConsumerDataProvider:", error);
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  const fetchLists = async () => {
+    try {
+      const { getLists } = ConsumerListService;
+      const listData = await getLists();
+      setLists(listData);
+
+      localStorage.setItem(
+        "lists",
+        JSON.stringify({
+          list: listData,
+          timestamp: Date.now(),
+        })
+      );
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to fetch Lists");
+      console.error("Error in ConsumerDataProvider:", error);
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
   useEffect(() => {
     setDataLoading(true);
     const cached = localStorage.getItem("data");
@@ -27,36 +69,24 @@ export function ConsumerDataProvider({ children }) {
       setLists(parsed.list);
       setDataLoading(false);
     } else {
-      const fetchData = async () => {
-        try {
-          const { getOrders } = ConsumerOrderService;
-          const { getLists } = ConsumerListService;
-          const orderData = await getOrders();
-          const listData = await getLists();
-          setOrders(orderData);
-          setLists(listData);
-
-          localStorage.setItem(
-            "data",
-            JSON.stringify({
-              order: orderData,
-              list: listData,
-              timestamp: Date.now(),
-            })
-          );
-        } catch (error) {
-          toast.error(error.response?.data?.message || "Failed to fetch Data");
-          console.error("Error in ConsumerDataProvider:", error);
-        } finally {
-          setDataLoading(false);
-        }
-      };
-      if (currentUser?.type === "consumer") fetchData();
+      if (currentUser?.type === "consumer") {
+        fetchLists();
+        fetchOrders();
+      }
     }
   }, [currentUser]);
 
   return (
-    <DataContext.Provider value={{ orders, lists, clearCache, dataLoading }}>
+    <DataContext.Provider
+      value={{
+        orders,
+        lists,
+        clearCache,
+        fetchLists,
+        fetchOrders,
+        dataLoading,
+      }}
+    >
       {children}
     </DataContext.Provider>
   );

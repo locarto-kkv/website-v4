@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { VendorProfileService } from "../../../services/vendor/vendorProfileService";
 
 const VendorLocationSetup = () => {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ const VendorLocationSetup = () => {
   const [coords, setCoords] = useState({ lat: "", lng: "" });
   const [loading, setLoading] = useState(false);
   const [shopName, setShopName] = useState("");
+
+  const { getProfile, updateProfile } = VendorProfileService;
 
   // Effect to initialize the map instance. Runs only once on mount.
   useEffect(() => {
@@ -35,7 +38,7 @@ const VendorLocationSetup = () => {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
       );
       const data = await response.json();
-      
+
       if (data && data.address) {
         const addr = data.address;
         const addressParts = [
@@ -45,7 +48,7 @@ const VendorLocationSetup = () => {
           addr.city || addr.town || addr.village,
           addr.state,
         ].filter(Boolean);
-        
+
         const formattedAddress = addressParts.join(", ");
         setAddress(formattedAddress);
         setPincode(addr.postcode || "");
@@ -95,12 +98,12 @@ const VendorLocationSetup = () => {
       async (position) => {
         const { latitude, longitude } = position.coords;
         const newLatLng = [latitude, longitude];
-        
+
         setCoords({ lat: latitude.toFixed(6), lng: longitude.toFixed(6) });
-        
+
         if (map) {
           map.setView(newLatLng, 15);
-          
+
           setMarker((prevMarker) => {
             if (prevMarker) {
               prevMarker.setLatLng(newLatLng);
@@ -109,7 +112,7 @@ const VendorLocationSetup = () => {
             return L.marker(newLatLng).addTo(map);
           });
         }
-        
+
         await fetchAddress(latitude, longitude);
         setLoading(false);
       },
@@ -133,17 +136,17 @@ const VendorLocationSetup = () => {
         `https://nominatim.openstreetmap.org/search?format=json&postalcode=${pincode}&country=India`
       );
       const data = await response.json();
-      
+
       if (data && data.length > 0) {
         const lat = parseFloat(data[0].lat);
         const lng = parseFloat(data[0].lon);
         const newLatLng = [lat, lng];
-        
+
         setCoords({ lat: lat.toFixed(6), lng: lng.toFixed(6) });
-        
+
         if (map) {
           map.setView(newLatLng, 15);
-          
+
           setMarker((prevMarker) => {
             if (prevMarker) {
               prevMarker.setLatLng(newLatLng);
@@ -152,7 +155,7 @@ const VendorLocationSetup = () => {
             return L.marker(newLatLng).addTo(map);
           });
         }
-        
+
         await fetchAddress(lat, lng);
       } else {
         alert("Pincode not found");
@@ -216,17 +219,17 @@ const VendorLocationSetup = () => {
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 mt-1">
-              <svg 
-                className="w-6 h-6 text-blue-600" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
             </div>
@@ -235,7 +238,12 @@ const VendorLocationSetup = () => {
                 Location Setup Instructions
               </h3>
               <p className="text-blue-800 leading-relaxed">
-                To establish your shop location, you can either use your current location, enter a pincode, or click anywhere on the interactive map to place a location pin. The address will be automatically fetched and displayed. After positioning your pin, select your business category from the dropdown menu and click "Save Shop & Continue" to proceed.
+                To establish your shop location, you can either use your current
+                location, enter a pincode, or click anywhere on the interactive
+                map to place a location pin. The address will be automatically
+                fetched and displayed. After positioning your pin, select your
+                business category from the dropdown menu and click "Save Shop &
+                Continue" to proceed.
               </p>
             </div>
           </div>
@@ -248,22 +256,22 @@ const VendorLocationSetup = () => {
                 {/* Shop Name Section */}
                 <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <svg 
-                      className="w-5 h-5 text-orange-500" 
-                      fill="none" 
-                      stroke="currentColor" 
+                    <svg
+                      className="w-5 h-5 text-orange-500"
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" 
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                       />
                     </svg>
                     Shop Name
                   </h3>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Enter your shop name
@@ -287,17 +295,17 @@ const VendorLocationSetup = () => {
                   disabled={loading}
                   className="w-full bg-purple-500 hover:bg-purple-600 disabled:bg-purple-300 text-white py-3 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
                 >
-                  <svg 
-                    className="w-5 h-5" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"
                     />
                   </svg>
                   {loading ? "Getting Location..." : "Use Current Location"}
@@ -306,28 +314,28 @@ const VendorLocationSetup = () => {
                 {/* Pincode Section */}
                 <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <svg 
-                      className="w-5 h-5 text-orange-500" 
-                      fill="none" 
-                      stroke="currentColor" 
+                    <svg
+                      className="w-5 h-5 text-orange-500"
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" 
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                       />
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" 
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
                     Pincode
                   </h3>
-                  
+
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -341,23 +349,23 @@ const VendorLocationSetup = () => {
                         placeholder="e.g., 400050"
                       />
                     </div>
-                    
+
                     <button
                       onClick={handleSetLocationByPincode}
                       disabled={loading}
                       className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white py-3 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
                     >
-                      <svg 
-                        className="w-4 h-4" 
-                        fill="none" 
-                        stroke="currentColor" 
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         />
                       </svg>
                       Find Location by Pincode
@@ -388,17 +396,17 @@ const VendorLocationSetup = () => {
                     onClick={handleRemovePin}
                     className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
                   >
-                    <svg 
-                      className="w-4 h-4" 
-                      fill="none" 
-                      stroke="currentColor" 
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                       />
                     </svg>
                     Remove Pin
@@ -444,13 +452,11 @@ const VendorLocationSetup = () => {
 
             {/* Map Container */}
             <div className="lg:col-span-2 h-96 lg:h-[700px] relative">
-              <div
-                id="map-container"
-                className="w-full h-full"
-              ></div>
+              <div id="map-container" className="w-full h-full"></div>
               <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded-lg shadow-md border border-gray-200 z-[1000]">
                 <p className="text-sm text-gray-600">
-                  <span className="font-semibold">Click on map</span> to place pin
+                  <span className="font-semibold">Click on map</span> to place
+                  pin
                 </p>
               </div>
               {loading && (

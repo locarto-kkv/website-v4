@@ -6,32 +6,43 @@ const DataContext = createContext();
 
 export function DataProvider({ children }) {
   const [blogs, setBlogs] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [start, setStart] = useState(0);
 
   const clearBlogs = () => {
     localStorage.removeItem("blogs");
     setBlogs([]);
   };
 
-  const fetchProductsInBatch = async (query) => {
-    const { getProducts, getProductsByCategory, getProductsByVendor } =
-      ConsumerProductService;
-
-    if (query.category) {
-      const data = await getProductsByCategory();
-      setProducts(data);
-    } else if (query.vendor_id) {
-      const data = await getProductsByVendor(query.vendor_id);
-      setProducts(data);
-    } else {
-      const data = await getProducts(start_index);
-      setProducts(data);
+  /**
+   * Fetch products and merge them with blogs
+   * Each blog (vendor) gets a `products` array of their products
+   */
+  const fetchProductsInBatch = async (query = {}) => {
+    try {
+      const response = await ConsumerProductService.getProductsByFilter(
+        query,
+        start
+      );
+      // setStart((prev) => prev + 10);
+      // Merge products with blogs based on vendor_id
+      setBlogs((prevBlogs) =>
+        prevBlogs.map((blog) => {
+          const vendorProducts = response.filter(
+            (product) => product.vendor_id === blog.id
+          );
+          return {
+            ...blog,
+            products: vendorProducts,
+          };
+        })
+      );
+    } catch (error) {
+      console.error("Error fetching products:", error);
     }
   };
 
   const fetchBlogs = async () => {
-    const { getBlogs } = ConsumerBlogService;
-    const data = await getBlogs(0);
+    const data = await ConsumerBlogService.getBlogs(0);
     setBlogs(data);
     localStorage.setItem(
       "blogs",
@@ -47,13 +58,17 @@ export function DataProvider({ children }) {
       setBlogs(parsed.data);
       return;
     }
-
     fetchBlogs();
   }, []);
 
   return (
     <DataContext.Provider
-      value={{ blogs, products, fetchBlogs, fetchProductsInBatch, clearBlogs }}
+      value={{
+        blogs,
+        fetchBlogs,
+        fetchProductsInBatch,
+        clearBlogs,
+      }}
     >
       {children}
     </DataContext.Provider>

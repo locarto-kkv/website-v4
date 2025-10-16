@@ -52,7 +52,10 @@ const ConsumerRoutes = () => {
           <Route path="settings" element={<ConsumerSettings />} /> */}
         </Route>
       </Route>
-      <Route path="shops/:shopId/products" element={<ShopProducts />} />
+      <Route
+        path="shops/:vendorId/products/:category"
+        element={<ShopProducts />}
+      />
     </Routes>
   );
 };
