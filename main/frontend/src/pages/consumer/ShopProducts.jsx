@@ -28,9 +28,6 @@ const ShopProducts = () => {
       setLoading(true);
       try {
         await fetchProductsInBatch({ vendor_id: vendorId, category });
-        console.log(category);
-
-        console.log(blogs);
       } catch (err) {
         console.error("Error fetching products:", err);
       } finally {
@@ -38,6 +35,7 @@ const ShopProducts = () => {
       }
     };
     fetchProducts();
+    console.log(blogs);
   }, [vendorId]);
 
   if (!vendor)
@@ -146,7 +144,7 @@ const ShopProducts = () => {
                 {vendor.name}
               </h2>
               <p className="text-white/90 mb-3 drop-shadow">
-                Premium quality products curated just for you
+                {vendor.blog?.description}
               </p>
               <div className="flex items-center justify-center md:justify-start gap-6 text-sm flex-wrap">
                 <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
@@ -186,7 +184,7 @@ const ShopProducts = () => {
                   <div className="relative mb-4">
                     <div className="overflow-hidden rounded-xl bg-white/5">
                       <img
-                        src={product.product_images[0]}
+                        src={product.product_images?.[0].url || null}
                         alt={product.name}
                         className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500"
                       />

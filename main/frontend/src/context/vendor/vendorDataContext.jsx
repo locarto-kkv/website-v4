@@ -35,13 +35,13 @@ export const VendorDataProvider = ({ children }) => {
     let newProducts, newVendor;
     if (range === "total") {
       newProducts = analyticData.products.total;
-      newVendor = analyticData.vendors.total;
+      newVendor = analyticData.vendor.total;
     } else if (range === "month") {
       newProducts = analyticData.products.monthly;
-      newVendor = analyticData.vendors.monthly?.[0];
+      newVendor = analyticData.vendor.monthly?.[0];
     } else if (range === "week") {
       newProducts = analyticData.products.weekly;
-      newVendor = analyticData.vendors.weekly?.[0];
+      newVendor = analyticData.vendor.weekly?.[0];
     }
 
     setProducts(newProducts);
@@ -72,7 +72,8 @@ export const VendorDataProvider = ({ children }) => {
       );
       setAnalyticData(response);
       setProducts(response.products?.total);
-      setVendor(response.vendors?.total);
+      setVendor(response.vendor?.total);
+
       return response;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch analytics");
@@ -112,7 +113,7 @@ export const VendorDataProvider = ({ children }) => {
           const parsed = JSON.parse(cachedAnalytics);
           setAnalyticData(parsed.data);
           setProducts(parsed.data.products?.total);
-          setVendor(parsed.data.vendors?.total);
+          setVendor(parsed.data.vendor?.total);
         }
         if (cachedOrders) {
           const parsed = JSON.parse(cachedOrders);

@@ -197,9 +197,7 @@ const MapView = () => {
           if (button)
             button.onclick = () =>
               navigate(
-                `/consumer/shops/${
-                  vendor.id
-                }/products/${currentCategory.name.toLowerCase()}`
+                `/consumer/shops/${vendor.id}/products/${currentCategory.name}`
               );
         });
       });
