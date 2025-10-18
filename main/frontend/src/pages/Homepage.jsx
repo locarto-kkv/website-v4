@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import SearchIcon from "../components/SearchIcon";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 
 const Homepage = () => {
@@ -11,7 +12,7 @@ const Homepage = () => {
   const navigate = useNavigate();
 
   // Available categories (Only these will be searchable/navigable)
-  const availableCategories = ["personal care", "accessories"]; // Updated
+  const availableCategories = ["personal care", "accessories"];
 
   // Popular Products Data
   const popularProducts = [
@@ -21,7 +22,7 @@ const Homepage = () => {
       description: "Fresh greens, quinoa, tomatoes, and avocado",
       price: "$12.99",
       image: "🥗",
-      category: "wellness", // Kept for example, might need adjustment if wellness removed elsewhere
+      category: "wellness",
       bgColor: "from-green-400 to-emerald-500",
     },
     {
@@ -30,7 +31,7 @@ const Homepage = () => {
       description: "Cheesy, saucy, and perfectly crispy crust",
       price: "$18.50",
       image: "🍕",
-      category: "lifestyle", // Kept for example, might need adjustment if lifestyle removed elsewhere
+      category: "lifestyle",
       bgColor: "from-red-400 to-orange-500",
     },
     {
@@ -40,16 +41,16 @@ const Homepage = () => {
         "Essential oils and bath bombs for the ultimate day of pampering",
       price: "$49.99",
       image: "🧴",
-      category: "personal care", // Matches allowed category
+      category: "personal care",
       bgColor: "from-purple-400 to-pink-500",
     },
     {
       id: 4,
-      name: "Stylish Watch", // Example Accessory
+      name: "Stylish Watch",
       description: "Elegant timepiece for everyday wear.",
       price: "$150.00",
-      image: "⌚️", // Example Accessory
-      category: "accessories", // Matches allowed category
+      image: "⌚️",
+      category: "accessories",
       bgColor: "from-blue-400 to-indigo-500",
     },
   ];
@@ -62,18 +63,17 @@ const Homepage = () => {
     }
 
     const normalizedQuery = searchQuery.toLowerCase().trim();
-    // Use the updated availableCategories for search validation
     const foundCategory = availableCategories.find((category) =>
       category.includes(normalizedQuery)
     );
 
     if (foundCategory) {
       // Redirect to map with selected category
-      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`); // Encode space
+      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`);
     } else {
       // Show error message with suggestion
       setShowError(true);
-      setSuggestedCategory(availableCategories[0]); // Suggest first available category
+      setSuggestedCategory(availableCategories[0]);
     }
   };
 
@@ -86,7 +86,7 @@ const Homepage = () => {
   };
 
   const handleSuggestionClick = (category) => {
-    navigate(`/map?category=${category.replace(" ", "%20")}`); // Encode space
+    navigate(`/map?category=${category.replace(" ", "%20")}`);
     closeError();
   };
 
@@ -98,11 +98,9 @@ const Homepage = () => {
   const handleProductClick = (product) => {
     // Check if the product's category is one of the allowed ones before navigating
     if (availableCategories.includes(product.category.toLowerCase())) {
-      navigate(`/map?category=${product.category.replace(" ", "%20")}`); // Encode space
+      navigate(`/map?category=${product.category.replace(" ", "%20")}`);
     } else {
       console.log(`Category "${product.category}" is not directly navigable via suggestions.`);
-      // Decide if you still want to navigate or show a message
-      // navigate(`/map?category=${product.category}`); // Option to navigate anyway
     }
   };
 
@@ -145,7 +143,7 @@ const Homepage = () => {
                       <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 flex items-center justify-center relative">
                         {/* Logo Image */}
                         <img
-                          src={`/src/assets/${logoNumber}.png`} // Make sure these paths are correct
+                          src={`/src/assets/${logoNumber}.png`}
                           alt={`Locarto Logo ${logoNumber}`}
                           className="relative z-10 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain transition-all duration-700 transform group-hover:rotate-12 group-hover:scale-110"
                           style={{
@@ -175,7 +173,7 @@ const Homepage = () => {
                         >
                           <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-red-400 rounded-full transform -translate-x-1/2 shadow-lg shadow-red-300"></div>
                         </div>
-                         <div
+                        <div
                           className="absolute inset-0 animate-spin"
                           style={{
                             animationDuration: `${22 + index * 2}s`,
@@ -199,7 +197,7 @@ const Homepage = () => {
                 </div>
 
                 {/* Global floating particles */}
-                 <div
+                <div
                   className="absolute -top-8 left-1/4 w-4 h-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-60"
                   style={{ animationDelay: "0.2s" }}
                 ></div>
@@ -211,7 +209,7 @@ const Homepage = () => {
                   className="absolute top-1/3 -right-8 w-2 h-2 bg-gradient-to-r from-orange-300 to-orange-500 rounded-full animate-bounce opacity-50"
                   style={{ animationDelay: "1.2s" }}
                 ></div>
-                 <div
+                <div
                   className="absolute top-1/4 -left-6 w-3 h-3 bg-gradient-to-r from-red-400 to-orange-500 rounded-full animate-bounce opacity-60"
                   style={{ animationDelay: "1.6s" }}
                 ></div>
@@ -224,7 +222,6 @@ const Homepage = () => {
                   style={{ animationDelay: "2.4s" }}
                 ></div>
 
-
                 {/* Large orbiting elements */}
                 <div
                   className="absolute inset-0 animate-spin opacity-20"
@@ -232,7 +229,7 @@ const Homepage = () => {
                 >
                   <div className="absolute top-4 left-1/2 w-3 h-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-full transform -translate-x-1/2"></div>
                 </div>
-                 <div
+                <div
                   className="absolute inset-0 animate-spin opacity-15"
                   style={{
                     animationDuration: "20s",
@@ -311,27 +308,26 @@ const Homepage = () => {
                     </Link>
                   </div>
                   <div className="absolute right-3 sm:right-4 md:right-6 top-1/2 transform -translate-y-1/2 group-hover:scale-110 transition-transform duration-300">
-                     <button type="submit" className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg focus:outline-none">
-                       <SearchIcon />
-                     </button>
+                    <button type="submit" className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg focus:outline-none">
+                      <SearchIcon />
+                    </button>
                   </div>
                 </div>
 
-                {/* Floating suggestion pills - UPDATED */}
+                {/* Floating suggestion pills */}
                 <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 hidden md:flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                  {/* Updated categories array */}
                   {["Personal Care", "Accessories"].map(
                     (category, index) => (
                       <button
                         key={category}
-                        type="button" // Important for forms
+                        type="button"
                         onClick={() =>
-                           navigate(`/map?category=${category.toLowerCase().replace(" ", "%20")}`) // Use lowercase, encode space
+                          navigate(`/map?category=${category.toLowerCase().replace(" ", "%20")}`)
                         }
                         className="px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-600 text-sm rounded-full shadow-lg border border-gray-200 animate-fade-in-up hover:bg-white hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
                         style={{ animationDelay: `${index * 0.1}s` }}
                       >
-                        {category} {/* Display original casing */}
+                        {category}
                       </button>
                     )
                   )}
@@ -512,121 +508,8 @@ const Homepage = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Locarto Brand Section */}
-            <div className="md:col-span-1">
-              <Link
-                to="/"
-                className="text-2xl font-bold text-orange-500 mb-4 block hover:text-orange-600 transition-colors"
-              >
-                Locarto
-              </Link>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Your one-stop destination for local products and services.
-              </p>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="font-bold text-gray-800 mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    to="/landing"
-                    className="text-gray-600 hover:text-orange-500 transition-colors text-sm"
-                  >
-                    About Us
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/contact" // Assuming you have a contact route
-                    className="text-gray-600 hover:text-orange-500 transition-colors text-sm"
-                  >
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/faq" // Assuming you have an FAQ route or modal trigger
-                    className="text-gray-600 hover:text-orange-500 transition-colors text-sm"
-                  >
-                    FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/privacy" // Assuming you have a privacy policy route
-                    className="text-gray-600 hover:text-orange-500 transition-colors text-sm"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Connect With Us */}
-            <div>
-              <h3 className="font-bold text-gray-800 mb-4">Connect With Us</h3>
-              <div className="flex space-x-4">
-                <a
-                  href="https://twitter.com" // Replace with actual link
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 bg-blue-400 text-white rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors"
-                >
-                  <i className="fab fa-twitter text-sm"></i>
-                </a>
-                <a
-                  href="https://facebook.com" // Replace with actual link
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
-                >
-                  <i className="fab fa-facebook-f text-sm"></i>
-                </a>
-                <a
-                  href="https://instagram.com" // Replace with actual link
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors"
-                >
-                  <i className="fab fa-instagram text-sm"></i>
-                </a>
-              </div>
-            </div>
-
-            {/* Newsletter */}
-            <div>
-              <h3 className="font-bold text-gray-800 mb-4">Newsletter</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                Subscribe for the latest updates and promotions.
-              </p>
-              <div className="flex flex-col gap-2">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
-                <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer Bottom */}
-          <div className="border-t border-gray-200 mt-8 pt-6 text-center">
-            <p className="text-gray-600 text-sm">
-              © {new Date().getFullYear()} Locarto. All rights reserved. {/* Dynamic Year */}
-            </p>
-          </div>
-        </div>
-      </footer>
-
+      {/* Footer - Using the same Footer component as Landing Page */}
+      <Footer />
 
       {/* Error Message Modal */}
       {showError && (
@@ -655,14 +538,12 @@ const Homepage = () => {
               Try one of these available categories:
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
-              {/* Uses the updated availableCategories */}
               {availableCategories.map((category) => (
                 <button
                   key={category}
                   onClick={() => handleSuggestionClick(category)}
                   className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-md hover:shadow-lg transform hover:scale-105"
                 >
-                  {/* Capitalize first letter */}
                   {category.charAt(0).toUpperCase() + category.slice(1)}
                 </button>
               ))}
