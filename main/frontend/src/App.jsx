@@ -11,11 +11,10 @@ import LandingPage from "./pages/Landingpage";
 import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage"; // <-- Import the new page
 
 import VendorRoutes from "./pages/vendor/vendorRoutes";
-
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
-
 import AdminRoutes from "./pages/admin/adminRoutes";
 
 import { ConsumerDataProvider } from "./context/consumer/consumerDataContext";
@@ -46,6 +45,8 @@ function App() {
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} /> {/* <-- Add this route */}
+
           {/* --- ADMIN ROUTES --- */}
           <Route path="admin/*" element={<AdminRoutes />} />
           {/* --- VENDOR ROUTES --- */}

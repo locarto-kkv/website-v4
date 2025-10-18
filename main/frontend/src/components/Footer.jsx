@@ -1,4 +1,6 @@
+// src/components/Footer.jsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; // <-- Import Link
 import FAQModal from './FAQModal';
 
 const Footer = () => {
@@ -10,7 +12,7 @@ const Footer = () => {
         <div className="max-w-6xl mx-auto">
           {/* Decorative top border */}
           <div className="border-t border-gray-700 mb-6 sm:mb-8"></div>
-          
+
           {/* Footer content grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
             {/* Brand section */}
@@ -52,16 +54,18 @@ const Footer = () => {
               <h4 className="font-bold text-white text-base mb-3 sm:mb-4">Company</h4>
               <ul className="space-y-2 sm:space-y-3">
                 <li>
-                  <a
-                    href="#"
+                  {/* Updated Link */}
+                  <Link
+                    to="/privacy-policy" // <-- Change href to 'to' and set the route
                     className="text-gray-400 hover:text-white text-sm transition-colors duration-200"
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
+                  {/* Keep Terms of Service as is, or update similarly if you create a page for it */}
                   <a
-                    href="#"
+                    href="#" // Assuming this doesn't exist yet
                     className="text-gray-400 hover:text-white text-sm transition-colors duration-200"
                   >
                     Terms of Service
@@ -84,9 +88,9 @@ const Footer = () => {
       </footer>
 
       {/* FAQ Modal */}
-      <FAQModal 
-        isOpen={isFaqModalOpen} 
-        onClose={() => setIsFaqModalOpen(false)} 
+      <FAQModal
+        isOpen={isFaqModalOpen}
+        onClose={() => setIsFaqModalOpen(false)}
       />
     </>
   );
