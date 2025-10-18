@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState , useEffect} from "react";
 import { Link } from "react-router-dom";
-import { useBlogs } from "../context/blogContext.jsx";
+
 
 // Components
 import Navbar from "../components/Navbar.jsx";
@@ -8,7 +8,9 @@ import Footer from "../components/Footer.jsx";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import WhatInItForYou from "../components/landing/WhatInItForYou.jsx";
 import RegisterSocial from "../components/RegisterSocial.jsx";
-import WaitlistPopup from "../components/landing/WaitListPopup.jsx"; // Import the new component
+import WaitlistPopup from "../components/landing/WaitListPopup.jsx";
+import { useBlogs } from "../context/blogContext.jsx";
+
 
 // Assets
 import tagImg from "../assets/tag.png";
@@ -147,6 +149,9 @@ const LandingPage = () => {
                 SMART CUSTOMERS
               </p>
             </div>
+            
+           
+
             {/* Video Section */}
             <div className="mt-28 w-full px-4 flex justify-center relative z-10 animate-[fadeIn_2s_ease-in]">
               <div className="relative group">
@@ -194,11 +199,14 @@ const LandingPage = () => {
               "
                 >
                   {blogs &&
-                    blogs.slice(0, 3).map((brand, idx) => (
-                      <div key={brand.id} className="flex justify-center">
-                        <BrandIdentityCard brand={brand} />
-                      </div>
-                    ))}
+                    blogs
+                      .filter((b) => b.blog)
+                      .slice(0, 3)
+                      .map((brand, idx) => (
+                        <div key={brand.id} className="flex justify-center">
+                          <BrandIdentityCard brand={brand} />
+                        </div>
+                      ))}
                 </div>
               </div>
             </div>
