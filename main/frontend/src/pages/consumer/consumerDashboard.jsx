@@ -1,692 +1,246 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+// src/pages/consumer/consumerDashboard.jsx
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation, Outlet, Link } from "react-router-dom";
+import { useConsumerData } from "../../context/consumer/consumerDataContext"; //
+import { useAuthStore } from "../../store/useAuthStore"; //
 
-// Mock components - replace with your actual imports
-const Navbar = ({ cartItems, onCartIconClick }) => (
-  <nav className="fixed top-0 left-0 right-0 h-[70px] bg-white shadow-md z-50 flex items-center px-6">
-    <div className="text-2xl font-bold text-orange-500">LOCARTO</div>
-    <div className="ml-auto flex items-center gap-4">
-      <button onClick={onCartIconClick} className="relative">
-        <i className="fas fa-shopping-cart text-xl"></i>
-        {cartItems.length > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {cartItems.length}
-          </span>
-        )}
-      </button>
-    </div>
-  </nav>
-);
+// Import the logo image
+import locartoImg from "../../../src/assets/locarto.png"; //
 
-const DateTimeDisplay = ({ dateString }) => {
-  const date = new Date(dateString);
-  return <span>{date.toLocaleDateString()}</span>;
-};
-
-const CustomerDashboard = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const [prices, setPrices] = useState({
-    subtotal: 0,
-    shipping: 5.99,
-    tax: 0,
-    total: 0,
-  });
-  const [zipCode, setZipCode] = useState("");
-  const [country, setCountry] = useState("UNITED STATES");
-  const [wishlistItems, setWishlistItems] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [activeTab, setActiveTab] = useState("overview");
-
-  const [reviewForm, setReviewForm] = useState({
-    rating: 0,
-    title: "",
-    content: "",
-  });
-
+// Navbar Component (Modified profile dropdown links)
+const Navbar = ({ onCartClick, cartCount }) => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { currentUser, logout, logoutLoading } = useAuthStore(); //
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
 
-  // Scroll to top on navigation
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-
-  // Check for URL parameter to auto-select cart tab
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('tab') === 'cart') {
-      setActiveTab("cart");
-    }
-  }, []);
-
-  useEffect(() => {
-    // Mock data - replace with actual API calls
-    const mockOrders = [
-      {
-        id: 1,
-        product: { name: "Mechanical Keyboard", price: 2999 },
-        created_at: new Date().toISOString(),
-        order_status: "delivered",
-        delivery_date: "2024-01-15"
-      },
-      {
-        id: 2,
-        product: { name: "Gaming Mouse", price: 1499 },
-        created_at: new Date().toISOString(),
-        order_status: "shipped",
-        delivery_date: "2024-01-20"
-      }
-    ];
-    setOrders(mockOrders);
-  }, []);
-
-  const updateQuantity = (item, change) => {
-    const newQty = Math.max(1, item.quantity + change);
-    const updatedCart = cartItems.map(i => 
-      i.id === item.id ? { ...i, quantity: newQty } : i
-    );
-    setCartItems(updatedCart);
-    updatePrices(updatedCart);
-  };
-
-  const updatePrices = (items) => {
-    const subtotal = items.reduce((sum, item) => {
-      return sum + item.price * item.quantity;
-    }, 0);
-    const shipping = 5.99;
-    const tax = subtotal * 0.08;
-    const total = subtotal + shipping + tax;
-
-    setPrices({ subtotal, shipping, tax, total });
-  };
-
-  const removeFromCart = (id) => {
-    const updatedCart = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedCart);
-    updatePrices(updatedCart);
-  };
-
-  const removeFromWishlist = (id) => {
-    setWishlistItems(wishlistItems.filter((item) => item.id !== id));
-  };
-
-  const handleReviewSubmit = (e) => {
+  const handleLogout = async (e) => { //
     e.preventDefault();
-    alert("Review submitted successfully!");
-    setReviewForm({ rating: 0, title: "", content: "" });
+    await logout(currentUser?.type); //
+    setDropdownOpen(false);
+    // Navigation back to home ('/') is handled within the logout function in useAuthStore
   };
 
-  const handleZipChange = (e) => {
-    setZipCode(e.target.value);
-  };
+  // Link to consumer settings/profile page
+  const profileLink = "/consumer/dashboard/settings"; //
 
-  const handleShopNow = () => {
-    navigate("/landing");
-  };
+   // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => { //
+      if (
+        dropdownOpen &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) && //
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target) //
+      ) {
+        setDropdownOpen(false); //
+      }
+    };
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "cart":
-        return renderCartSection();
-      case "wishlist":
-        return renderWishlistSection();
-      case "orders":
-        return renderOrdersSection();
-      case "reviews":
-        return renderReviewsSection();
-      default:
-        return renderOverviewSection();
-    }
-  };
+    document.addEventListener("mousedown", handleClickOutside); //
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside); //
+    };
+  }, [dropdownOpen]);
 
-  const renderCartSection = () => (
-    <div className="space-y-6">
-      <div className="lg:col-span-2">
-        {cartItems.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <i className="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
-            <h2 className="text-xl font-semibold text-gray-700">Your cart is empty</h2>
-            <p className="text-gray-500 mt-2">Add some products to get started!</p>
-            <button
-              onClick={handleShopNow}
-              className="mt-4 bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-lg"
-            >
-              Continue Shopping
-            </button>
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            {cartItems.map((item) => (
-              <div key={item.id} className="border-b p-4 flex items-start">
-                <img
-                  src={item.image || "https://via.placeholder.com/100"}
-                  alt={item.name}
-                  className="w-20 h-20 object-cover rounded-md mr-4"
-                />
-                <div className="flex-1">
-                  <h3 className="font-medium text-blue-700">{item.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    {item.sku && `SKU: ${item.sku}`}
-                  </p>
-                  <p className="text-sm text-gray-600">₹{item.price.toFixed(2)}</p>
-                  <div className="mt-2 flex items-center space-x-2">
-                    <button
-                      className="w-8 h-8 border border-gray-300 flex items-center justify-center rounded hover:bg-gray-100"
-                      onClick={() => updateQuantity(item, -1)}
-                    >
-                      -
-                    </button>
-                    <span className="w-12 text-center">{item.quantity}</span>
-                    <button
-                      className="w-8 h-8 border border-gray-300 flex items-center justify-center rounded hover:bg-gray-100"
-                      onClick={() => updateQuantity(item, 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-                <div className="text-right ml-4">
-                  <p className="font-bold">₹{(item.price * item.quantity).toFixed(2)}</p>
-                  <button
-                    className="text-red-500 hover:text-red-700 text-sm mt-1"
-                    onClick={() => removeFromCart(item.id)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            <div className="bg-gray-50 p-4 flex justify-between font-bold text-lg">
-              <span>Item Total:</span>
-              <span>₹{prices.subtotal.toFixed(2)}</span>
-            </div>
-          </div>
-        )}
-
-        <div className="mt-8 bg-gray-100 p-6 rounded-lg">
-          <h2 className="flex items-center text-xl font-semibold mb-2">
-            <i className="fas fa-clock mr-2"></i>
-            Saved for Later
-          </h2>
-          <p className="text-gray-600">Stash ideas here, commitment-free!</p>
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold mb-4">ESTIMATE SHIPPING & TAX</h2>
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <input type="checkbox" id="pickup" className="mr-2" />
-              <label htmlFor="pickup" className="text-sm">NYC SuperStore Pickup</label>
-              <a href="#" className="ml-2 text-blue-600 text-sm">See Details</a>
-            </div>
-            <select
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-            >
-              <option>UNITED STATES</option>
-              <option>CANADA</option>
-              <option>UK</option>
-            </select>
-            <div className="flex items-center">
-              <label className="text-sm mr-2">Zip Code</label>
-              <input
-                type="text"
-                value={zipCode}
-                onChange={handleZipChange}
-                placeholder="Enter Zip Code"
-                className="flex-1 p-3 border border-gray-300 rounded-lg"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span>₹{prices.subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping:</span>
-              <span>₹{prices.shipping.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Sales Tax:</span>
-              <span>₹{prices.tax.toFixed(2)}</span>
-            </div>
-            <div className="border-t pt-3 mt-3 flex justify-between font-bold text-lg">
-              <span>Total:</span>
-              <span>₹{prices.total.toFixed(2)}</span>
-            </div>
-          </div>
-
-          <button className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold flex items-center justify-center">
-            <i className="fas fa-lock mr-2"></i>
-            Begin Checkout
-          </button>
-        </div>
-
-        <div className="flex space-x-4">
-          <button className="flex-1 bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded-lg text-sm">
-            Move All to Wish List
-          </button>
-          <button className="flex-1 bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded-lg text-sm">
-            Remove All
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderWishlistSection = () => (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Wishlist</h2>
-      {wishlistItems.length === 0 ? (
-        <p className="text-gray-500">Your wishlist is empty.</p>
-      ) : (
-        <div className="space-y-4">
-          {wishlistItems.map((item) => (
-            <div key={item.id} className="flex items-center">
-              <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
-              <div className="flex-1">
-                <h3 className="font-medium">{item.name}</h3>
-                <p className="text-gray-600 text-sm">₹{item.price}</p>
-              </div>
-              <button
-                className="text-red-500 hover:text-red-700"
-                onClick={() => removeFromWishlist(item.id)}
-              >
-                <i className="fas fa-trash"></i>
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
-  const renderOrdersSection = () => (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-800">Recent Orders</h2>
-        <a href="#" className="text-orange-500 hover:text-orange-600">
-          View All
-        </a>
-      </div>
-
-      <div className="space-y-4">
-        {orders.map((order) => (
-          <div
-            key={order.id}
-            className="flex items-center border-b pb-4 last:border-b-0"
-          >
-            <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4">
-              <img src="https://media.wired.com/photos/65b0438c22aa647640de5c75/master/pass/Mechanical-Keyboard-Guide-Gear-GettyImages-1313504623.jpg" alt="Product" className="w-full h-full object-cover rounded-lg" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-medium">{order.product.name}</h3>
-              <p className="text-gray-600 text-sm">
-                <DateTimeDisplay dateString={order.created_at} />
-              </p>
-              <p className="text-gray-600 text-sm">
-                {order.order_status === "delivered"
-                  ? `Delivered on ${order.delivery_date}`
-                  : order.order_status === "shipped"
-                  ? `Shipped on ${order.delivery_date}`
-                  : order.order_status}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="font-medium">₹{order.product.price}</p>
-              <span
-                className={`${
-                  order.order_status === "delivered"
-                    ? "bg-green-100 text-green-800"
-                    : order.order_status === "shipped"
-                    ? "bg-blue-100 text-blue-800"
-                    : "bg-yellow-100 text-yellow-800"
-                } text-xs font-medium px-2.5 py-0.5 rounded-full`}
-              >
-                {order.order_status.charAt(0).toUpperCase() +
-                  order.order_status.slice(1)}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderReviewsSection = () => (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Leave a Review</h2>
-      <div className="flex items-center mb-6">
-        <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
-        <div>
-          <h3 className="font-medium">Wireless Headphones</h3>
-          <p className="text-gray-600 text-sm">
-            Order #ORD-7841 • Delivered
-          </p>
-        </div>
-      </div>
-
-      <form onSubmit={handleReviewSubmit} className="space-y-4">
-        <div>
-          <label className="block text-gray-700 mb-2">Rating</label>
-          <div className="flex text-2xl text-yellow-400">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <i
-                key={star}
-                className={`fas fa-star cursor-pointer hover:text-yellow-500 ${
-                  star <= reviewForm.rating
-                    ? "text-yellow-400"
-                    : "text-gray-300"
-                }`}
-                onClick={() =>
-                  setReviewForm({ ...reviewForm, rating: star })
-                }
-              ></i>
-            ))}
-          </div>
-        </div>
-        <div>
-          <label className="block text-gray-700 mb-2">Review Title</label>
-          <input
-            type="text"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            placeholder="Great product!"
-            value={reviewForm.title}
-            onChange={(e) =>
-              setReviewForm({ ...reviewForm, title: e.target.value })
-            }
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 mb-2">Review</label>
-          <textarea
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            rows="4"
-            placeholder="Share your experience with this product..."
-            value={reviewForm.content}
-            onChange={(e) =>
-              setReviewForm({ ...reviewForm, content: e.target.value })
-            }
-            required
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          className="bg-orange-500 text-white py-3 px-6 rounded-lg font-bold hover:bg-orange-600 transition"
-        >
-          Submit Review
-        </button>
-      </form>
-    </div>
-  );
-
-  const renderOverviewSection = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Recent Orders</h2>
-          <button 
-            onClick={() => setActiveTab("orders")}
-            className="text-orange-500 hover:text-orange-600"
-          >
-            View All
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          {orders.slice(0, 3).map((order) => (
-            <div
-              key={order.id}
-              className="flex items-center border-b pb-4 last:border-b-0"
-            >
-              <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4">
-                <img src="https://media.wired.com/photos/65b0438c22aa647640de5c75/master/pass/Mechanical-Keyboard-Guide-Gear-GettyImages-1313504623.jpg" alt="Product" className="w-full h-full object-cover rounded-lg" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium">{order.product.name}</h3>
-                <p className="text-gray-600 text-sm">
-                  <DateTimeDisplay dateString={order.created_at} />
-                </p>
-                <p className="text-gray-600 text-sm">
-                  {order.order_status === "delivered"
-                    ? `Delivered on ${order.delivery_date}`
-                    : order.order_status === "shipped"
-                    ? `Shipped on ${order.delivery_date}`
-                    : order.order_status}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="font-medium">₹{order.product.price}</p>
-                <span
-                  className={`${
-                    order.order_status === "delivered"
-                      ? "bg-green-100 text-green-800"
-                      : order.order_status === "shipped"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  } text-xs font-medium px-2.5 py-0.5 rounded-full`}
-                >
-                  {order.order_status.charAt(0).toUpperCase() +
-                    order.order_status.slice(1)}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">Leave a Review</h2>
-        <div className="flex items-center mb-6">
-          <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
-          <div>
-            <h3 className="font-medium">Wireless Headphones</h3>
-            <p className="text-gray-600 text-sm">
-              Order #ORD-7841 • Delivered
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handleReviewSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 mb-2">Rating</label>
-            <div className="flex text-2xl text-yellow-400">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <i
-                  key={star}
-                  className={`fas fa-star cursor-pointer hover:text-yellow-500 ${
-                    star <= reviewForm.rating
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                  onClick={() =>
-                    setReviewForm({ ...reviewForm, rating: star })
-                  }
-                ></i>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Review Title</label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              placeholder="Great product!"
-              value={reviewForm.title}
-              onChange={(e) =>
-                setReviewForm({ ...reviewForm, title: e.target.value })
-              }
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Review</label>
-            <textarea
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              rows="4"
-              placeholder="Share your experience with this product..."
-              value={reviewForm.content}
-              onChange={(e) =>
-                setReviewForm({ ...reviewForm, content: e.target.value })
-              }
-              required
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            className="bg-orange-500 text-white py-3 px-6 rounded-lg font-bold hover:bg-orange-600 transition"
-          >
-            Submit Review
-          </button>
-        </form>
-      </div>
-    </div>
-  );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar
-        cartItems={cartItems}
-        onCartIconClick={() => setActiveTab("cart")}
-      />
+    <nav className="fixed top-0 left-0 right-0 h-[70px] bg-white shadow-md z-50 flex items-center px-6 border-b border-gray-100">
+      {/* Logo */}
+      <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <img
+          src={locartoImg} //
+          alt="Locarto Logo"
+          className="h-14 w-auto object-contain scale-125 translate-y-[2px]" //
+        />
+      </Link>
 
-      <div className="flex pt-[70px]">
-        {/* Sidebar - Fixed */}
-        <aside className="w-64 bg-white shadow-md h-[calc(100vh-70px)] flex-shrink-0">
-          <div className="p-4">
-            <ul className="space-y-3 pt-4">
-              <li>
-                <button
-                  onClick={() => setActiveTab("overview")}
-                  className={`w-full text-left py-3 px-4 rounded-lg transition font-medium flex items-center justify-between ${
-                    activeTab === "overview"
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  Overview
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setActiveTab("cart")}
-                  className={`w-full text-left py-3 px-4 rounded-lg transition font-medium flex items-center justify-between ${
-                    activeTab === "cart"
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  <span>Cart</span>
-                  {cartItems.length > 0 && (
-                    <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {cartItems.length}
-                    </span>
-                  )}
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setActiveTab("wishlist")}
-                  className={`w-full text-left py-3 px-4 rounded-lg transition font-medium flex items-center justify-between ${
-                    activeTab === "wishlist"
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  <span>Wishlist</span>
-                  {wishlistItems.length > 0 && (
-                    <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {wishlistItems.length}
-                    </span>
-                  )}
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setActiveTab("orders")}
-                  className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-                    activeTab === "orders"
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  Orders
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setActiveTab("reviews")}
-                  className={`w-full text-left py-3 px-4 rounded-lg transition font-medium ${
-                    activeTab === "reviews"
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  Reviews
-                </button>
-              </li>
-            </ul>
-          </div>
-        </aside>
+      {/* Right side actions */}
+      <div className="ml-auto flex items-center gap-4">
+        {/* Notifications */}
+        <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <i className="fas fa-bell text-xl text-gray-700"></i> {/* */}
+          {/* Example notification badge - replace '2' with dynamic count */}
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg"> {/* */}
+             2
+          </span>
+        </button>
 
-        {/* Main Content - Scrollable */}
-        <main className="flex-1 h-[calc(100vh-70px)] overflow-y-auto">
-          <div className="p-6">
-            <h1 className="text-3xl font-bold mb-6">Customer Dashboard</h1>
-            
-            {/* Dashboard Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-orange-500">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-gray-600">Total Orders</p>
-                    <h3 className="text-3xl font-bold mt-2">{orders.length}</h3>
-                  </div>
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <i className="fas fa-shopping-bag text-orange-500 text-xl"></i>
-                  </div>
-                </div>
-              </div>
+        {/* Cart */}
+        <button
+          onClick={onCartClick}
+          className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors" //
+        >
+          <i className="fas fa-shopping-cart text-xl text-gray-700"></i> {/* */}
+          {cartCount > 0 && ( //
+            <span className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg"> {/* */}
+              {cartCount} {/* */}
+            </span>
+          )}
+        </button>
 
-              <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-orange-500">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-gray-600">Wishlist</p>
-                    <h3 className="text-3xl font-bold mt-2">
-                      {wishlistItems.length}
-                    </h3>
-                  </div>
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <i className="fas fa-heart text-orange-500 text-xl"></i>
-                  </div>
-                </div>
-              </div>
+        {/* User Profile Dropdown - UPDATED */}
+        <div className="relative">
+          <button
+            ref={buttonRef} //
+            onClick={() => setDropdownOpen(!dropdownOpen)} //
+            className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition" //
+          >
+            <i className="fas fa-user-circle text-xl"></i> {/* */}
+          </button>
 
-              <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-orange-500">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-gray-600">Reviews</p>
-                    <h3 className="text-3xl font-bold mt-2">{reviews.length}</h3>
-                  </div>
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <i className="fas fa-star text-orange-500 text-xl"></i>
-                  </div>
-                </div>
-              </div>
+           {/* Dropdown Menu - UPDATED */}
+           {dropdownOpen && (
+            <div
+              ref={dropdownRef} //
+              className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md z-50 border border-gray-100" //
+            >
+              {/* Changed Settings to Profile */}
+              <Link
+                to={profileLink} // Stays pointing to settings page for now
+                className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors" //
+                onClick={() => setDropdownOpen(false)} //
+              >
+                <i className="fas fa-user mr-2 text-gray-500"></i> {/* Changed Icon */}
+                 Profile {/* Changed Text */}
+              </Link>
+              {/* Logout button */}
+              <button
+                onClick={handleLogout} //
+                className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center" //
+                disabled={logoutLoading} //
+              >
+                <i className="fas fa-sign-out-alt mr-2 text-gray-500"></i> {/* Kept Icon */}
+                {logoutLoading ? "Logging Out..." : "Logout"} {/* */}
+              </button>
             </div>
+          )}
+        </div>
+        {/* --- End User Profile Dropdown --- */}
 
-            {/* Main Content Area */}
-            {renderContent()}
+      </div>
+    </nav>
+  );
+};
+
+// --- CustomerSidebar and CustomerDashboardLayout remain unchanged ---
+// Sidebar Component
+const CustomerSidebar = ({ cartCount, wishlistCount }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const activePath = location.pathname;
+
+  const menuItems = [
+    { id: "overview", label: "Overview", icon: "fas fa-home", badge: null, path: "/consumer/dashboard/overview" }, //
+    { id: "orders", label: "Orders", icon: "fas fa-box", badge: null, path: "/consumer/dashboard/orders" }, //
+    { id: "lists", label: "Lists", icon: "fas fa-list", badge: cartCount + wishlistCount, path: "/consumer/dashboard/lists" }, //
+    { id: "reviews", label: "Reviews", icon: "fas fa-star", badge: null, path: "/consumer/dashboard/reviews" }, //
+    { id: "support", label: "Support", icon: "fas fa-headset", badge: null, path: "/consumer/dashboard/support" }, //
+    { id: "settings", label: "Settings", icon: "fas fa-cog", badge: null, path: "/consumer/dashboard/settings" }, //
+  ];
+
+  const isActive = (itemPath) => { //
+    return activePath === itemPath || (activePath === "/consumer/dashboard" && itemPath === "/consumer/dashboard/overview"); //
+  };
+
+  return (
+    <aside className="w-64 bg-white shadow-lg border-r border-gray-200 h-[calc(100vh-70px)] flex-shrink-0"> {/* */}
+      <div className="p-4"> {/* */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100"> {/* */}
+          <h3 className="font-bold text-gray-900 mb-1">Customer Portal</h3> {/* */}
+          <p className="text-sm text-gray-600">Manage your shopping</p> {/* */}
+        </div>
+
+        <ul className="space-y-2"> {/* */}
+          {menuItems.map((item) => ( //
+            <li key={item.id}> {/* */}
+              <button
+                onClick={() => navigate(item.path)} //
+                className={`group w-full text-left py-3 px-4 rounded-xl transition-all duration-300 font-medium flex items-center gap-3 ${ //
+                  isActive(item.path) //
+                    ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg transform scale-105" //
+                    : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 hover:shadow-md hover:scale-105" //
+                }`}
+              >
+                <i
+                  className={`${item.icon} text-lg ${ //
+                    isActive(item.path) //
+                      ? "text-white" //
+                      : "text-gray-500 group-hover:text-orange-500" //
+                  } transition-colors duration-300`}
+                ></i>
+                <span className="font-semibold flex-1">{item.label}</span> {/* */}
+
+                {item.badge > 0 && ( //
+                  <span className={`text-xs rounded-full h-5 min-w-[20px] px-2 flex items-center justify-center font-bold ${ //
+                    isActive(item.path) //
+                      ? "bg-white text-orange-500" //
+                      : "bg-orange-500 text-white" //
+                  }`}>
+                    {item.badge} {/* */}
+                  </span>
+                )}
+
+                {isActive(item.path) && ( <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div> )} {/* */}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </aside>
+  );
+};
+
+// Main Layout Component
+const CustomerDashboardLayout = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { lists } = useConsumerData(); //
+
+  const cartItems = lists?.cart ? Object.values(lists.cart) : []; //
+  const wishlistItems = lists?.wishlist ? [...lists.wishlist] : []; //
+
+  const getPageTitle = () => { //
+    const path = location.pathname;
+    if (path.endsWith("/orders")) return "My Orders"; //
+    if (path.endsWith("/lists")) return "My Lists"; //
+    if (path.endsWith("/reviews")) return "My Reviews"; //
+    if (path.endsWith("/support")) return "Customer Support"; //
+    if (path.endsWith("/settings")) return "Account Settings"; //
+    return "Dashboard Overview"; // Default title for overview or base path
+  };
+  const getPageDescription = () => { //
+     const path = location.pathname;
+    if (path.endsWith("/orders")) return "Track and manage all your orders in one place"; //
+    if (path.endsWith("/lists")) return "Manage your cart and wishlist items"; //
+    if (path.endsWith("/reviews")) return "Share your feedback on purchased products"; //
+    if (path.endsWith("/support")) return "Get help with your orders and account"; //
+    if (path.endsWith("/settings")) return "Manage your account preferences and information"; //
+    return "Welcome back! Here's what's happening with your orders."; // Default
+  }
+  const pageTitle = getPageTitle();
+  const pageDescription = getPageDescription();
+
+  return (
+    <div className="min-h-screen bg-gray-50"> {/* */}
+      <Navbar
+        onCartClick={() => navigate("/consumer/dashboard/lists")} //
+        cartCount={cartItems.length} //
+      />
+      <div className="flex pt-[70px]"> {/* */}
+        <CustomerSidebar
+          cartCount={cartItems.length} //
+          wishlistCount={wishlistItems.length} //
+        />
+        <main className="flex-1 h-[calc(100vh-70px)] overflow-y-auto"> {/* */}
+          <div className="p-8"> {/* */}
+             <div className="mb-8"> {/* */}
+               <h1 className="text-3xl font-bold text-gray-900 mb-2">{pageTitle}</h1> {/* */}
+               <p className="text-gray-600">{pageDescription}</p> {/* */}
+            </div>
+            <Outlet /> {/* */}
           </div>
         </main>
       </div>
@@ -694,4 +248,4 @@ const CustomerDashboard = () => {
   );
 };
 
-export default CustomerDashboard;
+export default CustomerDashboardLayout; //

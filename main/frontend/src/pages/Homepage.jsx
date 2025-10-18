@@ -104,12 +104,12 @@ const Homepage = () => {
       <Navbar pageType="homepage" />
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 pt-16">
         <div className="max-w-6xl w-full mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-20">
-            {/* Multi-Logo Gallery with Orange Tinted Logos */}
-            <div className="relative mx-auto mb-16">
+            {/* Multi-Logo Gallery with Orange Tinted Logos - REDUCED HEIGHT */}
+            <div className="relative mx-auto mb-8 mt-8">
               <div className="w-full max-w-5xl mx-auto">
                 {/* Massive animated background effects */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-red-500 via-pink-500 via-purple-500 to-blue-500 rounded-3xl blur-3xl opacity-15 animate-pulse scale-110"></div>
@@ -122,9 +122,9 @@ const Homepage = () => {
                   style={{ animationDelay: "1s" }}
                 ></div>
 
-                {/* Horizontal Logo Container */}
-                <div className="relative z-10 flex justify-center items-center gap-8 lg:gap-16 py-16 px-4">
-                  {/* Logo Images Array */}
+                {/* Horizontal Logo Container - REDUCED PADDING */}
+                <div className="relative z-10 flex justify-center items-center gap-6 lg:gap-12 py-8 px-4">
+                  {/* Logo Images Array - SMALLER SIZES */}
                   {[1, 2, 3, 4, 5].map((logoNumber, index) => (
                     <div
                       key={logoNumber}
@@ -134,13 +134,13 @@ const Homepage = () => {
                         animation: "float 4s ease-in-out infinite",
                       }}
                     >
-                      {/* Logo container - just for positioning */}
-                      <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 flex items-center justify-center relative">
-                        {/* Logo Image - Floating freely with no container */}
+                      {/* Logo container - REDUCED SIZE */}
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 flex items-center justify-center relative">
+                        {/* Logo Image - SMALLER */}
                         <img
                           src={`/src/assets/${logoNumber}.png`}
                           alt={`Locarto Logo ${logoNumber}`}
-                          className="relative z-10 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain transition-all duration-700 transform group-hover:rotate-12 group-hover:scale-110"
+                          className="relative z-10 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain transition-all duration-700 transform group-hover:rotate-12 group-hover:scale-110"
                           style={{
                             filter:
                               "drop-shadow(0 15px 35px rgba(255,100,50,0.4)) drop-shadow(0 5px 15px rgba(255,120,60,0.3))",
@@ -245,15 +245,15 @@ const Homepage = () => {
               </div>
             </div>
 
-            {/* Enhanced Main Heading with Multiple Effects */}
-            <div className="relative mb-12">
-              <div className="text-center space-y-4">
-                <h1 className="text-4xl sm:text-5xl md:text-4xl lg:text-5xl xl:text-6xl font-black relative">
+            {/* Enhanced Main Heading with Multiple Effects - REDUCED MARGIN */}
+            <div className="relative mb-6">
+              <div className="text-center space-y-3">
+                <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-5xl font-black relative">
                   <span className="bg-gradient-to-r from-gray-900 via-black to-gray-800 bg-clip-text text-transparent relative z-10 block leading-normal">
                     What are you in the
                   </span>
                 </h1>
-                <h1 className="text-4xl sm:text-5xl md:text-4xl lg:text-5xl xl:text-6xl font-black relative">
+                <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl xl:text-5xl font-black relative">
                   <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent relative z-10 block animate-pulse leading-normal">
                     mood for today?
                   </span>
@@ -264,8 +264,8 @@ const Homepage = () => {
               </div>
             </div>
 
-            {/* Enhanced Subtitle with Animation */}
-            <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+            {/* Enhanced Subtitle with Animation - REDUCED MARGIN */}
+            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed font-light">
               <span className="inline-block animate-fade-in-up">
                 Discover the{" "}
               </span>{" "}
