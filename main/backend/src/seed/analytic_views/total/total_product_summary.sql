@@ -8,6 +8,9 @@ SELECT
     p.quantity AS quantity,
     p.price AS price,
     p.category AS category,
+    p.product_images AS product_images,
+    p.status AS status,
+    p.description AS description,
     -- basic aggregations
     COUNT(DISTINCT o.id) AS orders_count,
     COUNT(DISTINCT o.consumer_id) AS consumers_count,

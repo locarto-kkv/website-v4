@@ -10,11 +10,13 @@ export const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const { data: userProfile } = await db
+    const { data } = await db
       .from("vendors")
       .select()
       .eq("id", userId)
       .single();
+
+    const { password, ...userProfile } = data;
 
     res.status(200).json(userProfile);
   } catch (error) {

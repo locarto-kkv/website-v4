@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useVendorData } from "../../../context/vendor/vendorDataContext";
 import { VendorProfileService } from "../../../services/vendor/vendorProfileService";
 
 const VendorLocationSetup = () => {
@@ -10,12 +11,11 @@ const VendorLocationSetup = () => {
   const [marker, setMarker] = useState(null);
   const [pincode, setPincode] = useState("");
   const [address, setAddress] = useState("");
-  const [category, setCategory] = useState("");
   const [coords, setCoords] = useState({ lat: "", lng: "" });
   const [loading, setLoading] = useState(false);
-  const [shopName, setShopName] = useState("");
 
-  const { getProfile, updateProfile } = VendorProfileService;
+  const { vendor, profile } = useVendorData();
+  console.log(profile);
 
   // Effect to initialize the map instance. Runs only once on mount.
   useEffect(() => {
@@ -174,33 +174,24 @@ const VendorLocationSetup = () => {
       setCoords({ lat: "", lng: "" });
       setPincode("");
       setAddress("");
-      setCategory("");
-      setShopName("");
     }
   };
 
   const handleSave = () => {
-    if (coords.lat && coords.lng && category && address && shopName) {
-      const newShop = {
+    if (coords.lat && coords.lng && address) {
+      const newLocation = {
         id: `new-shop-${Date.now()}`,
-        name: shopName,
-        location: address,
         position: [parseFloat(coords.lat), parseFloat(coords.lng)],
         address: address,
         pincode: pincode,
-        category: category,
       };
 
-      const existingShops = JSON.parse(localStorage.getItem("newShops")) || [];
-      localStorage.setItem(
-        "newShops",
-        JSON.stringify([...existingShops, newShop])
-      );
+      console.log(newLocation);
 
       alert("Shop location saved!");
-      navigate("/map");
+      navigate("/vendor/profile");
     } else {
-      alert("Please enter shop name, set a location, and choose a category.");
+      alert("Please enter shop name and set a location.");
     }
   };
 
@@ -241,9 +232,8 @@ const VendorLocationSetup = () => {
                 To establish your shop location, you can either use your current
                 location, enter a pincode, or click anywhere on the interactive
                 map to place a location pin. The address will be automatically
-                fetched and displayed. After positioning your pin, select your
-                business category from the dropdown menu and click "Save Shop &
-                Continue" to proceed.
+                fetched and displayed. After positioning your pin, click "Save
+                Pin & Continue" to proceed.
               </p>
             </div>
           </div>
@@ -253,42 +243,6 @@ const VendorLocationSetup = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
             <div className="lg:col-span-1 p-6 bg-gray-50 border-r border-gray-200">
               <div className="space-y-6">
-                {/* Shop Name Section */}
-                <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <svg
-                      className="w-5 h-5 text-orange-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                      />
-                    </svg>
-                    Shop Name
-                  </h3>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Enter your shop name
-                    </label>
-                    <input
-                      type="text"
-                      value={shopName}
-                      onChange={(e) => setShopName(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                      placeholder="e.g., Raj Electronics"
-                    />
-                    <p className="text-xs text-gray-500 mt-2">
-                      This name will be displayed on the map
-                    </p>
-                  </div>
-                </div>
-
                 {/* Current Location Button */}
                 <button
                   onClick={handleSetCurrentLocation}
@@ -413,29 +367,13 @@ const VendorLocationSetup = () => {
                   </button>
                 )}
 
-                {/* Category Section */}
-                <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                    Shop Category
-                  </h3>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">Select Category</option>
-                    <option value="Wellness">Wellness</option>
-                    <option value="Accessories">Accessories</option>
-                  </select>
-                </div>
-
                 {/* Save Button */}
                 <button
                   onClick={handleSave}
                   disabled={loading}
                   className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-green-300 disabled:to-green-400 text-white py-4 rounded-lg transition-all duration-200 font-bold text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 >
-                  Save Shop & Continue
+                  Save Pin & Continue
                 </button>
 
                 {/* Status Indicator */}

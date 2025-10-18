@@ -1,86 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { formatCurrency } from "../../../lib/utils.js";
 import { VendorProductService } from "../../../services/vendor/vendorProductService.js";
+import { useVendorData } from "../../../context/vendor/vendorDataContext.jsx";
 
 const VendorProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [viewMode, setViewMode] = useState("grid");
+  const [imagesUpdated, setImagesUpdated] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [productId, setProductId] = useState(null);
   const [productData, setProductData] = useState({
     name: "",
     description: "",
     price: "",
-    stock: "",
+    quantity: "",
     category: "",
-    image: null,
+    product_images: [],
   });
 
-  // Predefined categories list
-  const predefinedCategories = ["All", "Wellness", "Lifestyle", "Accessories"];
+  const { products, getAnalytics } = useVendorData();
 
-  // Extract unique categories from products (including predefined ones)
-  const availableCategories = [
-    ...new Set([
-      ...predefinedCategories,
-      ...products.map((product) => product.category),
-    ]),
-  ].filter((category) => category);
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      // Mock data for demonstration
-      const mockProducts = [
-        {
-          id: 1,
-          name: "Premium Wireless Headphones",
-          description:
-            "High-quality wireless headphones with noise cancellation",
-          price: 299.99,
-          stock: 15,
-          category: "Accessories",
-          image: null,
-          rating: 4.8,
-          sales: 245,
-        },
-        {
-          id: 2,
-          name: "Smart Fitness Tracker",
-          description: "Advanced fitness tracking with heart rate monitor",
-          price: 199.99,
-          stock: 8,
-          category: "Wellness",
-          image: null,
-          rating: 4.6,
-          sales: 189,
-        },
-        {
-          id: 3,
-          name: "Organic Coffee Beans",
-          description: "Premium organic coffee beans from sustainable farms",
-          price: 24.99,
-          stock: 0,
-          category: "Lifestyle",
-          image: null,
-          rating: 4.9,
-          sales: 156,
-        },
-      ];
-      setProducts(mockProducts);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const predefinedCategories = ["All", "Personal Care", "Accessories"];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -88,43 +32,83 @@ const VendorProducts = () => {
   };
 
   const handleImageChange = (e) => {
-    setProductData((prev) => ({ ...prev, image: e.target.files[0] }));
+    setProductData((prev) => ({
+      ...prev,
+      product_images: [...prev.product_images, { file: e.target.files[0] }],
+    }));
+    setImagesUpdated(true);
   };
 
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-    try {
-      const { addProduct } = VendorProductService;
-      await addProduct(productData);
-      setShowAddModal(false);
-      resetForm();
-      fetchProducts();
-    } catch (error) {
-      console.error("Error adding product:", error);
+  const handleDeleteImage = async (image, index) => {
+    if (window.confirm("Are you sure you want to delete this image?")) {
+      const updatedImages = productData.product_images.filter(
+        (_, i) => i !== index
+      );
+      setProductData({
+        ...productData,
+        product_images: updatedImages,
+      });
+      setImagesUpdated(true);
     }
   };
 
-  const handleEditProduct = (product) => {
-    setEditingProduct(product);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (editingProduct) {
+      await VendorProductService.editProduct(
+        productId,
+        productData,
+        imagesUpdated
+      );
+    } else {
+      await VendorProductService.addProduct(productData);
+    }
+
+    resetForm();
+
+    await getAnalytics();
+    setLoading(false);
+
+    setShowModal(false);
+    setProductId(null);
+    setImagesUpdated(false);
+  };
+
+  const handleEditProduct = async (product) => {
+    setEditingProduct(true);
+    setProductId(product.product_id);
+
+    const formattedImages = (product.product_images || []).map((img, i) => {
+      if (typeof img === "string") {
+        return {
+          name: `product_image_${i + 1}`,
+          url: img,
+        };
+      }
+      return img;
+    });
+
     setProductData({
       name: product.name,
       description: product.description,
       price: product.price.toString(),
-      stock: product.stock.toString(),
+      quantity: product.quantity.toString(),
       category: product.category,
-      image: null,
+      product_images: formattedImages,
     });
-    setShowEditModal(true);
+
+    setShowModal(true);
   };
 
   const handleDeleteProduct = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      try {
-        // Delete logic here
-        setProducts((prev) => prev.filter((p) => p.id !== productId));
-      } catch (error) {
-        console.error("Error deleting product:", error);
-      }
+      setLoading(true);
+      await VendorProductService.deleteProduct(productId);
+      await getAnalytics();
+
+      setLoading(false);
     }
   };
 
@@ -133,20 +117,12 @@ const VendorProducts = () => {
       name: "",
       description: "",
       price: "",
-      stock: "",
+      quantity: "",
       category: "",
-      image: null,
+      product_images: [],
     });
+    setProductId(null);
     setEditingProduct(null);
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
   };
 
   const getStockStatus = (stock) => {
@@ -173,10 +149,10 @@ const VendorProducts = () => {
   const filteredProducts = products
     .filter((product) => {
       const matchesCategory =
-        selectedCategory === "All" || product.category === selectedCategory;
+        selectedCategory === "all" || product.category === selectedCategory;
       const matchesSearch =
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase());
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
@@ -191,20 +167,6 @@ const VendorProducts = () => {
           return a.name.localeCompare(b.name);
       }
     });
-
-  if (loading) {
-    return (
-      <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-        <div className="flex flex-col items-center justify-center h-64">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-200"></div>
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-orange-600 absolute top-0 left-0"></div>
-          </div>
-          <p className="mt-4 text-gray-600 font-medium">Loading products...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -224,11 +186,13 @@ const VendorProducts = () => {
 
         <div className="flex items-center gap-4 mt-4 lg:mt-0">
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={() => setShowModal(true)}
             className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
-            <i className="fas fa-plus"></i>
-            Add Product
+            <>
+              <i className="fas fa-plus"></i>
+              Add Product
+            </>
           </button>
         </div>
       </div>
@@ -325,7 +289,7 @@ const VendorProducts = () => {
               : `Add products to the ${selectedCategory} category to get started`}
           </p>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={() => setShowModal(true)}
             className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             <i className="fas fa-plus mr-2"></i>
@@ -341,12 +305,12 @@ const VendorProducts = () => {
           }
         >
           {filteredProducts.map((product) => {
-            const stockStatus = getStockStatus(product.stock);
+            const stockStatus = getStockStatus(product.quantity);
 
             if (viewMode === "list") {
               return (
                 <div
-                  key={product.id}
+                  key={product.product_id}
                   className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300"
                 >
                   <div className="flex items-center gap-6">
@@ -382,13 +346,13 @@ const VendorProducts = () => {
                             {formatCurrency(product.price)}
                           </span>
                           <span className="text-sm text-gray-500">
-                            Stock: {product.stock}
+                            Stock: {product.quantity}
                           </span>
-                          {product.rating && (
+                          {product.avg_review && (
                             <div className="flex items-center gap-1">
                               <i className="fas fa-star text-yellow-400"></i>
                               <span className="text-sm font-medium">
-                                {product.rating}
+                                {product.avg_review}
                               </span>
                             </div>
                           )}
@@ -398,14 +362,12 @@ const VendorProducts = () => {
                           <button
                             onClick={() => handleEditProduct(product)}
                             className="p-3 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit Product"
                           >
                             <i className="fas fa-edit"></i>
                           </button>
                           <button
-                            onClick={() => handleDeleteProduct(product.id)}
+                            onClick={() => handleDeleteProduct(product)}
                             className="p-3 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete Product"
                           >
                             <i className="fas fa-trash"></i>
                           </button>
@@ -419,13 +381,13 @@ const VendorProducts = () => {
 
             return (
               <div
-                key={product.id}
+                key={product.product_id}
                 className="group bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
                 <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
-                  {product.image ? (
+                  {product.product_images ? (
                     <img
-                      src={product.image}
+                      src={product.product_images[0]?.url}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
@@ -469,33 +431,43 @@ const VendorProducts = () => {
                     </span>
                     <div className="text-right">
                       <div className="text-sm text-gray-500">
-                        Stock: {product.stock}
+                        Stock: {product.quantity}
                       </div>
-                      {product.rating && (
+                      {product.avg_review && (
                         <div className="flex items-center gap-1 justify-end mt-1">
                           <i className="fas fa-star text-yellow-400 text-xs"></i>
                           <span className="text-xs font-medium">
-                            {product.rating}
+                            {product.avg_review}
                           </span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleEditProduct(product)}
-                      className="flex-1 flex items-center justify-center gap-2 py-2 px-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                      disabled={loading}
+                      className={`${
+                        loading && "opacity-70 cursor-not-allowed"
+                      } flex-1 flex items-center justify-center gap-2 py-2 px-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium`}
                     >
                       <i className="fas fa-edit text-sm"></i>
-                      Edit
+                      {loading ? (!productId ? "Edit" : "Editing...") : "Edit"}
                     </button>
                     <button
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="flex-1 flex items-center justify-center gap-2 py-2 px-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                      onClick={() => handleDeleteProduct(product.product_id)}
+                      disabled={loading}
+                      className={`${
+                        loading && "opacity-70 cursor-not-allowed"
+                      } flex-1 flex items-center justify-center gap-2 py-2 px-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium`}
                     >
                       <i className="fas fa-trash text-sm"></i>
-                      Delete
+                      {loading
+                        ? !productId
+                          ? "Deleting..."
+                          : "Delete"
+                        : "Delete"}
                     </button>
                   </div>
                 </div>
@@ -506,7 +478,7 @@ const VendorProducts = () => {
       )}
 
       {/* Enhanced Add/Edit Product Modal */}
-      {(showAddModal || showEditModal) && (
+      {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
             {/* Modal Header */}
@@ -524,8 +496,7 @@ const VendorProducts = () => {
                 </div>
                 <button
                   onClick={() => {
-                    setShowAddModal(false);
-                    setShowEditModal(false);
+                    setShowModal(false);
                     resetForm();
                   }}
                   className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -537,7 +508,7 @@ const VendorProducts = () => {
 
             {/* Modal Body */}
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-              <form onSubmit={handleAddProduct}>
+              <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-semibold text-gray-800 mb-2">
@@ -597,8 +568,8 @@ const VendorProducts = () => {
                     </label>
                     <input
                       type="number"
-                      name="stock"
-                      value={productData.stock}
+                      name="quantity"
+                      value={productData.quantity}
                       onChange={handleInputChange}
                       required
                       min="0"
@@ -653,14 +624,37 @@ const VendorProducts = () => {
                         />
                       </label>
                     </div>
-                    {productData.image && (
-                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm text-green-800 flex items-center gap-2">
-                          <i className="fas fa-check-circle"></i>
-                          Selected: {productData.image.name}
-                        </p>
+                    {productData.product_images?.map((image, index) => (
+                      <div
+                        key={index}
+                        className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg flex justify-between items-center"
+                      >
+                        <a
+                          href={
+                            image.url
+                              ? image.url
+                              : image.file instanceof File
+                              ? URL.createObjectURL(image.file)
+                              : "#"
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-green-800 flex items-center gap-2 hover:underline"
+                        >
+                          <i className="fas fa-image"></i>
+                          {`product_image_${index + 1}`}
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteImage(image, index)}
+                          className="text-red-500 hover:text-red-700"
+                          title="Remove image"
+                        >
+                          <i className="fas fa-times"></i>
+                        </button>
                       </div>
-                    )}
+                    ))}
                   </div>
                 </div>
 
@@ -669,8 +663,9 @@ const VendorProducts = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      setShowAddModal(false);
-                      setShowEditModal(false);
+                      setShowModal(false);
+                      setLoading(false);
+                      setImagesUpdated(false);
                       resetForm();
                     }}
                     className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-all"
@@ -679,14 +674,30 @@ const VendorProducts = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                    disabled={loading}
+                    className={`px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold transition-all shadow-lg transform
+    ${
+      loading
+        ? "opacity-70 cursor-not-allowed"
+        : "hover:from-orange-600 hover:to-red-600 hover:shadow-xl hover:scale-105"
+    }`}
                   >
-                    <i
-                      className={`fas ${
-                        editingProduct ? "fa-save" : "fa-plus"
-                      } mr-2`}
-                    ></i>
-                    {editingProduct ? "Update Product" : "Add Product"}
+                    {loading ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin mr-2"></i>
+                        Processing...
+                      </>
+                    ) : editingProduct ? (
+                      <>
+                        <i className="fas fa-save mr-2"></i>
+                        Update Product
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-plus mr-2"></i>
+                        Add Product
+                      </>
+                    )}
                   </button>
                 </div>
               </form>

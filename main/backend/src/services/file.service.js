@@ -14,8 +14,6 @@ export const getFileUploadUrl = async (id, name, file, bucket) => {
 
     const filePath = `${id}/${formattedFileName}`;
 
-    await db.storage.from(bucket).remove([filePath]);
-
     const { data, error } = await db.storage
       .from(bucket)
       .createSignedUploadUrl(filePath);

@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { ConsumerOrderService } from "../../services/consumer/consumerOrderService.js";
 import { ConsumerListService } from "../../services/consumer/consumerListService.js";
-import { useAuthStore } from "../../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore.jsx";
 
 const DataContext = createContext();
 
@@ -12,67 +13,77 @@ export function ConsumerDataProvider({ children }) {
   const { currentUser } = useAuthStore();
 
   const clearCache = () => {
-    localStorage.clear();
+    localStorage.removeItem("consumer_orders");
+    localStorage.removeItem("consumer_lists");
     setOrders([]);
     setLists([]);
   };
 
   const fetchOrders = async () => {
     try {
-      const { getOrders } = ConsumerOrderService;
-      const orderData = await getOrders();
-      setOrders(orderData);
+      const cached = localStorage.getItem("consumer_orders");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setOrders(parsed.data);
+        return parsed.data;
+      }
+
+      const response = await ConsumerOrderService.getOrders();
+      setOrders(response);
 
       localStorage.setItem(
-        "orders",
-        JSON.stringify({
-          order: orderData,
-          timestamp: Date.now(),
-        })
+        "consumer_orders",
+        JSON.stringify({ data: response, timestamp: Date.now() })
       );
+
+      return response;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch orders");
-      console.error("Error in ConsumerDataProvider:", error);
-    } finally {
-      setDataLoading(false);
+      console.error("Error fetching consumer orders:", error);
     }
   };
 
   const fetchLists = async () => {
     try {
-      const { getLists } = ConsumerListService;
-      const listData = await getLists();
-      setLists(listData);
+      const cached = localStorage.getItem("consumer_lists");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setLists(parsed.data);
+        return parsed.data;
+      }
+
+      const response = await ConsumerListService.getLists();
+      setLists(response);
 
       localStorage.setItem(
-        "lists",
-        JSON.stringify({
-          list: listData,
-          timestamp: Date.now(),
-        })
+        "consumer_lists",
+        JSON.stringify({ data: response, timestamp: Date.now() })
       );
+
+      return response;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to fetch Lists");
-      console.error("Error in ConsumerDataProvider:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch lists");
+      console.error("Error fetching consumer lists:", error);
+    }
+  };
+
+  const loadConsumerData = async () => {
+    setDataLoading(true);
+    try {
+      await Promise.all([fetchOrders(), fetchLists()]);
+    } catch (error) {
+      console.error("Error loading consumer data:", error);
     } finally {
       setDataLoading(false);
     }
   };
 
   useEffect(() => {
-    setDataLoading(true);
-    const cached = localStorage.getItem("data");
-
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      setOrders(parsed.order);
-      setLists(parsed.list);
-      setDataLoading(false);
+    if (currentUser?.type === "consumer") {
+      loadConsumerData();
     } else {
-      if (currentUser?.type === "consumer") {
-        fetchLists();
-        fetchOrders();
-      }
+      clearCache();
+      setDataLoading(false);
     }
   }, [currentUser]);
 
@@ -81,10 +92,10 @@ export function ConsumerDataProvider({ children }) {
       value={{
         orders,
         lists,
-        clearCache,
-        fetchLists,
-        fetchOrders,
         dataLoading,
+        fetchOrders,
+        fetchLists,
+        clearCache,
       }}
     >
       {children}

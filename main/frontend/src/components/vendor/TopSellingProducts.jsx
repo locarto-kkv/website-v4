@@ -12,7 +12,7 @@ const TopSellingProducts = () => {
 
   const { products, changeDataRange } = useVendorData();
 
-  const topProducts = products.slice(0, 3);
+  const topProducts = products?.slice(0, 3) || [];
 
   const getRankBadge = (index) => {
     const badges = {

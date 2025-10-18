@@ -11,21 +11,41 @@ const VendorProfile = () => {
     description: "",
     established: "",
     employeeCount: "",
-    businessType: ""
+    businessType: "",
   });
 
   const [documents, setDocuments] = useState([
-    { name: "Business_License.pdf", size: "1.2MB", status: "verified", uploadDate: "2024-01-15" },
-    { name: "Tax_ID_Verification.pdf", size: "800KB", status: "verified", uploadDate: "2024-01-15" },
-    { name: "Insurance_Certificate.pdf", size: "500KB", status: "pending", uploadDate: "2024-02-10" },
-    { name: "Bank_Statement.pdf", size: "1.5MB", status: "rejected", uploadDate: "2024-02-01" }
+    {
+      name: "Business_License.pdf",
+      size: "1.2MB",
+      status: "verified",
+      uploadDate: "2024-01-15",
+    },
+    {
+      name: "Tax_ID_Verification.pdf",
+      size: "800KB",
+      status: "verified",
+      uploadDate: "2024-01-15",
+    },
+    {
+      name: "Insurance_Certificate.pdf",
+      size: "500KB",
+      status: "pending",
+      uploadDate: "2024-02-10",
+    },
+    {
+      name: "Bank_Statement.pdf",
+      size: "1.5MB",
+      status: "rejected",
+      uploadDate: "2024-02-01",
+    },
   ]);
 
   const [milestones] = useState([
     { title: "First Sale", date: "Jan 20, 2022", completed: true },
     { title: "100 Orders", date: "Mar 15, 2022", completed: true },
     { title: "5 Star Rating", date: "May 10, 2022", completed: true },
-    { title: "500 Orders", date: "Target: Dec 2024", completed: false }
+    { title: "500 Orders", date: "Target: Dec 2024", completed: false },
   ]);
 
   const [metrics] = useState({
@@ -35,7 +55,7 @@ const VendorProfile = () => {
     totalRevenue: 125000,
     averageRating: 4.8,
     totalReviews: 128,
-    responseTime: "2 hours"
+    responseTime: "2 hours",
   });
 
   const navigate = useNavigate();
@@ -49,12 +69,14 @@ const VendorProfile = () => {
       companyName: "Apex Innovations Inc.",
       email: "info@apexinnovations.com",
       phone: "+91 98765 43210",
-      address: "123 Tech Park Avenue, Electronic City, Bangalore, Karnataka 560100",
+      address:
+        "123 Tech Park Avenue, Electronic City, Bangalore, Karnataka 560100",
       website: "https://www.apexinnovations.com",
-      description: "Leading provider of innovative tech solutions and digital services for businesses worldwide.",
+      description:
+        "Leading provider of innovative tech solutions and digital services for businesses worldwide.",
       established: "2018",
       employeeCount: "25-50",
-      businessType: "Technology Services"
+      businessType: "Technology Services",
     });
   }, []);
 
@@ -64,28 +86,36 @@ const VendorProfile = () => {
 
   const getDocumentStatusColor = (status) => {
     switch (status) {
-      case 'verified': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "verified":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getDocumentIcon = (status) => {
     switch (status) {
-      case 'verified': return 'fas fa-check-circle';
-      case 'pending': return 'fas fa-clock';
-      case 'rejected': return 'fas fa-times-circle';
-      default: return 'fas fa-file';
+      case "verified":
+        return "fas fa-check-circle";
+      case "pending":
+        return "fas fa-clock";
+      case "rejected":
+        return "fas fa-times-circle";
+      default:
+        return "fas fa-file";
     }
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -98,7 +128,9 @@ const VendorProfile = () => {
         </div>
         <div>
           <h1 className="text-3xl font-black text-gray-900">Vendor Profile</h1>
-          <p className="text-gray-600">Manage your business profile and documentation</p>
+          <p className="text-gray-600">
+            Manage your business profile and documentation
+          </p>
         </div>
       </div>
 
@@ -114,7 +146,9 @@ const VendorProfile = () => {
                   <i className="fas fa-building text-3xl text-white"></i>
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold mb-2">{profileData.companyName}</h2>
+                  <h2 className="text-3xl font-bold mb-2">
+                    {profileData.companyName}
+                  </h2>
                   <div className="flex flex-wrap items-center gap-4 text-blue-100">
                     <div className="flex items-center gap-2">
                       <i className="fas fa-envelope"></i>
@@ -133,9 +167,18 @@ const VendorProfile = () => {
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
-                      <i key={i} className={`fas fa-star text-sm ${i < Math.floor(metrics.averageRating) ? 'text-yellow-300' : 'text-white/30'}`}></i>
+                      <i
+                        key={i}
+                        className={`fas fa-star text-sm ${
+                          i < Math.floor(metrics.averageRating)
+                            ? "text-yellow-300"
+                            : "text-white/30"
+                        }`}
+                      ></i>
                     ))}
-                    <span className="ml-2 font-bold">{metrics.averageRating}</span>
+                    <span className="ml-2 font-bold">
+                      {metrics.averageRating}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -143,45 +186,6 @@ const VendorProfile = () => {
 
             {/* Profile Content */}
             <div className="p-6">
-              {/* Business Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                      <i className="fas fa-chart-line text-white"></i>
-                    </div>
-                    <div>
-                      <p className="text-green-800 font-bold text-2xl">{formatCurrency(metrics.totalRevenue)}</p>
-                      <p className="text-green-600 text-sm">Total Revenue</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <i className="fas fa-shopping-cart text-white"></i>
-                    </div>
-                    <div>
-                      <p className="text-blue-800 font-bold text-2xl">{metrics.totalOrders}</p>
-                      <p className="text-blue-600 text-sm">Total Orders</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-200">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                      <i className="fas fa-clock text-white"></i>
-                    </div>
-                    <div>
-                      <p className="text-purple-800 font-bold text-2xl">{metrics.responseTime}</p>
-                      <p className="text-purple-600 text-sm">Avg Response</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Business Details */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <div>
@@ -192,15 +196,21 @@ const VendorProfile = () => {
                   <div className="space-y-3">
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-600">Business Type</p>
-                      <p className="font-medium text-gray-900">{profileData.businessType}</p>
+                      <p className="font-medium text-gray-900">
+                        {profileData.businessType}
+                      </p>
                     </div>
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-600">Employee Count</p>
-                      <p className="font-medium text-gray-900">{profileData.employeeCount} employees</p>
+                      <p className="font-medium text-gray-900">
+                        {profileData.employeeCount} employees
+                      </p>
                     </div>
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-600">Address</p>
-                      <p className="font-medium text-gray-900">{profileData.address}</p>
+                      <p className="font-medium text-gray-900">
+                        {profileData.address}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -224,7 +234,9 @@ const VendorProfile = () => {
                     </div>
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-600">Description</p>
-                      <p className="font-medium text-gray-900">{profileData.description}</p>
+                      <p className="font-medium text-gray-900">
+                        {profileData.description}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -261,7 +273,7 @@ const VendorProfile = () => {
                     Upload Document
                   </button>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {documents.map((doc, index) => (
                     <div
@@ -274,14 +286,25 @@ const VendorProfile = () => {
                           <i className="fas fa-file-pdf text-red-500 text-xl"></i>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{doc.name}</p>
-                          <p className="text-sm text-gray-500">{doc.size} • {doc.uploadDate}</p>
+                          <p className="font-medium text-gray-900">
+                            {doc.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {doc.size} • {doc.uploadDate}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getDocumentStatusColor(doc.status)}`}>
-                          <i className={`${getDocumentIcon(doc.status)} mr-1`}></i>
-                          {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getDocumentStatusColor(
+                            doc.status
+                          )}`}
+                        >
+                          <i
+                            className={`${getDocumentIcon(doc.status)} mr-1`}
+                          ></i>
+                          {doc.status.charAt(0).toUpperCase() +
+                            doc.status.slice(1)}
                         </span>
                         <i className="fas fa-download text-gray-400 hover:text-blue-600 transition-colors"></i>
                       </div>
@@ -301,14 +324,18 @@ const VendorProfile = () => {
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-check-circle text-green-600"></i>
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Account Status</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Account Status
+              </h2>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                 <div className="flex items-center gap-2">
                   <i className="fas fa-shield-check text-green-600"></i>
-                  <span className="font-medium text-green-800">Verified Business</span>
+                  <span className="font-medium text-green-800">
+                    Verified Business
+                  </span>
                 </div>
                 <i className="fas fa-check text-green-600"></i>
               </div>
@@ -316,7 +343,9 @@ const VendorProfile = () => {
               <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="flex items-center gap-2">
                   <i className="fas fa-star text-blue-600"></i>
-                  <span className="font-medium text-blue-800">Premium Member</span>
+                  <span className="font-medium text-blue-800">
+                    Premium Member
+                  </span>
                 </div>
                 <i className="fas fa-crown text-blue-600"></i>
               </div>
@@ -324,7 +353,9 @@ const VendorProfile = () => {
               <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
                 <div className="flex items-center gap-2">
                   <i className="fas fa-bolt text-purple-600"></i>
-                  <span className="font-medium text-purple-800">Fast Responder</span>
+                  <span className="font-medium text-purple-800">
+                    Fast Responder
+                  </span>
                 </div>
                 <i className="fas fa-lightning-bolt text-purple-600"></i>
               </div>
@@ -342,12 +373,33 @@ const VendorProfile = () => {
 
             <div className="space-y-4">
               {milestones.map((milestone, index) => (
-                <div key={index} className={`flex items-center gap-3 p-3 rounded-lg ${milestone.completed ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${milestone.completed ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
-                    <i className={`fas ${milestone.completed ? 'fa-check' : 'fa-clock'} text-sm`}></i>
+                <div
+                  key={index}
+                  className={`flex items-center gap-3 p-3 rounded-lg ${
+                    milestone.completed
+                      ? "bg-green-50 border border-green-200"
+                      : "bg-gray-50 border border-gray-200"
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      milestone.completed
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-300 text-gray-600"
+                    }`}
+                  >
+                    <i
+                      className={`fas ${
+                        milestone.completed ? "fa-check" : "fa-clock"
+                      } text-sm`}
+                    ></i>
                   </div>
                   <div>
-                    <p className={`font-medium ${milestone.completed ? 'text-green-800' : 'text-gray-700'}`}>
+                    <p
+                      className={`font-medium ${
+                        milestone.completed ? "text-green-800" : "text-gray-700"
+                      }`}
+                    >
                       {milestone.title}
                     </p>
                     <p className="text-xs text-gray-500">{milestone.date}</p>
@@ -362,9 +414,14 @@ const VendorProfile = () => {
                 <span className="font-medium">75%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300" style={{ width: "75%" }}></div>
+                <div
+                  className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: "75%" }}
+                ></div>
               </div>
-              <p className="text-xs text-gray-500 mt-2">125 more orders to reach Gold level</p>
+              <p className="text-xs text-gray-500 mt-2">
+                125 more orders to reach Gold level
+              </p>
             </div>
           </div>
 
@@ -382,7 +439,9 @@ const VendorProfile = () => {
                 <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
                   <i className="fas fa-chart-bar text-white text-sm"></i>
                 </div>
-                <span className="font-medium text-gray-800">View Analytics</span>
+                <span className="font-medium text-gray-800">
+                  View Analytics
+                </span>
               </button>
 
               <button className="w-full flex items-center gap-3 p-3 text-left bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
@@ -396,7 +455,9 @@ const VendorProfile = () => {
                 <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
                   <i className="fas fa-headset text-white text-sm"></i>
                 </div>
-                <span className="font-medium text-gray-800">Contact Support</span>
+                <span className="font-medium text-gray-800">
+                  Contact Support
+                </span>
               </button>
             </div>
           </div>

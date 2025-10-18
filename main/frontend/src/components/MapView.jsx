@@ -15,22 +15,16 @@ const MapView = () => {
 
   const categories = [
     {
-      name: "Wellness",
+      name: "Personal Care",
       color: "#10B981",
       icon: "fas fa-leaf",
-      description: "Yoga studios, fitness centers, and wellness retreats",
-    },
-    {
-      name: "Lifestyle",
-      color: "#F59E0B",
-      icon: "fas fa-shopping-bag",
-      description: "Fashion stores, home decor, and lifestyle products",
+      description: "Skin Care, Beauty, Fragrances",
     },
     {
       name: "Accessories",
       color: "#EF4444",
       icon: "fas fa-gem",
-      description: "Jewellery, watches, and fashion accessories",
+      description: "Fashion, Daily, Tech",
     },
   ];
 
@@ -111,7 +105,7 @@ const MapView = () => {
   // Fetch products for the current category when it changes
   useEffect(() => {
     const fetchCategoryProducts = async () => {
-      const category = categories[currentCategoryIndex].name.toLowerCase();
+      const category = categories[currentCategoryIndex].name;
       try {
         await fetchProductsInBatch({ category });
         console.log(`Fetched products for category:`, blogs);
