@@ -259,7 +259,7 @@ const Navbar = ({ pageType = "landing" }) => {
                     onClick={handleDashboardNavigation}
                     className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors"
                   >
-                     <i className="fas fa-tachometer-alt mr-2 text-gray-500"></i> Dashboard
+                     <i className="fas fa-th-large mr-2 text-gray-500"></i> Dashboard
                   </button>
                   <button
                     className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
