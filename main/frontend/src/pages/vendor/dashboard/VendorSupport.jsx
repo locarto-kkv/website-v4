@@ -1,3 +1,4 @@
+// src/pages/vendor/dashboard/VendorSupport.jsx
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -67,36 +68,7 @@ const VendorSupport = () => {
     }
   ];
 
-  const quickActions = [
-    {
-      title: 'Reset Password',
-      icon: 'fas fa-key',
-      color: 'bg-blue-500 hover:bg-blue-600',
-      description: 'Reset your account password',
-      action: () => window.open('/reset-password', '_blank')
-    },
-    {
-      title: 'View Orders',
-      icon: 'fas fa-shopping-bag',
-      color: 'bg-green-500 hover:bg-green-600',
-      description: 'Check your order history',
-      action: () => window.open('/orders', '_blank')
-    },
-    {
-      title: 'Billing Info',
-      icon: 'fas fa-credit-card',
-      color: 'bg-purple-500 hover:bg-purple-600',
-      description: 'Update payment methods',
-      action: () => window.open('/billing', '_blank')
-    },
-    {
-      title: 'Account Settings',
-      icon: 'fas fa-cog',
-      color: 'bg-gray-500 hover:bg-gray-600',
-      description: 'Manage your account',
-      action: () => window.open('/settings', '_blank')
-    }
-  ];
+  // Removed quickActions array
 
   const contactMethods = [
     {
@@ -165,11 +137,12 @@ const VendorSupport = () => {
           <i className="fas fa-headset text-white text-xl"></i>
         </div>
         <div>
-          <h1 className="text-3xl font-black text-gray-900">Customer Support</h1>
+          {/* Renamed Title */}
+          <h1 className="text-3xl font-black text-gray-900">Vendor Support</h1>
           <p className="text-gray-600">Get help and find answers to your questions</p>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-3 space-y-6">
@@ -229,7 +202,7 @@ const VendorSupport = () => {
                 {filteredFAQs.length} articles found
               </span>
             </div>
-            
+
             {filteredFAQs.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -254,7 +227,7 @@ const VendorSupport = () => {
                       </div>
                       <i className={`fas fa-chevron-${expandedFAQ === faq.id ? 'up' : 'down'} text-gray-400 transition-transform`}></i>
                     </button>
-                    
+
                     {expandedFAQ === faq.id && (
                       <div className="px-4 pb-4 bg-gray-50 border-t border-gray-200">
                         <p className="text-gray-700 leading-relaxed mb-3">{faq.answer}</p>
@@ -273,8 +246,8 @@ const VendorSupport = () => {
             )}
           </div>
 
-          {/* Quick Actions Grid */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          {/* Quick Actions Grid - REMOVED */}
+          {/* <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                 <i className="fas fa-bolt text-green-600"></i>
@@ -299,7 +272,8 @@ const VendorSupport = () => {
                 </button>
               ))}
             </div>
-          </div>
+          </div> 
+          */}
         </div>
 
         {/* Sidebar */}
@@ -312,7 +286,7 @@ const VendorSupport = () => {
               </div>
               <h2 className="text-lg font-bold text-gray-900">Need More Help?</h2>
             </div>
-            
+
             <div className="space-y-3">
               {contactMethods.map((method, index) => (
                 <button

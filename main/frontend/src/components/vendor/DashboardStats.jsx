@@ -1,6 +1,9 @@
+// src/components/vendor/DashboardStats.jsx
 import { formatCurrency } from "../../lib/utils.js";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const StatCard = ({ title, value, iconClass, trend, trendValue, gradient }) => (
+  // ... (StatCard component remains the same)
   <div className="group relative bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-orange-200 transform hover:-translate-y-1">
     {/* Gradient border accent */}
     <div
@@ -51,9 +54,12 @@ const StatCard = ({ title, value, iconClass, trend, trendValue, gradient }) => (
 );
 
 const DashboardStats = ({ products = [], vendor = [] }) => {
+  const navigate = useNavigate(); // Initialize navigate
+
   const totalRevenue = vendor.total_amount || 0;
 
   const formatNumber = (num) => {
+    // ... (formatNumber function remains the same)
     if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
     if (num >= 1000) return (num / 1000).toFixed(1) + "K";
     return num?.toString() || 0;
@@ -61,6 +67,7 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
 
   // Mock trend data - in real app this would come from props or API
   const getTrendData = (type) => {
+    // ... (getTrendData function remains the same)
     const trends = {
       products: { trend: "up", percent: "+12%" },
       vendor: { trend: "up", percent: "+8.5%" },
@@ -78,11 +85,11 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
       ...getTrendData("products"),
     },
     {
-      title: "Total vendor",
+      title: "Total Orders", // Changed title from "Total vendor"
       value: formatNumber(vendor.orders_count),
       iconClass: "fas fa-shopping-bag",
       gradient: "bg-gradient-to-br from-green-500 to-green-600",
-      ...getTrendData("vendor"),
+      ...getTrendData("vendor"), // Kept 'vendor' key for trend data consistency
     },
     {
       title: "Total Revenue",
@@ -92,6 +99,15 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
       ...getTrendData("revenue"),
     },
   ];
+
+  // Define Quick Actions with corrected navigation
+  const quickActions = [
+    { label: "Add Product", icon: "fas fa-plus", color: "bg-blue-500", path: "/vendor/products" },
+    { label: "View Orders", icon: "fas fa-list", color: "bg-green-500", path: "/vendor/dashboard" }, // Navigates to dashboard where orders table is
+    { label: "Analytics", icon: "fas fa-chart-bar", color: "bg-purple-500", path: "/vendor/analytics" }, // Corrected path
+    { label: "Settings", icon: "fas fa-cog", color: "bg-gray-500", path: "/vendor/settings" },
+  ];
+
 
   return (
     <div className="space-y-6">
@@ -120,7 +136,8 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
             value={stat.value}
             iconClass={stat.iconClass}
             trend={stat.trend}
-            trendValue={stat.trendValue}
+            // Corrected prop name if it was wrong
+            trendValue={stat.percent}
             gradient={stat.gradient}
           />
         ))}
@@ -132,22 +149,11 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
           Quick Actions
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: "Add Product", icon: "fas fa-plus", color: "bg-blue-500" },
-            {
-              label: "View Orders",
-              icon: "fas fa-list",
-              color: "bg-green-500",
-            },
-            {
-              label: "Analytics",
-              icon: "fas fa-chart-bar",
-              color: "bg-purple-500",
-            },
-            { label: "Settings", icon: "fas fa-cog", color: "bg-gray-500" },
-          ].map((action, index) => (
+          {/* Map over the quickActions array */}
+          {quickActions.map((action, index) => (
             <button
               key={index}
+              onClick={() => navigate(action.path)} // Use navigate with the defined path
               className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-gray-200 group"
             >
               <div
