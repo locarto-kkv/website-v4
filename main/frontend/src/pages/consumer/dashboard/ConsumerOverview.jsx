@@ -44,14 +44,16 @@ const StatCard = ({ title, value, icon, gradient, trend, trendValue }) => (
   </div>
 );
 
+
 const CustomerOverview = () => {
   const navigate = useNavigate();
-  const { orders } = useConsumerData(); // Get orders data from context
+  // Get orders AND lists data from context
+  const { orders, lists } = useConsumerData(); // <-- Added 'lists'
 
   // Filter pending orders (based on original logic)
   const pendingOrders = (orders || []).filter(
     (o) => o.status === "pending" || o.status === "shipped"
-  );
+  ); //
 
   // --- Mock Data (Replace or remove if context provides this) ---
   // You might already have this logic or data in your context or fetched elsewhere
@@ -59,13 +61,19 @@ const CustomerOverview = () => {
     { id: 1, name: "Recommended Product 1", price: 999 },
     { id: 2, name: "Recommended Product 2", price: 1998 },
     { id: 3, name: "Recommended Product 3", price: 2997 },
-  ];
+  ]; //
   // --- End Mock Data ---
 
-  const totalSpent = (orders || []).reduce(
-    (sum, o) => sum + (o.product?.price || 0) * (o.quantity || 0),
-    0
-  );
+  // Calculate Total Spent (keep if needed elsewhere, otherwise remove)
+  // const totalSpent = (orders || []).reduce(
+  //   (sum, o) => sum + (o.product?.price || 0) * (o.quantity || 0),
+  //   0
+  // );
+
+  // **NEW: Calculate Wishlist Count**
+  // Use optional chaining and nullish coalescing for safety
+  const wishlistCount = lists?.wishlist?.size ?? 0; // Get the size of the Set
+
 
   return (
     <div className="space-y-6">
@@ -76,19 +84,21 @@ const CustomerOverview = () => {
           value={orders?.length || 0}
           icon="fas fa-shopping-bag"
           gradient="bg-gradient-to-br from-blue-500 to-blue-600"
-        />
+        /> {/* */}
         <StatCard
           title="Pending Orders"
           value={pendingOrders.length}
           icon="fas fa-clock"
           gradient="bg-gradient-to-br from-orange-500 to-red-500"
-        />
+        /> {/* */}
+        {/* **MODIFIED StatCard: Replaced Total Spent with Wishlist Count** */}
         <StatCard
-          title="Total Spent"
-          value={`₹${totalSpent.toLocaleString("en-IN")}`} // Format currency
-          icon="fas fa-rupee-sign"
-          gradient="bg-gradient-to-br from-green-500 to-green-600"
-        />
+          title="Items in Wishlist" // New Title
+          value={wishlistCount} // New Value
+          icon="fas fa-heart" // New Icon
+          gradient="bg-gradient-to-br from-pink-500 to-purple-600" // New Gradient (Example)
+        /> {/* */}
+         {/* **END MODIFICATION** */}
       </div>
 
       {/* Recommendations & Pending Orders */}
@@ -121,7 +131,7 @@ const CustomerOverview = () => {
                   </button>
                 </div>
               )
-            )}
+            )} {/* */}
           </div>
         </div>
 
@@ -137,7 +147,7 @@ const CustomerOverview = () => {
               className="text-orange-500 hover:text-orange-600 font-semibold text-sm"
             >
               View All
-            </button>
+            </button> {/* */}
           </div>
           <div className="space-y-4">
             {pendingOrders.length === 0 ? (
@@ -180,7 +190,7 @@ const CustomerOverview = () => {
                   </span>
                 </div>
               ))
-            )}
+            )} {/* */}
           </div>
         </div>
       </div>

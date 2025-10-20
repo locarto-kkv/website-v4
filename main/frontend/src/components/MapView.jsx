@@ -219,7 +219,7 @@ const MapView = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative">
       {/* Logo / Home Button */}
-      <div className="absolute top-6 left-6 z-[9999]">
+      <div className="absolute top-4 left-4 z-[9999]">
         <Link
           to="/"
           className="group hover:scale-105 transform transition-transform duration-300"
@@ -227,7 +227,7 @@ const MapView = () => {
           <img
             src={locartoImg}
             alt="Locarto"
-            className="h-12 w-auto md:h-14 lg:h-16"
+            className="h-14 w-auto object-contain scale-125 translate-y-[2px]" 
           />
         </Link>
       </div>
