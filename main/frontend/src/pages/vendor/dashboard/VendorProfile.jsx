@@ -40,8 +40,9 @@ const VendorProfile = () => {
   }, [vendor, profile, blogs]);
 
   const openSetup = () => navigate("/vendor/setup");
+  const goToSettings = () => navigate('/vendor/settings');
 
-  // ✅ Unified document status handler
+  // Unified document status handler
   const getDocumentStatus = (status) => {
     switch (status) {
       case "verified":
@@ -71,7 +72,7 @@ const VendorProfile = () => {
     }
   };
 
-  // ✅ Account status logic
+  // Account status logic
   const getAccountStatus = (status) => {
     switch (status) {
       case "pending":
@@ -110,7 +111,10 @@ const VendorProfile = () => {
   if (!profileData) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Loading Profile...</p>
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading Profile...</p>
+        </div>
       </div>
     );
   }
@@ -118,80 +122,95 @@ const VendorProfile = () => {
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        {profileData.brandLogo ? (
-          <img
-            src={profileData.brandLogo}
-            alt="Brand Logo"
-            className="w-12 h-12 rounded-xl object-cover shadow-sm"
-          />
-        ) : (
-          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-            <i className="fas fa-user-tie text-white text-xl"></i>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          {profileData.brandLogo ? (
+            <img
+              src={profileData.brandLogo}
+              alt="Brand Logo"
+              className="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-white"
+            />
+          ) : (
+            <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <i className="fas fa-user-tie text-white text-2xl"></i>
+            </div>
+          )}
+          <div>
+            <h1 className="text-3xl font-black text-gray-900">Vendor Profile</h1>
+            <p className="text-gray-600">
+              Manage your business profile and documentation
+            </p>
           </div>
-        )}
-        <div>
-          <h1 className="text-3xl font-black text-gray-900">Vendor Profile</h1>
-          <p className="text-gray-600">
-            Manage your business profile and documentation
-          </p>
         </div>
+
+        {/* Settings Button in Header */}
+        <button
+          onClick={goToSettings}
+          className="group relative flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium"
+        >
+          <i className="fas fa-cog text-gray-600 group-hover:text-orange-500 transition-colors group-hover:rotate-90 duration-300"></i>
+          <span>Settings</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Main Profile Information */}
         <div className="xl:col-span-3">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
             {/* Profile Header */}
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white relative overflow-hidden">
-              <div className="absolute inset-0 bg-black/10"></div>
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 p-8 text-white relative overflow-hidden">
+              {/* Decorative Background Elements */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -mr-32 -mt-32"></div>
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full -ml-24 -mb-24"></div>
+              </div>
+
               <div className="relative flex items-start gap-6">
                 {profileData.brandLogo ? (
                   <img
                     src={profileData.brandLogo}
                     alt="Brand Logo"
-                    className="w-24 h-24 rounded-2xl object-cover border border-white/30 shadow-sm"
+                    className="w-28 h-28 rounded-2xl object-cover border-4 border-white/30 shadow-2xl"
                   />
                 ) : (
-                  <div className="w-24 h-24 bg-white/20 rounded-2xl flex items-center justify-center border border-white/30">
-                    <i className="fas fa-building text-3xl text-white"></i>
+                  <div className="w-28 h-28 bg-white/20 rounded-2xl flex items-center justify-center border-4 border-white/30 backdrop-blur-sm shadow-2xl">
+                    <i className="fas fa-building text-4xl text-white"></i>
                   </div>
                 )}
 
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold mb-2">
+                  <h2 className="text-4xl font-bold mb-3 drop-shadow-lg">
                     {profileData.companyName}
                   </h2>
-                  <div className="flex flex-wrap items-center gap-4 text-blue-100">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-6 text-white/90">
+                    <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
                       <i className="fas fa-envelope"></i>
-                      <span>{profileData.email}</span>
+                      <span className="font-medium">{profileData.email}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
                       <i className="fas fa-phone"></i>
-                      <span>{profileData.phone}</span>
+                      <span className="font-medium">{profileData.phone}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
                       <i className="fas fa-calendar-alt"></i>
-                      <span>Est. {profileData.established}</span>
+                      <span className="font-medium">Est. {profileData.established}</span>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <i
-                        key={i}
-                        className={`fas fa-star text-sm ${
-                          i < Math.floor(metrics.averageRating)
-                            ? "text-yellow-300"
-                            : "text-white/30"
-                        }`}
-                      ></i>
-                    ))}
-                    <span className="ml-2 font-bold">
-                      {metrics.averageRating}
+                  <div className="flex items-center gap-2 mt-4">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <i
+                          key={i}
+                          className={`fas fa-star text-lg ${
+                            i < Math.floor(metrics.averageRating)
+                              ? "text-yellow-300"
+                              : "text-white/30"
+                          }`}
+                        ></i>
+                      ))}
+                    </div>
+                    <span className="ml-2 font-bold text-xl bg-white/20 px-3 py-1 rounded-lg backdrop-blur-sm">
+                      {metrics.averageRating.toFixed(1)}
                     </span>
                   </div>
                 </div>
@@ -199,24 +218,26 @@ const VendorProfile = () => {
             </div>
 
             {/* Profile Content */}
-            <div className="p-6">
+            <div className="p-8">
               {/* Business Details */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <i className="fas fa-info-circle text-blue-600"></i>
+                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <i className="fas fa-info-circle text-blue-600"></i>
+                    </div>
                     Business Information
                   </h3>
                   <div className="space-y-3">
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Products</p>
-                      <p className="font-medium text-gray-900">
+                    <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                      <p className="text-sm text-gray-600 font-medium mb-1">Products</p>
+                      <p className="font-bold text-gray-900 text-xl">
                         {vendor?.products_count || 0} total
                       </p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Address</p>
-                      <p className="font-medium text-gray-900">
+                    <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                      <p className="text-sm text-gray-600 font-medium mb-1">Address</p>
+                      <p className="font-semibold text-gray-900">
                         {profileData.address[0]?.address_line_1}
                       </p>
                     </div>
@@ -224,54 +245,66 @@ const VendorProfile = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <i className="fas fa-link text-green-600"></i>
-                    Overview
+                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <i className="fas fa-chart-line text-green-600"></i>
+                    </div>
+                    Business Overview
                   </h3>
                   <div className="space-y-3">
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Description</p>
-                      <p className="font-medium text-gray-900">
+                    <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                      <p className="text-sm text-gray-600 font-medium mb-1">Description</p>
+                      <p className="font-medium text-gray-900 leading-relaxed">
                         {profileData.description}
                       </p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Categories</p>
-                      <p className="font-medium text-gray-900">
-                        {Object.keys(vendor?.category_count || {}).join(", ") ||
-                          "N/A"}
-                      </p>
+                    <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                      <p className="text-sm text-gray-600 font-medium mb-1">Categories</p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {Object.keys(vendor?.category_count || {}).map((category, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-white rounded-full text-sm font-semibold text-gray-700 border border-gray-200"
+                          >
+                            {category}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* ✅ Buttons only if NOT verified */}
+              {/* Action Buttons - only if NOT verified */}
               {accountStatus.label !== "Account Verified" && (
-                <div className="flex flex-wrap gap-4 mb-8">
+                <div className="flex flex-wrap gap-4 mb-8 pb-8 border-b border-gray-200">
                   <button
                     onClick={openSetup}
-                    className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
-                    <i className="fas fa-cog mr-2"></i> Complete Setup
+                    <i className="fas fa-cog"></i>
+                    <span>Complete Setup</span>
                   </button>
-                  <button className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors">
-                    <i className="fas fa-edit mr-2"></i> Edit Profile
+                  <button className="flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <i className="fas fa-edit"></i>
+                    <span>Edit Profile</span>
                   </button>
                 </div>
               )}
 
-              {/* ✅ Documents section only if verified */}
+              {/* Documents section - only if verified */}
               {accountStatus.label === "Account Verified" && (
-                <div className="border-t pt-6">
+                <div className="border-t pt-8">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                      <i className="fas fa-folder text-amber-600"></i>
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2 text-lg">
+                      <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                        <i className="fas fa-folder text-amber-600"></i>
+                      </div>
                       Business Documents
                     </h3>
-                    <button className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium">
-                      <i className="fas fa-upload mr-2"></i>
-                      Upload Document
+                    <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all font-bold shadow-lg hover:shadow-xl transform hover:scale-105">
+                      <i className="fas fa-upload"></i>
+                      <span>Upload Document</span>
                     </button>
                   </div>
 
@@ -282,22 +315,23 @@ const VendorProfile = () => {
                         return (
                           <div
                             key={index}
-                            className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
+                            className="flex items-center justify-between p-5 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer border-2 border-gray-200 hover:border-orange-300 hover:shadow-md"
                           >
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                                <i className="fas fa-file-pdf text-red-500 text-xl"></i>
+                            <div className="flex items-center gap-4">
+                              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
+                                <i className="fas fa-file-pdf text-red-500 text-2xl"></i>
                               </div>
                               <div>
-                                <p className="font-medium text-gray-900">
+                                <p className="font-bold text-gray-900">
                                   {doc.name}
                                 </p>
+                                <p className="text-sm text-gray-500">PDF Document</p>
                               </div>
                             </div>
                             <span
-                              className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${statusInfo.color}`}
+                              className={`px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 ${statusInfo.color}`}
                             >
-                              <i className={`${statusInfo.icon}`}></i>
+                              <i className={`${statusInfo.icon} text-sm`}></i>
                               {statusInfo.label}
                             </span>
                           </div>
@@ -305,9 +339,12 @@ const VendorProfile = () => {
                       })}
                     </div>
                   ) : (
-                    <p className="text-gray-500 italic">
-                      No documents uploaded yet.
-                    </p>
+                    <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i className="fas fa-folder-open text-gray-400 text-2xl"></i>
+                      </div>
+                      <p className="text-gray-500 font-medium">No documents uploaded yet.</p>
+                    </div>
                   )}
                 </div>
               )}
@@ -317,26 +354,53 @@ const VendorProfile = () => {
 
         {/* Sidebar - Account Status */}
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-id-badge text-gray-700"></i>
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center">
+                <i className="fas fa-id-badge text-orange-600 text-lg"></i>
               </div>
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900">
                 Account Status
               </h2>
             </div>
 
             <div
-              className={`p-4 border rounded-lg flex justify-between items-center ${accountStatus.color}`}
+              className={`p-5 border-2 rounded-xl flex justify-between items-center ${accountStatus.color} transition-all`}
             >
-              <span className="font-semibold">{accountStatus.label}</span>
-              <i className={`${accountStatus.icon} text-lg`}></i>
+              <span className="font-bold text-lg">{accountStatus.label}</span>
+              <i className={`${accountStatus.icon} text-2xl`}></i>
             </div>
 
-            <p className="mt-3 text-sm text-gray-700 leading-relaxed">
+            <p className="mt-4 text-sm text-gray-700 leading-relaxed">
               {accountStatus.desc}
             </p>
+
+            {accountStatus.label === "Account Verified" && (
+              <button className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl">
+                <i className="fas fa-users mr-2"></i>
+                Visit Member's Hub
+              </button>
+            )}
+          </div>
+
+          {/* Quick Stats Card */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
+                <i className="fas fa-chart-bar text-blue-600 text-lg"></i>
+              </div>
+              <span className="text-xl">Quick Stats</span>
+            </h3>
+            <div className="space-y-3">
+              <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                <p className="text-sm text-gray-600 font-medium">Total Orders</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.totalOrders}</p>
+              </div>
+              <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                <p className="text-sm text-gray-600 font-medium">Revenue</p>
+                <p className="text-2xl font-bold text-gray-900">₹{metrics.totalRevenue}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
