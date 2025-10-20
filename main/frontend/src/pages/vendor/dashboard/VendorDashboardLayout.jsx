@@ -23,6 +23,7 @@ const VendorDashboardLayout = () => {
     if (path.endsWith("/orders")) return { title: "Manage Orders", icon: "fas fa-shopping-bag", description: "View and manage all customer orders" };
     if (path.endsWith("/analytics")) return { title: "Vendor Analytics", icon: "fas fa-chart-bar", description: "Comprehensive insights into your business performance"};
     if (path.endsWith("/products")) return { title: "My Products", icon: "fas fa-box", description: "Manage your product inventory and listings" };
+    if (path.endsWith("/milestones")) return { title: "Milestones", icon: "fas fa-flag-checkered", description: "Track your achievements and progress" };
     if (path.endsWith("/members-hub")) return { title: "Members Hub", icon: "fas fa-users", description: "Manage your membership and connections" };
     if (path.endsWith("/support")) return { title: "Vendor Support", icon: "fas fa-headset", description: "Get help and find answers to your questions" };
     if (path.endsWith("/profile")) return { title: "Vendor Profile", icon: "fas fa-user-circle", description: "Manage your business profile and documentation" };

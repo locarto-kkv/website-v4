@@ -1,4 +1,7 @@
 import React, { useState, useMemo } from 'react';
+// Import hooks/services if using context or API instead of mock data
+// import { useVendorData } from '../../../context/vendor/vendorDataContext';
+// import { formatCurrency, formatDate, getOrderStatusConfig } from '../../../lib/utils';
 
 // Mock data for demonstration
 const mockOrders = [
@@ -10,7 +13,8 @@ const mockOrders = [
     amount: 4999,
     order_status: 'delivered',
     created_at: '2025-10-15',
-    deliveryNote: true
+    deliveryNote: true,
+    order_invoice: 'https://example.com/invoice/ORD001.pdf' // Example invoice URL
   },
   {
     id: 'ORD002',
@@ -20,7 +24,8 @@ const mockOrders = [
     amount: 12999,
     order_status: 'shipped',
     created_at: '2025-10-18',
-    deliveryNote: false
+    deliveryNote: false,
+    order_invoice: null // Example: No invoice
   },
   {
     id: 'ORD003',
@@ -30,7 +35,8 @@ const mockOrders = [
     amount: 999,
     order_status: 'processing',
     created_at: '2025-10-19',
-    deliveryNote: false
+    deliveryNote: false,
+    order_invoice: 'https://example.com/invoice/ORD003.pdf'
   },
   {
     id: 'ORD004',
@@ -40,7 +46,8 @@ const mockOrders = [
     amount: 1499,
     order_status: 'pending',
     created_at: '2025-10-20',
-    deliveryNote: false
+    deliveryNote: false,
+    order_invoice: null
   },
   {
     id: 'ORD005',
@@ -50,10 +57,12 @@ const mockOrders = [
     amount: 3499,
     order_status: 'cancelled',
     created_at: '2025-10-12',
-    deliveryNote: true
+    deliveryNote: true,
+    order_invoice: 'https://example.com/invoice/ORD005.pdf'
   }
 ];
 
+// Utility functions (as provided in the user's code)
 const getOrderStatusConfig = (status) => {
   const configs = {
     pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: 'fas fa-clock', bgDot: 'bg-yellow-400' },
@@ -84,14 +93,18 @@ const VendorOrders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recent');
   const [viewMode, setViewMode] = useState('table');
-  
+
+  // Use mock data - replace with context/API call if needed
+  // const { orders, dataLoading } = useVendorData();
   const orders = mockOrders;
+  const dataLoading = false; // Set to false when using mock data
+
   const statusFilters = ['all', 'pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
 
   const filteredAndSortedOrders = useMemo(() => {
     let result = orders.filter(order => {
       const matchesStatus = filterStatus === 'all' || order.order_status?.toLowerCase() === filterStatus;
-      const matchesSearch = 
+      const matchesSearch =
         order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.product?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.customer?.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -112,7 +125,7 @@ const VendorOrders = () => {
     });
 
     return result;
-  }, [filterStatus, searchQuery, sortBy]);
+  }, [filterStatus, searchQuery, sortBy, orders]); // Added orders dependency
 
   const getOrderStats = () => {
     const total = orders.length;
@@ -124,10 +137,16 @@ const VendorOrders = () => {
 
   const stats = getOrderStats();
 
+  // Handle loading state if not using mock data
+  if (dataLoading) {
+     return <div className="p-6 text-center">Loading orders...</div>;
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    // **MODIFIED**: Removed outer padding/bg gradient, assuming layout provides it
+    <div className="space-y-6"> {/* Added space-y for gap */}
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"> {/* Removed mb-8 */}
         {[
           { label: 'Total Orders', value: stats.total, icon: 'fas fa-shopping-bag', color: 'from-blue-500 to-cyan-500' },
           { label: 'Pending', value: stats.pending, icon: 'fas fa-clock', color: 'from-yellow-500 to-orange-500' },
@@ -149,7 +168,7 @@ const VendorOrders = () => {
       </div>
 
       {/* Controls Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6"> {/* Removed mb-6 */}
         <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-6">
           {/* Search */}
           <div className="flex-1 relative">
@@ -242,11 +261,13 @@ const VendorOrders = () => {
                     <th className="text-center px-6 py-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">Qty</th>
                     <th className="text-right px-6 py-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">Amount</th>
                     <th className="text-left px-6 py-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                    {/* **NEW**: Invoice Header */}
+                    <th className="text-left px-6 py-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">Invoice</th>
                     <th className="text-center px-6 py-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredAndSortedOrders.map((order, index) => (
+                  {filteredAndSortedOrders.map((order) => ( // Removed index
                     <tr key={order.id} className="hover:bg-orange-50 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
@@ -277,6 +298,23 @@ const VendorOrders = () => {
                       <td className="px-6 py-4">
                         <StatusBadge status={order.order_status} />
                       </td>
+                      {/* **NEW**: Invoice Data Cell */}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        {order.order_invoice ? ( // Check if order_invoice exists
+                          <a
+                            href={order.order_invoice} // Link to the invoice URL
+                            target="_blank" // Open in new tab
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-1"
+                            title="View Invoice"
+                          >
+                            <i className="fas fa-file-invoice text-xs"></i> View
+                          </a>
+                        ) : (
+                          <span className="text-gray-400">N/A</span> // Display N/A if no invoice
+                        )}
+                      </td>
+                      {/* End New Cell */}
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
                           <button className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View Details">
@@ -294,7 +332,7 @@ const VendorOrders = () => {
             )}
           </div>
         </div>
-      ) : (
+      ) : ( // Card View
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAndSortedOrders.length === 0 ? (
             <div className="col-span-full text-center py-16">
@@ -303,7 +341,7 @@ const VendorOrders = () => {
             </div>
           ) : (
             filteredAndSortedOrders.map((order) => {
-              const statusConfig = getOrderStatusConfig(order.order_status);
+              // const statusConfig = getOrderStatusConfig(order.order_status); // Already defined StatusBadge
               return (
                 <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 group">
                   <div className="flex items-start justify-between mb-4">
@@ -336,12 +374,32 @@ const VendorOrders = () => {
                     <p className="text-xs text-gray-500">{order.customer?.email}</p>
                   </div>
 
-                  <div className="flex gap-2">
-                    <button className="flex-1 p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all text-sm font-medium">
-                      <i className="fas fa-eye mr-2"></i>View
+                   {/* **NEW**: Invoice Link in Card View */}
+                   <div className="border-t border-gray-100 pt-4 mb-4">
+                       <p className="text-sm text-gray-600 mb-2">Invoice</p>
+                       {order.order_invoice ? (
+                         <a
+                           href={order.order_invoice}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-1 text-sm"
+                           title="View Invoice"
+                         >
+                           <i className="fas fa-file-invoice text-xs"></i> View Invoice
+                         </a>
+                       ) : (
+                         <span className="text-gray-400 text-sm">N/A</span>
+                       )}
+                   </div>
+                   {/* End New Invoice Section */}
+
+
+                  <div className="flex gap-2 border-t border-gray-100 pt-4 mt-4"> {/* Added border-t and mt-4 */}
+                    <button className="flex-1 p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2">
+                      <i className="fas fa-eye"></i>View
                     </button>
-                    <button className="flex-1 p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-all text-sm font-medium">
-                      <i className="fas fa-ellipsis-v mr-2"></i>More
+                    <button className="flex-1 p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2">
+                      <i className="fas fa-ellipsis-v"></i>More
                     </button>
                   </div>
                 </div>

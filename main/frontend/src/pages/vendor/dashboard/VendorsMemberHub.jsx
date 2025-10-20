@@ -1,215 +1,200 @@
-import React, { useState } from 'react';
+// src/pages/vendor/dashboard/VendorsMemberHub.jsx
+import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+// You might need data from your vendor context
+// import { useVendorData } from '../../../context/vendor/vendorDataContext';
 
 const VendorsMemberHub = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
+    // const { profile, vendor, analyticsData } = useVendorData(); // Example: Get data if needed
 
-  // Sample data
-  const milestones = [
-    { id: 1, title: 'First Sale', achieved: true, icon: 'fas fa-trophy' },
-    { id: 2, title: '100 Products', achieved: true, icon: 'fas fa-box' },
-    { id: 3, title: '1000 Sales', achieved: false, icon: 'fas fa-star' }
-  ];
+    // --- Placeholder Data/Config for Premium Features ---
+    const currentPlan = {
+        name: "Locarto Premium",
+        status: "Active", // Could be 'Active', 'Expiring Soon', 'Cancelled'
+        renewalDate: "2026-10-20", // Example date
+        price: 499, // Example price
+        currency: "INR",
+        keyBenefits: [
+            "Enhanced Analytics Suite",
+            "Featured Product Listings",
+            "Priority Support Channel",
+            "Lower Transaction Fees",
+            "Custom Storefront Options",
+        ]
+    };
 
-  const liveStockBuyers = [
-    { id: 1, name: 'John Smith', avatar: 'JS', status: 'online', lastActive: 'Active now' },
-    { id: 2, name: 'Sarah Wilson', avatar: 'SW', status: 'online', lastActive: 'Active now' },
-    { id: 3, name: 'Mike Johnson', avatar: 'MJ', status: 'away', lastActive: '5 min ago' }
-  ];
+    const premiumStats = {
+        featuredViews: 1250, // Example stat
+        conversionBoost: "+3.5%", // Example stat
+        priorityTicketsResolved: 8, // Example stat
+    };
 
-  const welcomeMessage = {
-    title: "Welcome to Members Hub!",
-    content: "Connect with buyers, track your milestones, and grow your business."
-  };
+    // --- Handlers ---
+    const handleManageSubscription = () => {
+        // Navigate to a dedicated subscription management page or open a modal
+        console.log("Navigate to manage subscription");
+        // navigate('/vendor/settings/subscription'); // Example navigation
+    };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-       
+    const handleCreatePromotion = () => {
+        // Navigate to a promotion creation page/modal
+        console.log("Navigate to create promotion");
+        // navigate('/vendor/promotions/new'); // Example navigation
+    };
 
-        {/* Welcome Message */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg p-6 mb-6 text-white">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <i className="fas fa-info-circle text-2xl"></i>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-2">{welcomeMessage.title}</h2>
-              <p className="text-white/90">{welcomeMessage.content}</p>
-            </div>
-          </div>
-        </div>
+     const handleViewEnhancedAnalytics = () => {
+        // Navigate to the enhanced analytics section/page
+        navigate('/vendor/analytics'); // Navigate to existing analytics, assuming it shows more for premium
+    };
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Membership Plan Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                  <i className="fas fa-id-card text-orange-500"></i>
-                  Membership Plan
-                </h2>
-                <button className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
-                  Upgrade
-                </button>
-              </div>
-              
-              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 border-2 border-orange-200">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">Premium Vendor</h3>
-                    <p className="text-gray-600">All features included</p>
-                  </div>
-                  <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                    <i className="fas fa-crown text-white text-2xl"></i>
-                  </div>
+     const handleAccessPrioritySupport = () => {
+        // Navigate to support page or open dedicated chat
+        navigate('/vendor/support'); // Example navigation
+    };
+
+
+    return (
+        <div className="space-y-6"> {/* Use space-y for consistent gap */}
+
+            {/* Premium Plan Overview */}
+            <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl shadow-xl p-6 md:p-8 text-white">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                             <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                 {currentPlan.status}
+                             </span>
+                             <h2 className="text-3xl font-bold">{currentPlan.name}</h2>
+                        </div>
+                        <p className="text-white/80">
+                            {currentPlan.status === "Active" ? `Renews on ${new Date(currentPlan.renewalDate).toLocaleDateString()}` : "Manage your subscription"}
+                        </p>
+                    </div>
+                     <div className="text-right flex-shrink-0">
+                         {/* Placeholder price */}
+                         <p className="text-4xl font-black">₹{currentPlan.price}<span className="text-xl font-medium text-white/70">/mo</span></p>
+                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Unlimited Products</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Priority Support</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Advanced Analytics</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Featured Listings</span>
-                  </div>
+                <div className="mt-6 pt-6 border-t border-white/20">
+                    <h3 className="font-semibold mb-3 text-white/90">Key Premium Benefits:</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                        {currentPlan.keyBenefits.slice(0, 6).map((benefit, index) => ( // Show max 6 benefits here
+                            <div key={index} className="flex items-center gap-2">
+                                <i className="fas fa-check-circle text-green-300 text-xs"></i>
+                                <span className="opacity-90">{benefit}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Milestones Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <i className="fas fa-flag-checkered text-orange-500"></i>
-                Your Milestones
-              </h2>
-              <div className="space-y-4">
-                {milestones.map((milestone) => (
-                  <div 
-                    key={milestone.id}
-                    className={`flex items-center gap-4 p-4 rounded-xl transition-all ${
-                      milestone.achieved 
-                        ? 'bg-green-50 border-2 border-green-200' 
-                        : 'bg-gray-50 border-2 border-gray-200'
-                    }`}
-                  >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      milestone.achieved 
-                        ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
-                        : 'bg-gray-300'
-                    }`}>
-                      <i className={`${milestone.icon} text-white text-xl`}></i>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-gray-900">{milestone.title}</h3>
-                      <p className="text-sm text-gray-600">
-                        {milestone.achieved ? 'Completed!' : 'In Progress'}
-                      </p>
-                    </div>
-                    {milestone.achieved && (
-                      <i className="fas fa-check-circle text-green-500 text-2xl"></i>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Sidebar */}
-          <div className="space-y-6">
-            {/* Live Stock Buyers */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                Live Stock Buyers
-              </h2>
-              
-              {/* Search */}
-              <div className="mb-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search buyers..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none"
-                  />
-                  <i className="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                </div>
-              </div>
-
-              {/* Buyers List */}
-              <div className="space-y-3">
-                {liveStockBuyers.map((buyer) => (
-                  <div 
-                    key={buyer.id}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-all"
-                  >
-                    <div className="relative">
-                      <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold">
-                        {buyer.avatar}
-                      </div>
-                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                        buyer.status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
-                      }`}></div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{buyer.name}</h3>
-                      <p className="text-xs text-gray-500">{buyer.lastActive}</p>
-                    </div>
-                    <button className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center hover:bg-orange-200 transition-colors">
-                      <i className="fas fa-comment text-orange-500"></i>
+                 <div className="mt-6 flex justify-end">
+                    <button
+                        onClick={handleManageSubscription}
+                        className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white py-2 px-6 rounded-lg font-semibold transition-all hover:shadow-md"
+                    >
+                        Manage Subscription
                     </button>
-                  </div>
-                ))}
-              </div>
-
-              <button className="w-full mt-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
-                View All Buyers
-              </button>
+                </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Stats</h2>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <i className="fas fa-handshake text-blue-500 text-xl"></i>
-                    <span className="font-semibold text-gray-700">Active Deals</span>
-                  </div>
-                  <span className="text-2xl font-bold text-blue-500">12</span>
+            {/* Premium Features Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                {/* Enhanced Analytics Card */}
+                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl flex items-center justify-center">
+                            <i className="fas fa-chart-pie text-purple-600 text-lg"></i>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">Enhanced Analytics</h3>
+                    </div>
+                    <p className="text-gray-600 text-sm mb-4">
+                        Unlock deeper insights into customer behavior, sales trends, and product performance.
+                    </p>
+                    <div className="space-y-2 mb-4">
+                        <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                            <span className="font-medium text-gray-700">Conversion Boost:</span>
+                            <span className="font-bold text-green-600">{premiumStats.conversionBoost}</span>
+                        </div>
+                         {/* Add another premium stat example */}
+                         <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                            <span className="font-medium text-gray-700">Customer Return Rate:</span>
+                            <span className="font-bold text-gray-800">25%</span>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleViewEnhancedAnalytics}
+                        className="w-full mt-auto py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm"
+                    >
+                        View Full Analytics Suite
+                    </button>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <i className="fas fa-dollar-sign text-green-500 text-xl"></i>
-                    <span className="font-semibold text-gray-700">Revenue</span>
-                  </div>
-                  <span className="text-2xl font-bold text-green-500">$5.2K</span>
+
+                {/* Promotional Tools Card */}
+                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-xl flex items-center justify-center">
+                            <i className="fas fa-bullhorn text-teal-600 text-lg"></i>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">Promotional Tools</h3>
+                    </div>
+                    <p className="text-gray-600 text-sm mb-4">
+                        Boost visibility with featured listings and create special offers to attract more customers.
+                    </p>
+                     <div className="space-y-2 mb-4">
+                        <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                            <span className="font-medium text-gray-700">Featured Listing Views:</span>
+                            <span className="font-bold text-gray-800">{premiumStats.featuredViews}</span>
+                        </div>
+                         <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                            <span className="font-medium text-gray-700">Active Promotions:</span>
+                            <span className="font-bold text-gray-800">2</span>
+                        </div>
+                    </div>
+                    <button
+                         onClick={handleCreatePromotion}
+                        className="w-full mt-auto py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium text-sm"
+                    >
+                        Create New Promotion
+                    </button>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <i className="fas fa-users text-purple-500 text-xl"></i>
-                    <span className="font-semibold text-gray-700">Connections</span>
-                  </div>
-                  <span className="text-2xl font-bold text-purple-500">48</span>
+
+                 {/* Priority Support Card */}
+                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-sky-100 rounded-xl flex items-center justify-center">
+                            <i className="fas fa-headset text-blue-600 text-lg"></i>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">Priority Support</h3>
+                    </div>
+                    <p className="text-gray-600 text-sm mb-4">
+                        Get faster responses and dedicated assistance from our premium support team.
+                    </p>
+                    <div className="space-y-2 mb-4">
+                        <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                            <span className="font-medium text-gray-700">Avg. Response Time:</span>
+                            <span className="font-bold text-gray-800">&lt; 1 Hour</span>
+                        </div>
+                         <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
+                            <span className="font-medium text-gray-700">Tickets Resolved (Month):</span>
+                            <span className="font-bold text-gray-800">{premiumStats.priorityTicketsResolved}</span>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleAccessPrioritySupport}
+                        className="w-full mt-auto py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                    >
+                        Access Priority Support
+                    </button>
                 </div>
-              </div>
+
+                {/* Add more cards for other premium features like: */}
+                {/* - Custom Storefront Options */}
+                {/* - Exclusive Resources (Webinars/Guides) */}
+
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default VendorsMemberHub;

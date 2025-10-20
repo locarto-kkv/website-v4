@@ -50,19 +50,19 @@ const StatCard = ({ title, value, iconClass, trend, trendValue, gradient }) => (
 
     {/* Hover effect overlay */}
     <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-  </div>
+  </div> //
 );
 
 const DashboardStats = ({ products = [], vendor = [] }) => {
   const navigate = useNavigate(); // Initialize navigate
 
-  const totalRevenue = vendor.total_amount || 0;
+  const totalRevenue = vendor.total_amount || 0; //
 
   const formatNumber = (num) => {
     // ... (formatNumber function remains the same)
     if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
     if (num >= 1000) return (num / 1000).toFixed(1) + "K";
-    return num?.toString() || 0;
+    return num?.toString() || 0; //
   };
 
   // Mock trend data - in real app this would come from props or API
@@ -73,7 +73,7 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
       vendor: { trend: "up", percent: "+8.5%" },
       revenue: { trend: "up", percent: "+15.2%" },
     };
-    return trends[type] || {};
+    return trends[type] || {}; //
   };
 
   const statsData = [
@@ -98,14 +98,14 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
       gradient: "bg-gradient-to-br from-orange-500 to-red-500",
       ...getTrendData("revenue"),
     },
-  ];
+  ]; //
 
   // Define Quick Actions with corrected navigation
   const quickActions = [
-    { label: "Add Product", icon: "fas fa-plus", color: "bg-blue-500", path: "/vendor/products" },
-    { label: "View Orders", icon: "fas fa-list", color: "bg-green-500", path: "/vendor/dashboard" }, // Navigates to dashboard where orders table is
-    { label: "Analytics", icon: "fas fa-chart-bar", color: "bg-purple-500", path: "/vendor/analytics" }, // Corrected path
-    { label: "Settings", icon: "fas fa-cog", color: "bg-gray-500", path: "/vendor/settings" },
+    { label: "Add Product", icon: "fas fa-plus", color: "bg-blue-500", path: "/vendor/products" }, //
+    { label: "View Orders", icon: "fas fa-list", color: "bg-green-500", path: "/vendor/orders" }, // Link to orders page
+    { label: "Analytics", icon: "fas fa-chart-bar", color: "bg-purple-500", path: "/vendor/analytics" }, //
+    { label: "Settings", icon: "fas fa-cog", color: "bg-gray-500", path: "/vendor/settings" }, //
   ];
 
 
@@ -118,7 +118,7 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
           <i className="fas fa-sync-alt text-xs"></i>
           Refresh
         </button>
-      </div>
+      </div> {/* */}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -129,12 +129,11 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
             value={stat.value}
             iconClass={stat.iconClass}
             trend={stat.trend}
-            // Corrected prop name if it was wrong
-            trendValue={stat.percent}
+            trendValue={stat.percent} // Corrected prop name if it was wrong
             gradient={stat.gradient}
           />
         ))}
-      </div>
+      </div> {/* */}
 
       {/* Quick Actions */}
       <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
@@ -160,7 +159,7 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
             </button>
           ))}
         </div>
-      </div>
+      </div> {/* */}
     </div>
   );
 };

@@ -5,26 +5,26 @@ import { useAuthStore } from "../store/useAuthStore"; // Import auth store
 import { useConsumerData } from "../context/consumer/consumerDataContext"; // Import consumer context
 
 const Sidebar = ({ onNavigate }) => {
-  const location = useLocation();
-  const activePath = location.pathname;
+  const location = useLocation(); //
+  const activePath = location.pathname; //
   const navigate = useNavigate(); // Use navigate hook directly
 
   const { currentUser } = useAuthStore(); // Get current user
-  const isConsumer = currentUser?.type === "consumer";
+  const isConsumer = currentUser?.type === "consumer"; //
 
   // --- Get consumer data only if the user is a consumer ---
-  const consumerData = isConsumer ? useConsumerData() : { lists: null };
-  const lists = consumerData.lists;
+  const consumerData = isConsumer ? useConsumerData() : { lists: null }; //
+  const lists = consumerData.lists; //
 
   // Calculate counts (handle potential undefined lists)
   // Ensure lists.cart and lists.wishlist exist before accessing properties
-  const cartCount = lists?.cart ? Object.keys(lists.cart).length : 0;
+  const cartCount = lists?.cart ? Object.keys(lists.cart).length : 0; //
   // Use optional chaining and nullish coalescing for wishlist size
-  const wishlistCount = lists?.wishlist?.size ?? 0;
-  const listBadgeCount = cartCount + wishlistCount;
+  const wishlistCount = lists?.wishlist?.size ?? 0; //
+  const listBadgeCount = cartCount + wishlistCount; //
   // --- End consumer data logic ---
 
-  let menuItems = [];
+  let menuItems = []; //
   let headerDetails = {
     title: "Dashboard",
     icon: "fas fa-tachometer-alt",
@@ -32,46 +32,43 @@ const Sidebar = ({ onNavigate }) => {
   }; // Default
 
   // --- Define items and theme based on user type ---
-  if (currentUser?.type === "vendor") {
+  if (currentUser?.type === "vendor") { //
     headerDetails = {
       title: "Vendor Portal",
       icon: "fas fa-store",
       gradient: "from-orange-500 to-red-500", // Vendor orange theme
     };
     menuItems = [
-      { id: "dashboard", label: "Dashboard", icon: "fas fa-chart-line", path: "/vendor/dashboard" },
-      // Add the new Orders item here
-      { id: "orders", label: "Orders", icon: "fas fa-shopping-bag", path: "/vendor/orders"},
-      { id: "analytics", label: "Analytics", icon: "fas fa-chart-bar", path: "/vendor/analytics" },
-      { id: "products", label: "Products", icon: "fas fa-box", path: "/vendor/products" },
-      { id: "members-hub", label: "Members Hub", icon: "fas fa-users", path: "/vendor/members-hub" },
-      // { id: "support", label: "Support", icon: "fas fa-headset", path: "/vendor/support" }, // <-- REMOVED SUPPORT BUTTON
-      { id: "profile", label: "Profile", icon: "fas fa-user-circle", path: "/vendor/profile" },
+      { id: "dashboard", label: "Dashboard", icon: "fas fa-chart-line", path: "/vendor/dashboard" }, //
+      { id: "orders", label: "Orders", icon: "fas fa-shopping-bag", path: "/vendor/orders"}, //
+      { id: "analytics", label: "Analytics", icon: "fas fa-chart-bar", path: "/vendor/analytics" }, //
+      { id: "products", label: "Products", icon: "fas fa-box", path: "/vendor/products" }, //
+      { id: "milestones", label: "Milestones", icon: "fas fa-flag-checkered", path: "/vendor/milestones" }, // Added Milestones
+      { id: "members-hub", label: "Members Hub", icon: "fas fa-users", path: "/vendor/members-hub" }, //
+      { id: "profile", label: "Profile", icon: "fas fa-user-circle", path: "/vendor/profile" }, //
     ];
-  } else if (currentUser?.type === "consumer") {
-    // ... (consumer items remain the same)
+  } else if (currentUser?.type === "consumer") { //
     headerDetails = {
       title: "Customer Portal",
       icon: "fas fa-user",
-      gradient: "from-orange-500 to-red-500", // <<<<<< CHANGED TO ORANGE THEME
+      gradient: "from-orange-500 to-red-500", // Orange theme
     };
     menuItems = [
-      { id: "overview", label: "Overview", icon: "fas fa-home", badge: null, path: "/consumer/dashboard/overview" },
-      { id: "orders", label: "Orders", icon: "fas fa-box", badge: null, path: "/consumer/dashboard/orders" },
-      { id: "lists", label: "Lists", icon: "fas fa-list", badge: listBadgeCount, path: "/consumer/dashboard/lists" },
-      { id: "reviews", label: "Reviews", icon: "fas fa-star", badge: null, path: "/consumer/dashboard/reviews" },
-     
-      { id: "settings", label: "Settings", icon: "fas fa-cog", badge: null, path: "/consumer/dashboard/settings" },
+      { id: "overview", label: "Overview", icon: "fas fa-home", badge: null, path: "/consumer/dashboard/overview" }, //
+      { id: "orders", label: "Orders", icon: "fas fa-box", badge: null, path: "/consumer/dashboard/orders" }, //
+      { id: "lists", label: "Lists", icon: "fas fa-list", badge: listBadgeCount, path: "/consumer/dashboard/lists" }, //
+      { id: "reviews", label: "Reviews", icon: "fas fa-star", badge: null, path: "/consumer/dashboard/reviews" }, //
+      // { id: "support", label: "Support", icon: "fas fa-headset", badge: null, path: "/consumer/dashboard/support" }, // Support removed
+      { id: "settings", label: "Settings", icon: "fas fa-cog", badge: null, path: "/consumer/dashboard/settings" }, //
     ];
-  } else if (currentUser?.type === "admin") {
-     // ... (admin items remain the same)
+  } else if (currentUser?.type === "admin") { //
      headerDetails = {
       title: "Admin Panel",
       icon: "fas fa-user-shield",
       gradient: "from-purple-500 to-violet-600", // Example gradient for admin
     };
     menuItems = [
-      { id: "dashboard", label: "Dashboard", icon: "fas fa-tachometer-alt", path: "/admin/dashboard" },
+      { id: "dashboard", label: "Dashboard", icon: "fas fa-th-large", path: "/admin/dashboard" }, // Changed icon
       // Add other admin links...
     ];
   }
@@ -81,19 +78,16 @@ const Sidebar = ({ onNavigate }) => {
     // Handle base dashboard path for overview explicitly for consumer
     if (itemPath === '/consumer/dashboard/overview' && activePath === '/consumer/dashboard') {
         return true;
-    }
+    } //
     // Handle exact match or when base path matches overview for vendor (original logic)
     if (itemPath === '/vendor/dashboard' && activePath === '/vendor') {
         return true;
-    }
+    } //
     // General case: Check if the current path starts with the item's path
-    // This handles nested routes as well, make sure it's the most specific match first if needed
-    // Example: /consumer/dashboard/orders should match /consumer/dashboard/orders but not /consumer/dashboard/overview
-    // Ensure exact match for base dashboard paths
      if (itemPath === '/consumer/dashboard' || itemPath === '/vendor/dashboard') {
          return activePath === itemPath;
-     }
-    return activePath.startsWith(itemPath) ;
+     } //
+    return activePath.startsWith(itemPath) ; //
   };
 
 
@@ -110,7 +104,7 @@ const Sidebar = ({ onNavigate }) => {
             <h2 className="font-bold text-gray-900 text-lg">{headerDetails.title}</h2>
           </div>
         </div>
-      </div>
+      </div> {/* */}
 
       {/* Navigation Menu */}
       <nav className="flex-1 p-4 overflow-y-auto">
@@ -122,7 +116,7 @@ const Sidebar = ({ onNavigate }) => {
                 className={`group w-full text-left py-3 px-4 rounded-xl transition-all duration-300 font-medium flex items-center gap-3 ${
                   isActive(item.path)
                     ? `bg-gradient-to-r ${headerDetails.gradient} text-white shadow-lg transform scale-105` // Use dynamic gradient for active item
-                    : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 hover:shadow-md hover:scale-105"
+                    : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 hover:shadow-md hover:scale-105" //
                 }`}
               >
                 <i
@@ -143,19 +137,19 @@ const Sidebar = ({ onNavigate }) => {
                   }`}>
                     {item.badge}
                   </span>
-                )}
+                )} {/* */}
 
                 {/* Active indicator */}
                 {isActive(item.path) && (
                   <div className="ml-auto">
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                   </div>
-                )}
+                )} {/* */}
               </button>
             </li>
           ))}
         </ul>
-      </nav>
+      </nav> {/* */}
     </div>
   );
 };

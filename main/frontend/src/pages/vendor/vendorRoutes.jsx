@@ -14,7 +14,8 @@ import VendorSupport from "./dashboard/VendorSupport";
 import VendorSetup from "./dashboard/VendorSetupWizard";
 import VendorsMemberHub from "./dashboard/VendorsMemberHub";
 import VendorLocationSetup from "./dashboard/VendorLocationSetup";
-import VendorOrders from "./dashboard/VendorOrders"; // Import the new component
+import VendorOrders from "./dashboard/VendorOrders";
+import VendorMilestones from "./dashboard/VendorMilestones"; // <-- IMPORT THE NEW COMPONENT
 
 const ProtectedRoute = () => {
   // ... (ProtectedRoute remains the same)
@@ -26,7 +27,7 @@ const ProtectedRoute = () => {
     return <Navigate to="/vendor/login" replace />;
   } else {
     return <Outlet />;
-  }
+  } //
 };
 
 const VendorRoutes = () => {
@@ -50,8 +51,9 @@ const VendorRoutes = () => {
         <Route element={<VendorDashboardLayout />}>
           <Route index element={<VendorDashboard />} />
           <Route path="dashboard" element={<VendorDashboard />} />
-          <Route path="orders" element={<VendorOrders />} /> {/* Add the new route */}
+          <Route path="orders" element={<VendorOrders />} />
           <Route path="products" element={<VendorProducts />} />
+          <Route path="milestones" element={<VendorMilestones />} /> {/* <-- ADD THIS ROUTE */}
           <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
           <Route path="analytics" element={<VendorAnalytics />} />
@@ -62,7 +64,7 @@ const VendorRoutes = () => {
         </Route>
       </Route>
     </Routes>
-  );
+  ); //
 };
 
 export default VendorRoutes;
