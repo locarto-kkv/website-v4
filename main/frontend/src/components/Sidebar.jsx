@@ -60,7 +60,7 @@ const Sidebar = ({ onNavigate }) => {
       { id: "orders", label: "Orders", icon: "fas fa-box", badge: null, path: "/consumer/dashboard/orders" },
       { id: "lists", label: "Lists", icon: "fas fa-list", badge: listBadgeCount, path: "/consumer/dashboard/lists" },
       { id: "reviews", label: "Reviews", icon: "fas fa-star", badge: null, path: "/consumer/dashboard/reviews" },
-      { id: "support", label: "Support", icon: "fas fa-headset", badge: null, path: "/consumer/dashboard/support" },
+     
       { id: "settings", label: "Settings", icon: "fas fa-cog", badge: null, path: "/consumer/dashboard/settings" },
     ];
   } else if (currentUser?.type === "admin") {
