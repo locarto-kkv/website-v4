@@ -9,7 +9,7 @@ const VendorProfile = () => {
   const navigate = useNavigate();
   console.log(profile);
 
-  const [profileData, setProfileData] = useState({});
+  const [profileData, setProfileData] = useState(null);
   const [metrics, setMetrics] = useState({});
   const [documents, setDocuments] = useState([]);
 
@@ -106,6 +106,14 @@ const VendorProfile = () => {
   };
 
   const accountStatus = getAccountStatus(profile?.status);
+
+  if (!profileData) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading Profile...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">

@@ -4,9 +4,17 @@ import TopSellingProducts from "../../components/vendor/TopSellingProducts";
 import { useVendorData } from "../../context/vendor/vendorDataContext";
 
 const VendorDashboard = () => {
-  const { products, vendor } = useVendorData();
+  const { products, vendor, dataLoading } = useVendorData();
 
   // console.log(products, vendor);
+
+  if (dataLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading Dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto">
