@@ -113,14 +113,7 @@ const DashboardStats = ({ products = [], vendor = [] }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Dashboard Overview
-          </h2>
-          <p className="text-gray-600 mt-1">
-            Track your business performance at a glance
-          </p>
-        </div>
+      
         <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 text-sm font-medium">
           <i className="fas fa-sync-alt text-xs"></i>
           Refresh

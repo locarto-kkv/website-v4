@@ -132,16 +132,7 @@ const VendorSupport = () => {
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-          <i className="fas fa-headset text-white text-xl"></i>
-        </div>
-        <div>
-          {/* Renamed Title */}
-          <h1 className="text-3xl font-black text-gray-900">Vendor Support</h1>
-          <p className="text-gray-600">Get help and find answers to your questions</p>
-        </div>
-      </div>
+      
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Main Content */}

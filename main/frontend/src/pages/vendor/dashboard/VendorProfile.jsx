@@ -1,3 +1,4 @@
+// src/pages/vendor/dashboard/VendorProfile.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useVendorData } from "../../../context/vendor/vendorDataContext";
@@ -7,7 +8,7 @@ const VendorProfile = () => {
   const { blogs } = useData();
   const { vendor, profile, dataLoading } = useVendorData();
   const navigate = useNavigate();
-  console.log(profile);
+  // console.log(profile); // Keep console logs if needed for debugging, remove for production
 
   const [profileData, setProfileData] = useState(null);
   const [metrics, setMetrics] = useState({});
@@ -19,9 +20,9 @@ const VendorProfile = () => {
         companyName: profile?.name || vendor?.vendor_name || "N/A",
         email: profile?.email || "N/A",
         phone: profile?.phone_no || "N/A",
-        address: profile?.address || "N/A",
+        address: profile?.address || "N/A", // Assuming address is now an object/array handled below
         brandLogo: profile?.brand_logo_1 || "",
-        established: new Date(profile?.created_at).getFullYear(),
+        established: profile?.created_at ? new Date(profile.created_at).getFullYear() : 'N/A', // Safer date handling
         description:
           blogs?.find((b) => b.id === profile.blog_id)?.blog?.description ||
           "No description available.",
@@ -32,18 +33,22 @@ const VendorProfile = () => {
         totalRevenue: vendor?.total_amount || 0,
         averageRating:
           blogs?.find((b) => b.id === profile.blog_id)?.blog?.rating || 0,
-        categoryCount: vendor?.category_count || {},
+        categoryCount: vendor?.category_count || {}, // Ensure category_count is an object
+        productsCount: vendor?.products_count || 0, // Added products_count
       });
 
+       // Ensure profile.documents is treated as an array
       setDocuments(Array.isArray(profile?.documents) ? profile.documents : []);
+
     }
   }, [vendor, profile, blogs]);
 
   const openSetup = () => navigate("/vendor/setup");
-  const goToSettings = () => navigate('/vendor/settings');
+  const goToSettings = () => navigate('/vendor/settings'); // Keep this function
 
   // Unified document status handler
   const getDocumentStatus = (status) => {
+    // ... (getDocumentStatus function remains the same)
     switch (status) {
       case "verified":
         return {
@@ -74,7 +79,8 @@ const VendorProfile = () => {
 
   // Account status logic
   const getAccountStatus = (status) => {
-    switch (status) {
+    // ... (getAccountStatus function remains the same)
+     switch (status) {
       case "pending":
         return {
           label: "Setup Incomplete",
@@ -108,8 +114,13 @@ const VendorProfile = () => {
 
   const accountStatus = getAccountStatus(profile?.status);
 
+   // Safer address display
+  const displayAddress = profileData?.address?.[0]?.address_line_1 || "N/A";
+
+
   if (!profileData) {
-    return (
+    // ... (Loading state remains the same)
+     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -121,38 +132,7 @@ const VendorProfile = () => {
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          {profileData.brandLogo ? (
-            <img
-              src={profileData.brandLogo}
-              alt="Brand Logo"
-              className="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-white"
-            />
-          ) : (
-            <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <i className="fas fa-user-tie text-white text-2xl"></i>
-            </div>
-          )}
-          <div>
-            <h1 className="text-3xl font-black text-gray-900">Vendor Profile</h1>
-            <p className="text-gray-600">
-              Manage your business profile and documentation
-            </p>
-          </div>
-        </div>
-
-        {/* Settings Button in Header */}
-        <button
-          onClick={goToSettings}
-          className="group relative flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium"
-        >
-          <i className="fas fa-cog text-gray-600 group-hover:text-orange-500 transition-colors group-hover:rotate-90 duration-300"></i>
-          <span>Settings</span>
-        </button>
-      </div>
-
+     
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Main Profile Information */}
         <div className="xl:col-span-3">
@@ -202,7 +182,7 @@ const VendorProfile = () => {
                         <i
                           key={i}
                           className={`fas fa-star text-lg ${
-                            i < Math.floor(metrics.averageRating)
+                            i < Math.floor(metrics.averageRating || 0) // Safer access
                               ? "text-yellow-300"
                               : "text-white/30"
                           }`}
@@ -210,7 +190,7 @@ const VendorProfile = () => {
                       ))}
                     </div>
                     <span className="ml-2 font-bold text-xl bg-white/20 px-3 py-1 rounded-lg backdrop-blur-sm">
-                      {metrics.averageRating.toFixed(1)}
+                      {(metrics.averageRating || 0).toFixed(1)} {/* Safer access */}
                     </span>
                   </div>
                 </div>
@@ -232,13 +212,13 @@ const VendorProfile = () => {
                     <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                       <p className="text-sm text-gray-600 font-medium mb-1">Products</p>
                       <p className="font-bold text-gray-900 text-xl">
-                        {vendor?.products_count || 0} total
+                        {metrics.productsCount || 0} total {/* Use metrics.productsCount */}
                       </p>
                     </div>
                     <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                       <p className="text-sm text-gray-600 font-medium mb-1">Address</p>
                       <p className="font-semibold text-gray-900">
-                        {profileData.address[0]?.address_line_1}
+                        {displayAddress} {/* Use displayAddress variable */}
                       </p>
                     </div>
                   </div>
@@ -254,28 +234,34 @@ const VendorProfile = () => {
                   <div className="space-y-3">
                     <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
                       <p className="text-sm text-gray-600 font-medium mb-1">Description</p>
-                      <p className="font-medium text-gray-900 leading-relaxed">
+                      <p className="font-medium text-gray-900 leading-relaxed line-clamp-3"> {/* Added line-clamp */}
                         {profileData.description}
                       </p>
                     </div>
                     <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
                       <p className="text-sm text-gray-600 font-medium mb-1">Categories</p>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {Object.keys(vendor?.category_count || {}).map((category, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-white rounded-full text-sm font-semibold text-gray-700 border border-gray-200"
-                          >
-                            {category}
-                          </span>
-                        ))}
-                      </div>
+                       <div className="flex flex-wrap gap-2 mt-2">
+                         {/* Ensure metrics.categoryCount is an object before mapping */}
+                         {Object.keys(metrics.categoryCount || {}).length > 0 ? (
+                           Object.keys(metrics.categoryCount).map((category, index) => (
+                             <span
+                               key={index}
+                               className="px-3 py-1 bg-white rounded-full text-sm font-semibold text-gray-700 border border-gray-200"
+                             >
+                               {category}
+                             </span>
+                           ))
+                         ) : (
+                           <span className="text-sm text-gray-500">No categories assigned</span>
+                         )}
+                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons - only if NOT verified */}
+              {/* ... (Action buttons logic remains the same) */}
               {accountStatus.label !== "Account Verified" && (
                 <div className="flex flex-wrap gap-4 mb-8 pb-8 border-b border-gray-200">
                   <button
@@ -292,7 +278,9 @@ const VendorProfile = () => {
                 </div>
               )}
 
+
               {/* Documents section - only if verified */}
+              {/* ... (Documents section logic remains the same) */}
               {accountStatus.label === "Account Verified" && (
                 <div className="border-t pt-8">
                   <div className="flex items-center justify-between mb-6">
@@ -348,14 +336,17 @@ const VendorProfile = () => {
                   )}
                 </div>
               )}
+
             </div>
           </div>
         </div>
 
-        {/* Sidebar - Account Status */}
+        {/* Sidebar - Account Status, Quick Stats, and Settings Button */}
         <div className="space-y-6">
+          {/* Account Status Card */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-            <div className="flex items-center gap-3 mb-6">
+             {/* ... (Account Status content remains the same) */}
+              <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center">
                 <i className="fas fa-id-badge text-orange-600 text-lg"></i>
               </div>
@@ -381,6 +372,7 @@ const VendorProfile = () => {
                 Visit Member's Hub
               </button>
             )}
+
           </div>
 
           {/* Quick Stats Card */}
@@ -398,10 +390,21 @@ const VendorProfile = () => {
               </div>
               <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
                 <p className="text-sm text-gray-600 font-medium">Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">₹{metrics.totalRevenue}</p>
+                 {/* Format revenue as currency */}
+                <p className="text-2xl font-bold text-gray-900">₹{ (metrics.totalRevenue || 0).toLocaleString('en-IN')}</p>
               </div>
             </div>
           </div>
+
+          {/* Settings Button MOVED here */}
+          <button
+              onClick={goToSettings}
+              className="w-full group relative flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium"
+            >
+              <i className="fas fa-cog text-gray-600 group-hover:text-orange-500 transition-colors group-hover:rotate-90 duration-300"></i>
+              <span>Settings</span>
+          </button>
+
         </div>
       </div>
     </div>

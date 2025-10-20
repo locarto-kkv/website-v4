@@ -25,17 +25,7 @@ const VendorsMemberHub = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-              <i className="fas fa-users text-white text-xl"></i>
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Members Hub</h1>
-              <p className="text-gray-600">Manage your membership and connections</p>
-            </div>
-          </div>
-        </div>
+       
 
         {/* Welcome Message */}
         <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg p-6 mb-6 text-white">

@@ -172,18 +172,7 @@ const VendorProducts = () => {
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       {/* Enhanced Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2 flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-              <i className="fas fa-box text-white"></i>
-            </div>
-            My Products
-          </h1>
-          <p className="text-gray-600">
-            Manage your product inventory and listings
-          </p>
-        </div>
-
+        
         <div className="flex items-center gap-4 mt-4 lg:mt-0">
           <button
             onClick={() => setShowModal(true)}

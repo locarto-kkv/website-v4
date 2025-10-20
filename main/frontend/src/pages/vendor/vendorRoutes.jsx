@@ -1,3 +1,4 @@
+// src/pages/vendor/vendorRoutes.jsx
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useVendorData } from "../../context/vendor/vendorDataContext";
@@ -11,10 +12,12 @@ import VendorSettings from "./dashboard/VendorSettings";
 import VendorProducts from "./dashboard/VendorProducts";
 import VendorSupport from "./dashboard/VendorSupport";
 import VendorSetup from "./dashboard/VendorSetupWizard";
-import VendorsMemberHub from "./dashboard/VendorsMemberHub"; // Add this import
-import VendorLocationSetup from "./dashboard/VendorLocationSetup"; // Import the new component
+import VendorsMemberHub from "./dashboard/VendorsMemberHub";
+import VendorLocationSetup from "./dashboard/VendorLocationSetup";
+import VendorOrders from "./dashboard/VendorOrders"; // Import the new component
 
 const ProtectedRoute = () => {
+  // ... (ProtectedRoute remains the same)
   const { currentUser } = useAuthStore();
   const { clearCache } = useVendorData();
 
@@ -28,7 +31,6 @@ const ProtectedRoute = () => {
 
 const VendorRoutes = () => {
   const { currentUser } = useAuthStore();
-  // console.log(currentUser);
 
   return (
     <Routes>
@@ -48,6 +50,7 @@ const VendorRoutes = () => {
         <Route element={<VendorDashboardLayout />}>
           <Route index element={<VendorDashboard />} />
           <Route path="dashboard" element={<VendorDashboard />} />
+          <Route path="orders" element={<VendorOrders />} /> {/* Add the new route */}
           <Route path="products" element={<VendorProducts />} />
           <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
@@ -55,7 +58,7 @@ const VendorRoutes = () => {
           <Route path="settings" element={<VendorSettings />} />
           <Route path="support" element={<VendorSupport />} />
           <Route path="setup" element={<VendorSetup />} />
-          <Route path="setup/location" element={<VendorLocationSetup />} /> {/* Add new route */}
+          <Route path="setup/location" element={<VendorLocationSetup />} />
         </Route>
       </Route>
     </Routes>

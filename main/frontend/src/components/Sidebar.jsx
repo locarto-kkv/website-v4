@@ -40,13 +40,16 @@ const Sidebar = ({ onNavigate }) => {
     };
     menuItems = [
       { id: "dashboard", label: "Dashboard", icon: "fas fa-chart-line", path: "/vendor/dashboard" },
+      // Add the new Orders item here
+      { id: "orders", label: "Orders", icon: "fas fa-shopping-bag", path: "/vendor/orders"},
       { id: "analytics", label: "Analytics", icon: "fas fa-chart-bar", path: "/vendor/analytics" },
       { id: "products", label: "Products", icon: "fas fa-box", path: "/vendor/products" },
       { id: "members-hub", label: "Members Hub", icon: "fas fa-users", path: "/vendor/members-hub" },
-      { id: "support", label: "Support", icon: "fas fa-headset", path: "/vendor/support" },      
+      { id: "support", label: "Support", icon: "fas fa-headset", path: "/vendor/support" },
       { id: "profile", label: "Profile", icon: "fas fa-user-circle", path: "/vendor/profile" },
     ];
   } else if (currentUser?.type === "consumer") {
+    // ... (consumer items remain the same)
     headerDetails = {
       title: "Customer Portal",
       icon: "fas fa-user",
@@ -61,7 +64,8 @@ const Sidebar = ({ onNavigate }) => {
       { id: "settings", label: "Settings", icon: "fas fa-cog", badge: null, path: "/consumer/dashboard/settings" },
     ];
   } else if (currentUser?.type === "admin") {
-    headerDetails = {
+     // ... (admin items remain the same)
+     headerDetails = {
       title: "Admin Panel",
       icon: "fas fa-user-shield",
       gradient: "from-purple-500 to-violet-600", // Example gradient for admin
@@ -85,7 +89,11 @@ const Sidebar = ({ onNavigate }) => {
     // General case: Check if the current path starts with the item's path
     // This handles nested routes as well, make sure it's the most specific match first if needed
     // Example: /consumer/dashboard/orders should match /consumer/dashboard/orders but not /consumer/dashboard/overview
-    return activePath === itemPath || (activePath.startsWith(itemPath) && itemPath !== '/consumer/dashboard' && itemPath !== '/vendor/dashboard');
+    // Ensure exact match for base dashboard paths
+     if (itemPath === '/consumer/dashboard' || itemPath === '/vendor/dashboard') {
+         return activePath === itemPath;
+     }
+    return activePath.startsWith(itemPath) ;
   };
 
 
