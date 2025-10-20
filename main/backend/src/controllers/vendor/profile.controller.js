@@ -12,7 +12,7 @@ export const getProfile = async (req, res) => {
 
     const { data } = await db
       .from("vendors")
-      .select()
+      .select("*, address: addresses_vendor_id_fkey(*)")
       .eq("id", userId)
       .single();
 
@@ -91,9 +91,21 @@ export const updateProfile = async (req, res) => {
       newProfileData.documents = filePublicUrls;
     }
 
+    if (newProfileData.address) {
+      console.log({ ...newProfileData.address, vendor_id: userId });
+
+      const { data, error } = await db
+        .from("addresses")
+        .upsert(
+          { ...newProfileData.address, vendor_id: userId },
+          { onConflict: "id" }
+        );
+      console.log(data, error);
+    }
+
     const { data: updatedUser, error } = await db
       .from("vendors")
-      .update(newProfileData)
+      .update({ ...newProfileData.profile })
       .eq("id", userId)
       .select()
       .single();

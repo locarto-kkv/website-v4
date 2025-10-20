@@ -60,9 +60,7 @@ export const AdminBlogService = {
   },
 
   deleteBlog: async (blogId, vendorId) => {
-    await axiosInstance.delete(`${BASE_URL}/delete/${blogId}`, {
-      params: { vendorId },
-    });
+    await axiosInstance.delete(`${BASE_URL}/delete/${blogId}`);
     toast.success("Blog Deleted");
   },
 

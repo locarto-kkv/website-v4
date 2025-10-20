@@ -27,6 +27,7 @@ export const VendorProfileService = {
         response.fileUploadUrls
       );
     }
+
     return response.vendor;
   },
 

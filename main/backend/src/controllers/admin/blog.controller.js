@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const addBlog = async (req, res) => {
   try {
-    const { vendor_id, ...blogData } = req.body;
+    const blogData = req.body;
 
     const { data: newBlog, error } = await db
       .from("brands")
@@ -36,13 +36,6 @@ export const addBlog = async (req, res) => {
         .single();
 
       if (error) throw error;
-
-      const { data } = await db
-        .from("vendors")
-        .update({ blog_id: updatedBlog.id })
-        .eq("id", vendor_id)
-        .select()
-        .single();
 
       res.status(201).json({ blog: updatedBlog, imgUploadUrl });
     } else {
@@ -103,10 +96,6 @@ export const editBlog = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const { vendorId } = req.query;
-
-    await db.from("vendors").update({ blog_id: null }).eq("id", vendorId);
-
     const { data, error } = await db.from("brands").delete().eq("id", blogId);
 
     await deleteFolder(blogId, "brand-logos");

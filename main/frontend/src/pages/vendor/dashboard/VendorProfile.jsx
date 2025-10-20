@@ -7,6 +7,7 @@ const VendorProfile = () => {
   const { blogs } = useData();
   const { vendor, profile, dataLoading } = useVendorData();
   const navigate = useNavigate();
+  console.log(profile);
 
   const [profileData, setProfileData] = useState({});
   const [metrics, setMetrics] = useState({});
@@ -208,7 +209,7 @@ const VendorProfile = () => {
                     <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-600">Address</p>
                       <p className="font-medium text-gray-900">
-                        {profileData.address}
+                        {profileData.address[0]?.address_line_1}
                       </p>
                     </div>
                   </div>
