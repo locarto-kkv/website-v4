@@ -368,7 +368,10 @@ const VendorProfile = () => {
             </p>
 
             {accountStatus.label === "Account Verified" && (
-              <button className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl">
+              <button
+                onClick={() => navigate('/vendor/members-hub')} // <-- MODIFIED HERE
+                className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl"
+              >
                 <i className="fas fa-users mr-2"></i>
                 Visit Member's Hub
               </button>
