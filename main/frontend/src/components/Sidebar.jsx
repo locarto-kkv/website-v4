@@ -45,7 +45,7 @@ const Sidebar = ({ onNavigate }) => {
       { id: "analytics", label: "Analytics", icon: "fas fa-chart-bar", path: "/vendor/analytics" },
       { id: "products", label: "Products", icon: "fas fa-box", path: "/vendor/products" },
       { id: "members-hub", label: "Members Hub", icon: "fas fa-users", path: "/vendor/members-hub" },
-      { id: "support", label: "Support", icon: "fas fa-headset", path: "/vendor/support" },
+      // { id: "support", label: "Support", icon: "fas fa-headset", path: "/vendor/support" }, // <-- REMOVED SUPPORT BUTTON
       { id: "profile", label: "Profile", icon: "fas fa-user-circle", path: "/vendor/profile" },
     ];
   } else if (currentUser?.type === "consumer") {

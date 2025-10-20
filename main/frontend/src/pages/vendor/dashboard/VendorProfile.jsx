@@ -44,7 +44,8 @@ const VendorProfile = () => {
   }, [vendor, profile, blogs]);
 
   const openSetup = () => navigate("/vendor/setup");
-  const goToSettings = () => navigate('/vendor/settings'); // Keep this function
+  const goToSettings = () => navigate('/vendor/settings');
+  const goToSupport = () => navigate('/vendor/support'); // <-- ADDED function to navigate to support
 
   // Unified document status handler
   const getDocumentStatus = (status) => {
@@ -132,7 +133,7 @@ const VendorProfile = () => {
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
-     
+
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Main Profile Information */}
         <div className="xl:col-span-3">
@@ -396,13 +397,22 @@ const VendorProfile = () => {
             </div>
           </div>
 
-          {/* Settings Button MOVED here */}
+          {/* Settings Button */}
           <button
               onClick={goToSettings}
               className="w-full group relative flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium"
             >
               <i className="fas fa-cog text-gray-600 group-hover:text-orange-500 transition-colors group-hover:rotate-90 duration-300"></i>
               <span>Settings</span>
+          </button>
+
+          {/* ADDED Support Button */}
+          <button
+              onClick={goToSupport}
+              className="w-full group relative flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium"
+            >
+              <i className="fas fa-headset text-gray-600 group-hover:text-orange-500 transition-colors"></i>
+              <span>Support</span>
           </button>
 
         </div>
