@@ -3,13 +3,16 @@ import { OAuth2Client } from "google-auth-library";
 import logger from "../../lib/logger.js";
 import { env } from "../../lib/env.js";
 
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+
 import db from "../../lib/db.js";
 import { generateToken } from "../../lib/utils.js";
-import { sendOtp, verifyOtp } from "../../services/consumer/otp.service.js";
+import { sendOtp, verifyOtp } from "../../services/otp.service.js";
 
 const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_REDIRECT_URI = env.GOOGLE_REDIRECT_URI;
+const GOOGLE_REDIRECT_URI = env.GOOGLE_CONSUMER_REDIRECT_URI;
 const FRONTEND_URL = env.FRONTEND_URL;
 
 const client = new OAuth2Client(
@@ -148,7 +151,7 @@ export const loginGoogle = async (req, res) => {
         scope: ["openid", "email", "profile"],
       });
 
-      res.status.redirect(url);
+      return res.redirect(url);
     }
 
     const { tokens } = await client.getToken(code);
@@ -173,7 +176,7 @@ export const loginGoogle = async (req, res) => {
 
     if (existingUser) {
       generateToken(existingUser.id, "consumer", res);
-      res.status.redirect(FRONTEND_URL + "/dashboard");
+      return res.redirect(FRONTEND_URL + "/consumer/dashboard");
     }
 
     const { data: newUser, error } = await db
@@ -199,7 +202,7 @@ export const loginGoogle = async (req, res) => {
 
     generateToken(newUser.id, "consumer", res);
 
-    res.status.redirect(FRONTEND_URL + "/dashboard");
+    res.redirect(FRONTEND_URL + "/consumer/dashboard");
   } catch (error) {
     logger({
       level: "error",

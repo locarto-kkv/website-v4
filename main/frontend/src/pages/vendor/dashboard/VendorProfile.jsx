@@ -5,7 +5,7 @@ import { useData } from "../../../context/dataContext";
 
 const VendorProfile = () => {
   const { blogs } = useData();
-  const { vendor, profile } = useVendorData();
+  const { vendor, profile, dataLoading } = useVendorData();
   const navigate = useNavigate();
 
   const [profileData, setProfileData] = useState({});
@@ -14,7 +14,6 @@ const VendorProfile = () => {
 
   useEffect(() => {
     if (vendor && profile) {
-      // Build profile info dynamically from vendor + profile
       setProfileData({
         companyName: profile?.name || vendor?.vendor_name || "N/A",
         email: profile?.email || "N/A",
@@ -27,7 +26,6 @@ const VendorProfile = () => {
           "No description available.",
       });
 
-      // Setup metrics from vendor data
       setMetrics({
         totalOrders: vendor?.orders_count || 0,
         totalRevenue: vendor?.total_amount || 0,
@@ -36,47 +34,77 @@ const VendorProfile = () => {
         categoryCount: vendor?.category_count || {},
       });
 
-      // Documents
-      setDocuments(
-        profile?.documents && Array.isArray(profile.documents)
-          ? profile.documents
-          : []
-      );
+      setDocuments(Array.isArray(profile?.documents) ? profile.documents : []);
     }
   }, [vendor, profile, blogs]);
 
   const openSetup = () => navigate("/vendor/setup");
 
-  const getDocumentStatusColor = (status) => {
+  // ✅ Unified document status handler
+  const getDocumentStatus = (status) => {
     switch (status) {
       case "verified":
         return {
           color: "bg-green-100 text-green-800",
-          icon: "fas fa-check-circle",
+          icon: "fas fa-check-circle text-green-600",
+          label: "Verified",
         };
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return {
+          color: "bg-yellow-100 text-yellow-800",
+          icon: "fas fa-clock text-yellow-600",
+          label: "Pending",
+        };
       case "rejected":
-        return "bg-red-100 text-red-800";
+        return {
+          color: "bg-red-100 text-red-800",
+          icon: "fas fa-times-circle text-red-600",
+          label: "Rejected",
+        };
       default:
-        return "bg-gray-100 text-gray-800";
+        return {
+          color: "bg-gray-100 text-gray-800",
+          icon: "fas fa-file text-gray-500",
+          label: "Unknown",
+        };
     }
   };
 
-  const getDocumentIcon = (status) => {
+  // ✅ Account status logic
+  const getAccountStatus = (status) => {
     switch (status) {
-      case "verified":
-        return "fas fa-check-circle";
       case "pending":
-        return "fas fa-clock";
-      case "rejected":
-        return "fas fa-times-circle";
+        return {
+          label: "Setup Incomplete",
+          color: "bg-yellow-50 border-yellow-200 text-yellow-800",
+          icon: "fas fa-clock text-yellow-600",
+          desc: "Please complete your setup to access all facilities.",
+        };
+      case "complete":
+        return {
+          label: "Waiting for Verification",
+          color: "bg-orange-50 border-orange-200 text-orange-800",
+          icon: "fas fa-hourglass-half text-orange-600",
+          desc: "Please wait, our admins will contact you shortly to verify your identity.",
+        };
+      case "verified":
+        return {
+          label: "Account Verified",
+          color: "bg-green-50 border-green-200 text-green-800",
+          icon: "fas fa-check-circle text-green-600",
+          desc: "Your account is verified! You can now access all facilities. Visit the Member's Hub to learn more.",
+        };
       default:
-        return "fas fa-file";
+        return {
+          label: "Unknown Status",
+          color: "bg-gray-50 border-gray-200 text-gray-700",
+          icon: "fas fa-question-circle text-gray-500",
+          desc: "Account status could not be determined.",
+        };
     }
   };
 
-  const getAccountStatus = (status) => {};
+  const accountStatus = getAccountStatus(profile?.status);
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -209,90 +237,97 @@ const VendorProfile = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4 mb-8">
-                <button
-                  onClick={openSetup}
-                  className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  <i className="fas fa-cog mr-2"></i> Complete Setup
-                </button>
-                <button className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors">
-                  <i className="fas fa-edit mr-2"></i> Edit Profile
-                </button>
-                <button className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
-                  <i className="fas fa-download mr-2"></i> Export Data
-                </button>
-              </div>
-
-              {/* Documents Section */}
-              <div className="border-t pt-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                    <i className="fas fa-folder text-amber-600"></i>
-                    Business Documents
-                  </h3>
-                  <button className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium">
-                    <i className="fas fa-upload mr-2"></i>
-                    Upload Document
+              {/* ✅ Buttons only if NOT verified */}
+              {accountStatus.label !== "Account Verified" && (
+                <div className="flex flex-wrap gap-4 mb-8">
+                  <button
+                    onClick={openSetup}
+                    className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
+                    <i className="fas fa-cog mr-2"></i> Complete Setup
+                  </button>
+                  <button className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors">
+                    <i className="fas fa-edit mr-2"></i> Edit Profile
                   </button>
                 </div>
+              )}
 
-                {documents.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {documents.map((doc, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
-                        onClick={() => handleDownloadDocument(doc.url)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                            <i className="fas fa-file-pdf text-red-500 text-xl"></i>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {doc.name}
-                            </p>
-                          </div>
-                        </div>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getDocumentStatusColor(
-                            doc.status
-                          )}`}
-                        >
-                          <i
-                            className={`${getDocumentIcon(doc.status)} mr-1`}
-                          ></i>
-                          {doc.status}
-                        </span>
-                      </div>
-                    ))}
+              {/* ✅ Documents section only if verified */}
+              {accountStatus.label === "Account Verified" && (
+                <div className="border-t pt-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                      <i className="fas fa-folder text-amber-600"></i>
+                      Business Documents
+                    </h3>
+                    <button className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium">
+                      <i className="fas fa-upload mr-2"></i>
+                      Upload Document
+                    </button>
                   </div>
-                ) : (
-                  <p className="text-gray-500 italic">
-                    No documents uploaded yet.
-                  </p>
-                )}
-              </div>
+
+                  {documents.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {documents.map((doc, index) => {
+                        const statusInfo = getDocumentStatus(doc.status);
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                <i className="fas fa-file-pdf text-red-500 text-xl"></i>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900">
+                                  {doc.name}
+                                </p>
+                              </div>
+                            </div>
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${statusInfo.color}`}
+                            >
+                              <i className={`${statusInfo.icon}`}></i>
+                              {statusInfo.label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 italic">
+                      No documents uploaded yet.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* Sidebar - Account Status */}
         <div className="space-y-6">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                <i className="fas fa-check-circle text-green-600"></i>
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                <i className="fas fa-id-badge text-gray-700"></i>
               </div>
               <h2 className="text-lg font-bold text-gray-900">
                 Account Status
               </h2>
             </div>
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg flex justify-between items-center">
-              <span className="font-medium text-green-800">Active Vendor</span>
-              <i className="fas fa-check text-green-600"></i>
+
+            <div
+              className={`p-4 border rounded-lg flex justify-between items-center ${accountStatus.color}`}
+            >
+              <span className="font-semibold">{accountStatus.label}</span>
+              <i className={`${accountStatus.icon} text-lg`}></i>
             </div>
+
+            <p className="mt-3 text-sm text-gray-700 leading-relaxed">
+              {accountStatus.desc}
+            </p>
           </div>
         </div>
       </div>

@@ -27,19 +27,13 @@ const OtpInput = ({ value, onChange }) => (
   </div>
 );
 
-const PasswordInput = ({
-  value,
-  onChange,
-  showPassword,
-  setShowPassword,
-  isLogin,
-}) => (
+const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => (
   <div>
     <label
       htmlFor="password"
       className="block text-sm font-medium text-gray-700"
     >
-      {isLogin ? "Password" : "Create Password"}
+      Password
     </label>
     <div className="relative">
       <input
@@ -121,12 +115,11 @@ const AuthConsumer = () => {
   };
 
   const handleGoogleSubmit = async (e) => {
-    googleLogin();
+    googleLogin("consumer");
     await checkAuth();
   };
 
   const resendOtp = async () => {
-    if (cooldown > 0) return;
     const otpRes = await sendVerification(formData, "consumer");
     console.log(sentOtp);
     setSentOtp(true);
@@ -217,149 +210,6 @@ const AuthConsumer = () => {
               <OtpInput value={formData.otp} onChange={handleChange} />
             )}
 
-            {/* {!isLogin && (
-              <>
-                            <div>
-                <label
-                  htmlFor="name"
-                  className="block text-xs font-medium text-gray-700"
-                >
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1.5 px-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
-              </div>
-                <div>
-                  <label
-                    htmlFor="phone"
-                    className="block text-xs font-medium text-gray-700"
-                  >
-                    Phone Number
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    // required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1.5 px-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="address"
-                    className="block text-xs font-medium text-gray-700"
-                  >
-                    Address
-                  </label>
-                  <input
-                    id="address"
-                    name="address"
-                    type="text"
-                    // required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1.5 px-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
-                    value={formData.address}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-[100px,1fr]">
-                  <div>
-                    <label
-                      htmlFor="age"
-                      className="block text-xs font-medium text-gray-700"
-                    >
-                      Age
-                    </label>
-                    <div className="mt-1 relative">
-                      <select
-                        id="age"
-                        name="age"
-                        // required
-                        className="block w-full h-8 px-2 pr-5 border border-gray-300 rounded text-xs leading-4 bg-white appearance-none focus:outline-none focus:ring-primary focus:border-primary"
-                        value={formData.age}
-                        onChange={handleChange}
-                      >
-                        <option value="">Age</option>
-                        {Array.from({ length: 101 }, (_, i) => (
-                          <option key={i} value={i}>
-                            {i}
-                          </option>
-                        ))}
-                      </select>
-                      <span className="pointer-events-none absolute inset-y-0 right-1 flex items-center text-gray-500 text-xs">
-                        ▾
-                      </span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="sex"
-                      className="block text-xs font-medium text-gray-700"
-                    >
-                      Sex
-                    </label>
-                    <div className="mt-1 relative">
-                      <select
-                        id="sex"
-                        name="sex"
-                        // required
-                        className="block w-full h-8 px-2 pr-5 border border-gray-300 rounded text-xs leading-4 bg-white appearance-none focus:outline-none focus:ring-primary focus:border-primary"
-                        value={formData.sex}
-                        onChange={handleChange}
-                      >
-                        <option value="">Select</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                      </select>
-                      <span className="pointer-events-none absolute inset-y-0 right-1 flex items-center text-gray-500 text-xs">
-                        ▾
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="country"
-                    className="block text-xs font-medium text-gray-700"
-                  >
-                    Country
-                  </label>
-                  <div className="mt-1 relative">
-                    <select
-                      id="country"
-                      name="country"
-                      // required
-                      className="block w-full h-8 px-2 pr-5 border border-gray-300 rounded text-xs leading-4 bg-white appearance-none focus:outline-none focus:ring-primary focus:border-primary"
-                      value={formData.country}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Country</option>
-                      <option value="us">United States</option>
-                      <option value="ca">Canada</option>
-                      <option value="uk">United Kingdom</option>
-                      <option value="au">Australia</option>
-                      <option value="de">Germany</option>
-                    </select>
-                    <span className="pointer-events-none absolute inset-y-0 right-1 flex items-center text-gray-500 text-xs">
-                      ▾
-                    </span>
-                  </div>
-                </div>
-              </>
-            )} */}
             {isLogin && usePassword && (
               <PasswordInput
                 value={formData.password}
@@ -408,17 +258,6 @@ const AuthConsumer = () => {
               </button>
             </div>
           </form>
-          {/* {isLogin && (
-            <div>
-              <button
-                type="submit"
-                onClick={handleAuthType}
-                className="w-full mt-4 py-1.5 px-3 rounded-md shadow-sm text-xs font-medium bg-gray-200 text-gray-700 hover:bg-orange-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary"
-              >
-                {usePassword ? "Use OTP" : "Use Password"}
-              </button>
-            </div>
-          )} */}
 
           <div className="mt-3">
             <button

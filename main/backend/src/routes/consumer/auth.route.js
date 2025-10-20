@@ -7,6 +7,7 @@ import {
   loginGoogle,
 } from "../../controllers/consumer/auth.controller.js";
 import { protectRoute } from "../../middleware/auth.middleware.js";
+
 const router = Router();
 
 router.post("/verify", sendVerification);

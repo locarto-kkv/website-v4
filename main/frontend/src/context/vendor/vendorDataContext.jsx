@@ -104,23 +104,27 @@ export const VendorDataProvider = ({ children }) => {
       const cachedAnalytics = localStorage.getItem("vendor_analytics");
       const cachedOrders = localStorage.getItem("vendor_orders");
 
-      if (cachedProfile || cachedAnalytics || cachedOrders) {
-        if (cachedProfile) {
-          const parsed = JSON.parse(cachedProfile);
-          setProfile(parsed.data);
-        }
-        if (cachedAnalytics) {
-          const parsed = JSON.parse(cachedAnalytics);
-          setAnalyticData(parsed.data);
-          setProducts(parsed.data.products?.total);
-          setVendor(parsed.data.vendor?.total);
-        }
-        if (cachedOrders) {
-          const parsed = JSON.parse(cachedOrders);
-          setOrders(parsed.data);
-        }
+      if (cachedProfile) {
+        const parsed = JSON.parse(cachedProfile);
+        setProfile(parsed.data);
       } else {
-        await Promise.all([getProfile(), getAnalytics(), getOrders()]);
+        await getProfile();
+      }
+
+      if (cachedAnalytics) {
+        const parsed = JSON.parse(cachedAnalytics);
+        setAnalyticData(parsed.data);
+        setProducts(parsed.data.products?.total);
+        setVendor(parsed.data.vendor?.total);
+      } else {
+        await getAnalytics();
+      }
+
+      if (cachedOrders) {
+        const parsed = JSON.parse(cachedOrders);
+        setOrders(parsed.data);
+      } else {
+        await getOrders();
       }
     } catch (error) {
       console.error("Error loading vendor data:", error);

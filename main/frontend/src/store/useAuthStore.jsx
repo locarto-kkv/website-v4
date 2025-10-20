@@ -20,6 +20,10 @@ export const useAuthStore = create(
 
       // ---- Auth functions ----
       sendVerification: async (data, type) => {
+        if (get().cooldown > 0) {
+          toast.error("Wait for cooldown");
+          return;
+        }
         set({ otpLoading: true });
         try {
           const res = await axiosInstance.post(`/${type}/auth/verify`, data);
@@ -37,7 +41,7 @@ export const useAuthStore = create(
         set({ loginLoading: true });
         try {
           const res = await axiosInstance.post(`/${type}/auth/login`, data);
-          set({ currentUser: res.data, cooldown: 0 });
+          set({ currentUser: res.data, cooldown: 0, sentOtp: false });
           toast.success("Login Successful");
         } catch (error) {
           toast.error(error.response?.data?.message || "Login failed");
@@ -51,7 +55,7 @@ export const useAuthStore = create(
         set({ signupLoading: true });
         try {
           const res = await axiosInstance.post(`/${type}/auth/signup`, data);
-          set({ currentUser: res.data, cooldown: 0 });
+          set({ currentUser: res.data, cooldown: 0, sentOtp: false });
           toast.success("Signup Successful");
         } catch (error) {
           toast.error(error.response?.data?.message || "Signup failed");
@@ -61,12 +65,11 @@ export const useAuthStore = create(
         }
       },
 
-      googleLogin: () => {
+      googleLogin: (type) => {
         set({ authLoading: true });
         try {
           window.location.href =
-            import.meta.env.VITE_BACKEND_URL +
-            "/api/consumer/auth/login-google";
+            import.meta.env.VITE_BACKEND_URL + `/api/${type}/auth/login-google`;
         } catch (error) {
           toast.error(error.response?.data?.message || "Google failed");
           console.log("Error in googleLogin:", error.response?.data?.message);
@@ -111,7 +114,6 @@ export const useAuthStore = create(
       partialize: (state) => ({
         currentUser: state.currentUser,
         cooldown: state.cooldown,
-        sentOtp: state.sentOtp,
       }),
     }
   )

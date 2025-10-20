@@ -6,6 +6,7 @@ import profileRoutes from "./profile.routes.js";
 import orderRoutes from "./order.routes.js";
 import reviewRoutes from "./review.routes.js";
 import analyticsRoutes from "./analytic.routes.js";
+import supportRoutes from "./support.routes.js";
 
 const router = Router();
 
@@ -15,5 +16,6 @@ router.use("/profile", profileRoutes);
 router.use("/order", orderRoutes);
 router.use("/review", reviewRoutes);
 router.use("/analytic", analyticsRoutes);
+router.use("/support", supportRoutes);
 
 export default router;
