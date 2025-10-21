@@ -32,17 +32,14 @@ const VendorLocationSetup = () => {
     state: "",
     country: "",
     website: "",
+    coordinates: { lat: "", lng: "" },
   });
 
   const { profile } = useVendorData();
-  console.log(profile);
 
-  // Fetch approximate location from pincode (forward geocoding)
+  // ✅ Fetch approximate location from pincode (forward geocoding)
   const fetchLocationByPincode = async (pincode) => {
-    if (!pincode) {
-      alert("Please enter a pincode.");
-      return;
-    }
+    if (!pincode) return;
     setLoading(true);
     try {
       const response = await fetch(
@@ -57,7 +54,6 @@ const VendorLocationSetup = () => {
         const lng = parseFloat(data[0].lon);
         const latlng = [lat, lng];
 
-        // Center map and add marker
         if (map) {
           map.setView(latlng, 14);
           setMarker((prevMarker) => {
@@ -69,20 +65,17 @@ const VendorLocationSetup = () => {
           });
         }
 
-        // Optionally reverse-geocode for readable address
         await fetchAddress(lat, lng);
       } else {
-        alert("No results found for this pincode.");
+        console.warn("No results found for this pincode.");
       }
     } catch (err) {
       console.error("Error fetching location from pincode:", err);
-      alert("Error fetching location. Please try again.");
     }
-
     setLoading(false);
   };
 
-  // Fetch address from coordinates (reverse geocode)
+  // ✅ Fetch address from coordinates (reverse geocode)
   const fetchAddress = async (lat, lng) => {
     try {
       const response = await fetch(
@@ -112,37 +105,17 @@ const VendorLocationSetup = () => {
           country: addr.country || "",
           coordinates: { lat, lng },
         });
-      } else {
-        setNewAddress({
-          addressLine1: "Address not available",
-          addressLine2: "",
-          pincode: "",
-          state: "",
-          country: "",
-          coordinates: { lat: "", lng: "" },
-        });
       }
     } catch (error) {
       console.error("Error fetching address:", error);
-      setNewAddress({
-        addressLine1: "Address not available",
-        addressLine2: "",
-        pincode: "",
-        state: "",
-        country: "",
-        coordinates: { lat: "", lng: "" },
-      });
     }
   };
 
+  // ✅ Load setup form from localStorage
   useEffect(() => {
     const storedForm = localStorage.getItem("setupform");
     if (storedForm) {
-      console.log(storedForm);
-
       const parsedForm = JSON.parse(storedForm);
-      console.log({ ...setupForm, ...parsedForm });
-
       setSetupForm((prev) => ({ ...prev, ...parsedForm }));
       setNewAddress({
         addressLine1: parsedForm.addressLine1 || "",
@@ -151,16 +124,10 @@ const VendorLocationSetup = () => {
         state: parsedForm.state || "",
         country: parsedForm.country || "",
       });
-      // After map initializes, center map based on saved pincode
-      setTimeout(() => {
-        if (parsedForm.pincode) {
-          fetchLocationByPincode(parsedForm.pincode);
-        }
-      }, 1000);
     }
-  }, [map]);
+  }, []);
 
-  // Initialize the map instance
+  // ✅ Initialize map
   useEffect(() => {
     const mapInstance = L.map("map-container").setView([20.5937, 78.9629], 5);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -169,12 +136,35 @@ const VendorLocationSetup = () => {
     }).addTo(mapInstance);
     setMap(mapInstance);
 
-    return () => {
-      mapInstance.remove();
-    };
+    return () => mapInstance.remove();
   }, []);
 
-  // Handle user manually selecting on map
+  // ✅ Set initial marker — from profile.coordinates or pincode
+  useEffect(() => {
+    if (!map) return;
+
+    const storedCoords = setupForm.coordinates;
+    const storedPincode = setupForm.pincode;
+
+    if (storedCoords.lat) {
+      const { lat, lng } = storedCoords;
+      const latlng = [parseFloat(lat), parseFloat(lng)];
+
+      // Center map and place marker
+      map.setView(latlng, 14);
+      const newMarker = L.marker(latlng).addTo(map);
+      setMarker(newMarker);
+      setNewAddress((prev) => ({
+        ...prev,
+        coordinates: { lat, lng },
+      }));
+    } else if (storedPincode) {
+      // Fallback to pincode-based location
+      fetchLocationByPincode(storedPincode);
+    }
+  }, [map, profile, setupForm.pincode]);
+
+  // ✅ Handle manual marker move — only update coordinates
   useEffect(() => {
     if (!map) return;
 
@@ -191,6 +181,13 @@ const VendorLocationSetup = () => {
       });
 
       await fetchAddress(lat, lng);
+
+      // Only update coordinates in setupForm
+      setSetupForm((prev) => ({
+        ...prev,
+        coordinates: { lat: lat.toFixed(6), lng: lng.toFixed(6) },
+      }));
+
       setLoading(false);
     };
 
@@ -198,73 +195,42 @@ const VendorLocationSetup = () => {
     return () => map.off("click", handleClick);
   }, [map]);
 
-  // Save and confirm address update
+  // ✅ Save
   const handleNextStep = async () => {
-    const confirmation = window.confirm(
-      "Do you want to update your previous address with the latest address?"
-    );
-
-    if (confirmation) {
-      var updatedForm = {
-        ...setupForm,
-        addressLine1: newAddress.addressLine1 || setupForm.addressLine1,
-        addressLine2: newAddress.addressLine2 || setupForm.addressLine2,
-        pincode: newAddress.pincode || setupForm.pincode,
-        state: newAddress.state || setupForm.state,
-        country: newAddress.country || setupForm.country,
-        coordinates: newAddress.coordinates,
-      };
-
-      localStorage.setItem("setupform", JSON.stringify(updatedForm));
-    } else {
-      var updatedForm = setupForm;
-      localStorage.setItem("setupform", JSON.stringify(setupForm));
-    }
-
     const profileData = {
-      profile: { name: updatedForm.businessName },
+      profile: { name: setupForm.businessName },
       address: {
         label: "Main",
-        address_line_1: updatedForm.addressLine1,
-        address_line_2: updatedForm.addressLine2,
-        pincode: updatedForm.pincode,
-        state: updatedForm.state,
-        country: updatedForm.country,
-        coordinates: [updatedForm.coordinates.lat, updatedForm.coordinates.lng],
+        address_line_1: setupForm.addressLine1,
+        address_line_2: setupForm.addressLine2,
+        pincode: setupForm.pincode,
+        state: setupForm.state,
+        country: setupForm.country,
+        coordinates: [setupForm.coordinates.lat, setupForm.coordinates.lng],
       },
       extra: {
-        businessType: updatedForm.businessType,
-        website: updatedForm.website,
+        businessType: setupForm.businessType,
+        website: setupForm.website,
         primary_contact: {
-          name: updatedForm.name,
-          phone_no: updatedForm.phone,
-          email: updatedForm.email,
+          name: setupForm.name,
+          phone_no: setupForm.phone,
+          email: setupForm.email,
         },
       },
     };
 
+    localStorage.setItem("setupform", JSON.stringify(setupForm));
     await VendorProfileService.updateProfile(profileData);
     navigate("/vendor/profile");
   };
 
-  // Cancel setup (save current setupForm)
   const closeSetup = () => {
     localStorage.setItem("setupform", JSON.stringify(setupForm));
-    console.log("Setup form saved on cancel:", setupForm);
     navigate("/vendor/profile");
-  };
-
-  // handle Enter key on the pincode input
-  const handlePincodeKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      fetchLocationByPincode(newAddress.pincode);
-    }
   };
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-orange-50 to-blue-50 p-6">
-      {/* Full-screen loading overlay */}
       {loading && (
         <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-4"></div>
@@ -285,14 +251,10 @@ const VendorLocationSetup = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Sidebar */}
-          <div className="bg-white rounded-xl shadow-md p-3 space-y-6 border border-gray-200">
-            {/* Pincode Search Input + Button (aligned) */}
+          <div className="bg-white rounded-xl shadow-md p-4 space-y-6 border border-gray-200">
             <div>
               <label className="block text-gray-700 mb-2">Enter Pincode</label>
-
-              {/* inline-flex container to align input + button perfectly */}
-              <div className="inline-flex items-stretch w-full gap-0">
+              <div className="inline-flex items-stretch w-full">
                 <input
                   type="text"
                   name="pincode"
@@ -303,74 +265,57 @@ const VendorLocationSetup = () => {
                       pincode: e.target.value,
                     }))
                   }
-                  onKeyDown={handlePincodeKeyDown}
-                  className="flex-1 py-3 px-1 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="flex-1 py-3 px-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   placeholder="e.g. 400050"
-                  aria-label="Enter pincode"
                 />
-
                 <button
                   type="button"
                   onClick={() => fetchLocationByPincode(newAddress.pincode)}
-                  className="inline-flex items-center justify-center px-4 border border-l-0 border-gray-300 bg-blue-600 hover:bg-blue-700 text-white rounded-r-lg transition-all"
-                  aria-label="Search pincode"
+                  className="inline-flex items-center justify-center px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-r-lg transition-all"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M21 21l-4.35-4.35"></path>
-                    <circle cx="11" cy="11" r="6"></circle>
-                  </svg>
+                  <i className="fas fa-search"></i>
                 </button>
               </div>
             </div>
 
-            {/* Address Display */}
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Current Address
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">
-                {setupForm.addressLine1}
+                {setupForm.addressLine1 || "No address loaded"}
                 {setupForm.addressLine2 && (
                   <>
                     <br />
-                    {newAddress.addressLine2}
+                    {setupForm.addressLine2}
                   </>
                 )}
               </p>
-
-              {newAddress.pincode && (
+              {setupForm.pincode && (
                 <p className="text-gray-600 text-sm mt-2">
-                  <span className="font-medium">Pincode:</span>
-                  {newAddress.pincode}
+                  <span className="font-medium">Pincode:</span>{" "}
+                  {setupForm.pincode}
                 </p>
               )}
-              {newAddress.state && (
+              {setupForm.state && (
                 <p className="text-gray-600 text-sm mt-1">
-                  <span className="font-medium">State:</span> {newAddress.state}
+                  <span className="font-medium">State:</span> {setupForm.state}
                 </p>
               )}
-              {newAddress.country && (
+              {setupForm.country && (
                 <p className="text-gray-600 text-sm mt-1">
-                  <span className="font-medium">Country:</span>
-                  {newAddress.country}
+                  <span className="font-medium">Country:</span>{" "}
+                  {setupForm.country}
                 </p>
               )}
             </div>
 
-            {/* Buttons */}
             <button
               onClick={handleNextStep}
               className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-all"
             >
               Save Pin & Continue
             </button>
-
             <button
               onClick={closeSetup}
               className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-all"
@@ -379,7 +324,6 @@ const VendorLocationSetup = () => {
             </button>
           </div>
 
-          {/* Map */}
           <div className="lg:col-span-2 h-[600px] rounded-xl overflow-hidden border border-gray-200 shadow-md relative">
             <div id="map-container" className="w-full h-full"></div>
           </div>

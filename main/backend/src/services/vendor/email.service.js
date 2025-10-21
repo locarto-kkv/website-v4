@@ -1,25 +1,23 @@
 import nodemailer from "nodemailer";
-import logger from "../../lib/logger";
+import logger from "../../lib/logger.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
 export const sendAuthEmail = async (payload) => {
   try {
-    const payload = payload;
-
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
 
-    const to = "it@locarto.in";
+    const to = "vrushankssj@gmail.com";
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to,
-      subject: `Verification Email From ${payload.businessName}`,
-      text: payload,
+      subject: `Profile Verification Email From ${payload.profile.name}`,
+      text: JSON.stringify(payload, null, "\t"),
     });
   } catch (error) {
     logger({

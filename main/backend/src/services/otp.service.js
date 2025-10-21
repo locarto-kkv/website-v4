@@ -44,7 +44,7 @@ async function sendEmail(to, otp) {
     from: process.env.EMAIL_USER,
     to,
     subject: "Your OTP Code",
-    text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
+    text: `Your OTP is ${otp}. It will expire in 2 minutes.`,
   });
   console.log(`Email OTP sent to ${to}`);
 }

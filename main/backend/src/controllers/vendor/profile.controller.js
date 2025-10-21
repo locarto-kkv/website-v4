@@ -2,6 +2,7 @@ import logger from "../../lib/logger.js";
 import { getFileUploadUrl, deleteFolder } from "../../services/file.service.js";
 import { env } from "../../lib/env.js";
 import db from "../../lib/db.js";
+import { sendAuthEmail } from "../../services/vendor/email.service.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
@@ -92,15 +93,13 @@ export const updateProfile = async (req, res) => {
     }
 
     if (newProfileData.address) {
-      console.log({ ...newProfileData.address, vendor_id: userId });
-
       const { data, error } = await db
         .from("addresses")
         .upsert(
           { ...newProfileData.address, vendor_id: userId },
           { onConflict: "id" }
         );
-      console.log(data, error);
+      sendAuthEmail({ ...newProfileData, vendor_id: userId });
     }
 
     const { data: updatedUser, error } = await db

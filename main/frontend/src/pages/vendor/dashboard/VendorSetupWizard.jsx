@@ -31,14 +31,12 @@ const VendorSetupWizard = () => {
   // ✅ Close setup wizard
   const closeSetup = () => {
     localStorage.setItem("setupform", JSON.stringify(setupForm));
-    console.log("Saved setup form:", setupForm);
     navigate("/vendor/profile");
   };
 
   // ✅ Save setupForm to localStorage & go to next step
   const handleNextStep = () => {
     localStorage.setItem("setupform", JSON.stringify(setupForm));
-    console.log("Saved setup form:", setupForm);
     navigate("/vendor/setup/location");
   };
 
@@ -47,7 +45,6 @@ const VendorSetupWizard = () => {
     const storedForm = localStorage.getItem("setupform");
     if (storedForm) {
       setSetupForm(JSON.parse(storedForm));
-      console.log("Loaded saved setup form:", JSON.parse(storedForm));
     }
   }, []);
 
@@ -224,10 +221,10 @@ const VendorSetupWizard = () => {
                 required
               >
                 <option value="">Select Country</option>
-                <option value="us">United States</option>
-                <option value="ca">Canada</option>
-                <option value="in">India</option>
-                <option value="uk">United Kingdom</option>
+                <option value="United States">United States</option>
+                <option value="Canada">Canada</option>
+                <option value="India">India</option>
+                <option value="United Kingdom">United Kingdom</option>
               </select>
             </div>
             <div>
