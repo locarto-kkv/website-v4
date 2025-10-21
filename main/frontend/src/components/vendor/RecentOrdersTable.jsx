@@ -11,9 +11,9 @@ const StatusBadge = ({ status }) => {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${config.color}`}
+      className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] sm:text-xs font-semibold ${config.color}`}
     >
-      <i className={`${config.icon} text-xs`}></i>
+      <i className={`${config.icon} text-[10px] sm:text-xs`}></i>
       {config.label}
     </span>
   );
@@ -26,13 +26,11 @@ const RecentOrdersTable = () => {
   const [sortDirection, setSortDirection] = useState("desc");
   const [filter, setFilter] = useState("all");
 
-  // Filter orders based on status
-  const filteredOrders = orders.filter((order) => {
+  const filteredOrders = (orders || []).filter((order) => {
     if (filter === "all") return true;
     return order.order_status?.toLowerCase() === filter;
   });
 
-  // Sort orders
   const sortedOrders = [...filteredOrders].sort((a, b) => {
     let aValue = a[sortField];
     let bValue = b[sortField];
@@ -58,190 +56,115 @@ const RecentOrdersTable = () => {
   };
 
   const statusFilters = [
-    { value: "all", label: "All Orders", count: orders.length },
-    {
-      value: "pending",
-      label: "Pending",
-      count: orders.filter((o) => o.order_status?.toLowerCase() === "pending")
-        .length,
-    },
-    {
-      value: "delivered",
-      label: "Delivered",
-      count: orders.filter((o) => o.order_status?.toLowerCase() === "delivered")
-        .length,
-    },
-    {
-      value: "shipped",
-      label: "Shipped",
-      count: orders.filter((o) => o.order_status?.toLowerCase() === "shipped")
-        .length,
-    },
+    { value: "all", label: "All Orders", count: (orders || []).length },
+    { value: "pending", label: "Pending", count: (orders || []).filter(o => o.order_status?.toLowerCase() === "pending").length },
+    { value: "delivered", label: "Delivered", count: (orders || []).filter(o => o.order_status?.toLowerCase() === "delivered").length },
+    { value: "shipped", label: "Shipped", count: (orders || []).filter(o => o.order_status?.toLowerCase() === "shipped").length },
   ];
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header with responsive layout */}
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-4 sm:px-6 sm:py-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
               <i className="fas fa-shopping-cart text-orange-500"></i>
               Recent Orders
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              {filteredOrders.length} of {orders.length} orders
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">
+              {filteredOrders.length} of {orders.length} orders shown
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Status Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">
-                Filter:
-              </label>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              >
-                {statusFilters.map((status) => (
-                  <option key={status.value} value={status.value}>
-                    {status.label} ({status.count})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center gap-1 hover:underline transition-colors">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="flex-1 sm:flex-none px-2 py-1.5 sm:px-3 sm:py-1.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            >
+              {statusFilters.map((status) => (
+                <option key={status.value} value={status.value}>
+                  {status.label} ({status.count})
+                </option>
+              ))}
+            </select>
+            <button className="text-orange-600 hover:text-orange-700 font-medium text-xs sm:text-sm flex items-center gap-1 hover:underline transition-colors whitespace-nowrap">
               <span>View All</span>
-              <i className="fas fa-arrow-right text-xs"></i>
+              <i className="fas fa-arrow-right text-[10px]"></i>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table container with horizontal scroll */}
       <div className="overflow-x-auto">
         {filteredOrders.length === 0 ? (
           <div className="text-center py-12">
             <i className="fas fa-inbox text-gray-300 text-4xl mb-4"></i>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
               No orders found
             </h3>
-            <p className="text-gray-500">
+            <p className="text-gray-500 text-xs sm:text-sm">
               There are no orders matching your current filter.
             </p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
+          // Add min-width to the table to ensure it scrolls when viewport is too narrow
+          <table className="w-full min-w-[640px]">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
                 <th
-                  className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("id")}
                 >
                   <div className="flex items-center gap-2">
-                    Order ID
-                    <i
-                      className={`fas fa-sort text-xs ${
-                        sortField === "id" ? "text-orange-500" : "text-gray-400"
-                      }`}
-                    ></i>
+                    Order
+                    <i className={`fas fa-sort text-xs ${sortField === "id" ? "text-orange-500" : "text-gray-400"}`}></i>
                   </div>
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Product Details
-                </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
+                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
+                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">Customer</th>
                 <th
-                  className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("amount")}
                 >
                   <div className="flex items-center gap-2">
                     Amount
-                    <i
-                      className={`fas fa-sort text-xs ${
-                        sortField === "amount"
-                          ? "text-orange-500"
-                          : "text-gray-400"
-                      }`}
-                    ></i>
+                    <i className={`fas fa-sort text-xs ${sortField === "amount" ? "text-orange-500" : "text-gray-400"}`}></i>
                   </div>
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                <th className="text-center px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
               {sortedOrders.slice(0, 5).map((order, index) => (
-                <tr
-                  key={order.id}
-                  className="hover:bg-gray-50 transition-colors duration-150 group"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <div>
-                        <div className="font-semibold text-gray-900">
-                          #{order.id}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {formatDate(order.created_at)}
-                        </div>
-                      </div>
-                    </div>
+                <tr key={order.id} className="hover:bg-gray-50 transition-colors group">
+                  <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                    <div className="font-semibold text-gray-900 text-xs sm:text-sm">#{order.id}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500">{formatDate(order.created_at)}</div>
                   </td>
-
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center">
-                        <i className="fas fa-box text-orange-600 text-sm"></i>
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {order.product?.name || "Product Name"}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Qty: {order.quantity || 1}
-                        </div>
-                      </div>
-                    </div>
+                  <td className="px-4 py-3 sm:px-6 sm:py-4">
+                    <div className="font-medium text-gray-900 text-xs sm:text-sm">{order.product?.name || "Product Name"}</div>
+                    <div className="text-xs text-gray-500">Qty: {order.quantity || 1}</div>
                   </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                     <div className="font-medium text-gray-900 text-xs sm:text-sm">{order.customer?.name}</div>
+                  </td>
+                  <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                    <div className="font-bold text-sm sm:text-base text-gray-900">{formatCurrency(order.amount)}</div>
+                  </td>
+                  <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                     <StatusBadge status={order.order_status} />
                   </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-bold text-lg text-gray-900">
-                      {formatCurrency(order.amount)}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <button
-                        className="p-2 text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200"
-                        title="View Details"
-                      >
-                        <i className="fas fa-eye text-sm"></i>
+                  <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                    <div className="flex items-center justify-center gap-1 sm:gap-2">
+                      <button className="p-1.5 sm:p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all" title="View Details">
+                        <i className="fas fa-eye text-xs sm:text-sm"></i>
                       </button>
-                      <button
-                        className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                        title="Edit Order"
-                      >
-                        <i className="fas fa-edit text-sm"></i>
-                      </button>
-                      <button
-                        className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                        title="Delete Order"
-                      >
-                        <i className="fas fa-trash text-sm"></i>
+                      <button className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit Order">
+                        <i className="fas fa-edit text-xs sm:text-sm"></i>
                       </button>
                     </div>
                   </td>
@@ -251,27 +174,9 @@ const RecentOrdersTable = () => {
           </table>
         )}
       </div>
-
-      {/* Footer */}
-      {filteredOrders.length > 0 && (
-        <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 flex items-center justify-between text-sm text-gray-600">
-          <div>
-            Showing {filteredOrders.length} of {orders.length} orders
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <i className="fas fa-download text-xs"></i>
-              Export
-            </button>
-            <button className="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <i className="fas fa-sync-alt text-xs"></i>
-              Refresh
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
 export default RecentOrdersTable;
+

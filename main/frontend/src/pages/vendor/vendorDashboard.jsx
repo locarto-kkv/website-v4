@@ -6,21 +6,25 @@ import { useVendorData } from "../../context/vendor/vendorDataContext";
 const VendorDashboard = () => {
   const { products, vendor, dataLoading } = useVendorData();
 
-  // console.log(products, vendor);
-
   if (dataLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading Dashboard...</p>
+      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+        <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading Dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    // The main layout for the dashboard page.
+    // It's a single column by default, stacking components vertically on mobile.
+    // On large screens (lg:), it becomes a 3-column grid where the recent orders table takes 2 columns.
+    <div className="space-y-4 sm:space-y-6">
       <DashboardStats products={products} vendor={vendor} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
           <RecentOrdersTable vendor={vendor} />
         </div>
@@ -34,3 +38,4 @@ const VendorDashboard = () => {
 };
 
 export default VendorDashboard;
+
