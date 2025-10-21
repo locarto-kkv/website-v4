@@ -9,7 +9,7 @@ const BrandIdentityCard = ({
   onDelete,
 }) => {
   const [containerWidth, setContainerWidth] = useState(0);
-  const brandDetails = brand.blog || {};
+  const brandDetails = brand.blog[0] || {};
 
   const calculateResponsiveStyles = useCallback((width) => {
     if (width <= 480) {

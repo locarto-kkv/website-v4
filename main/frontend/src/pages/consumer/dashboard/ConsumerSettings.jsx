@@ -67,14 +67,14 @@ const EditableInput = ({
 const CustomerSettings = () => {
   // --- State for Form Inputs ---
   const [profileData, setProfileData] = useState({
-    name: "Jane Doe", // Placeholder
-    email: "jane.doe@example.com", // Placeholder
-    phone: "555-1234", // Placeholder
-    addressLine1: "123 Main St", // Placeholder
-    addressLine2: "Apt 4B", // Placeholder
-    city: "Anytown", // Placeholder
-    state: "Anystate", // Placeholder
-    pincode: "12345", // Placeholder
+    name: "Jane Doe",
+    email: "jane.doe@example.com",
+    phone: "555-1234",
+    addressLine1: "123 Main St",
+    addressLine2: "Apt 4B",
+    city: "Anytown",
+    state: "Anystate",
+    pincode: "12345",
   });
   const [loading, setLoading] = useState(false); // For fetching/saving state
   const [isEditingAccountInfo, setIsEditingAccountInfo] = useState(false); // State for edit mode

@@ -37,13 +37,48 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
       gradient: "from-orange-500 to-red-500",
     };
     menuItems = [
-      { id: "dashboard", label: "Dashboard", icon: "fas fa-chart-line", path: "/vendor/dashboard" },
-      { id: "orders", label: "Orders", icon: "fas fa-shopping-bag", path: "/vendor/orders"},
-      { id: "analytics", label: "Analytics", icon: "fas fa-chart-bar", path: "/vendor/analytics" },
-      { id: "products", label: "Products", icon: "fas fa-box", path: "/vendor/products" },
-      { id: "milestones", label: "Milestones", icon: "fas fa-flag-checkered", path: "/vendor/milestones" },
-      { id: "members-hub", label: "Members Hub", icon: "fas fa-users", path: "/vendor/members-hub" },
-      { id: "profile", label: "Profile", icon: "fas fa-user-circle", path: "/vendor/profile" },
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: "fas fa-chart-line",
+        path: "/vendor/dashboard/overview",
+      },
+      {
+        id: "orders",
+        label: "Orders",
+        icon: "fas fa-shopping-bag",
+        path: "/vendor/dashboard/orders",
+      },
+      {
+        id: "analytics",
+        label: "Analytics",
+        icon: "fas fa-chart-bar",
+        path: "/vendor/dashboard/analytics",
+      },
+      {
+        id: "products",
+        label: "Products",
+        icon: "fas fa-box",
+        path: "/vendor/dashboard/products",
+      },
+      {
+        id: "milestones",
+        label: "Milestones",
+        icon: "fas fa-flag-checkered",
+        path: "/vendor/dashboard/milestones",
+      },
+      {
+        id: "members-hub",
+        label: "Members Hub",
+        icon: "fas fa-users",
+        path: "/vendor/dashboard/members-hub",
+      },
+      {
+        id: "profile",
+        label: "Profile",
+        icon: "fas fa-user-circle",
+        path: "/vendor/dashboard/profile",
+      },
       // REMOVED Settings and Support from here
       // { id: "settings", label: "Settings", icon: "fas fa-cog", path: "/vendor/settings" },
       // { id: "support", label: "Support", icon: "fas fa-headset", path: "/vendor/support" },
@@ -55,36 +90,101 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
       gradient: "from-orange-500 to-red-500", // Using same gradient as vendor for consistency
     };
     menuItems = [
-      { id: "overview", label: "Overview", icon: "fas fa-home", badge: null, path: "/consumer/dashboard/overview" },
-      { id: "orders", label: "Orders", icon: "fas fa-box", badge: null, path: "/consumer/dashboard/orders" },
-      { id: "lists", label: "Lists", icon: "fas fa-list", badge: listBadgeCount, path: "/consumer/dashboard/lists" },
-      { id: "reviews", label: "Reviews", icon: "fas fa-star", badge: null, path: "/consumer/dashboard/reviews" },
-      { id: "settings", label: "Settings", icon: "fas fa-cog", badge: null, path: "/consumer/dashboard/settings" },
-      { id: "support", label: "Support", icon: "fas fa-headset", path: "/consumer/dashboard/support" },
+      {
+        id: "overview",
+        label: "Overview",
+        icon: "fas fa-home",
+        badge: null,
+        path: "/consumer/dashboard/overview",
+      },
+      {
+        id: "orders",
+        label: "Orders",
+        icon: "fas fa-box",
+        badge: null,
+        path: "/consumer/dashboard/orders",
+      },
+      {
+        id: "lists",
+        label: "Lists",
+        icon: "fas fa-list",
+        badge: listBadgeCount,
+        path: "/consumer/dashboard/lists",
+      },
+      {
+        id: "reviews",
+        label: "Reviews",
+        icon: "fas fa-star",
+        badge: null,
+        path: "/consumer/dashboard/reviews",
+      },
+      {
+        id: "settings",
+        label: "Settings",
+        icon: "fas fa-cog",
+        badge: null,
+        path: "/consumer/dashboard/settings",
+      },
+      {
+        id: "support",
+        label: "Support",
+        icon: "fas fa-headset",
+        path: "/consumer/dashboard/support",
+      },
     ];
   } else if (currentUser?.type === "admin") {
-     headerDetails = {
+    headerDetails = {
       title: "Admin Panel",
       icon: "fas fa-user-shield",
       gradient: "from-purple-500 to-violet-600",
     };
     menuItems = [
-      { id: "dashboard", label: "Dashboard", icon: "fas fa-th-large", path: "/admin/dashboard" },
-      { id: "users", label: "Users", icon: "fas fa-users-cog", path: "/admin/users" }, // Example
-      { id: "content", label: "Content", icon: "fas fa-edit", path: "/admin/content" }, // Example
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: "fas fa-th-large",
+        path: "/admin/dashboard",
+      },
+      {
+        id: "users",
+        label: "Users",
+        icon: "fas fa-users-cog",
+        path: "/admin/users",
+      }, // Example
+      {
+        id: "content",
+        label: "Content",
+        icon: "fas fa-edit",
+        path: "/admin/content",
+      }, // Example
     ];
   }
 
   // Determine if a menu item is active
   const isActive = (itemPath) => {
-     if (itemPath === '/consumer/dashboard/overview' && (activePath === '/consumer/dashboard' || activePath === '/consumer/dashboard/')) {
-        return true;
+    if (
+      itemPath === "/consumer/dashboard/overview" &&
+      (activePath === "/consumer/dashboard" ||
+        activePath === "/consumer/dashboard/")
+    ) {
+      return true;
     }
-    if (itemPath === '/vendor/dashboard' && (activePath === '/vendor' || activePath === '/vendor/')) {
-        return true;
+    if (
+      itemPath === "/vendor/dashboard" &&
+      (activePath === "/vendor" || activePath === "/vendor/")
+    ) {
+      return true;
     }
-    if (itemPath === '/consumer/dashboard' || itemPath === '/vendor/dashboard' || itemPath === '/admin/dashboard') {
-         return activePath === itemPath || (itemPath.endsWith('/dashboard') && activePath === itemPath.replace('/dashboard', ''));
+    if (
+      itemPath === "/consumer/dashboard" ||
+      itemPath === "/vendor/dashboard" ||
+      itemPath === "/admin/dashboard"
+    ) {
+      return (
+        activePath === itemPath ||
+        (itemPath.endsWith("/dashboard") &&
+          activePath === itemPath.replace("/dashboard", ""))
+      );
     }
     return activePath.startsWith(itemPath);
   };
@@ -118,7 +218,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
           lg:pt-0
           flex-shrink-0 z-50
           transform transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
         role="navigation"
         aria-label="Main navigation"
@@ -135,11 +235,15 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
         {/* Header */}
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 bg-gradient-to-r ${headerDetails.gradient} rounded-lg flex items-center justify-center`}>
+            <div
+              className={`w-10 h-10 bg-gradient-to-r ${headerDetails.gradient} rounded-lg flex items-center justify-center`}
+            >
               <i className={`${headerDetails.icon} text-white text-lg`}></i>
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 text-lg">{headerDetails.title}</h2>
+              <h2 className="font-bold text-gray-900 text-lg">
+                {headerDetails.title}
+              </h2>
             </div>
           </div>
         </div>
@@ -168,21 +272,23 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
 
                   {/* Badge */}
                   {item.badge != null && item.badge > 0 && (
-                     <span className={`text-xs rounded-full h-5 min-w-[20px] px-2 flex items-center justify-center font-bold transition-colors ${
-                       isActive(item.path)
-                        ? "bg-white text-orange-500"
-                        : "bg-orange-500 text-white"
-                    }`}>
+                    <span
+                      className={`text-xs rounded-full h-5 min-w-[20px] px-2 flex items-center justify-center font-bold transition-colors ${
+                        isActive(item.path)
+                          ? "bg-white text-orange-500"
+                          : "bg-orange-500 text-white"
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   )}
 
                   {/* Active Indicator */}
-                   {isActive(item.path) && (
+                  {isActive(item.path) && (
                     <div className="ml-auto opacity-75">
                       <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
                     </div>
-                   )}
+                  )}
                 </button>
               </li>
             ))}

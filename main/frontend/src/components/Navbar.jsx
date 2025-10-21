@@ -77,7 +77,8 @@ const Navbar = ({ pageType = "landing" }) => {
     setMobileMenuOpen(false);
 
     // If already on landing page, scroll to section
-    if (location.pathname === "/landing" || location.pathname === "/") { // Added check for root path too
+    if (location.pathname === "/landing" || location.pathname === "/") {
+      // Added check for root path too
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -100,7 +101,7 @@ const Navbar = ({ pageType = "landing" }) => {
 
     // Navigate to appropriate dashboard
     if (currentUser?.type === "vendor") {
-      navigate("/vendor/dashboard");
+      navigate("/vendor/dashboard/overview");
     } else if (currentUser?.type === "consumer") {
       // Navigate to overview specifically
       navigate("/consumer/dashboard/overview");
@@ -114,11 +115,11 @@ const Navbar = ({ pageType = "landing" }) => {
 
   const handleLogout = () => {
     if (currentUser?.type) {
-        logout(currentUser.type);
+      logout(currentUser.type);
     }
     setDropdownOpen(false);
     setMobileMenuOpen(false); // Close mobile menu on logout
-  }
+  };
 
   return (
     <nav className="bg-white shadow-md h-[70px] px-4 flex justify-between items-center fixed top-0 left-0 w-full z-50">
@@ -148,21 +149,33 @@ const Navbar = ({ pageType = "landing" }) => {
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center space-x-6">
-            <Link to={pageType === "homepage" ? "/landing" : "/"} className="text-gray-700 hover:text-orange-500 font-medium transition-colors">
-                {pageType === "homepage" ? "About Us" : "Home"}
-            </Link>
-            <Link to="/map" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">
-                Categories
-            </Link>
-            <button onClick={() => handleSectionNavigation("how-it-works")} className="text-gray-700 hover:text-orange-500 font-medium transition-colors">
-                How It Works
-            </button>
-            <button onClick={() => handleSectionNavigation("testimonials")} className="text-gray-700 hover:text-orange-500 font-medium transition-colors">
-                Testimonials
-            </button>
+          <Link
+            to={pageType === "homepage" ? "/landing" : "/"}
+            className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+          >
+            {pageType === "homepage" ? "About Us" : "Home"}
+          </Link>
+          <Link
+            to="/map"
+            className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+          >
+            Categories
+          </Link>
+          <button
+            onClick={() => handleSectionNavigation("how-it-works")}
+            className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+          >
+            How It Works
+          </button>
+          <button
+            onClick={() => handleSectionNavigation("testimonials")}
+            className="text-gray-700 hover:text-orange-500 font-medium transition-colors"
+          >
+            Testimonials
+          </button>
         </div>
       </div>
-      
+
       {/* Right Column (Cart & Profile) */}
       <div className="flex-1 flex justify-end items-center space-x-3">
         <button
@@ -183,7 +196,11 @@ const Navbar = ({ pageType = "landing" }) => {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="bg-gray-200 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-300 transition"
           >
-             {currentUser ? <i className="fas fa-user text-sm"></i> : <i className="fas fa-user-plus text-sm"></i>}
+            {currentUser ? (
+              <i className="fas fa-user text-sm"></i>
+            ) : (
+              <i className="fas fa-user-plus text-sm"></i>
+            )}
           </button>
 
           {dropdownOpen && (
@@ -197,13 +214,15 @@ const Navbar = ({ pageType = "landing" }) => {
                     onClick={handleDashboardNavigation}
                     className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors"
                   >
-                     <i className="fas fa-th-large mr-2 text-gray-500"></i> Dashboard
+                    <i className="fas fa-th-large mr-2 text-gray-500"></i>{" "}
+                    Dashboard
                   </button>
                   <button
                     className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                     onClick={handleLogout}
                   >
-                     <i className="fas fa-sign-out-alt mr-2 text-gray-500"></i> Logout
+                    <i className="fas fa-sign-out-alt mr-2 text-gray-500"></i>{" "}
+                    Logout
                   </button>
                 </>
               ) : (
@@ -213,14 +232,16 @@ const Navbar = ({ pageType = "landing" }) => {
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors"
                     onClick={() => setDropdownOpen(false)}
                   >
-                     <i className="fas fa-user mr-2 text-gray-500"></i> Login as Customer
+                    <i className="fas fa-user mr-2 text-gray-500"></i> Login as
+                    Customer
                   </Link>
                   <Link
                     to="/vendor/login"
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                     onClick={() => setDropdownOpen(false)}
                   >
-                     <i className="fas fa-store mr-2 text-gray-500"></i> Login as Vendor
+                    <i className="fas fa-store mr-2 text-gray-500"></i> Login as
+                    Vendor
                   </Link>
                 </>
               )}
@@ -228,7 +249,7 @@ const Navbar = ({ pageType = "landing" }) => {
           )}
         </div>
       </div>
-      
+
       {/* --- Mobile Menu Overlay --- */}
       <div
         className={`absolute md:hidden top-[70px] left-0 w-full bg-white shadow-md z-40 ${
@@ -299,7 +320,7 @@ const Navbar = ({ pageType = "landing" }) => {
           </div>
         </div>
       </div>
-      
+
       {/* Side Cart */}
       <SideCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>

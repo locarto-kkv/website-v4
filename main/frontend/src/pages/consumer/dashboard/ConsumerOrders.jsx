@@ -44,9 +44,7 @@ const CustomerOrders = () => {
                   {" "}
                   {/* Center image on small screens */}
                   <img
-                    src={
-                      order.product?.image || "https://via.placeholder.com/100"
-                    }
+                    src={order.product?.image || "N/A"}
                     alt={order.product?.name || "Product Image"}
                     className="w-full h-full object-cover"
                   />

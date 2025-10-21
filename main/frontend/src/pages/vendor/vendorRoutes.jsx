@@ -5,7 +5,7 @@ import { useVendorData } from "../../context/vendor/vendorDataContext";
 
 import AuthVendor from "./authVendor";
 import VendorDashboardLayout from "./dashboard/VendorDashboardLayout";
-import VendorDashboard from "./vendorDashboard";
+import VendorOverview from "./dashboard/VendorOverview";
 import VendorProfile from "./dashboard/VendorProfile";
 import VendorAnalytics from "./dashboard/VendorAnalytics";
 import VendorSettings from "./dashboard/VendorSettings";
@@ -15,19 +15,31 @@ import VendorSetup from "./dashboard/VendorSetupWizard";
 import VendorsMemberHub from "./dashboard/VendorsMemberHub";
 import VendorLocationSetup from "./dashboard/VendorLocationSetup";
 import VendorOrders from "./dashboard/VendorOrders";
-import VendorMilestones from "./dashboard/VendorMilestones"; // <-- IMPORT THE NEW COMPONENT
+import VendorMilestones from "./dashboard/VendorMilestones";
 
 const ProtectedRoute = () => {
-  // ... (ProtectedRoute remains the same)
+  const { clearCache, dataLoading } = useVendorData();
   const { currentUser } = useAuthStore();
-  const { clearCache } = useVendorData();
+  console.log(dataLoading);
 
   if (currentUser?.type !== "vendor") {
     clearCache();
     return <Navigate to="/vendor/login" replace />;
   } else {
+    if (dataLoading) {
+      return (
+        <div className="flex items-center justify-center min-h-screen pt-[70px]">
+          {" "}
+          {/* Adjusted min-height */}
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading vendor data...</p>
+          </div>
+        </div>
+      );
+    }
     return <Outlet />;
-  } //
+  }
 };
 
 const VendorRoutes = () => {
@@ -40,20 +52,21 @@ const VendorRoutes = () => {
         path="login"
         element={
           currentUser?.type === "vendor" ? (
-            <Navigate to="/vendor/dashboard" replace />
+            <Navigate to="/vendor/dashboard/overview" replace />
           ) : (
             <AuthVendor />
           )
         }
       />
 
-      <Route element={<ProtectedRoute />}>
+      <Route path="dashboard" element={<ProtectedRoute />}>
         <Route element={<VendorDashboardLayout />}>
-          <Route index element={<VendorDashboard />} />
-          <Route path="dashboard" element={<VendorDashboard />} />
+          <Route index element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<VendorOverview />} />
           <Route path="orders" element={<VendorOrders />} />
           <Route path="products" element={<VendorProducts />} />
-          <Route path="milestones" element={<VendorMilestones />} /> {/* <-- ADD THIS ROUTE */}
+          <Route path="milestones" element={<VendorMilestones />} />{" "}
+          {/* <-- ADD THIS ROUTE */}
           <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
           <Route path="analytics" element={<VendorAnalytics />} />

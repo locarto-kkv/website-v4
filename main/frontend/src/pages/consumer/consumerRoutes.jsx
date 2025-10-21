@@ -4,11 +4,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useConsumerData } from "../../context/consumer/consumerDataContext";
 
 // Import the new Layout
-import CustomerDashboardLayout from "./dashboard/CustomerDashboardLayout"; // Adjust path if needed
-
-// Import Shared Components (No longer needed here)
-// import DashboardNavbar from "../../components/DashboardNavbar";
-// import Sidebar from "../../components/Sidebar";
+import CustomerDashboardLayout from "./dashboard/CustomerDashboardLayout";
 
 // Consumer pages/components
 import AuthConsumer from "./authConsumer";
@@ -24,17 +20,28 @@ import ShopProducts from "./ShopProducts";
 // --- Simplified Protected Route ---
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
-  const { clearCache } = useConsumerData();
+  const { clearCache, dataLoading } = useConsumerData();
+  console.log(dataLoading);
 
   if (currentUser?.type !== "consumer") {
     clearCache();
     return <Navigate to="/consumer/login" replace />;
+  } else {
+    if (dataLoading) {
+      return (
+        <div className="flex items-center justify-center min-h-screen pt-[70px]">
+          {" "}
+          {/* Adjusted min-height */}
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading consumer data...</p>
+          </div>
+        </div>
+      );
+    }
+    return <Outlet />;
   }
-
-  // Render the CustomerDashboardLayout, which handles NavBar, Sidebar, and Outlet
-  return <CustomerDashboardLayout />;
 };
-// --- End Simplified Protected Route ---
 
 const ConsumerRoutes = () => {
   const { currentUser } = useAuthStore();
@@ -53,18 +60,16 @@ const ConsumerRoutes = () => {
           )
         }
       />
-      {/* --- Protected Dashboard Routes --- */}
-      {/* Use the ProtectedRoute which now renders the CustomerDashboardLayout */}
       <Route path="dashboard" element={<ProtectedRoute />}>
-        {/* Index route redirects to overview */}
-        <Route index element={<Navigate to="overview" replace />} />
-        {/* Nested routes are rendered via the Outlet in CustomerDashboardLayout */}
-        <Route path="overview" element={<CustomerOverview />} />
-        <Route path="orders" element={<CustomerOrders />} />
-        <Route path="lists" element={<CustomerLists />} />
-        <Route path="reviews" element={<CustomerReviews />} />
-        <Route path="support" element={<CustomerSupport />} />
-        <Route path="settings" element={<CustomerSettings />} />
+        <Route element={<CustomerDashboardLayout />}>
+          <Route index element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<CustomerOverview />} />
+          <Route path="orders" element={<CustomerOrders />} />
+          <Route path="lists" element={<CustomerLists />} />
+          <Route path="reviews" element={<CustomerReviews />} />
+          <Route path="support" element={<CustomerSupport />} />
+          <Route path="settings" element={<CustomerSettings />} />
+        </Route>
       </Route>
       {/* --- End Protected Dashboard Routes --- */}
 

@@ -6,7 +6,7 @@ import { ConsumerListService } from "../../../services/consumer/consumerListServ
 
 const CustomerLists = () => {
   const [listView, setListView] = useState("cart");
-  const { lists, fetchLists, dataLoading } = useConsumerData();
+  const { lists, fetchLists } = useConsumerData();
   const { updateList, removeFromList } = ConsumerListService;
 
   const updateQuantity = async (productId, delta) => {
