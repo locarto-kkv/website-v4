@@ -122,138 +122,76 @@ const Navbar = ({ pageType = "landing" }) => {
 
   return (
     <nav className="bg-white shadow-md h-[70px] px-4 flex justify-between items-center fixed top-0 left-0 w-full z-50">
-      {/* Logo */}
-      <div className="flex items-center">
+      {/* --- RESPONSIVE 3-COLUMN LAYOUT --- */}
+      {/* Left Column (Logo) */}
+      <div className="flex-1 flex justify-start">
         <Link to="/" className="flex items-center">
           <img
             src={locartoImg}
             alt="Locarto"
             className="h-14 w-auto object-contain scale-125 translate-y-[2px]"
-          /> {/* */}
+          />
         </Link>
       </div>
 
-      {/* Mobile Menu Button */}
-      <button
-        className="md:hidden text-gray-700"
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      >
-        <i
-          className={`fas ${mobileMenuOpen ? "fa-times" : "fa-bars"} text-xl`}
-        ></i> {/* */}
-      </button>
+      {/* Center Column (Nav Links on Desktop, Hamburger on Mobile) */}
+      <div className="flex-1 flex justify-center items-center">
+        {/* Mobile Hamburger Menu Button */}
+        <button
+          className="md:hidden text-gray-700"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <i
+            className={`fas ${mobileMenuOpen ? "fa-times" : "fa-bars"} text-xl`}
+          ></i>
+        </button>
 
-      {/* Navigation Links */}
-      <div
-        className={`absolute md:static top-[70px] left-0 w-full md:w-auto bg-white md:bg-transparent shadow-md md:shadow-none z-40 ${
-          mobileMenuOpen ? "block" : "hidden"
-        } md:block`}
-      > {/* Adjusted top position for mobile */}
-        <div className="flex flex-col md:flex-row md:items-center md:space-x-6 p-4 md:p-0">
-          <Link
-            to={pageType === "homepage" ? "/landing" : "/"}
-            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            {pageType === "homepage" ? "About Us" : "Home"}
-          </Link> {/* */}
-
-          {/* **MODIFIED: Categories Link** */}
-          <Link
-            to="/map" // Link directly to the map view
-            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
-            onClick={() => setMobileMenuOpen(false)} // Close mobile menu on click
-          >
-            Categories
-          </Link> {/* */}
-          {/* **END MODIFICATION** */}
-
-          {/* How It Works Button (Scrolls or Navigates) */}
-          <button
-            onClick={() => handleSectionNavigation("how-it-works")} // Ensure 'how-it-works' is an ID on your landing page
-            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
-          >
-            How It Works
-          </button> {/* */}
-
-          {/* Testimonials Button (Scrolls or Navigates) */}
-          <button
-            onClick={() => handleSectionNavigation("testimonials")} // Ensure 'testimonials' is an ID on your landing page
-            className="py-2 md:py-0 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
-          >
-            Testimonials
-          </button> {/* */}
-
-          {/* Login/Dashboard/Logout links for mobile */}
-           <div className="md:hidden mt-4 pt-4 border-t border-gray-100 space-y-2">
-                {currentUser ? (
-                    <>
-                        <button
-                          onClick={handleDashboardNavigation}
-                          className="block w-full text-left py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
-                        >
-                          Dashboard
-                        </button>
-                        <button
-                          className="block w-full text-left py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
-                          onClick={handleLogout}
-                        >
-                          Logout
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <Link
-                          to="/consumer/login"
-                          className="block py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Login as Customer
-                        </Link>
-                        <Link
-                          to="/vendor/login"
-                          className="block py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Login as Vendor
-                        </Link>
-                    </>
-                )}
-           </div>
+        {/* Desktop Navigation Links */}
+        <div className="hidden md:flex items-center space-x-6">
+            <Link to={pageType === "homepage" ? "/landing" : "/"} className="text-gray-700 hover:text-orange-500 font-medium transition-colors">
+                {pageType === "homepage" ? "About Us" : "Home"}
+            </Link>
+            <Link to="/map" className="text-gray-700 hover:text-orange-500 font-medium transition-colors">
+                Categories
+            </Link>
+            <button onClick={() => handleSectionNavigation("how-it-works")} className="text-gray-700 hover:text-orange-500 font-medium transition-colors">
+                How It Works
+            </button>
+            <button onClick={() => handleSectionNavigation("testimonials")} className="text-gray-700 hover:text-orange-500 font-medium transition-colors">
+                Testimonials
+            </button>
         </div>
       </div>
-
-      {/* Right Side Elements (Cart & Profile - Desktop) */}
-      <div className="hidden md:flex items-center space-x-3"> {/* Hide on mobile */}
+      
+      {/* Right Column (Cart & Profile) */}
+      <div className="flex-1 flex justify-end items-center space-x-3">
         <button
           onClick={toggleCart}
           className="text-gray-700 hover:text-orange-500 transition-colors relative"
         >
           <i className="fas fa-shopping-cart text-lg"></i>
-          {/* Display cart count dynamically - ensure cartItems is updated */}
           {cartItems.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"> {/* Made badge bold */}
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
               {cartItems.length}
             </span>
-          )} {/* */}
+          )}
         </button>
 
-        <div className="relative">
+        <div className="relative hidden md:block">
           <button
             ref={buttonRef}
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="bg-gray-200 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-300 transition"
           >
-             {/* Show user icon or initial */}
              {currentUser ? <i className="fas fa-user text-sm"></i> : <i className="fas fa-user-plus text-sm"></i>}
-          </button> {/* */}
+          </button>
 
-          {dropdownOpen && ( // Dropdown Menu
+          {dropdownOpen && (
             <div
               ref={dropdownRef}
-              className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50 border border-gray-100" // Added border
+              className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50 border border-gray-100"
             >
-              {currentUser ? ( // If logged in
+              {currentUser ? (
                 <>
                   <button
                     onClick={handleDashboardNavigation}
@@ -268,7 +206,7 @@ const Navbar = ({ pageType = "landing" }) => {
                      <i className="fas fa-sign-out-alt mr-2 text-gray-500"></i> Logout
                   </button>
                 </>
-              ) : ( // If logged out
+              ) : (
                 <>
                   <Link
                     to="/consumer/login"
@@ -285,14 +223,85 @@ const Navbar = ({ pageType = "landing" }) => {
                      <i className="fas fa-store mr-2 text-gray-500"></i> Login as Vendor
                   </Link>
                 </>
-              )} {/* */}
+              )}
             </div>
           )}
         </div>
       </div>
-
+      
+      {/* --- Mobile Menu Overlay --- */}
+      <div
+        className={`absolute md:hidden top-[70px] left-0 w-full bg-white shadow-md z-40 ${
+          mobileMenuOpen ? "block" : "hidden"
+        }`}
+      >
+        <div className="flex flex-col p-4 space-y-2">
+          <Link
+            to={pageType === "homepage" ? "/landing" : "/"}
+            className="py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            {pageType === "homepage" ? "About Us" : "Home"}
+          </Link>
+          <Link
+            to="/map"
+            className="py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Categories
+          </Link>
+          <button
+            onClick={() => handleSectionNavigation("how-it-works")}
+            className="py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
+          >
+            How It Works
+          </button>
+          <button
+            onClick={() => handleSectionNavigation("testimonials")}
+            className="py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left"
+          >
+            Testimonials
+          </button>
+          <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+            {currentUser ? (
+              <>
+                <button
+                  onClick={handleDashboardNavigation}
+                  className="block w-full text-left py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+                >
+                  Dashboard
+                </button>
+                <button
+                  className="block w-full text-left py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/consumer/login"
+                  className="block py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Login as Customer
+                </Link>
+                <Link
+                  to="/vendor/login"
+                  className="block py-2 text-gray-700 hover:text-orange-500 font-medium transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Login as Vendor
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      
       {/* Side Cart */}
-      <SideCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} /> {/* */}
+      <SideCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>
   );
 };
