@@ -5,7 +5,7 @@ import { useAuthStore } from "../store/useAuthStore";
 // Import ConsumerDataContext conditionally or ensure safe access
 import { useConsumerData } from "../context/consumer/consumerDataContext";
 
-// Accept isOpen and onClose props
+// Accept isOpen and onClose props for mobile responsiveness
 const Sidebar = ({ onNavigate, isOpen, onClose }) => {
   const location = useLocation();
   const activePath = location.pathname;
@@ -223,17 +223,10 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
         role="navigation"
         aria-label="Main navigation"
       >
-        {/* Mobile Close Button */}
-        <button
-          onClick={onClose}
-          className="lg:hidden absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors z-10"
-          aria-label="Close menu"
-        >
-          <i className="fas fa-times text-xl text-gray-600"></i>
-        </button>
-
+        {/* Mobile Close Button - Moved inside the header for better layout */}
+        
         {/* Header */}
-        <div className="p-6 border-b border-gray-100">
+        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div
               className={`w-10 h-10 bg-gradient-to-r ${headerDetails.gradient} rounded-lg flex items-center justify-center`}
@@ -246,7 +239,16 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
               </h2>
             </div>
           </div>
+          {/* Mobile Close Button - Now positioned within the flex container */}
+          <button
+            onClick={onClose}
+            className="lg:hidden p-2 -mr-2 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close menu"
+          >
+            <i className="fas fa-times text-xl text-gray-600"></i>
+          </button>
         </div>
+
 
         {/* Navigation Menu */}
         <nav className="flex-1 p-4 overflow-y-auto">

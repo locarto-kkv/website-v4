@@ -1,5 +1,5 @@
 // src/pages/consumer/dashboard/CustomerDashboardLayout.jsx
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import DashboardNavbar from "../../../components/DashboardNavbar"; // Adjust path if needed
 import Sidebar from "../../../components/Sidebar"; // Adjust path if needed
@@ -8,14 +8,30 @@ import { useConsumerData } from "../../../context/consumer/consumerDataContext";
 const CustomerDashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility on mobile
 
   // Scrolls to the top of the page on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
+  // Effect to close the sidebar on route changes or when resizing to a desktop view
+  useEffect(() => {
+    setIsSidebarOpen(false); // Close sidebar on any navigation
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // Tailwind's lg breakpoint
+        setIsSidebarOpen(false); // Ensure sidebar is closed on larger screens
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [location.pathname]);
+
+
   // --- Dynamic Header Logic ---
-  // Returns an object containing title, description, and icon class
+  // Returns an object containing title, description, and icon class based on the current URL
   const getPageConfig = () => {
     const path = location.pathname;
     // Match more specific paths first
@@ -72,38 +88,47 @@ const CustomerDashboardLayout = () => {
   } = getPageConfig();
   // --- End Dynamic Header Logic ---
 
+  // --- Functions to control sidebar visibility ---
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const closeSidebar = () => setIsSidebarOpen(false);
+  // --- End functions ---
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardNavbar /> {/* Shared Navbar */}
+      {/* The DashboardNavbar receives the 'onMenuClick' prop. 
+        This function will be called by the hamburger icon on mobile to toggle the sidebar.
+        This does not affect the desktop UI as the hamburger icon is hidden on larger screens.
+      */}
+      <DashboardNavbar onMenuClick={toggleSidebar} />
+      
       <div className="flex pt-[70px]">
-        {/* Pass navigate function to Sidebar */}
-        <Sidebar onNavigate={navigate} /> {/* Shared Sidebar */}
+        {/* The Sidebar receives 'isOpen' and 'onClose' props.
+          - 'isOpen' determines if the sidebar should be visible on mobile.
+          - 'onClose' allows the sidebar to close itself (e.g., when an item is clicked or the overlay is touched).
+          The responsive logic inside the Sidebar component ensures it is always visible and static on desktop (lg screens and up),
+          so these props only affect the mobile/tablet view.
+        */}
+        <Sidebar onNavigate={navigate} isOpen={isSidebarOpen} onClose={closeSidebar} />
+        
         {/* Main content area */}
         <main className="flex-1 h-[calc(100vh-70px)] overflow-y-auto">
           <div className="p-6 md:p-8">
-            {" "}
-            {/* Standardized padding */}
             {/* Dynamic Page Header */}
-            {/* **MODIFIED HERE TO INCLUDE ICON** */}
             <div className="flex items-center gap-4 mb-8">
               {/* Dynamic Icon */}
               <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                {" "}
-                {/* Added shadow */}
                 <i className={`${pageIcon} text-white text-xl`}></i>
               </div>
               {/* Dynamic Title and Description */}
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                   {pageTitle}
-                </h1>{" "}
-                {/* Removed mb-1 */}
-                <p className="text-gray-600 mt-1">{pageDescription}</p>{" "}
-                {/* Added mt-1 */}
+                </h1>
+                <p className="text-gray-600 mt-1">{pageDescription}</p>
               </div>
             </div>
-            {/* **END MODIFICATION** */}
-            <Outlet /> {/* Renders the nested route component */}
+            {/* Renders the nested route component (e.g., ConsumerOverview, ConsumerOrders) */}
+            <Outlet />
           </div>
         </main>
       </div>
