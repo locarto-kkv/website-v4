@@ -8,7 +8,6 @@ const VendorProfile = () => {
   const { blogs } = useData();
   const { vendor, profile, dataLoading } = useVendorData();
   const navigate = useNavigate();
-  // console.log(profile); // Keep console logs if needed for debugging, remove for production
 
   const [profileData, setProfileData] = useState(null);
   const [metrics, setMetrics] = useState({});
@@ -20,9 +19,10 @@ const VendorProfile = () => {
         companyName: profile?.name || vendor?.vendor_name || "N/A",
         email: profile?.email || "N/A",
         phone: profile?.phone_no || "N/A",
-        address: profile?.address || "N/A", // Assuming address is now an object/array handled below
+        // Safely access the first address object if it exists
+        address: profile?.address?.[0] || {}, // Default to empty object if no address
         brandLogo: profile?.brand_logo_1 || "",
-        established: profile?.created_at ? new Date(profile.created_at).getFullYear() : 'N/A', // Safer date handling
+        established: profile?.created_at ? new Date(profile.created_at).getFullYear() : 'N/A',
         description:
           blogs?.find((b) => b.id === profile.blog_id)?.blog?.description ||
           "No description available.",
@@ -33,8 +33,8 @@ const VendorProfile = () => {
         totalRevenue: vendor?.total_amount || 0,
         averageRating:
           blogs?.find((b) => b.id === profile.blog_id)?.blog?.rating || 0,
-        categoryCount: vendor?.category_count || {}, // Ensure category_count is an object
-        productsCount: vendor?.products_count || 0, // Added products_count
+        categoryCount: vendor?.category_count || {},
+        productsCount: vendor?.products_count || 0,
       });
 
        // Ensure profile.documents is treated as an array
@@ -45,215 +45,196 @@ const VendorProfile = () => {
 
   const openSetup = () => navigate("/vendor/setup");
   const goToSettings = () => navigate('/vendor/settings');
-  const goToSupport = () => navigate('/vendor/support'); // <-- ADDED function to navigate to support
+  const goToSupport = () => navigate('/vendor/support');
 
   // Unified document status handler
   const getDocumentStatus = (status) => {
-    // ... (getDocumentStatus function remains the same)
-    switch (status) {
+    switch (status?.toLowerCase()) { // Added safety check and toLowerCase
       case "verified":
-        return {
-          color: "bg-green-100 text-green-800",
-          icon: "fas fa-check-circle text-green-600",
-          label: "Verified",
-        };
+        return { color: "bg-green-100 text-green-800", icon: "fas fa-check-circle text-green-600", label: "Verified" };
       case "pending":
-        return {
-          color: "bg-yellow-100 text-yellow-800",
-          icon: "fas fa-clock text-yellow-600",
-          label: "Pending",
-        };
+        return { color: "bg-yellow-100 text-yellow-800", icon: "fas fa-clock text-yellow-600", label: "Pending" };
       case "rejected":
-        return {
-          color: "bg-red-100 text-red-800",
-          icon: "fas fa-times-circle text-red-600",
-          label: "Rejected",
-        };
+        return { color: "bg-red-100 text-red-800", icon: "fas fa-times-circle text-red-600", label: "Rejected" };
       default:
-        return {
-          color: "bg-gray-100 text-gray-800",
-          icon: "fas fa-file text-gray-500",
-          label: "Unknown",
-        };
+        return { color: "bg-gray-100 text-gray-800", icon: "fas fa-file text-gray-500", label: "Unknown" };
     }
   };
 
   // Account status logic
   const getAccountStatus = (status) => {
-    // ... (getAccountStatus function remains the same)
-     switch (status) {
+     switch (status?.toLowerCase()) { // Added safety check and toLowerCase
       case "pending":
-        return {
-          label: "Setup Incomplete",
-          color: "bg-yellow-50 border-yellow-200 text-yellow-800",
-          icon: "fas fa-clock text-yellow-600",
-          desc: "Please complete your setup to access all facilities.",
-        };
-      case "complete":
-        return {
-          label: "Waiting for Verification",
-          color: "bg-orange-50 border-orange-200 text-orange-800",
-          icon: "fas fa-hourglass-half text-orange-600",
-          desc: "Please wait, our admins will contact you shortly to verify your identity.",
-        };
+        return { label: "Setup Incomplete", color: "bg-yellow-50 border-yellow-200 text-yellow-800", icon: "fas fa-clock text-yellow-600", desc: "Please complete your setup to access all facilities." };
+      case "complete": // Assuming 'complete' means submitted but not verified
+        return { label: "Waiting for Verification", color: "bg-orange-50 border-orange-200 text-orange-800", icon: "fas fa-hourglass-half text-orange-600", desc: "Please wait, our admins will contact you shortly to verify your identity." };
       case "verified":
-        return {
-          label: "Account Verified",
-          color: "bg-green-50 border-green-200 text-green-800",
-          icon: "fas fa-check-circle text-green-600",
-          desc: "Your account is verified! You can now access all facilities. Visit the Member's Hub to learn more.",
-        };
+        return { label: "Account Verified", color: "bg-green-50 border-green-200 text-green-800", icon: "fas fa-check-circle text-green-600", desc: "Your account is verified! You can now access all facilities. Visit the Member's Hub to learn more." };
       default:
-        return {
-          label: "Unknown Status",
-          color: "bg-gray-50 border-gray-200 text-gray-700",
-          icon: "fas fa-question-circle text-gray-500",
-          desc: "Account status could not be determined.",
-        };
+        return { label: "Unknown Status", color: "bg-gray-50 border-gray-200 text-gray-700", icon: "fas fa-question-circle text-gray-500", desc: "Account status could not be determined." };
     }
   };
 
   const accountStatus = getAccountStatus(profile?.status);
 
-   // Safer address display
-  const displayAddress = profileData?.address?.[0]?.address_line_1 || "N/A";
+  // Safer address display - format address lines, city, state, pincode
+  const displayAddress = profileData?.address
+      ? [
+          profileData.address.address_line_1,
+          profileData.address.address_line_2,
+          profileData.address.city,
+          profileData.address.state,
+          profileData.address.pincode,
+        ]
+          .filter(Boolean) // Remove empty parts
+          .join(", ") // Join with comma and space
+      : "N/A";
 
 
-  if (!profileData) {
-    // ... (Loading state remains the same)
+  if (dataLoading && !profileData) { // Show loading only if profileData is not yet set
      return (
-      <div className="flex items-center justify-center h-screen">
+      // Consistent loading indicator
+      <div className="flex items-center justify-center min-h-[calc(100vh-150px)]"> {/* Centered loading */}
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading Profile...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading Profile...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+  // Handle case where profile data might still be loading or null after fetch attempt
+  if (!profileData) {
+      return (
+           <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen text-center">
+               <p className="text-gray-600">Could not load profile data. Please try again later.</p>
+               {/* Optionally add a refresh button */}
+           </div>
+      )
+  }
 
+
+  return (
+    // Removed outer padding (p-6) - assuming layout provides it
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+
+      {/* Responsive Grid Layout */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Main Profile Information */}
         <div className="xl:col-span-3">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-            {/* Profile Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 p-8 text-white relative overflow-hidden">
+            {/* Profile Header - Responsive adjustments */}
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6 sm:p-8 text-white relative overflow-hidden">
               {/* Decorative Background Elements */}
               <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -mr-32 -mt-32"></div>
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full -ml-24 -mb-24"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-white rounded-full -mr-16 sm:-mr-32 -mt-16 sm:-mt-32"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-48 sm:h-48 bg-white rounded-full -ml-12 sm:-ml-24 -mb-12 sm:-mb-24"></div>
               </div>
 
-              <div className="relative flex items-start gap-6">
+              {/* Flex container for logo and details - stack on mobile */}
+              <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+                {/* Logo */}
                 {profileData.brandLogo ? (
                   <img
                     src={profileData.brandLogo}
                     alt="Brand Logo"
-                    className="w-28 h-28 rounded-2xl object-cover border-4 border-white/30 shadow-2xl"
+                    className="w-20 h-20 sm:w-28 sm:h-28 rounded-xl sm:rounded-2xl object-cover border-2 sm:border-4 border-white/30 shadow-lg sm:shadow-2xl flex-shrink-0" // Adjusted size, border, shadow
                   />
                 ) : (
-                  <div className="w-28 h-28 bg-white/20 rounded-2xl flex items-center justify-center border-4 border-white/30 backdrop-blur-sm shadow-2xl">
-                    <i className="fas fa-building text-4xl text-white"></i>
+                  <div className="w-20 h-20 sm:w-28 sm:h-28 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center border-2 sm:border-4 border-white/30 backdrop-blur-sm shadow-lg sm:shadow-2xl flex-shrink-0">
+                    <i className="fas fa-building text-3xl sm:text-4xl text-white"></i>
                   </div>
                 )}
 
-                <div className="flex-1">
-                  <h2 className="text-4xl font-bold mb-3 drop-shadow-lg">
+                {/* Details */}
+                <div className="flex-1 text-center sm:text-left">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 drop-shadow-lg">
                     {profileData.companyName}
                   </h2>
-                  <div className="flex flex-wrap items-center gap-6 text-white/90">
-                    <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                  {/* Contact Info - wrap items */}
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 text-white/90 text-xs sm:text-sm">
+                    <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg backdrop-blur-sm whitespace-nowrap">
                       <i className="fas fa-envelope"></i>
                       <span className="font-medium">{profileData.email}</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                    <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg backdrop-blur-sm whitespace-nowrap">
                       <i className="fas fa-phone"></i>
                       <span className="font-medium">{profileData.phone}</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                    <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg backdrop-blur-sm whitespace-nowrap">
                       <i className="fas fa-calendar-alt"></i>
                       <span className="font-medium">Est. {profileData.established}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-4">
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <i
-                          key={i}
-                          className={`fas fa-star text-lg ${
-                            i < Math.floor(metrics.averageRating || 0) // Safer access
-                              ? "text-yellow-300"
-                              : "text-white/30"
-                          }`}
-                        ></i>
-                      ))}
-                    </div>
-                    <span className="ml-2 font-bold text-xl bg-white/20 px-3 py-1 rounded-lg backdrop-blur-sm">
-                      {(metrics.averageRating || 0).toFixed(1)} {/* Safer access */}
-                    </span>
-                  </div>
+                   {/* Rating */}
+                   <div className="flex items-center justify-center sm:justify-start gap-2 mt-3 sm:mt-4">
+                     <div className="flex items-center gap-0.5 sm:gap-1">
+                       {[...Array(5)].map((_, i) => (
+                         <i key={i} className={`fas fa-star text-base sm:text-lg ${ i < Math.floor(metrics.averageRating || 0) ? "text-yellow-300" : "text-white/30" }`}></i>
+                       ))}
+                     </div>
+                     <span className="ml-1 sm:ml-2 font-bold text-lg sm:text-xl bg-white/20 px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg backdrop-blur-sm">
+                       {(metrics.averageRating || 0).toFixed(1)}
+                     </span>
+                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Profile Content */}
-            <div className="p-8">
-              {/* Business Details */}
+            {/* Profile Content - Responsive padding */}
+            <div className="p-6 sm:p-8">
+              {/* Business Details & Overview - Stack on mobile */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {/* Business Information */}
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-base sm:text-lg">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <i className="fas fa-info-circle text-blue-600"></i>
                     </div>
                     Business Information
                   </h3>
                   <div className="space-y-3">
-                    <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                      <p className="text-sm text-gray-600 font-medium mb-1">Products</p>
-                      <p className="font-bold text-gray-900 text-xl">
-                        {metrics.productsCount || 0} total {/* Use metrics.productsCount */}
+                     <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium mb-1">Products Listed</p>
+                      <p className="font-bold text-gray-900 text-lg sm:text-xl">
+                        {metrics.productsCount || 0}
                       </p>
                     </div>
-                    <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                      <p className="text-sm text-gray-600 font-medium mb-1">Address</p>
-                      <p className="font-semibold text-gray-900">
-                        {displayAddress} {/* Use displayAddress variable */}
+                     <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium mb-1">Primary Address</p>
+                      <p className="font-semibold text-gray-900 text-sm sm:text-base">
+                        {displayAddress}
                       </p>
                     </div>
                   </div>
                 </div>
 
+                {/* Business Overview */}
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-base sm:text-lg">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <i className="fas fa-chart-line text-green-600"></i>
                     </div>
                     Business Overview
                   </h3>
                   <div className="space-y-3">
                     <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
-                      <p className="text-sm text-gray-600 font-medium mb-1">Description</p>
-                      <p className="font-medium text-gray-900 leading-relaxed line-clamp-3"> {/* Added line-clamp */}
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium mb-1">Description</p>
+                      <p className="font-medium text-gray-900 leading-relaxed line-clamp-3 text-sm sm:text-base">
                         {profileData.description}
                       </p>
                     </div>
                     <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
-                      <p className="text-sm text-gray-600 font-medium mb-1">Categories</p>
-                       <div className="flex flex-wrap gap-2 mt-2">
-                         {/* Ensure metrics.categoryCount is an object before mapping */}
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium mb-1">Categories</p>
+                       <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
                          {Object.keys(metrics.categoryCount || {}).length > 0 ? (
                            Object.keys(metrics.categoryCount).map((category, index) => (
-                             <span
-                               key={index}
-                               className="px-3 py-1 bg-white rounded-full text-sm font-semibold text-gray-700 border border-gray-200"
-                             >
+                             <span key={index} className="px-2 py-0.5 sm:px-3 sm:py-1 bg-white rounded-full text-[10px] sm:text-xs font-semibold text-gray-700 border border-gray-200 whitespace-nowrap">
                                {category}
                              </span>
                            ))
                          ) : (
-                           <span className="text-sm text-gray-500">No categories assigned</span>
+                           <span className="text-xs sm:text-sm text-gray-500">No categories</span>
                          )}
                        </div>
                     </div>
@@ -261,66 +242,71 @@ const VendorProfile = () => {
                 </div>
               </div>
 
-              {/* Action Buttons - only if NOT verified */}
-              {/* ... (Action buttons logic remains the same) */}
+              {/* Action Buttons - Stack vertically on mobile */}
               {accountStatus.label !== "Account Verified" && (
-                <div className="flex flex-wrap gap-4 mb-8 pb-8 border-b border-gray-200">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-8 pb-8 border-b border-gray-200">
                   <button
                     onClick={openSetup}
-                    className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
                   >
                     <i className="fas fa-cog"></i>
                     <span>Complete Setup</span>
                   </button>
-                  <button className="flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+                  <button
+                     onClick={openSetup} // Assuming edit also goes via setup for now
+                     className="flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
+                   >
                     <i className="fas fa-edit"></i>
                     <span>Edit Profile</span>
                   </button>
                 </div>
               )}
 
-
-              {/* Documents section - only if verified */}
-              {/* ... (Documents section logic remains the same) */}
-              {accountStatus.label === "Account Verified" && (
-                <div className="border-t pt-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2 text-lg">
-                      <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+              {/* Documents Section - Responsive grid and adjustments */}
+               {/* Only show if verified */}
+              {(accountStatus.label === "Account Verified" || documents.length > 0) && ( // Show even if not verified but documents exist
+                <div className="border-t pt-6 sm:pt-8">
+                  {/* Header */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                     <h3 className="font-bold text-gray-900 flex items-center gap-2 text-base sm:text-lg">
+                      <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i className="fas fa-folder text-amber-600"></i>
                       </div>
                       Business Documents
                     </h3>
-                    <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all font-bold shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <button
+                        onClick={openSetup} // Link to setup page for uploading
+                        className="flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all font-bold shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-sm w-full sm:w-auto"
+                      >
                       <i className="fas fa-upload"></i>
-                      <span>Upload Document</span>
+                      <span>Upload / Manage</span>
                     </button>
                   </div>
 
+                  {/* Document List/Empty State */}
                   {documents.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {documents.map((doc, index) => {
                         const statusInfo = getDocumentStatus(doc.status);
                         return (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-5 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer border-2 border-gray-200 hover:border-orange-300 hover:shadow-md"
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
-                                <i className="fas fa-file-pdf text-red-500 text-2xl"></i>
+                          <div key={index} className="flex items-center justify-between p-4 sm:p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-orange-300 hover:shadow-sm transition-all">
+                             <div className="flex items-center gap-3 sm:gap-4 overflow-hidden"> {/* Added overflow */}
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm border border-gray-200 flex-shrink-0">
+                                {/* Use a generic file icon or determine based on type if available */}
+                                <i className="fas fa-file-alt text-gray-500 text-lg sm:text-xl"></i>
                               </div>
-                              <div>
-                                <p className="font-bold text-gray-900">
-                                  {doc.name}
+                              <div className="overflow-hidden"> {/* Added overflow */}
+                                <p className="font-bold text-gray-900 text-sm sm:text-base truncate"> {/* Added truncate */}
+                                  {doc.name || `Document ${index + 1}`} {/* Fallback name */}
                                 </p>
-                                <p className="text-sm text-gray-500">PDF Document</p>
+                                <p className="text-xs sm:text-sm text-gray-500">
+                                  {/* Add file type if available, e.g., PDF */}
+                                  {doc.type || 'File'}
+                                </p>
                               </div>
                             </div>
-                            <span
-                              className={`px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 ${statusInfo.color}`}
-                            >
-                              <i className={`${statusInfo.icon} text-sm`}></i>
+                             <span className={`px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 whitespace-nowrap flex-shrink-0 ${statusInfo.color}`}>
+                              <i className={`${statusInfo.icon} text-xs sm:text-sm`}></i>
                               {statusInfo.label}
                             </span>
                           </div>
@@ -328,11 +314,13 @@ const VendorProfile = () => {
                       })}
                     </div>
                   ) : (
-                    <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i className="fas fa-folder-open text-gray-400 text-2xl"></i>
+                    // Empty state for documents
+                    <div className="text-center py-10 sm:py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i className="fas fa-folder-open text-gray-400 text-xl sm:text-2xl"></i>
                       </div>
-                      <p className="text-gray-500 font-medium">No documents uploaded yet.</p>
+                      <p className="text-gray-500 font-medium text-sm sm:text-base">No documents uploaded yet.</p>
+                       <p className="text-xs sm:text-sm text-gray-400 mt-1">Upload documents via the Setup page.</p>
                     </div>
                   )}
                 </div>
@@ -342,82 +330,88 @@ const VendorProfile = () => {
           </div>
         </div>
 
-        {/* Sidebar - Account Status, Quick Stats, and Settings Button */}
+        {/* Sidebar - Account Status, Quick Stats, Actions - Adjusted spacing */}
         <div className="space-y-6">
           {/* Account Status Card */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-             {/* ... (Account Status content remains the same) */}
-              <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center">
-                <i className="fas fa-id-badge text-orange-600 text-lg"></i>
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i className="fas fa-id-badge text-orange-600 text-base sm:text-lg"></i>
               </div>
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
                 Account Status
               </h2>
             </div>
-
-            <div
-              className={`p-5 border-2 rounded-xl flex justify-between items-center ${accountStatus.color} transition-all`}
-            >
-              <span className="font-bold text-lg">{accountStatus.label}</span>
-              <i className={`${accountStatus.icon} text-2xl`}></i>
+             {/* Status Badge */}
+            <div className={`p-4 sm:p-5 border-2 rounded-xl flex flex-col sm:flex-row justify-between items-center text-center sm:text-left gap-2 ${accountStatus.color} transition-all`}>
+              <span className="font-bold text-base sm:text-lg">{accountStatus.label}</span>
+              <i className={`${accountStatus.icon} text-xl sm:text-2xl`}></i>
             </div>
-
-            <p className="mt-4 text-sm text-gray-700 leading-relaxed">
+             {/* Description */}
+            <p className="mt-4 text-xs sm:text-sm text-gray-700 leading-relaxed">
               {accountStatus.desc}
             </p>
-
+             {/* Member Hub Button */}
             {accountStatus.label === "Account Verified" && (
               <button
-                onClick={() => navigate('/vendor/members-hub')} // <-- MODIFIED HERE
-                className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl"
+                onClick={() => navigate('/vendor/members-hub')}
+                className="w-full mt-5 sm:mt-6 px-4 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
               >
                 <i className="fas fa-users mr-2"></i>
                 Visit Member's Hub
               </button>
             )}
-
+            {/* Show setup button if incomplete */}
+             {accountStatus.label === "Setup Incomplete" && (
+              <button
+                onClick={openSetup}
+                className="w-full mt-5 sm:mt-6 px-4 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:from-orange-600 hover:to-red-600 transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
+              >
+                <i className="fas fa-cog mr-2"></i>
+                Complete Setup Now
+              </button>
+            )}
           </div>
 
           {/* Quick Stats Card */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
-                <i className="fas fa-chart-bar text-blue-600 text-lg"></i>
+            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-base sm:text-lg">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i className="fas fa-chart-bar text-blue-600 text-base sm:text-lg"></i>
               </div>
-              <span className="text-xl">Quick Stats</span>
+              Quick Stats
             </h3>
             <div className="space-y-3">
-              <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                <p className="text-sm text-gray-600 font-medium">Total Orders</p>
-                <p className="text-2xl font-bold text-gray-900">{metrics.totalOrders}</p>
+              <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Orders</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">{metrics.totalOrders}</p>
               </div>
-              <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
-                <p className="text-sm text-gray-600 font-medium">Revenue</p>
-                 {/* Format revenue as currency */}
-                <p className="text-2xl font-bold text-gray-900">₹{ (metrics.totalRevenue || 0).toLocaleString('en-IN')}</p>
+              <div className="p-3 sm:p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Revenue</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                    {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(metrics.totalRevenue || 0)}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Settings Button */}
-          <button
-              onClick={goToSettings}
-              className="w-full group relative flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium"
-            >
-              <i className="fas fa-cog text-gray-600 group-hover:text-orange-500 transition-colors group-hover:rotate-90 duration-300"></i>
-              <span>Settings</span>
-          </button>
-
-          {/* ADDED Support Button */}
-          <button
-              onClick={goToSupport}
-              className="w-full group relative flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium"
-            >
-              <i className="fas fa-headset text-gray-600 group-hover:text-orange-500 transition-colors"></i>
-              <span>Support</span>
-          </button>
-
+          {/* Action Buttons: Settings & Support */}
+          <div className="space-y-3">
+             <button
+                onClick={goToSettings}
+                className="w-full group flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium text-sm sm:text-base"
+              >
+                <i className="fas fa-cog text-gray-500 group-hover:text-orange-500 transition-colors group-hover:rotate-90 duration-300 text-sm sm:text-base"></i>
+                <span>Settings</span>
+            </button>
+             <button
+                onClick={goToSupport}
+                className="w-full group flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl transition-all shadow-md hover:shadow-lg border border-gray-200 hover:border-orange-300 font-medium text-sm sm:text-base"
+              >
+                <i className="fas fa-headset text-gray-500 group-hover:text-orange-500 transition-colors text-sm sm:text-base"></i>
+                <span>Support</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 // src/pages/vendor/dashboard/VendorDashboardLayout.jsx
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react"; // Import useState
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import DashboardNavbar from "../../../components/DashboardNavbar";
 import Sidebar from "../../../components/Sidebar";
@@ -7,14 +7,28 @@ import { useVendorData } from "../../../context/vendor/vendorDataContext";
 
 const VendorDashboardLayout = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Import and use useLocation
-
+  const location = useLocation();
   const { dataLoading } = useVendorData();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // <-- Add state for sidebar visibility
 
   // Scrolls to the top of the page on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Close sidebar when navigating or on desktop resize (optional enhancement)
+  useEffect(() => {
+    setIsSidebarOpen(false); // Close sidebar on route change
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [location.pathname]);
+
 
   // --- Dynamic Header Logic ---
   const getPageConfig = () => {
@@ -52,11 +66,22 @@ const VendorDashboardLayout = () => {
     );
   }
 
+  // --- Functions to control sidebar visibility ---
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const closeSidebar = () => setIsSidebarOpen(false);
+  // --- End functions ---
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardNavbar />
+      {/* Pass toggleSidebar to Navbar */}
+      <DashboardNavbar onMenuClick={toggleSidebar} />
       <div className="flex pt-[70px]">
-        <Sidebar onNavigate={(path) => navigate(path)} />
+        {/* Pass state and close function to Sidebar */}
+        <Sidebar
+          onNavigate={(path) => navigate(path)}
+          isOpen={isSidebarOpen}
+          onClose={closeSidebar}
+        />
         {/* The main content area is now the scrollable container */}
         <main className="flex-1 h-[calc(100vh-70px)] overflow-y-auto">
              <div className="p-6 md:p-8"> {/* Standardized padding */}
