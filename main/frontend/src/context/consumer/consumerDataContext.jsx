@@ -13,21 +13,20 @@ export function ConsumerDataProvider({ children }) {
   const { currentUser } = useAuthStore();
 
   const clearCache = () => {
-    localStorage.removeItem("consumer_orders");
-    localStorage.removeItem("consumer_lists");
-    setOrders([]);
-    setLists([]);
+    setDataLoading(true);
+    try {
+      localStorage.removeItem("consumer_orders");
+      localStorage.removeItem("consumer_lists");
+      setOrders([]);
+      setLists([]);
+    } finally {
+      setDataLoading(false);
+    }
   };
 
   const fetchOrders = async () => {
+    setDataLoading(true);
     try {
-      const cached = localStorage.getItem("consumer_orders");
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        setOrders(parsed.data);
-        return parsed.data;
-      }
-
       const response = await ConsumerOrderService.getOrders();
       setOrders(response);
 
@@ -40,18 +39,14 @@ export function ConsumerDataProvider({ children }) {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch orders");
       console.error("Error fetching consumer orders:", error);
+    } finally {
+      setDataLoading(false);
     }
   };
 
   const fetchLists = async () => {
+    setDataLoading(true);
     try {
-      const cached = localStorage.getItem("consumer_lists");
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        setLists(parsed.data);
-        return parsed.data;
-      }
-
       const response = await ConsumerListService.getLists();
       setLists(response);
 
@@ -64,13 +59,29 @@ export function ConsumerDataProvider({ children }) {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch lists");
       console.error("Error fetching consumer lists:", error);
+    } finally {
+      setDataLoading(false);
     }
   };
 
   const loadConsumerData = async () => {
     setDataLoading(true);
     try {
-      await Promise.all([fetchOrders(), fetchLists()]);
+      const cachedLists = localStorage.getItem("consumer_lists");
+      if (cachedLists) {
+        const parsedLists = JSON.parse(cachedLists);
+        setLists(parsedLists.data);
+      } else {
+        await fetchLists();
+      }
+
+      const cachedOrders = localStorage.getItem("consumer_orders");
+      if (cachedOrders) {
+        const parsedOrders = JSON.parse(cachedOrders);
+        setOrders(parsedOrders.data);
+      } else {
+        await fetchOrders();
+      }
     } catch (error) {
       console.error("Error loading consumer data:", error);
     } finally {

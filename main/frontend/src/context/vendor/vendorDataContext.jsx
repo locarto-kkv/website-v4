@@ -18,37 +18,48 @@ export const VendorDataProvider = ({ children }) => {
   const { currentUser } = useAuthStore();
 
   const clearCache = () => {
-    localStorage.removeItem("vendor_profile");
-    localStorage.removeItem("vendor_analytics");
-    localStorage.removeItem("vendor_orders");
+    setDataLoading(true);
+    try {
+      localStorage.removeItem("vendor_profile");
+      localStorage.removeItem("vendor_analytics");
+      localStorage.removeItem("vendor_orders");
 
-    setAnalyticData([]);
-    setOrders([]);
-    setProducts([]);
-    setVendor([]);
-    setProfile(null);
+      setAnalyticData([]);
+      setOrders([]);
+      setProducts([]);
+      setVendor([]);
+      setProfile(null);
+    } finally {
+      setDataLoading(false);
+    }
   };
 
   const changeDataRange = (range) => {
-    if (!analyticData) return;
+    setDataLoading(true);
+    try {
+      if (!analyticData) return;
 
-    let newProducts, newVendor;
-    if (range === "total") {
-      newProducts = analyticData.products.total;
-      newVendor = analyticData.vendor.total;
-    } else if (range === "month") {
-      newProducts = analyticData.products.monthly;
-      newVendor = analyticData.vendor.monthly?.[0];
-    } else if (range === "week") {
-      newProducts = analyticData.products.weekly;
-      newVendor = analyticData.vendor.weekly?.[0];
+      let newProducts, newVendor;
+      if (range === "total") {
+        newProducts = analyticData.products.total;
+        newVendor = analyticData.vendor.total;
+      } else if (range === "month") {
+        newProducts = analyticData.products.monthly;
+        newVendor = analyticData.vendor.monthly?.[0];
+      } else if (range === "week") {
+        newProducts = analyticData.products.weekly;
+        newVendor = analyticData.vendor.weekly?.[0];
+      }
+
+      setProducts(newProducts);
+      setVendor(newVendor);
+    } finally {
+      setDataLoading(false);
     }
-
-    setProducts(newProducts);
-    setVendor(newVendor);
   };
 
   const getProfile = async () => {
+    setDataLoading(true);
     try {
       const response = await VendorProfileService.getProfile();
       localStorage.setItem(
@@ -60,10 +71,13 @@ export const VendorDataProvider = ({ children }) => {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch profile");
       console.error("Error fetching profile:", error);
+    } finally {
+      setDataLoading(false);
     }
   };
 
   const getAnalytics = async () => {
+    setDataLoading(true);
     try {
       const response = await VendorAnalyticService.getAnalytics();
       localStorage.setItem(
@@ -73,15 +87,17 @@ export const VendorDataProvider = ({ children }) => {
       setAnalyticData(response);
       setProducts(response.products?.total);
       setVendor(response.vendor?.total);
-
       return response;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch analytics");
       console.error("Error fetching analytics:", error);
+    } finally {
+      setDataLoading(false);
     }
   };
 
   const getOrders = async () => {
+    setDataLoading(true);
     try {
       const response = await VendorOrderService.getOrders();
       localStorage.setItem(
@@ -93,13 +109,14 @@ export const VendorDataProvider = ({ children }) => {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch orders");
       console.error("Error fetching orders:", error);
+    } finally {
+      setDataLoading(false);
     }
   };
 
   const loadVendorData = async () => {
+    setDataLoading(true);
     try {
-      setDataLoading(true);
-
       const cachedProfile = localStorage.getItem("vendor_profile");
       const cachedAnalytics = localStorage.getItem("vendor_analytics");
       const cachedOrders = localStorage.getItem("vendor_orders");

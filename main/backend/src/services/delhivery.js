@@ -1,13 +1,11 @@
 import axios from "axios";
+import { env } from "../lib/env.js";
 
-const DELHIVERY_BASE_URL = "https://staging-express.delhivery.com";
-const DELHIVERY_TRACK_URL = "https://track.delhivery.com";
-const DELHIVERY_DEV_URL = "https://express-dev-test.delhivery.com";
-const DELHIVERY_TOKEN = "YOUR_API_TOKEN"; // Replace with your token
+const DELHIVERY_BASE_URL = "https://track.delhivery.com";
+const DELHIVERY_TOKEN = env.DELHIVERY_API_KEY; // Replace with your token
 
 const headers = {
   Authorization: `Token ${DELHIVERY_TOKEN}`,
-  Accept: "application/json",
   "Content-Type": "application/json",
 };
 
@@ -18,6 +16,8 @@ export async function checkServiceability(pincode) {
     headers,
   });
 }
+// const response = await checkServiceability("400701");
+// console.log(response.data.delivery_codes[0]);
 
 // 2️⃣ Get Expected TAT (delivery time)
 export async function getExpectedTAT(
@@ -25,7 +25,7 @@ export async function getExpectedTAT(
   destinationPin,
   expectedPickupDate
 ) {
-  return axios.get(`${DELHIVERY_DEV_URL}/api/dc/expected_tat`, {
+  return axios.get(`${DELHIVERY_BASE_URL}/api/dc/expected_tat`, {
     params: {
       origin_pin: originPin,
       destination_pin: destinationPin,
@@ -37,6 +37,9 @@ export async function getExpectedTAT(
   });
 }
 
+// const response = await getExpectedTAT("400701", "400001");
+// console.log(response.data);
+
 // 3️⃣ Fetch Waybill numbers
 export async function fetchWaybill(count = 5) {
   return axios.get(`${DELHIVERY_BASE_URL}/waybill/api/bulk/json/`, {
@@ -44,6 +47,32 @@ export async function fetchWaybill(count = 5) {
     headers,
   });
 }
+
+// const response = await fetchWaybill();
+// console.log(response.data);
+
+// 9️⃣ Calculate Shipping Cost
+export async function calculateShippingCost({
+  originPin,
+  destinationPin,
+  weight,
+  paymentType = "Pre-paid",
+}) {
+  return axios.get(`${DELHIVERY_BASE_URL}/api/kinko/v1/invoice/charges/.json`, {
+    params: {
+      md: "E",
+      ss: "Delivered",
+      d_pin: destinationPin,
+      o_pin: originPin,
+      cgm: weight,
+      pt: paymentType,
+    },
+    headers,
+  });
+}
+
+// const response = await calculateShippingCost("400701", "400001", "1000");
+// console.log(response.data);
 
 // 4️⃣ Create Shipment
 export async function createShipment(payload) {
@@ -69,41 +98,10 @@ export async function cancelShipment(waybill) {
   );
 }
 
-// 7️⃣ Update E-waybill
-export async function updateEwaybill(waybill, invoiceNo, ewaybillNo) {
-  return axios.put(
-    `${DELHIVERY_TRACK_URL}/api/rest/ewaybill/${waybill}/`,
-    {
-      data: [{ dcn: invoiceNo, ewbn: ewaybillNo }],
-    },
-    { headers }
-  );
-}
-
 // 8️⃣ Track Shipment
 export async function trackShipment(waybill) {
   return axios.get(`${DELHIVERY_BASE_URL}/api/v1/packages/json/`, {
     params: { waybill },
-    headers,
-  });
-}
-
-// 9️⃣ Calculate Shipping Cost
-export async function calculateShippingCost({
-  originPin,
-  destinationPin,
-  weight,
-  paymentType = "Pre-paid",
-}) {
-  return axios.get(`${DELHIVERY_BASE_URL}/api/kinko/v1/invoice/charges/.json`, {
-    params: {
-      md: "E",
-      ss: "Delivered",
-      d_pin: destinationPin,
-      o_pin: originPin,
-      cgm: weight,
-      pt: paymentType,
-    },
     headers,
   });
 }
