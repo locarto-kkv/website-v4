@@ -1,83 +1,127 @@
-// src/components/SideCart.jsx
+// src/components/consumer/SideCart.jsx
 import React, { useState, useEffect } from "react";
+// Corrected import path
 import { ConsumerListService } from "../../services/consumer/consumerListService";
 import { useNavigate } from "react-router-dom";
+// Corrected import path
+import { formatCurrency } from "../../lib/utils"; // Import formatCurrency
 
 const SideCart = ({ isOpen, onClose }) => {
+  // --- STATE ---
   const [cartItems, setCartItems] = useState([]);
   const [prices, setPrices] = useState({
     subtotal: 0,
-    shipping: 0,
-    tax: 0,
+    shipping: 0, // Example fixed shipping
+    tax: 0, // Example tax rate
     total: 0,
   });
   const [couponCode, setCouponCode] = useState("");
   const [couponMessage, setCouponMessage] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponApplied, setCouponApplied] = useState(false); // Example state
+  const [loading, setLoading] = useState(true); // Added loading state
+
+  // --- HOOKS ---
   const navigate = useNavigate();
+  // Assuming ConsumerListService provides these functions:
+  const { getLists, removeFromList, updateList } = ConsumerListService;
 
-  const { getList, removeFromList, updateList } = ConsumerListService;
+  // --- EFFECTS ---
+  // Load cart items on mount or when isOpen changes
+  useEffect(() => {
+    if (isOpen) {
+      const loadCart = async () => {
+        setLoading(true); // Start loading
+        try {
+          const res = await getLists(); // Changed from getList to getLists
+          const currentCartItems = res?.cart || []; // Safely access cart
+          setCartItems(currentCartItems);
+          updatePrices(currentCartItems);
+        } catch (error) {
+          console.error("Error loading cart:", error);
+          // Optionally show an error message to the user
+        } finally {
+          setLoading(false); // Stop loading
+        }
+      };
+      loadCart();
+    }
+  }, [isOpen]); // Depend on isOpen to refresh cart when opened
 
-  // Load cart items on mount
-  // useEffect(() => {
-  //   const loadCart = async () => {
-  //     const res = await getList();
-  //     if (res.cart) {
-  //       setCartItems(res.cart);
-  //       updatePrices(res.cart);
-  //     }
-  //   };
-  // loadCart();
-  // }, []);
-
+  // --- FUNCTIONS ---
   // Update prices based on cart items
   const updatePrices = (items) => {
     const subtotal = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) => sum + (item.price || 0) * (item.quantity || 0), // Use safe defaults
       0
     );
-    const shipping = 5.99;
+    const shipping = subtotal > 0 ? 5.99 : 0; // Only add shipping if there are items
     const tax = subtotal * 0.08; // 8% tax example
     const total = subtotal + shipping + tax;
 
     setPrices({ subtotal, shipping, tax, total });
   };
 
-  // Update quantity
-  const updateQuantity = async (itemId, change) => {
-    const newQty = Math.max(
-      1,
-      cartItems.find((item) => item.id === itemId)?.quantity + change
-    );
-    const updatedCart = cartItems.map((item) =>
-      item.id === itemId ? { ...item, quantity: newQty } : item
-    );
-    await updateList("cart", newQty, itemId);
-    setCartItems(updatedCart);
-    updatePrices(updatedCart);
-  };
+  // Update quantity in cart
+  const updateQuantity = async (productId, delta) => {
+    const currentItem = cartItems.find((item) => item.product_id === productId); // Match product_id
+    if (!currentItem) return;
 
-  // Remove item from cart
-  const removeFromCart = async (id) => {
-    await removeFromList("cart", id);
-    setCartItems(cartItems.filter((item) => item.id !== id));
-    updatePrices(cartItems.filter((item) => item.id !== id));
-  };
+    const newQty = Math.max(0, (currentItem.quantity || 0) + delta); // Ensure quantity is >= 0
 
-  // Apply coupon code
-  const applyCoupon = () => {
-    if (couponCode.trim()) {
-      setCouponMessage("Coupon code applied successfully.");
-      setCouponApplied(true);
+    try {
+      if (newQty <= 0) {
+        await removeFromList("cart", productId);
+      } else {
+        await updateList("cart", newQty, productId);
+      }
+      // Re-fetch cart data to reflect changes
+      const updatedData = await getLists();
+      const updatedCartItems = updatedData?.cart || [];
+      setCartItems(updatedCartItems);
+      updatePrices(updatedCartItems);
+    } catch (err) {
+      console.error("Error updating cart quantity:", err);
+      // Optionally show error feedback
     }
   };
 
-  // Close cart and clear message
-  const handleCheckout = () => {
-    navigate("/checkout");
-    onClose();
+  // Remove item from cart
+  const removeFromCart = async (productId) => {
+    try {
+      await removeFromList("cart", productId);
+      // Re-fetch cart data
+      const updatedData = await getLists();
+      const updatedCartItems = updatedData?.cart || [];
+      setCartItems(updatedCartItems);
+      updatePrices(updatedCartItems);
+    } catch (err) {
+      console.error("Error removing from cart:", err);
+      // Optionally show error feedback
+    }
   };
 
+  // Apply coupon code (Placeholder logic)
+  const applyCoupon = () => {
+    if (couponCode.trim().toUpperCase() === "LOCARTO10") {
+      setCouponMessage("Coupon 'LOCARTO10' applied successfully!");
+      setCouponApplied(true);
+      // Add logic here to actually adjust the price if needed
+    } else if (couponCode.trim()) {
+      setCouponMessage("Invalid coupon code.");
+      setCouponApplied(false);
+    } else {
+      setCouponMessage("");
+      setCouponApplied(false);
+    }
+  };
+
+  // Navigate to checkout page and close the side cart
+  const handleCheckout = () => {
+    navigate("/consumer/checkout"); // Navigate to the new checkout route
+    onClose(); // Close the side cart drawer
+  };
+
+  // --- RENDER ---
   return (
     <div
       className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${
@@ -85,63 +129,52 @@ const SideCart = ({ isOpen, onClose }) => {
           ? "opacity-100 pointer-events-auto"
           : "opacity-0 pointer-events-none"
       }`}
-      onClick={onClose}
+      onClick={onClose} // Close when clicking the overlay
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cart-title"
     >
       {/* Enhanced Overlay with Backdrop Blur */}
       <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" />
 
       {/* Enhanced Cart Drawer */}
       <div
-        className={`absolute right-0 top-0 h-full w-80 md:w-96 bg-white shadow-2xl transform transition-all duration-300 ease-out ${
+        className={`absolute right-0 top-0 h-full w-full max-w-sm sm:max-w-md bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the drawer
       >
         {/* Enhanced Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-              <i className="fas fa-shopping-cart text-blue-600 text-sm"></i>
-            </div>
+        <div className="flex justify-between items-center p-5 sm:p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 flex-shrink-0">
+          <h2 id="cart-title" className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2">
+            <i className="fas fa-shopping-cart text-orange-500"></i>
             Your Cart
-            {cartItems.length > 0 && (
-              <span className="ml-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+            {!loading && cartItems.length > 0 && (
+              <span className="ml-1 bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
                 {cartItems.length}
               </span>
             )}
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors duration-200"
+            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors duration-200"
+            aria-label="Close cart"
           >
             <i className="fas fa-times text-sm"></i>
           </button>
         </div>
 
-        {/* Enhanced Cart Content */}
-        <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
-          {/* Enhanced Coupon Message */}
-          {couponMessage && (
-            <div
-              className={`mb-6 p-4 text-sm rounded-lg border-l-4 transition-all duration-300 ${
-                couponApplied
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-400"
-                  : "bg-amber-50 text-amber-800 border-amber-400"
-              }`}
-            >
-              <div className="flex items-center">
-                <i
-                  className={`fas ${
-                    couponApplied ? "fa-check-circle" : "fa-info-circle"
-                  } mr-2`}
-                ></i>
-                {couponMessage}
-              </div>
+        {/* Enhanced Cart Content Area (Scrollable) */}
+        <div className="flex-grow overflow-y-auto custom-scrollbar p-5 sm:p-6">
+          {/* Loading State */}
+          {loading ? (
+            <div className="text-center py-16 text-gray-500">
+               <i className="fas fa-spinner fa-spin text-3xl mb-4"></i>
+               <p>Loading cart...</p>
             </div>
-          )}
-
-          {/* Enhanced Empty Cart State */}
-          {cartItems.length === 0 ? (
+          ) :
+          /* Enhanced Empty Cart State */
+          cartItems.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i className="fas fa-shopping-cart text-3xl text-gray-400"></i>
@@ -154,146 +187,155 @@ const SideCart = ({ isOpen, onClose }) => {
               </p>
               <button
                 onClick={onClose}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all"
               >
                 Continue Shopping
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
-              {cartItems.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="group bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200 border border-gray-100"
-                  style={{
-                    animation: `slideIn 0.3s ease-out ${index * 0.1}s both`,
-                  }}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="relative">
+            // Cart has items - Render sections
+            <>
+              {/* Cart Items List */}
+              <div className="space-y-4 mb-6">
+                {cartItems.map((item, index) => (
+                  <div
+                    key={item.product_id} // Use product_id as key
+                    className="group bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200 border border-gray-100 flex items-center gap-4"
+                    style={{
+                      animation: `slideIn 0.3s ease-out ${index * 0.05}s both`, // Staggered animation
+                    }}
+                  >
+                    {/* Image */}
+                    <div className="relative flex-shrink-0">
                       <img
-                        src={item.image || "https://via.placeholder.com/60"}
-                        alt={item.name}
-                        className="w-16 h-16 object-cover rounded-lg shadow-sm"
+                        // Use product_images safely
+                        src={item.product_images?.[0]?.url || 'https://placehold.co/80x80/e2e8f0/e2e8f0?text=IMG'}
+                        alt={item.name || 'Product'} // Use name safely
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg shadow-sm border border-gray-200"
                       />
-                      <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                      {/* Quantity Badge */}
+                       <div className="absolute -top-2 -right-2 w-5 h-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow">
                         {item.quantity}
-                      </div>
+                       </div>
                     </div>
+                    {/* Details and Actions */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-800 truncate">
-                        {item.name}
-                      </h3>
-                      <p className="text-blue-600 font-medium">
-                        ₹{item.price.toFixed(2)}
-                      </p>
+                       <h3 className="font-semibold text-gray-800 truncate text-sm sm:text-base">
+                        {item.name || "Product Name"}
+                       </h3>
+                       <p className="text-orange-600 font-bold text-sm sm:text-base">
+                         {formatCurrency(item.price)}
+                       </p>
+                        {/* Quantity Controls */}
+                       <div className="flex items-center gap-2 mt-2">
+                          <button
+                            className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-orange-600 border border-gray-300 rounded-md transition-colors duration-200 hover:border-orange-300"
+                            onClick={() => updateQuantity(item.product_id, -1)}
+                            aria-label={`Decrease quantity of ${item.name}`}
+                          >
+                            <i className="fas fa-minus text-xs"></i>
+                          </button>
+                          <span className="w-8 text-center font-medium text-gray-800 text-sm">{item.quantity}</span>
+                          <button
+                            className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-orange-600 border border-gray-300 rounded-md transition-colors duration-200 hover:border-orange-300"
+                            onClick={() => updateQuantity(item.product_id, 1)}
+                            aria-label={`Increase quantity of ${item.name}`}
+                          >
+                            <i className="fas fa-plus text-xs"></i>
+                          </button>
+                       </div>
                     </div>
-                    <div className="flex items-center space-x-1 bg-white rounded-lg shadow-sm border">
-                      <button
-                        className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-l-lg transition-colors duration-200"
-                        onClick={() => updateQuantity(item.id, -1)}
-                      >
-                        <i className="fas fa-minus text-xs"></i>
-                      </button>
-                      <span className="w-10 text-center font-medium text-gray-800">
-                        {item.quantity}
-                      </span>
-                      <button
-                        className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-r-lg transition-colors duration-200"
-                        onClick={() => updateQuantity(item.id, 1)}
-                      >
-                        <i className="fas fa-plus text-xs"></i>
-                      </button>
-                    </div>
+                    {/* Remove Button */}
                     <button
-                      className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100"
-                      onClick={() => removeFromCart(item.id)}
+                      className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                      onClick={() => removeFromCart(item.product_id)}
                       title="Remove item"
+                       aria-label={`Remove ${item.name} from cart`}
                     >
                       <i className="fas fa-trash text-sm"></i>
                     </button>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
 
-          {cartItems.length > 0 && (
-            <>
               {/* Enhanced Coupon Section */}
-              <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+              <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center">
-                    <i className="fas fa-tag text-blue-600 mr-2"></i>
+                  <div className="flex items-center gap-2">
+                    <i className="fas fa-tag text-orange-500"></i>
                     <span className="text-sm font-medium text-gray-700">
                       Have a coupon?
                     </span>
                   </div>
-                  {couponApplied && (
-                    <button className="text-sm text-red-500 hover:text-red-600 transition-colors duration-200">
+                  {/* Remove coupon button - Add logic later */}
+                  {/* {couponApplied && (
+                    <button className="text-xs text-red-500 hover:text-red-600 transition-colors duration-200">
                       Remove
                     </button>
-                  )}
+                  )} */}
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
                     placeholder="Enter coupon code"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-sm"
                   />
                   <button
                     onClick={applyCoupon}
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+                    className="bg-orange-500 text-white px-4 sm:px-5 py-2 sm:py-3 rounded-lg hover:bg-orange-600 transition-colors duration-200 font-semibold text-sm"
                   >
                     Apply
                   </button>
                 </div>
+                 {/* Coupon Message Area */}
+                {couponMessage && (
+                  <p className={`mt-2 text-xs font-medium ${couponApplied ? 'text-green-600' : 'text-red-600'}`}>
+                    {couponMessage}
+                  </p>
+                )}
               </div>
 
               {/* Enhanced Order Summary */}
-              <div className="mt-8 p-5 bg-gray-50 rounded-xl border border-gray-100">
-                <h3 className="font-semibold text-gray-800 mb-4 flex items-center">
-                  <i className="fas fa-receipt text-blue-600 mr-2"></i>
+              <div className="mt-6 p-5 bg-gray-50 rounded-xl border border-gray-200">
+                <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <i className="fas fa-receipt text-orange-500"></i>
                   Order Summary
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span className="font-medium">
-                      ₹{prices.subtotal.toFixed(2)}
+                    <span className="font-medium text-gray-800">
+                      {formatCurrency(prices.subtotal)}
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span className="font-medium">
-                      ₹{prices.shipping.toFixed(2)}
+                    <span className="font-medium text-gray-800">
+                      {formatCurrency(prices.shipping)}
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
-                    <span>Tax</span>
-                    <span className="font-medium">
-                      ₹{prices.tax.toFixed(2)}
+                    <span>Tax (Est.)</span>
+                    <span className="font-medium text-gray-800">
+                      {formatCurrency(prices.tax)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Discount</span>
-                    <span className="text-emerald-600 font-medium">
-                      -₹
-                      {(
-                        prices.total -
-                        prices.subtotal -
-                        prices.shipping -
-                        prices.tax
-                      ).toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="border-t border-gray-200 pt-3">
-                    <div className="flex justify-between font-bold text-lg text-gray-800">
+                   {/* Example Discount - Add logic later */}
+                  {/* {couponApplied && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount</span>
+                      <span className="font-medium">
+                        -{formatCurrency(prices.subtotal * 0.10)}
+                      </span>
+                    </div>
+                  )} */}
+                  <div className="border-t border-gray-200 pt-3 mt-2">
+                    <div className="flex justify-between font-bold text-base text-gray-900">
                       <span>Total</span>
-                      <span className="text-blue-600">
-                        ₹{prices.total.toFixed(2)}
+                      <span className="text-orange-600">
+                        {formatCurrency(prices.total)} {/* Adjust if discount applied */}
                       </span>
                     </div>
                   </div>
@@ -304,64 +346,44 @@ const SideCart = ({ isOpen, onClose }) => {
         </div>
 
         {/* Enhanced Checkout Footer */}
-        <div className="p-6 border-t border-gray-100 bg-white">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={onClose}
-              className="text-gray-600 hover:text-gray-800 transition-colors duration-200 flex items-center"
-            >
-              <i className="fas fa-arrow-left mr-2 text-sm"></i>
-              Continue shopping
-            </button>
-            <button
-              onClick={handleCheckout}
-              disabled={cartItems.length === 0}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              <span>Checkout</span>
-              <i className="fas fa-arrow-right ml-2 text-sm"></i>
-            </button>
-          </div>
+        <div className="p-5 sm:p-6 border-t border-gray-100 bg-white flex-shrink-0">
+          <button
+            onClick={handleCheckout}
+            // **REMOVED disabled attribute**
+            // disabled={cartItems.length === 0 || loading}
+            className={`w-full bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-bold transition-all duration-200 shadow-lg flex items-center justify-center gap-2 ${
+              cartItems.length === 0 || loading
+                ? "opacity-60 cursor-not-allowed" // Keep visual disabled state for clarity
+                : "hover:from-orange-600 hover:to-red-600 hover:shadow-xl transform hover:scale-[1.02]"
+            }`}
+          >
+            <span>Proceed to Checkout</span>
+            <i className="fas fa-arrow-right text-sm"></i>
+          </button>
+           <button
+             onClick={onClose}
+             className="w-full text-center text-gray-500 hover:text-gray-700 mt-3 text-sm font-medium"
+           >
+             or Continue Shopping
+           </button>
         </div>
       </div>
 
+      {/* Styles for animation and scrollbar */}
       <style>{`
         @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateX(20px); }
+          to { opacity: 1; transform: translateX(0); }
         }
-
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: #cbd5e1 #f1f5f9;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 3px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 3px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
+        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #cbd5e1 #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
       `}</style>
     </div>
   );
 };
 
 export default SideCart;
+

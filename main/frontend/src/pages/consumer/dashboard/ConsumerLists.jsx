@@ -1,20 +1,22 @@
 // src/pages/consumer/dashboard/CustomerLists.jsx
 import React, { useState } from "react";
 import { formatCurrency } from "../../../lib/utils.js";
-import { useConsumerData } from "../../../context/consumer/consumerDataContext.jsx"; 
+import { useConsumerData } from "../../../context/consumer/consumerDataContext.jsx";
 import { ConsumerListService } from "../../../services/consumer/consumerListService.js";
+import { useNavigate } from "react-router-dom";
 
 const CustomerLists = () => {
   const [listView, setListView] = useState("cart");
   const { lists, fetchLists } = useConsumerData();
   const { updateList, removeFromList } = ConsumerListService;
+  const navigate = useNavigate();
 
   const updateQuantity = async (productId, delta) => {
-    const currentItem = lists.cart?.find((item) => item.id === productId);
-
+    const currentItem = lists?.cart?.find((item) => item.id === productId);
     if (!currentItem) return;
 
-    const newQty = Math.max(0, currentItem.quantity + delta);
+    const currentQty = Number(currentItem.quantity) || 0;
+    const newQty = Math.max(0, currentQty + delta);
 
     try {
       if (newQty <= 0) {
@@ -31,7 +33,7 @@ const CustomerLists = () => {
   const removeFromCart = async (productId) => {
     try {
       await removeFromList("cart", productId);
-      await fetchLists(); 
+      await fetchLists();
     } catch (err) {
       console.error("Error removing from cart:", err);
     }
@@ -47,6 +49,10 @@ const CustomerLists = () => {
   };
 
   const moveToCart = async (item) => {
+    if (!item || !item.id) {
+      console.error("Invalid item passed to moveToCart:", item);
+      return;
+    }
     try {
       await updateList("cart", 1, item.id);
       await removeFromList("wishlist", item.id);
@@ -56,179 +62,364 @@ const CustomerLists = () => {
     }
   };
 
-  const totalCartAmount = lists.cart
+  const totalCartAmount = Array.isArray(lists?.cart)
     ? lists.cart.reduce(
-        (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
+        (sum, item) => sum + (Number(item?.price) || 0) * (Number(item?.quantity) || 0),
         0
       )
     : 0;
 
-  // Render Logic
+  const cartItemsCount = lists?.cart?.length || 0;
+  const wishlistItemsCount = lists?.wishlist?.length || 0;
+
   return (
-    <div className="space-y-6">
-      {/* Toggle Buttons: Responsive text size and padding */}
-      <div className="flex gap-2 sm:gap-4">
+    <div className="space-y-6 sm:space-y-8">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white shadow-2xl">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2">My Shopping Lists</h1>
+            <p className="text-sm sm:text-base text-white/90">Manage your cart and wishlist items</p>
+          </div>
+          <div className="flex gap-4 sm:gap-6">
+            <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl px-4 sm:px-6 py-3 sm:py-4">
+              <div className="text-2xl sm:text-3xl font-black">{cartItemsCount}</div>
+              <div className="text-xs sm:text-sm text-white/90 font-medium">Cart Items</div>
+            </div>
+            <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl px-4 sm:px-6 py-3 sm:py-4">
+              <div className="text-2xl sm:text-3xl font-black">{wishlistItemsCount}</div>
+              <div className="text-xs sm:text-sm text-white/90 font-medium">Wishlist Items</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Toggle Buttons */}
+      <div className="flex gap-3 sm:gap-4 bg-white rounded-xl sm:rounded-2xl p-2 shadow-lg border border-gray-100">
         <button
           onClick={() => setListView("cart")}
-          className={`flex-1 py-2 px-3 sm:py-3 sm:px-6 rounded-xl font-bold transition-all text-sm sm:text-base ${
+          className={`flex-1 py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl font-bold transition-all duration-300 text-sm sm:text-base relative overflow-hidden ${
             listView === "cart"
-              ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg"
-              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+              ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg scale-105"
+              : "bg-gray-50 text-gray-700 hover:bg-gray-100"
           }`}
         >
-          <i className="fas fa-shopping-cart mr-1 sm:mr-2"></i>
-          Cart ({lists.cart?.length || 0})
+          <span className="relative z-10 flex items-center justify-center gap-2">
+            <i className="fas fa-shopping-cart"></i>
+            <span className="hidden sm:inline">Shopping Cart</span>
+            <span className="sm:hidden">Cart</span>
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+              listView === "cart" ? "bg-white/20" : "bg-orange-100 text-orange-600"
+            }`}>
+              {cartItemsCount}
+            </span>
+          </span>
+          {listView === "cart" && (
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          )}
         </button>
         <button
           onClick={() => setListView("wishlist")}
-          className={`flex-1 py-2 px-3 sm:py-3 sm:px-6 rounded-xl font-bold transition-all text-sm sm:text-base ${
+          className={`flex-1 py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl font-bold transition-all duration-300 text-sm sm:text-base relative overflow-hidden ${
             listView === "wishlist"
-              ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg"
-              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+              ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg scale-105"
+              : "bg-gray-50 text-gray-700 hover:bg-gray-100"
           }`}
         >
-          <i className="fas fa-heart mr-1 sm:mr-2"></i>
-          Wishlist ({lists.wishlist?.length || 0})
+          <span className="relative z-10 flex items-center justify-center gap-2">
+            <i className="fas fa-heart"></i>
+            <span className="hidden sm:inline">My Wishlist</span>
+            <span className="sm:hidden">Wishlist</span>
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+              listView === "wishlist" ? "bg-white/20" : "bg-orange-100 text-orange-600"
+            }`}>
+              {wishlistItemsCount}
+            </span>
+          </span>
+          {listView === "wishlist" && (
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          )}
         </button>
       </div>
 
       {/* Cart View */}
       {listView === "cart" &&
-        (!lists.cart || lists.cart.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100">
-            <div className="text-center py-12">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-shopping-cart text-3xl sm:text-4xl text-gray-400"></i>
+        (!lists?.cart || lists.cart.length === 0 ? (
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-8 sm:p-12 border border-gray-100">
+            <div className="text-center py-8 sm:py-12">
+              <div className="relative inline-block mb-6">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mx-auto">
+                  <i className="fas fa-shopping-cart text-5xl sm:text-6xl text-orange-400"></i>
+                </div>
+                <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                  <i className="fas fa-plus text-white text-lg"></i>
+                </div>
               </div>
-              <p className="text-gray-500 text-sm sm:text-lg">
-                Your Cart is empty — add items to view them here
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3">Your Cart is Empty</h3>
+              <p className="text-sm sm:text-base text-gray-600 mb-8 max-w-md mx-auto">
+                Start adding items to your cart and they'll appear here
               </p>
+              <button
+                onClick={() => navigate('/map')}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300"
+              >
+                <i className="fas fa-shopping-bag"></i>
+                Start Shopping
+              </button>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100">
-            <div className="space-y-4 mb-6">
-              {lists.cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-col sm:flex-row items-center gap-4 p-3 sm:p-4 border border-gray-200 rounded-xl hover:border-orange-300 transition-colors"
-                >
-                  <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={item.image || "https://placehold.co/100x100/e2e8f0/e2e8f0"}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 text-center sm:text-left">
-                    <h3 className="font-bold text-gray-900 text-base sm:text-lg">
-                      {item.name || "Product Name"}
-                    </h3>
-                    <p className="text-orange-500 font-bold text-sm sm:text-base">
-                      {formatCurrency(item.price)}
-                    </p>
-                  </div>
-                  {/* Actions grouped for better mobile layout */}
-                  <div className="flex items-center gap-2 sm:gap-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="w-9 h-9 border border-gray-300 rounded-lg hover:border-orange-500 transition-all font-bold flex items-center justify-center text-lg"
-                          aria-label={`Decrease quantity of ${item.name}`}
-                        >
-                          -
-                        </button>
-                        <span className="w-8 text-center font-bold text-base">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="w-9 h-9 border border-gray-300 rounded-lg hover:border-orange-500 transition-all font-bold flex items-center justify-center text-lg"
-                          aria-label={`Increase quantity of ${item.name}`}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700 p-2 sm:ml-2"
-                        aria-label={`Remove ${item.name} from cart`}
-                      >
-                        <i className="fas fa-trash text-lg"></i>
-                      </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="border-t pt-6">
-              <div className="flex justify-between text-lg sm:text-xl font-bold mb-4">
-                <span>Total:</span>
-                <span className="text-orange-500">
-                  {formatCurrency(totalCartAmount)}
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+            {/* Cart Header */}
+            <div className="bg-gradient-to-r from-gray-50 to-orange-50 px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <i className="fas fa-shopping-cart text-orange-500"></i>
+                  Shopping Cart
+                </h2>
+                <span className="text-xs sm:text-sm text-gray-600 font-medium">
+                  {cartItemsCount} {cartItemsCount === 1 ? 'item' : 'items'}
                 </span>
               </div>
-              <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 sm:py-4 rounded-xl font-bold hover:shadow-xl transition-all text-base sm:text-lg">
-                Proceed to Checkout
-              </button>
+            </div>
+
+            {/* Cart Items */}
+            <div className="p-4 sm:p-8">
+              <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
+                {lists.cart.map((item) => (
+                  <div
+                    key={item.product_id || item.id}
+                    className="group relative bg-gradient-to-br from-white to-gray-50 p-4 sm:p-6 border-2 border-gray-200 rounded-xl sm:rounded-2xl hover:border-orange-300 hover:shadow-xl transition-all duration-300"
+                  >
+                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                      {/* Product Image */}
+                      <div className="relative flex-shrink-0">
+                        <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg">
+                          <img
+                            src={item.product_images?.[0]?.url || "https://placehold.co/120x120/e2e8f0/94a3b8?text=Product"}
+                            alt={item.name || "Product"}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/120x120/e2e8f0/94a3b8?text=Error"; }}
+                          />
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg">
+                          {item.quantity}
+                        </div>
+                      </div>
+
+                      {/* Product Details */}
+                      <div className="flex-1 text-center sm:text-left min-w-0">
+                        <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-2 line-clamp-2">
+                          {item.name || "Product Name"}
+                        </h3>
+                        <div className="flex items-center justify-center sm:justify-start gap-2 mb-3">
+                          <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                            {formatCurrency(item.price)}
+                          </span>
+                          <span className="text-xs sm:text-sm text-gray-500 font-medium">per item</span>
+                        </div>
+                        <div className="inline-flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-full">
+                          <span className="text-xs sm:text-sm text-gray-600 font-medium">Subtotal:</span>
+                          <span className="text-sm sm:text-base font-bold text-orange-600">
+                            {formatCurrency((item.price || 0) * (item.quantity || 0))}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Quantity Controls & Remove */}
+                      <div className="flex sm:flex-col items-center gap-3 sm:gap-4">
+                        {/* Quantity Controls */}
+                        <div className="flex items-center gap-2 sm:gap-3 bg-white border-2 border-gray-200 rounded-xl px-2 py-2 shadow-md">
+                          <button
+                            onClick={() => updateQuantity(item.id, -1)}
+                            disabled={!item.id}
+                            className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 rounded-lg hover:from-orange-500 hover:to-red-500 hover:text-white transition-all font-bold flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-lg"
+                            aria-label={`Decrease quantity of ${item.name || 'product'}`}
+                          >
+                            <i className="fas fa-minus text-sm"></i>
+                          </button>
+                          <span className="w-10 sm:w-12 text-center font-black text-lg sm:text-xl text-gray-800">
+                            {item.quantity || 0}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item.id, 1)}
+                            disabled={!item.id}
+                            className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 rounded-lg hover:from-orange-500 hover:to-red-500 hover:text-white transition-all font-bold flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-lg"
+                            aria-label={`Increase quantity of ${item.name || 'product'}`}
+                          >
+                            <i className="fas fa-plus text-sm"></i>
+                          </button>
+                        </div>
+
+                        {/* Remove Button */}
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          disabled={!item.id}
+                          className="w-10 h-10 sm:w-12 sm:h-12 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl flex items-center justify-center"
+                          aria-label={`Remove ${item.name || 'product'} from cart`}
+                        >
+                          <i className="fas fa-trash text-base sm:text-lg"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Cart Summary */}
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl sm:rounded-2xl p-5 sm:p-8 border-2 border-orange-200">
+                <div className="space-y-3 sm:space-y-4 mb-6">
+                  <div className="flex justify-between items-center text-sm sm:text-base">
+                    <span className="text-gray-600 font-medium">Subtotal ({cartItemsCount} items)</span>
+                    <span className="font-bold text-gray-800 text-base sm:text-lg">{formatCurrency(totalCartAmount)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm sm:text-base">
+                    <span className="text-gray-600 font-medium flex items-center gap-2">
+                      <i className="fas fa-truck text-green-500"></i>
+                      Shipping
+                    </span>
+                    <span className="font-bold text-green-600">FREE</span>
+                  </div>
+                  <div className="border-t-2 border-orange-300 pt-4 mt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg sm:text-xl font-bold text-gray-900">Total Amount</span>
+                      <span className="text-2xl sm:text-4xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+                        {formatCurrency(totalCartAmount)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate('/consumer/checkout')}
+                  className="w-full bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+                  disabled={totalCartAmount <= 0}
+                >
+                  <i className="fas fa-lock"></i>
+                  Proceed to Secure Checkout
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+
+                {/* Trust Badges */}
+                <div className="mt-6 flex items-center justify-center gap-4 sm:gap-6 text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <i className="fas fa-shield-alt text-green-500"></i>
+                    <span className="text-xs sm:text-sm font-medium">Secure</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <i className="fas fa-undo text-blue-500"></i>
+                    <span className="text-xs sm:text-sm font-medium">Easy Returns</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <i className="fas fa-headset text-orange-500"></i>
+                    <span className="text-xs sm:text-sm font-medium">24/7 Support</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ))}
 
       {/* Wishlist View */}
       {listView === "wishlist" &&
-        (!lists.wishlist || lists.wishlist.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100">
-            <div className="text-center py-12">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-heart text-3xl sm:text-4xl text-gray-400"></i>
+        (!lists?.wishlist || lists.wishlist.length === 0 ? (
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-8 sm:p-12 border border-gray-100">
+            <div className="text-center py-8 sm:py-12">
+              <div className="relative inline-block mb-6">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-pink-100 to-red-100 rounded-full flex items-center justify-center mx-auto">
+                  <i className="fas fa-heart text-5xl sm:text-6xl text-pink-400"></i>
+                </div>
+                <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-br from-pink-500 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                  <i className="fas fa-plus text-white text-lg"></i>
+                </div>
               </div>
-              <p className="text-gray-500 text-sm sm:text-lg">
-                Your wishlist is empty — add items to view them here
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3">Your Wishlist is Empty</h3>
+              <p className="text-sm sm:text-base text-gray-600 mb-8 max-w-md mx-auto">
+                Save your favorite items here for later
               </p>
+              <button
+                onClick={() => navigate('/map')}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300"
+              >
+                <i className="fas fa-heart"></i>
+                Explore Products
+              </button>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {lists.wishlist.map((item) => (
-                <div
-                  key={item.id}
-                  className="border border-gray-200 rounded-xl p-4 hover:border-orange-300 transition-colors"
-                >
-                  <div className="flex gap-4">
-                    <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
-                        src={item.image || "https://placehold.co/100x100/e2e8f0/e2e8f0"}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div>
-                        <h3 className="font-bold text-gray-900 text-base sm:text-lg">
-                          {item.name || "Product Name"}
-                        </h3>
-                        <p className="text-orange-500 font-bold mb-2 sm:mb-3 text-sm sm:text-base">
-                          {formatCurrency(item.price)}
-                        </p>
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+            {/* Wishlist Header */}
+            <div className="bg-gradient-to-r from-gray-50 to-pink-50 px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <i className="fas fa-heart text-pink-500"></i>
+                  My Wishlist
+                </h2>
+                <span className="text-xs sm:text-sm text-gray-600 font-medium">
+                  {wishlistItemsCount} {wishlistItemsCount === 1 ? 'item' : 'items'}
+                </span>
+              </div>
+            </div>
+
+            {/* Wishlist Items */}
+            <div className="p-4 sm:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                {lists.wishlist.map((item) => (
+                  <div
+                    key={item.product_id || item.id}
+                    className="group relative bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-pink-300 hover:shadow-xl transition-all duration-300"
+                  >
+                    <div className="flex gap-4">
+                      {/* Product Image */}
+                      <div className="relative flex-shrink-0">
+                        <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden shadow-lg">
+                          <img
+                            src={item.product_images?.[0]?.url || "https://placehold.co/120x120/e2e8f0/94a3b8?text=Product"}
+                            alt={item.name || "Product"}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/120x120/e2e8f0/94a3b8?text=Error"; }}
+                          />
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center shadow-lg">
+                          <i className="fas fa-heart text-xs"></i>
+                        </div>
                       </div>
-                      <div className="flex gap-2 mt-auto">
-                        <button
-                          onClick={() => moveToCart(item)}
-                          className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition-all"
-                        >
-                          Add to Cart
-                        </button>
-                        <button
-                          onClick={() => removeFromWishlist(item.id)}
-                          className="px-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                          aria-label={`Remove ${item.name} from wishlist`}
-                        >
-                          <i className="fas fa-trash"></i>
-                        </button>
+
+                      {/* Product Details */}
+                      <div className="flex-1 flex flex-col justify-between min-w-0">
+                        <div>
+                          <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-2 line-clamp-2">
+                            {item.name || "Product Name"}
+                          </h3>
+                          <div className="text-xl sm:text-2xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent mb-3 sm:mb-4">
+                            {formatCurrency(item.price)}
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2 mt-auto">
+                          <button
+                            onClick={() => moveToCart(item)}
+                            disabled={!item.id}
+                            className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                          >
+                            <i className="fas fa-shopping-cart"></i>
+                            Add to Cart
+                          </button>
+                          <button
+                            onClick={() => removeFromWishlist(item.id)}
+                            disabled={!item.id}
+                            className="px-3 sm:px-4 bg-red-50 text-red-500 rounded-lg sm:rounded-xl hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl"
+                            aria-label={`Remove ${item.name || 'product'} from wishlist`}
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         ))}
@@ -237,4 +428,3 @@ const CustomerLists = () => {
 };
 
 export default CustomerLists;
-

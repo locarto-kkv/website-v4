@@ -16,6 +16,7 @@ import CustomerSupport from "./dashboard/ConsumerSupport.jsx";
 import CustomerSettings from "./dashboard/ConsumerSettings.jsx";
 import RuleChatbot from "../Chatbot";
 import ShopProducts from "./ShopProducts";
+import CheckoutPage from "./CheckoutPage"; // <-- Import the new CheckoutPage
 
 // --- Simplified Protected Route ---
 const ProtectedRoute = () => {
@@ -26,7 +27,7 @@ const ProtectedRoute = () => {
     clearCache();
     return <Navigate to="/consumer/login" replace />;
   } else {
-    if (dataLoading) {
+    if (dataLoading && !['/consumer/checkout'].includes(location.pathname)) { // Don't show loading on checkout page itself initially
       return (
         <div className="flex items-center justify-center min-h-screen pt-[70px]">
           {" "}
@@ -59,8 +60,11 @@ const ConsumerRoutes = () => {
           )
         }
       />
-      <Route path="dashboard" element={<ProtectedRoute />}>
-        <Route element={<CustomerDashboardLayout />}>
+
+      {/* --- Protected Routes --- */}
+      <Route element={<ProtectedRoute />}>
+         {/* Dashboard Routes with Layout */}
+        <Route path="dashboard" element={<CustomerDashboardLayout />}>
           <Route index element={<Navigate to="overview" replace />} />
           <Route path="overview" element={<CustomerOverview />} />
           <Route path="orders" element={<CustomerOrders />} />
@@ -69,14 +73,17 @@ const ConsumerRoutes = () => {
           <Route path="support" element={<CustomerSupport />} />
           <Route path="settings" element={<CustomerSettings />} />
         </Route>
-      </Route>
-      {/* --- End Protected Dashboard Routes --- */}
 
-      {/* Other consumer routes (outside the dashboard layout) */}
-      <Route
-        path="shops/:vendorId/products/:category"
-        element={<ShopProducts />}
-      />
+        {/* Other protected consumer routes (outside the dashboard layout) */}
+        <Route path="checkout" element={<CheckoutPage />} /> {/* <-- Add Checkout Route */}
+        <Route
+          path="shops/:vendorId/products/:category"
+          element={<ShopProducts />}
+        />
+      </Route>
+      {/* --- End Protected Routes --- */}
+
+
       {/* Optional Catch-all */}
       {/* <Route path="*" element={<Navigate to="/consumer/dashboard/overview" replace />} /> */}
     </Routes>
