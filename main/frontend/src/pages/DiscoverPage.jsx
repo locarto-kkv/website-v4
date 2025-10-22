@@ -22,7 +22,7 @@ const DiscoverPage = () => {
   const [logoAnimationKey, setLogoAnimationKey] = useState(0);
 
   const { blogs } = useData();
-  const brandData = blogs.filter((b) => b.blog);
+  const brandData = blogs.filter((b) => b.blog.length > 0);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -117,8 +117,8 @@ const DiscoverPage = () => {
             const zIndex = index === currentLogoIndex ? 10 : 0;
             return (
               <img
-                key={`${brand.title}-${logoAnimationKey}`} // Include animation key to trigger re-render
-                src={brand.brand_logo}
+                key={`${brand.name}-${logoAnimationKey}`} // Include animation key to trigger re-render
+                src={brand.blog[0].brand_logo}
                 alt={brand.title}
                 className="absolute inset-0 w-full h-full object-contain transition-opacity duration-1000 ease-in-out"
                 style={{ opacity, zIndex }}

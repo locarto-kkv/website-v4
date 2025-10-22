@@ -21,7 +21,7 @@ const BrandInfoPage = () => {
   const { brandTitle } = useParams();
   const [brand, setBrand] = useState();
   const { blogs } = useData();
-  const brandData = blogs.filter((b) => b.blog);
+  const brandData = blogs.filter((b) => b.blog.length > 0);
 
   // Scroll to top whenever brandId changes
   useEffect(() => {
@@ -29,10 +29,11 @@ const BrandInfoPage = () => {
   }, [brandTitle]);
 
   useEffect(() => {
-    const foundBrand = brandData.find((b) => b.blog.title === brandTitle);
+    if (brandData.length < 1) return;
+    const foundBrand = brandData.find((b) => b.blog[0].title === brandTitle);
 
-    setBrand(foundBrand.blog || null);
-  }, [brandTitle, brandData]); // FIX: Added brandData as a dependency
+    setBrand(foundBrand.blog[0] || null);
+  }, [brandTitle, brandData]);
 
   // FIX: Memoize the random brands so they don't change on every render
   const randomBrands = useMemo(() => {
@@ -40,7 +41,11 @@ const BrandInfoPage = () => {
       return [];
     }
     // Shuffle + get random brands (excluding current one)
-    const otherBrands = brandData.filter((b) => b.title !== brand.title);
+
+    const otherBrands = brandData.filter(
+      (b) => b.blog[0]?.title !== brand.title
+    );
+
     for (let i = otherBrands.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [otherBrands[i], otherBrands[j]] = [otherBrands[j], otherBrands[i]];
