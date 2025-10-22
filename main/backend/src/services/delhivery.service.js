@@ -2,12 +2,14 @@ import axios from "axios";
 import { env } from "../lib/env.js";
 
 const DELHIVERY_BASE_URL = "https://track.delhivery.com";
-const DELHIVERY_TOKEN = env.DELHIVERY_API_KEY; // Replace with your token
+const DELHIVERY_TOKEN = env.DELHIVERY_API_KEY;
 
 const headers = {
   Authorization: `Token ${DELHIVERY_TOKEN}`,
   "Content-Type": "application/json",
 };
+
+// console.log(headers);
 
 // 1️⃣ Check Serviceability
 export async function checkServiceability(pincode) {
@@ -16,8 +18,10 @@ export async function checkServiceability(pincode) {
     headers,
   });
 }
-// const response = await checkServiceability("400701");
-// console.log(response.data.delivery_codes[0]);
+// const { data } = await checkServiceability("400701");
+// const { cod, pre_paid, cash, pickup, repl, sun_tat, is_oda } =
+//   data.delivery_codes[0].postal_code;
+// console.log(cod, pre_paid, cash, pickup, repl, sun_tat, is_oda);
 
 // 2️⃣ Get Expected TAT (delivery time)
 export async function getExpectedTAT(
@@ -37,8 +41,8 @@ export async function getExpectedTAT(
   });
 }
 
-// const response = await getExpectedTAT("400701", "400001");
-// console.log(response.data);
+// const { data } = await getExpectedTAT("400701", "400001");
+// console.log(data.data.tat, data.success);
 
 // 3️⃣ Fetch Waybill numbers
 export async function fetchWaybill(count = 5) {
@@ -48,7 +52,7 @@ export async function fetchWaybill(count = 5) {
   });
 }
 
-// const response = await fetchWaybill();
+// const response = await fetchWaybill(1);
 // console.log(response.data);
 
 // 9️⃣ Calculate Shipping Cost
@@ -72,7 +76,7 @@ export async function calculateShippingCost({
 }
 
 // const response = await calculateShippingCost("400701", "400001", "1000");
-// console.log(response.data);
+// console.log(response.data[0].total_amount);
 
 // 4️⃣ Create Shipment
 export async function createShipment(payload) {
@@ -83,6 +87,15 @@ export async function createShipment(payload) {
     { headers }
   );
 }
+
+// const response = await createShipment({
+//   name: consumer.name,
+//   add: consumer.address,
+//   phone: consumer.phone_no,
+//   pin: consumer.pincode,
+//   payment_mode: order.payment_mode,
+//   order: order.id,
+// });
 
 // 5️⃣ Edit Shipment
 export async function updateShipment(data) {

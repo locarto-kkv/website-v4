@@ -35,16 +35,16 @@ export const editOrder = async (req, res) => {
 
     let fileUploadUrl = null;
 
-    if (orderData.invoice) {
+    if (orderData.shipping_label) {
       fileUploadUrl = await getFileUploadUrl(
         orderId,
-        orderData.invoice,
+        orderData.shipping_label,
         "order-invoices"
       );
 
       const filePublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/order-invoices/${fileUploadUrl.filePath}`;
 
-      orderData.invoice = filePublicUrl;
+      orderData.shipping_label = filePublicUrl;
     }
 
     const { data: updatedOrder } = await db
@@ -54,7 +54,7 @@ export const editOrder = async (req, res) => {
       .select()
       .single();
 
-    res.status(200).json({ blog: updatedOrder, fileUploadUrl });
+    res.status(200).json({ order: updatedOrder, fileUploadUrl });
   } catch (error) {
     logger({
       level: "error",

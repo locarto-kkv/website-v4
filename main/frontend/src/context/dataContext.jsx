@@ -79,15 +79,15 @@ export function DataProvider({ children }) {
       const cached = localStorage.getItem("blogs");
       if (cached) {
         const parsed = JSON.parse(cached);
-        const cacheAge = Date.now() - parsed.timestamp;
-        const maxAge = 1000 * 60 * 30; // 30 minutes
+        // const cacheAge = Date.now() - parsed.timestamp;
+        // const maxAge = 1000 * 60 * 30; // 30 minutes
 
-        if (cacheAge < maxAge) {
-          setBlogs(parsed.data);
-          return;
-        } else {
-          console.log("Cache expired — refetching blogs...");
-        }
+        // if (cacheAge < maxAge) {
+        setBlogs(parsed.data);
+        return;
+        // } else {
+        //   console.log("Cache expired — refetching blogs...");
+        // }
       }
 
       fetchBlogs();

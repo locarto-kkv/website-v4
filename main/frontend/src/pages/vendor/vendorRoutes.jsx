@@ -20,7 +20,6 @@ import VendorMilestones from "./dashboard/VendorMilestones";
 const ProtectedRoute = () => {
   const { clearCache, dataLoading } = useVendorData();
   const { currentUser } = useAuthStore();
-  console.log(dataLoading);
 
   if (currentUser?.type !== "vendor") {
     clearCache();

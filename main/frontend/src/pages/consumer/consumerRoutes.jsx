@@ -21,7 +21,6 @@ import ShopProducts from "./ShopProducts";
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
   const { clearCache, dataLoading } = useConsumerData();
-  console.log(dataLoading);
 
   if (currentUser?.type !== "consumer") {
     clearCache();
