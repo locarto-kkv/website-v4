@@ -18,13 +18,15 @@ const MapView = () => {
       name: "Personal Care",
       color: "#10B981",
       icon: "fas fa-leaf",
-      description: "Discover unique Skin Care, Beauty, and Fragrance brands near you.",
+      description:
+        "Discover unique Skin Care, Beauty, and Fragrance brands near you.",
     },
     {
       name: "Accessories",
       color: "#EF4444",
       icon: "fas fa-gem",
-      description: "Explore local creators of Fashion, Daily, and Tech accessories.",
+      description:
+        "Explore local creators of Fashion, Daily, and Tech accessories.",
     },
   ];
 
@@ -59,11 +61,11 @@ const MapView = () => {
     const categoryName = categories[index].name.toLowerCase();
     navigate(`/map?category=${encodeURIComponent(categoryName)}`);
   };
-  
+
   const handleBackToCategories = () => {
-      setShowOverlay(true);
-      navigate('/map');
-  }
+    setShowOverlay(true);
+    navigate("/map");
+  };
 
   const createCustomIcon = (category) =>
     L.divIcon({
@@ -132,7 +134,7 @@ const MapView = () => {
     };
 
     fetchCategoryProducts();
-  }, [currentCategoryIndex, showOverlay, fetchProductsInBatch]);
+  }, [currentCategoryIndex, showOverlay]);
 
   useEffect(() => {
     if (!map) return;
@@ -147,7 +149,9 @@ const MapView = () => {
         const hasValidPosition =
           Array.isArray(vendor.position) && vendor.position.length === 2;
         const hasProducts =
-          vendor.products && Array.isArray(vendor.products) && vendor.products.length > 0;
+          vendor.products &&
+          Array.isArray(vendor.products) &&
+          vendor.products.length > 0;
         return hasValidPosition && hasProducts;
       });
 
@@ -161,7 +165,7 @@ const MapView = () => {
           className: "custom-tooltip",
           opacity: 0.9,
         });
-        
+
         const logo = vendor.brand_logo_1
           ? `<img src="${vendor.brand_logo_1}" alt="${vendor.name}" style="width:100%; border-radius:8px; margin-bottom:10px;" />`
           : "";
@@ -203,7 +207,7 @@ const MapView = () => {
                 `/consumer/shops/${vendor.id}/products/${currentCategory.name}`
               );
         });
-        
+
         markerLayer.current.addLayer(marker);
       });
 
@@ -211,14 +215,16 @@ const MapView = () => {
         if (vendorsToDisplay.length === 1) {
           map.setView(vendorsToDisplay[0].position, 13);
         } else {
-          const bounds = L.latLngBounds(vendorsToDisplay.map((v) => v.position));
+          const bounds = L.latLngBounds(
+            vendorsToDisplay.map((v) => v.position)
+          );
           map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
         }
       }
-      
+
       map.invalidateSize({ animate: true });
     }
-  }, [blogs, map, showOverlay, currentCategoryIndex, navigate]);
+  }, [blogs, showOverlay, currentCategoryIndex]);
 
   const currentCategory = categories[currentCategoryIndex];
 
@@ -242,103 +248,150 @@ const MapView = () => {
           <>
             {/* Desktop: Top Center Button */}
             <div className="hidden lg:block absolute top-6 left-1/2 transform -translate-x-1/2 z-[9999]">
-                <button
+              <button
                 onClick={handleBackToCategories}
                 className="group bg-black/40 backdrop-blur-lg hover:bg-black/60 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 border border-white/20 shadow-lg hover:shadow-xl flex items-center gap-2 text-sm"
-                >
+              >
                 <i className="fas fa-th-large group-hover:rotate-180 transition-transform duration-300"></i>
                 Back to Categories
-                </button>
+              </button>
             </div>
 
             {/* Mobile: Bottom Floating Bar */}
             <div className="lg:hidden absolute bottom-5 left-4 right-4 z-[9999] bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-3 flex items-center justify-between gap-3 animate-slide-up">
-                <div className="flex items-center gap-3 min-w-0"> {/* Added min-w-0 */}
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{backgroundColor: currentCategory.color}}>
-                         <i className={`${currentCategory.icon} text-white text-lg`}></i>
-                    </div>
-                    <div className="min-w-0"> {/* Added min-w-0 */}
-                        <p className="text-xs text-gray-400">Showing</p>
-                        <p className="font-bold text-white truncate">{currentCategory.name}</p> {/* Added truncate */}
-                    </div>
+              <div className="flex items-center gap-3 min-w-0">
+                {" "}
+                {/* Added min-w-0 */}
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: currentCategory.color }}
+                >
+                  <i
+                    className={`${currentCategory.icon} text-white text-lg`}
+                  ></i>
                 </div>
-                <button onClick={handleBackToCategories} className="bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-4 py-2 rounded-lg border border-white/20 transition-colors flex-shrink-0">
-                    Change
-                </button>
+                <div className="min-w-0">
+                  {" "}
+                  {/* Added min-w-0 */}
+                  <p className="text-xs text-gray-400">Showing</p>
+                  <p className="font-bold text-white truncate">
+                    {currentCategory.name}
+                  </p>{" "}
+                  {/* Added truncate */}
+                </div>
+              </div>
+              <button
+                onClick={handleBackToCategories}
+                className="bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-4 py-2 rounded-lg border border-white/20 transition-colors flex-shrink-0"
+              >
+                Change
+              </button>
             </div>
           </>
         )}
-        
+
         <div
           className={`
             fixed z-[9998] transition-all duration-500 ease-in-out
             
-            ${showOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+            ${showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"}
             
-            ${showOverlay ? 'bottom-0' : '-bottom-full'} lg:bottom-0 lg:left-0 lg:right-0 lg:top-0 lg:flex lg:items-center lg:justify-center lg:bg-black/30 lg:backdrop-blur-sm
+            ${
+              showOverlay ? "bottom-0" : "-bottom-full"
+            } lg:bottom-0 lg:left-0 lg:right-0 lg:top-0 lg:flex lg:items-center lg:justify-center lg:bg-black/30 lg:backdrop-blur-sm
           `}
         >
-            {/* Mobile Card */}
-            <div className="lg:hidden bg-gray-900/80 backdrop-blur-xl border-t border-white/10 p-5 rounded-t-2xl">
-                  <div className="flex justify-between items-center mb-4">
-                      <button onClick={prevCategory} className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20" aria-label="Previous Category">
-                          <i className="fas fa-chevron-left"></i>
-                      </button>
-                      <div
-                          className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
-                          style={{ background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)` }}
-                      >
-                          <i className={`${currentCategory.icon} text-2xl text-white`}></i>
-                      </div>
-                      <button onClick={nextCategory} className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20" aria-label="Next Category">
-                          <i className="fas fa-chevron-right"></i>
-                      </button>
-                  </div>
-
-                  <div className="text-center">
-                      <h2 className="text-3xl font-bold mb-2" style={{ color: currentCategory.color }}>
-                          {currentCategory.name}
-                      </h2>
-                      <p className="text-gray-300 text-sm mb-5 max-w-xs mx-auto">
-                          {currentCategory.description}
-                      </p>
-                      <button
-                          onClick={() => handleSelectCategory(currentCategoryIndex)}
-                          className="w-full bg-white/90 text-gray-900 font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-white transition-colors"
-                      >
-                          Explore
-                      </button>
-                  </div>
+          {/* Mobile Card */}
+          <div className="lg:hidden bg-gray-900/80 backdrop-blur-xl border-t border-white/10 p-5 rounded-t-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <button
+                onClick={prevCategory}
+                className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
+                aria-label="Previous Category"
+              >
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
+                }}
+              >
+                <i
+                  className={`${currentCategory.icon} text-2xl text-white`}
+                ></i>
+              </div>
+              <button
+                onClick={nextCategory}
+                className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
+                aria-label="Next Category"
+              >
+                <i className="fas fa-chevron-right"></i>
+              </button>
             </div>
 
-            {/* Desktop Overlay */}
-            <div className="hidden lg:flex items-center justify-center relative w-full max-w-6xl mx-auto text-center px-6">
-               <button onClick={prevCategory} className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10" aria-label="Previous Category">
-                  <i className="fas fa-chevron-left text-xl"></i>
-                </button>
-                <button onClick={nextCategory} className="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10" aria-label="Next Category">
-                  <i className="fas fa-chevron-right text-xl"></i>
-                </button>
-                
-                <div className="relative">
-                    <div
-                      className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6 mx-auto"
-                      style={{ background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)` }}
-                    >
-                      <i className={`${currentCategory.icon} text-3xl text-white`}></i>
-                    </div>
-                    <button
-                        onClick={() => handleSelectCategory(currentCategoryIndex)}
-                        className="text-7xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-300 bg-transparent border-none"
-                        style={{ color: currentCategory.color, textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20` }}
-                    >
-                        {currentCategory.name}
-                    </button>
-                    <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                      {currentCategory.description}
-                    </p>
-                </div>
+            <div className="text-center">
+              <h2
+                className="text-3xl font-bold mb-2"
+                style={{ color: currentCategory.color }}
+              >
+                {currentCategory.name}
+              </h2>
+              <p className="text-gray-300 text-sm mb-5 max-w-xs mx-auto">
+                {currentCategory.description}
+              </p>
+              <button
+                onClick={() => handleSelectCategory(currentCategoryIndex)}
+                className="w-full bg-white/90 text-gray-900 font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-white transition-colors"
+              >
+                Explore
+              </button>
             </div>
+          </div>
+
+          {/* Desktop Overlay */}
+          <div className="hidden lg:flex items-center justify-center relative w-full max-w-6xl mx-auto text-center px-6">
+            <button
+              onClick={prevCategory}
+              className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
+              aria-label="Previous Category"
+            >
+              <i className="fas fa-chevron-left text-xl"></i>
+            </button>
+            <button
+              onClick={nextCategory}
+              className="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
+              aria-label="Next Category"
+            >
+              <i className="fas fa-chevron-right text-xl"></i>
+            </button>
+
+            <div className="relative">
+              <div
+                className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6 mx-auto"
+                style={{
+                  background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
+                }}
+              >
+                <i
+                  className={`${currentCategory.icon} text-3xl text-white`}
+                ></i>
+              </div>
+              <button
+                onClick={() => handleSelectCategory(currentCategoryIndex)}
+                className="text-7xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-300 bg-transparent border-none"
+                style={{
+                  color: currentCategory.color,
+                  textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20`,
+                }}
+              >
+                {currentCategory.name}
+              </button>
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                {currentCategory.description}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -374,4 +427,3 @@ const MapView = () => {
 };
 
 export default MapView;
-

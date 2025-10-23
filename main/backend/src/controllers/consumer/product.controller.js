@@ -57,6 +57,7 @@ export const getProductsByFilter = async (req, res) => {
       const sum = summary.find((s) => s.product_id === p.id);
       return { ...p, ...sum };
     });
+    console.log(agg_products);
 
     res.status(200).json(agg_products);
   } catch (error) {
