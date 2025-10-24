@@ -249,6 +249,9 @@ const VendorOrders = () => {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                       Date
                     </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                      Shipping Label
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -274,6 +277,20 @@ const VendorOrders = () => {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {formatDate(order.created_at)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-500">
+                        {order.shipping_label ? (
+                          <a
+                            href={order.shipping_label}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline"
+                          >
+                            Download Shipping Label
+                          </a>
+                        ) : (
+                          "N/A"
+                        )}
                       </td>
                     </tr>
                   ))}

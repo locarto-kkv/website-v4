@@ -27,7 +27,8 @@ const ProtectedRoute = () => {
     clearCache();
     return <Navigate to="/consumer/login" replace />;
   } else {
-    if (dataLoading && !['/consumer/checkout'].includes(location.pathname)) { // Don't show loading on checkout page itself initially
+    if (dataLoading && !["/consumer/checkout"].includes(location.pathname)) {
+      // Don't show loading on checkout page itself initially
       return (
         <div className="flex items-center justify-center min-h-screen pt-[70px]">
           {" "}
@@ -54,7 +55,7 @@ const ConsumerRoutes = () => {
         path="login"
         element={
           currentUser?.type === "consumer" ? (
-            <Navigate to="/consumer/dashboard/overview" replace />
+            <Navigate to="/" replace />
           ) : (
             <AuthConsumer />
           )
@@ -63,7 +64,7 @@ const ConsumerRoutes = () => {
 
       {/* --- Protected Routes --- */}
       <Route element={<ProtectedRoute />}>
-         {/* Dashboard Routes with Layout */}
+        {/* Dashboard Routes with Layout */}
         <Route path="dashboard" element={<CustomerDashboardLayout />}>
           <Route index element={<Navigate to="overview" replace />} />
           <Route path="overview" element={<CustomerOverview />} />
@@ -73,16 +74,15 @@ const ConsumerRoutes = () => {
           <Route path="support" element={<CustomerSupport />} />
           <Route path="settings" element={<CustomerSettings />} />
         </Route>
-
         {/* Other protected consumer routes (outside the dashboard layout) */}
-        <Route path="checkout" element={<CheckoutPage />} /> {/* <-- Add Checkout Route */}
+        <Route path="checkout" element={<CheckoutPage />} />{" "}
+        {/* <-- Add Checkout Route */}
         <Route
           path="shops/:vendorId/products/:category"
           element={<ShopProducts />}
         />
       </Route>
       {/* --- End Protected Routes --- */}
-
 
       {/* Optional Catch-all */}
       {/* <Route path="*" element={<Navigate to="/consumer/dashboard/overview" replace />} /> */}

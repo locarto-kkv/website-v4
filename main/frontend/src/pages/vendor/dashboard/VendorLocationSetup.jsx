@@ -35,7 +35,7 @@ const VendorLocationSetup = () => {
     coordinates: { lat: "", lng: "" },
   });
 
-  const { profile } = useVendorData();
+  const { profile, getProfile } = useVendorData();
 
   // ✅ Fetch approximate location from pincode (forward geocoding)
   const fetchLocationByPincode = async (pincode) => {
@@ -77,6 +77,7 @@ const VendorLocationSetup = () => {
 
   // ✅ Fetch address from coordinates (reverse geocode)
   const fetchAddress = async (lat, lng) => {
+    setLoading(true);
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
@@ -97,7 +98,22 @@ const VendorLocationSetup = () => {
           addr.state,
         ].filter(Boolean);
 
+        const latlng = [parseFloat(lat), parseFloat(lng)];
+
+        // Center map and place marker
+        map.setView(latlng, 14);
+        const newMarker = L.marker(latlng).addTo(map);
+        setMarker(newMarker);
+
         setNewAddress({
+          addressLine1: addressLine1Parts.join(", "),
+          addressLine2: addressLine2Parts.join(", "),
+          pincode: addr.postcode || "",
+          state: addr.state || "",
+          country: addr.country || "",
+          coordinates: { lat, lng },
+        });
+        console.log("Fetched Address: ", {
           addressLine1: addressLine1Parts.join(", "),
           addressLine2: addressLine2Parts.join(", "),
           pincode: addr.postcode || "",
@@ -108,7 +124,28 @@ const VendorLocationSetup = () => {
       }
     } catch (error) {
       console.error("Error fetching address:", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const getUserLocation = () => {
+    setLoading(true);
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        await fetchAddress(latitude, longitude);
+      },
+      (err) => {
+        console.log(`Error: ${err.message}`);
+      }
+    );
+    setLoading(false);
   };
 
   // ✅ Load setup form from localStorage
@@ -148,16 +185,7 @@ const VendorLocationSetup = () => {
 
     if (storedCoords.lat) {
       const { lat, lng } = storedCoords;
-      const latlng = [parseFloat(lat), parseFloat(lng)];
-
-      // Center map and place marker
-      map.setView(latlng, 14);
-      const newMarker = L.marker(latlng).addTo(map);
-      setMarker(newMarker);
-      setNewAddress((prev) => ({
-        ...prev,
-        coordinates: { lat, lng },
-      }));
+      fetchAddress(lat, lng);
     } else if (storedPincode) {
       // Fallback to pincode-based location
       fetchLocationByPincode(storedPincode);
@@ -206,7 +234,7 @@ const VendorLocationSetup = () => {
         pincode: setupForm.pincode,
         state: setupForm.state,
         country: setupForm.country,
-        coordinates: [setupForm.coordinates.lat, setupForm.coordinates.lng],
+        coordinates: [newAddress.coordinates.lat, newAddress.coordinates.lng],
       },
       extra: {
         businessType: setupForm.businessType,
@@ -221,12 +249,13 @@ const VendorLocationSetup = () => {
 
     localStorage.setItem("setupform", JSON.stringify(setupForm));
     await VendorProfileService.updateProfile(profileData);
-    navigate("/vendor/profile");
+    await getProfile();
+    navigate("/vendor/dashboard/profile");
   };
 
   const closeSetup = () => {
     localStorage.setItem("setupform", JSON.stringify(setupForm));
-    navigate("/vendor/profile");
+    navigate("/vendor/dashboard/profile");
   };
 
   return (
@@ -258,7 +287,7 @@ const VendorLocationSetup = () => {
                 <input
                   type="text"
                   name="pincode"
-                  value={newAddress.pincode}
+                  value={setupForm.pincode}
                   onChange={(e) =>
                     setNewAddress((prev) => ({
                       ...prev,
@@ -280,36 +309,41 @@ const VendorLocationSetup = () => {
 
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Current Address
+                Current Pin At Location:
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">
-                {setupForm.addressLine1 || "No address loaded"}
-                {setupForm.addressLine2 && (
+                {newAddress.addressLine1 || "No address Found"}
+                {newAddress.addressLine2 && (
                   <>
                     <br />
-                    {setupForm.addressLine2}
+                    {newAddress.addressLine2}
                   </>
                 )}
               </p>
-              {setupForm.pincode && (
+              {newAddress.pincode && (
                 <p className="text-gray-600 text-sm mt-2">
                   <span className="font-medium">Pincode:</span>{" "}
-                  {setupForm.pincode}
+                  {newAddress.pincode}
                 </p>
               )}
-              {setupForm.state && (
+              {newAddress.state && (
                 <p className="text-gray-600 text-sm mt-1">
-                  <span className="font-medium">State:</span> {setupForm.state}
+                  <span className="font-medium">State:</span> {newAddress.state}
                 </p>
               )}
-              {setupForm.country && (
+              {newAddress.country && (
                 <p className="text-gray-600 text-sm mt-1">
                   <span className="font-medium">Country:</span>{" "}
-                  {setupForm.country}
+                  {newAddress.country}
                 </p>
               )}
             </div>
-
+            <button
+              onClick={getUserLocation}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+            >
+              Get Current Location
+            </button>
             <button
               onClick={handleNextStep}
               className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-all"

@@ -4,13 +4,14 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import locartoImg from "../assets/locarto.png";
 import { useData } from "../context/dataContext";
+import { useAuthStore } from "../store/useAuthStore";
 
 const MapView = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const categoryParam = queryParams.get("category");
   const navigate = useNavigate();
-
+  const { currentUser } = useAuthStore();
   const { blogs, fetchProductsInBatch } = useData();
 
   const categories = [
@@ -202,10 +203,15 @@ const MapView = () => {
             `.view-products-btn[data-vendor-id="${vendor.id}"]`
           );
           if (button)
-            button.onclick = () =>
-              navigate(
-                `/consumer/shops/${vendor.id}/products/${currentCategory.name}`
-              );
+            button.onclick = () => {
+              currentUser?.type === "consumer"
+                ? navigate(
+                    `/consumer/shops/${vendor.id}/products/${currentCategory.name}`
+                  )
+                : navigate(
+                    `/shops/${vendor.id}/products/${currentCategory.name}`
+                  );
+            };
         });
 
         markerLayer.current.addLayer(marker);

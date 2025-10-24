@@ -20,7 +20,8 @@ const CustomerDashboardLayout = () => {
     setIsSidebarOpen(false); // Close sidebar on any navigation
 
     const handleResize = () => {
-      if (window.innerWidth >= 1024) { // Tailwind's lg breakpoint
+      if (window.innerWidth >= 1024) {
+        // Tailwind's lg breakpoint
         setIsSidebarOpen(false); // Ensure sidebar is closed on larger screens
       }
     };
@@ -28,7 +29,6 @@ const CustomerDashboardLayout = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [location.pathname]);
-
 
   // --- Dynamic Header Logic ---
   // Returns an object containing title, description, and icon class based on the current URL
@@ -100,7 +100,7 @@ const CustomerDashboardLayout = () => {
         This does not affect the desktop UI as the hamburger icon is hidden on larger screens.
       */}
       <DashboardNavbar onMenuClick={toggleSidebar} />
-      
+
       <div className="flex pt-[70px]">
         {/* The Sidebar receives 'isOpen' and 'onClose' props.
           - 'isOpen' determines if the sidebar should be visible on mobile.
@@ -108,8 +108,12 @@ const CustomerDashboardLayout = () => {
           The responsive logic inside the Sidebar component ensures it is always visible and static on desktop (lg screens and up),
           so these props only affect the mobile/tablet view.
         */}
-        <Sidebar onNavigate={navigate} isOpen={isSidebarOpen} onClose={closeSidebar} />
-        
+        <Sidebar
+          onNavigate={navigate}
+          isOpen={isSidebarOpen}
+          onClose={closeSidebar}
+        />
+
         {/* Main content area */}
         <main className="flex-1 h-[calc(100vh-70px)] overflow-y-auto">
           <div className="p-6 md:p-8">

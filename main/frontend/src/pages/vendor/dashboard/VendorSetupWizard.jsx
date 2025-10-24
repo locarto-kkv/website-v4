@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useVendorData } from "../../../context/vendor/vendorDataContext";
 
 const VendorSetupWizard = () => {
   const navigate = useNavigate();
@@ -17,7 +18,10 @@ const VendorSetupWizard = () => {
     state: "",
     country: "",
     website: "",
+    coordinates: {},
   });
+
+  const { profile } = useVendorData();
 
   // ✅ Handle input changes dynamically
   const handleChange = (e) => {
@@ -31,17 +35,35 @@ const VendorSetupWizard = () => {
   // ✅ Close setup wizard
   const closeSetup = () => {
     localStorage.setItem("setupform", JSON.stringify(setupForm));
-    navigate("/vendor/profile");
+    navigate("/vendor/dashboard/profile");
   };
 
   // ✅ Save setupForm to localStorage & go to next step
   const handleNextStep = () => {
     localStorage.setItem("setupform", JSON.stringify(setupForm));
-    navigate("/vendor/setup/location");
+    navigate("/vendor/dashboard/setup/location");
   };
 
   // ✅ Retrieve setupForm from localStorage if it exists
   useEffect(() => {
+    if (profile.address.length > 0) {
+      const mainAddress = profile.address.find((item) => item.label === "Main");
+      console.log(mainAddress);
+
+      setSetupForm({
+        addressLine1: mainAddress.address_line_1,
+        addressLine2: mainAddress.address_line_2,
+        pincode: mainAddress.pincode,
+        state: mainAddress.state,
+        country: mainAddress.country,
+        coordinates: {
+          lat: mainAddress.coordinates[0],
+          lng: mainAddress.coordinates[1],
+        },
+      });
+      return;
+    }
+
     const storedForm = localStorage.getItem("setupform");
     if (storedForm) {
       setSetupForm(JSON.parse(storedForm));

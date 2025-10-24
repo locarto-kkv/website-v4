@@ -19,6 +19,7 @@ import AdminRoutes from "./pages/admin/adminRoutes";
 
 import { ConsumerDataProvider } from "./context/consumer/consumerDataContext";
 import { VendorDataProvider } from "./context/vendor/vendorDataContext";
+import ShopProducts from "./pages/consumer/ShopProducts";
 
 function App() {
   const { authLoading, checkAuth } = useAuthStore();
@@ -45,7 +46,11 @@ function App() {
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />{" "}
+          <Route
+            path="/shops/:vendorId/products/:category"
+            element={<ShopProducts />}
+          />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           {/* <-- Add this route */}
           {/* --- ADMIN ROUTES --- */}
           <Route path="admin/*" element={<AdminRoutes />} />

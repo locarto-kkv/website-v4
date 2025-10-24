@@ -55,7 +55,7 @@ export const signup = async (req, res) => {
 
     const { data: user, error } = await db
       .from("vendors")
-      .insert({ email, phone_no })
+      .insert({ email, phone_no, status: "pending" })
       .select()
       .single();
 
@@ -165,7 +165,6 @@ export const loginGoogle = async (req, res) => {
       name: payload.name,
       email: payload.email,
     };
-    console.log(userData);
 
     const { data: existingUser } = await db
       .from("vendors")
@@ -183,7 +182,6 @@ export const loginGoogle = async (req, res) => {
       .insert({
         email: userData.email,
         name: userData.name,
-        auth_type: "google",
       })
       .select()
       .single();

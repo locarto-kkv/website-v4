@@ -4,21 +4,35 @@ import { useParams, Link } from "react-router-dom";
 import { useData } from "../../context/dataContext";
 import { useConsumerData } from "../../context/consumer/consumerDataContext";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
+import { useAuthStore } from "../../store/useAuthStore";
+import toast from "react-hot-toast";
 
 const ShopProducts = () => {
   const { vendorId, category } = useParams(); // vendor.id from URL
-
+  const { currentUser } = useAuthStore();
   const { blogs, fetchProductsInBatch } = useData();
   const { updateList, removeFromList } = ConsumerListService;
-  const { lists, fetchLists } = useConsumerData();
+
+  let cart = [];
+  let wishlist = [];
+
+  if (currentUser?.type === "consumer") {
+    var { lists, fetchLists } = useConsumerData();
+
+    cart = lists?.cart || [];
+    wishlist = lists?.wishlist || [];
+  }
 
   const [vendor, setVendor] = useState(null);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Find vendor by ID from blogs
   useEffect(() => {
     const foundVendor = blogs?.find((v) => String(v.id) === String(vendorId));
+
     setVendor(foundVendor || null);
+    setProducts(foundVendor?.products || []);
   }, [blogs, vendorId]);
 
   // Fetch vendor products
@@ -35,7 +49,6 @@ const ShopProducts = () => {
       }
     };
     fetchProducts();
-    console.log(blogs);
   }, [vendorId]);
 
   if (!vendor)
@@ -51,14 +64,13 @@ const ShopProducts = () => {
       </div>
     );
 
-  const products = vendor.products || [];
-
-  const cart = lists?.cart || {};
-  const wishlist = lists?.wishlist || new Set();
-
   // Handle wishlist toggle
   const toggleWishlist = async (productId) => {
-    const isInWishlist = wishlist.has?.(productId);
+    if (currentUser?.type !== "consumer") {
+      toast.error("Please Login as Consumer");
+      return;
+    }
+    const isInWishlist = wishlist.some((item) => item.product_id === productId);
     try {
       if (isInWishlist) {
         await removeFromList("wishlist", productId);
@@ -72,8 +84,12 @@ const ShopProducts = () => {
   };
 
   // Handle add/remove cart quantity
-  const handleCartChange = async (productId, delta) => {
-    const currentQty = cart[productId] || 0;
+  const handleCartChange = async (productId, currentQty, delta) => {
+    if (currentUser?.type !== "consumer") {
+      toast.error("Please Login as Consumer");
+      return;
+    }
+
     const newQty = currentQty + delta;
 
     try {
@@ -172,8 +188,11 @@ const ShopProducts = () => {
         ) : products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {products.map((product) => {
-              const quantity = cart[product.id] || 0;
-              const isInWishlist = wishlist.has?.(product.id);
+              const quantity =
+                cart?.find((item) => item.id === product.id)?.quantity || 0;
+              const isInWishlist = wishlist.some(
+                (item) => item.product_id === product.id
+              );
 
               return (
                 <div
@@ -228,7 +247,9 @@ const ShopProducts = () => {
                       </span>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleCartChange(product.id, -1)}
+                          onClick={() =>
+                            handleCartChange(product.id, quantity, -1)
+                          }
                           disabled={quantity <= 0}
                           className="rounded-full w-8 h-8 flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-all duration-200 border border-white/20"
                         >
@@ -238,7 +259,9 @@ const ShopProducts = () => {
                           {quantity}
                         </span>
                         <button
-                          onClick={() => handleCartChange(product.id, +1)}
+                          onClick={() =>
+                            handleCartChange(product.id, quantity, +1)
+                          }
                           className="rounded-full w-8 h-8 flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-all duration-200 border border-white/20"
                         >
                           +
