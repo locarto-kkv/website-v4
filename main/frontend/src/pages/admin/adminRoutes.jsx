@@ -34,7 +34,7 @@ const AdminRoutes = () => {
         path="login"
         element={
           currentUser?.type === "admin" ? (
-            <Navigate to="/" replace /> // <-- MODIFIED HERE
+            <Navigate to="/admin/dashboard" replace />
           ) : (
             <AuthAdmin />
           )

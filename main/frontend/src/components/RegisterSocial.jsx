@@ -1,8 +1,6 @@
 import { useState } from "react";
 import Insta from "../../src/assets/insta.png";
-import Youtube from "../../src/assets/yt.png";
-import Whatsapp from "../../src/assets/whatsapp.png";
-import { submitEmail } from "../services/beta.service";
+import { submitEmail } from "../services/betaService.js";
 
 function RegisterSocial() {
   const [email, setEmail] = useState("");

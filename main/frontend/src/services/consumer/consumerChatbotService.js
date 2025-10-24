@@ -1,30 +1,44 @@
 export const rules = {
   ORDERS: {
+    // Choose order number
     "I have an issue with the ordered item(s)": {
       CLOSED: {
-        "Yes, I want to share feedback": { FEEDBACK: "END" },
+        // order support_status === "closed"
+        "Yes, I want to share feedback": {
+          FEEDBACK: "END", // take feedback and Exit
+        },
         "No, I don't want to share feedback": {
-          "Thank you for confirmation": "END",
+          "Thank you for confirmation": "END", // Exit
         },
       },
-      ELSE: {},
+      COMPLAINT: "END", // write a complaint and Exit
     },
-    "I want to report delivery partner misconduct": { COMPLAINT: "END" },
+    "I want to report delivery partner misconduct": {
+      COMPLAINT: "END", // write a complaint and Exit
+    },
     "I have not recieved my order": {
-      CLOSED: { "Okay, got it": "END" },
-      ELSE: {},
+      CLOSED: {
+        // order support_status === "closed"
+        "Okay, got it": "END", // Exit
+      },
+      COMPLAINT: "END", // write a complaint and Exit
     },
     "I have another issue with my order": {
       "I want to report a price discrepency": {
         CLOSED: {
-          "Yes, I want to share feedback": { FEEDBACK: "END" },
+          // order support_status === "closed"
+          "Yes, I want to share feedback": {
+            FEEDBACK: "END", // take feedback and Exit
+          },
           "No, I don't want to share feedback": {
-            "Thank you for confirmation": "END",
+            "Thank you for confirmation": "END", // Exit
           },
         },
-        ELSE: {},
+        COMPLAINT: "END", // write a complaint and Exit
       },
-      "I want a copy of my order invoice": { EMAIL: "END" },
+      "I want a copy of my order invoice": {
+        EMAIL: "END", // take email and Exit
+      },
     },
   },
   "Show previous orders": "ORDERS",

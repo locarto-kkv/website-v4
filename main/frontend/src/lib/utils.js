@@ -32,6 +32,24 @@ export const formatDate = (dateString) => {
   });
 };
 
+export const getGreeting = (name) => {
+  const now = new Date();
+  const hours = now.getHours();
+
+  const lower = name.toLowerCase();
+  const formattedName = lower.charAt(0).toUpperCase() + lower.slice(1);
+
+  if (hours >= 5 && hours < 12) {
+    return `Good Morning ${formattedName}!`;
+  } else if (hours >= 12 && hours < 17) {
+    return `Good Afternoon ${formattedName}!`;
+  } else if (hours >= 17 && hours < 21) {
+    return `Good Evening ${formattedName}!`;
+  } else {
+    return `How was your day ${formattedName} ?`;
+  }
+};
+
 export const getOrderStatusConfig = (status) => {
   const configs = {
     pending: {

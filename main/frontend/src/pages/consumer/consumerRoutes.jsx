@@ -1,5 +1,5 @@
 // src/pages/consumer/consumerRoutes.jsx
-import { Routes, Route, Navigate, Outlet } from "react-router-dom"; // Removed useNavigate, useLocation, useEffect, React
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useConsumerData } from "../../context/consumer/consumerDataContext";
 
@@ -50,7 +50,6 @@ const ConsumerRoutes = () => {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="chat" element={<RuleChatbot />} />
       <Route
         path="login"
         element={
@@ -73,6 +72,7 @@ const ConsumerRoutes = () => {
           <Route path="reviews" element={<CustomerReviews />} />
           <Route path="support" element={<CustomerSupport />} />
           <Route path="settings" element={<CustomerSettings />} />
+          <Route path="chat" element={<RuleChatbot />} />
         </Route>
         {/* Other protected consumer routes (outside the dashboard layout) */}
         <Route path="checkout" element={<CheckoutPage />} />{" "}
