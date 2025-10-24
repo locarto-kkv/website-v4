@@ -34,7 +34,7 @@ const AdminRoutes = () => {
         path="login"
         element={
           currentUser?.type === "admin" ? (
-            <Navigate to="/admin/dashboard" replace />
+            <Navigate to="/" replace /> // <-- MODIFIED HERE
           ) : (
             <AuthAdmin />
           )
@@ -43,7 +43,8 @@ const AdminRoutes = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AdminDashboardLayout />}>
-          <Route index element={<AdminDashboard />} />
+          {/* Redirect index route of admin to dashboard */}
+          <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           {/* <Route path="products" element={<AdminProducts />} />
           <Route path="members-hub" element={<AdminsMemberHub />} />

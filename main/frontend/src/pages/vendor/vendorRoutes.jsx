@@ -51,7 +51,7 @@ const VendorRoutes = () => {
         path="login"
         element={
           currentUser?.type === "vendor" ? (
-            <Navigate to="/vendor/dashboard/overview" replace />
+            <Navigate to="/" replace /> // <-- MODIFIED HERE
           ) : (
             <AuthVendor />
           )

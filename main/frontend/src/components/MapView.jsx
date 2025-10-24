@@ -111,7 +111,7 @@ const MapView = () => {
       }
     ).addTo(mapInstance);
 
-    L.control.zoom({ position: "bottomright" }).addTo(mapInstance);
+    
     markerLayer.current.addTo(mapInstance);
 
     setMap(mapInstance);

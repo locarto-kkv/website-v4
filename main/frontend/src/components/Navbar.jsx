@@ -5,6 +5,7 @@ import { useAuthStore } from "../store/useAuthStore.jsx"; // Added .jsx
 import SideCart from "../components/consumer/SideCart.jsx"; // Added .jsx
 import { ConsumerListService } from "../services/consumer/consumerListService.js";
 import locartoImg from "../assets/locarto.png";
+import toast from 'react-hot-toast'; // <-- Import toast
 
 const Navbar = ({ pageType = "landing" }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -98,18 +99,26 @@ const Navbar = ({ pageType = "landing" }) => {
   const handleDashboardNavigation = () => {
     setDropdownOpen(false);
     setMobileMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
 
-    if (currentUser?.type === "vendor") {
-      navigate("/vendor/dashboard/overview");
-    } else if (currentUser?.type === "consumer") {
-      navigate("/consumer/dashboard/overview");
-    } else if (currentUser?.type === "admin") {
-      navigate("/admin/dashboard");
+    if (currentUser) { // Check if user is logged in
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (currentUser.type === "vendor") {
+        navigate("/vendor/dashboard/overview");
+      } else if (currentUser.type === "consumer") {
+        navigate("/consumer/dashboard/overview");
+      } else if (currentUser.type === "admin") {
+        navigate("/admin/dashboard");
+      }
+      // No 'else' needed here as we handle logged-out case below
     } else {
-      navigate("/consumer/login");
+      // User is not logged in, show toast message
+      toast.error("Please log in or sign up to access the dashboard.");
+      // Optionally navigate to login page after toast:
+      // setTimeout(() => navigate('/consumer/login'), 1500);
     }
   };
+
 
   const handleLogout = () => {
     if (currentUser?.type) {
@@ -162,11 +171,12 @@ const Navbar = ({ pageType = "landing" }) => {
           >
             Categories
           </Link>
+          {/* Dashboard Link (Conditional) */}
           <button
-            onClick={() => handleSectionNavigation("how-it-works")}
-            className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link" // Added nav-link class
+            onClick={handleDashboardNavigation} // Use the existing function
+            className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link"
           >
-            How It Works
+            Dashboard
           </button>
           <button
             onClick={() => handleSectionNavigation("testimonials")}
@@ -284,11 +294,12 @@ const Navbar = ({ pageType = "landing" }) => {
           >
             Categories
           </Link>
+          {/* Mobile Dashboard Link (Conditional) */}
           <button
-            onClick={() => handleSectionNavigation("how-it-works")}
-            className="py-3 px-3 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left rounded-lg hover:bg-gray-50" // Added padding and hover bg
+            onClick={handleDashboardNavigation} // Use the existing function
+            className="py-3 px-3 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left rounded-lg hover:bg-gray-50" // Adjusted class for button style
           >
-            How It Works
+            Dashboard
           </button>
           <button
             onClick={() => handleSectionNavigation("testimonials")}

@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { Link } from "react-router-dom";
+import AuthLayout from "../../components/AuthLayout"; // Import the layout
 
-const OtpInput = ({ value, onChange }) => (
+// Inputs remain mostly the same, maybe adjust styling if needed
+const OtpInput = ({ value, onChange }) => ( // [cite: src/pages/vendor/authVendor.jsx]
   <div>
     <label
       htmlFor="otp"
-      className="block text-sm font-medium text-gray-700"
-    ></label>
+      className="block text-sm font-medium text-gray-700 sr-only" // Hide label visually but keep for accessibility
+    >OTP</label>
     <div className="relative">
       <input
         id="otp"
@@ -16,9 +18,9 @@ const OtpInput = ({ value, onChange }) => (
         inputMode="numeric"
         pattern="[0-9]*"
         maxLength={4}
-        placeholder="Enter OTP"
+        placeholder="Enter 4-digit OTP"
         required
-        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
         value={value}
         onChange={onChange}
       />
@@ -26,7 +28,7 @@ const OtpInput = ({ value, onChange }) => (
   </div>
 );
 
-const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => (
+const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => ( // [cite: src/pages/vendor/authVendor.jsx]
   <div>
     <label
       htmlFor="password"
@@ -34,260 +36,280 @@ const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => (
     >
       Password
     </label>
-    <div className="relative">
+    <div className="relative mt-1">
       <input
         id="password"
         name="password"
-        type={showPassword ? "text" : "password"}
+        type={showPassword ? "text" : "password"} // [cite: src/pages/vendor/authVendor.jsx]
         required
-        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 pr-10 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+        className="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-10 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
         value={value}
         onChange={onChange}
       />
 
       <button
         type="button"
-        onClick={() => setShowPassword(!showPassword)}
+        onClick={() => setShowPassword(!showPassword)} // [cite: src/pages/vendor/authVendor.jsx]
         className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 focus:outline-none"
-        aria-label={showPassword ? "Hide password" : "Show password"}
-        tabIndex={-1}
+        aria-label={showPassword ? "Hide password" : "Show password"} // [cite: src/pages/vendor/authVendor.jsx]
+        tabIndex={-1} // [cite: src/pages/vendor/authVendor.jsx]
       >
-        {showPassword ? "🙈" : "👁️"}
+        {showPassword ? ( // [cite: src/pages/vendor/authVendor.jsx]
+            <i className="fas fa-eye-slash"></i>
+        ) : (
+            <i className="fas fa-eye"></i>
+        )}
       </button>
     </div>
   </div>
 );
 
 const AuthVendor = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [usePassword, setUsePassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
+  const [isLogin, setIsLogin] = useState(true); // [cite: src/pages/vendor/authVendor.jsx]
+  const [usePassword, setUsePassword] = useState(false); // [cite: src/pages/vendor/authVendor.jsx]
+  const [showPassword, setShowPassword] = useState(false); // [cite: src/pages/vendor/authVendor.jsx]
+  const [formData, setFormData] = useState({ // [cite: src/pages/vendor/authVendor.jsx]
     email: "",
     otp: "",
     password: "",
-    loginType: "",
+    loginType: "", // Keep if used elsewhere, otherwise remove
   });
 
   const {
-    sendVerification,
-    login,
-    signup,
-    googleLogin,
-    checkAuth,
-    sentOtp,
-    loginLoading,
-    signupLoading,
-    otpLoading,
-    cooldown,
+    sendVerification, // [cite: src/pages/vendor/authVendor.jsx]
+    login, // [cite: src/pages/vendor/authVendor.jsx]
+    signup, // [cite: src/pages/vendor/authVendor.jsx]
+    googleLogin, // [cite: src/pages/vendor/authVendor.jsx]
+    checkAuth, // [cite: src/pages/vendor/authVendor.jsx]
+    sentOtp, // [cite: src/pages/vendor/authVendor.jsx]
+    loginLoading, // [cite: src/pages/vendor/authVendor.jsx]
+    signupLoading, // [cite: src/pages/vendor/authVendor.jsx]
+    otpLoading, // [cite: src/pages/vendor/authVendor.jsx]
+    cooldown, // [cite: src/pages/vendor/authVendor.jsx]
   } = useAuthStore();
 
-  const setSentOtp = (val) => useAuthStore.setState({ sentOtp: val });
+  const setSentOtp = (val) => useAuthStore.setState({ sentOtp: val }); // [cite: src/pages/vendor/authVendor.jsx]
 
-  const getButtonText = () => {
-    if (usePassword) return loginLoading ? "Logging in..." : "Login";
-    if (!usePassword) {
-      if (!sentOtp) return otpLoading ? "Getting OTP..." : "Request OTP";
-      if (sentOtp) return signupLoading ? "Verifying OTP..." : "Verify OTP";
+  const getButtonText = () => { // [cite: src/pages/vendor/authVendor.jsx]
+    if (usePassword) return loginLoading ? "Logging in..." : "Login with Password"; // [cite: src/pages/vendor/authVendor.jsx]
+    if (!usePassword) { // [cite: src/pages/vendor/authVendor.jsx]
+      if (!sentOtp) return otpLoading ? "Sending OTP..." : "Get OTP"; // [cite: src/pages/vendor/authVendor.jsx]
+      if (sentOtp) return signupLoading || loginLoading ? "Verifying..." : "Login / Sign Up with OTP"; // Combined state
     }
   };
 
-  const handleAuthType = () => {
-    setUsePassword((prev) => !prev);
+  const handleAuthType = () => { // [cite: src/pages/vendor/authVendor.jsx]
+    setUsePassword((prev) => !prev); // [cite: src/pages/vendor/authVendor.jsx]
+    setFormData((prev) => ({ ...prev, otp: "", password: "" })); // Clear other field on switch
+    setSentOtp(false); // Reset OTP state when switching
   };
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => { // [cite: src/pages/vendor/authVendor.jsx]
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value })); // [cite: src/pages/vendor/authVendor.jsx]
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => { // [cite: src/pages/vendor/authVendor.jsx]
+    e.preventDefault(); // [cite: src/pages/vendor/authVendor.jsx]
 
-    if (sentOtp || usePassword) {
-      isLogin
-        ? await login(formData, "vendor")
-        : await signup(formData, "vendor");
-      setSentOtp(false);
+    if (sentOtp || usePassword) { // [cite: src/pages/vendor/authVendor.jsx]
+      isLogin // [cite: src/pages/vendor/authVendor.jsx]
+        ? await login(formData, "vendor") // [cite: src/pages/vendor/authVendor.jsx]
+        : await signup(formData, "vendor"); // [cite: src/pages/vendor/authVendor.jsx]
+      setSentOtp(false); // [cite: src/pages/vendor/authVendor.jsx]
     } else {
-      const otpRes = await sendVerification(formData, "vendor");
-      setSentOtp(true);
+      await sendVerification(formData, "vendor"); // [cite: src/pages/vendor/authVendor.jsx]
+      setSentOtp(true); // [cite: src/pages/vendor/authVendor.jsx]
     }
   };
 
-  const handleGoogleSubmit = async (e) => {
-    googleLogin("vendor");
-    await checkAuth();
+  const handleGoogleSubmit = async () => { // Removed 'e' // [cite: src/pages/vendor/authVendor.jsx]
+    googleLogin("vendor"); // [cite: src/pages/vendor/authVendor.jsx]
+    // Removed checkAuth(), as redirection should happen via backend flow
   };
 
-  const resendOtp = async () => {
-    if (cooldown > 0) return;
-    const otpRes = await sendVerification(formData, "vendor");
-    console.log(sentOtp);
-    setSentOtp(true);
-    setFormData({ ...formData, otp: "" });
+  const resendOtp = async () => { // [cite: src/pages/vendor/authVendor.jsx]
+    if (cooldown > 0) return; // [cite: src/pages/vendor/authVendor.jsx]
+    await sendVerification(formData, "vendor"); // [cite: src/pages/vendor/authVendor.jsx]
+    setSentOtp(true); // [cite: src/pages/vendor/authVendor.jsx]
+    setFormData({ ...formData, otp: "" }); // [cite: src/pages/vendor/authVendor.jsx]
   };
 
-  useEffect(() => {
-    if (cooldown === 0) {
+  // Cooldown timer remains the same
+  useEffect(() => { // [cite: src/pages/vendor/authVendor.jsx]
+    if (cooldown === 0) { // [cite: src/pages/vendor/authVendor.jsx]
       return;
     }
-    const interval = setInterval(() => {
-      console.log(cooldown);
-      useAuthStore.setState((state) => {
-        if (state.cooldown <= 1) {
+    const interval = setInterval(() => { // [cite: src/pages/vendor/authVendor.jsx]
+      useAuthStore.setState((state) => { // [cite: src/pages/vendor/authVendor.jsx]
+        if (state.cooldown <= 1) { // [cite: src/pages/vendor/authVendor.jsx]
+          clearInterval(interval); // Clear interval when cooldown reaches 0
           return { cooldown: 0 };
         }
-        return { cooldown: state.cooldown - 1 };
+        return { cooldown: state.cooldown - 1 }; // [cite: src/pages/vendor/authVendor.jsx]
       });
     }, 1000);
-    return () => clearInterval(interval);
-  }, [cooldown]);
+    return () => clearInterval(interval); // [cite: src/pages/vendor/authVendor.jsx]
+  }, [cooldown]); // [cite: src/pages/vendor/authVendor.jsx]
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6">
-      <div className="text-2xl font-bold text-primary text-center">
-        <Link to="/">Locarto</Link>
-      </div>
+    <AuthLayout pageTitle="Vendor Portal">
+        {/* Removed redundant Locarto link */}
+      <div className="bg-white py-8 px-6 shadow-xl rounded-lg sm:px-10 border border-gray-200">
 
-      <div className="max-w-md w-full mx-auto">
-        <div className="bg-white py-6 px-4 shadow rounded-lg sm:px-6">
-          <div className="flex justify-center mb-4"></div>
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
+            {isLogin ? "Vendor Login" : "Vendor Sign Up"}
+          </h1>
+           <p className="text-sm text-gray-500 mt-1">Access your store dashboard</p>
+        </div>
 
-          <div className="text-center mb-5">
-            <h1 className="text-xl font-bold text-gray-800">
-              {isLogin ? "Vendor Login" : "Vendor Sign Up"}
-            </h1>
+        {/* New Login/Sign Up Toggle */}
+        <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+          <button
+            type="button"
+            onClick={() => { setIsLogin(true); setUsePassword(false); setSentOtp(false); setFormData(f=>({...f, otp:'', password:''})); }} // Reset state
+            className={`flex-1 py-2.5 px-3 text-center font-semibold rounded-md transition-all duration-300 text-sm ${
+              isLogin ? "bg-white text-orange-600 shadow" : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Login
+          </button>
+          <button
+            type="button"
+            onClick={() => { setIsLogin(false); setUsePassword(false); setSentOtp(false); setFormData(f=>({...f, otp:'', password:''})); }} // Reset state
+            className={`flex-1 py-2.5 px-3 text-center font-semibold rounded-md transition-all duration-300 text-sm ${
+              !isLogin ? "bg-white text-orange-600 shadow" : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Sign Up
+          </button>
+        </div>
+
+
+        <form onSubmit={handleSubmit} className="space-y-4" method="POST">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email Address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
+              value={formData.email}
+              onChange={handleChange}
+            />
           </div>
 
-          <div className="flex mb-4">
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(true);
-              }}
-              className={`flex-1 py-1.5 px-1 text-center font-medium rounded-l text-xs ${
-                isLogin
-                  ? "bg-orange-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(false);
-              }}
-              className={`flex-1 py-1.5 px-1 text-center font-medium rounded-r text-xs ${
-                !isLogin
-                  ? "bg-orange-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Sign Up
-            </button>
-          </div>
+          {sentOtp && !usePassword && (
+            <OtpInput value={formData.otp} onChange={handleChange} />
+          )}
 
-          <form onSubmit={handleSubmit} className="space-y-3" method="POST">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-xs font-medium text-gray-700"
-              >
-                {isLogin ? "Email Address" : "Email"}
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-1.5 px-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
+          {isLogin && usePassword && (
+            <PasswordInput
+              value={formData.password}
+              onChange={handleChange}
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+            />
+          )}
+
+          {/* Options: Use Password/OTP, Resend */}
+          <div className="flex items-center justify-between text-sm flex-wrap gap-2">
+            {isLogin && (
+               <button
+                  type="button"
+                  onClick={handleAuthType}
+                  className="font-medium text-orange-600 hover:text-orange-700 focus:outline-none"
+                >
+                  {usePassword ? "Login with OTP instead" : "Login with Password instead"}
+                </button>
+            )}
+             {/* Spacer for alignment when not showing Use Password */}
+             {!isLogin && <div className="flex-1"></div>}
 
             {sentOtp && !usePassword && (
-              <OtpInput value={formData.otp} onChange={handleChange} />
-            )}
-
-            {isLogin && usePassword && (
-              <PasswordInput
-                value={formData.password}
-                onChange={handleChange}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-                isLogin={isLogin}
-              />
-            )}
-
-            <div className="flex items-center justify-between text-xs">
-              {isLogin && (
-                <label className="flex items-center">
-                  <a
-                    onClick={handleAuthType}
-                    className="font-medium text-primary hover:text-orange-600"
-                  >
-                    {usePassword ? "Use OTP instead" : "Use Password instead"}
-                  </a>
-                </label>
-              )}
-              {sentOtp && (
-                <div className="">
-                  <a
-                    onClick={resendOtp}
-                    className={
-                      cooldown > 0
-                        ? "font-medium text-gray-500 hover:text-gray-600 cursor-not-allowed"
-                        : "font-medium text-primary hover:text-orange-600 cursor-pointer"
-                    }
-                  >
-                    {cooldown < 1
-                      ? "Resend Otp"
-                      : `Resend OTP in ${cooldown} seconds`}
-                  </a>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className="w-full flex justify-center py-1.5 px-3 rounded-md shadow-sm text-xs font-medium bg-orange-500 text-gray-700 hover:bg-orange-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary"
-              >
-                {getButtonText()}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-3">
-            <button
-              type="button"
-              onClick={handleGoogleSubmit}
-              className="w-full flex justify-center items-center py-1.5 px-3 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-300"
-            >
-              <i className="fab fa-google mr-1.5 text-sm"></i>{" "}
-              {isLogin ? "Login with Google" : "Sign up with Google"}
-            </button>
-          </div>
-
-          <div className="mt-4 text-center">
-            <p className="text-xs text-gray-600">
-              {isLogin
-                ? "Don't have an account ? "
-                : "Already have an account ? "}
               <button
                 type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="font-medium text-primary hover:text-orange-600 ml-1"
+                onClick={resendOtp}
+                disabled={cooldown > 0}
+                className={`font-medium focus:outline-none ${
+                  cooldown > 0
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-orange-600 hover:text-orange-700"
+                }`}
               >
-                {isLogin ? "Sign up" : "Sign in"}
+                {cooldown < 1
+                  ? "Resend OTP"
+                  : `Resend OTP in ${cooldown}s`}
               </button>
-            </p>
+            )}
           </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={loginLoading || signupLoading || otpLoading || (sentOtp && !usePassword && formData.otp.length !== 4)}
+              className="w-full flex justify-center py-3 px-4 rounded-md shadow-sm text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300"
+            >
+              {getButtonText()}
+            </button>
+          </div>
+        </form>
+
+        {/* Divider */}
+         <div className="my-6 flex items-center">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <span className="flex-shrink mx-2 text-xs text-gray-400 uppercase">Or</span>
+            <div className="flex-grow border-t border-gray-200"></div>
+          </div>
+
+        {/* Google Login Button */}
+        <div>
+          <button
+            type="button"
+            onClick={handleGoogleSubmit}
+            className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-300 transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+              <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+              <path fill="#FF3D00" d="M6.306 14.691c-1.354 2.807-2.13 5.92-2.13 9.179s.776 6.372 2.13 9.179l-5.657 5.657C1.046 34.046 0 29.268 0 24s1.046-10.046 2.649-13.818l5.657 4.509z"/>
+              <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-5.657-5.657c-1.746 1.166-3.973 1.85-6.309 1.85-4.818 0-8.943-3.08-10.36-7.37H2.649v5.67C6.182 40.023 14.437 44 24 44z"/>
+              <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l5.657 5.657C40.046 36.671 44 30.887 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+            </svg>
+             {isLogin ? "Login with Google" : "Sign up with Google"}
+          </button>
         </div>
+
+        {/* Toggle between Login/Sign up */}
+         <div className="mt-6 text-center text-sm">
+            {isLogin ? (
+              <p className="text-gray-600">
+                Don't have an account yet?{" "}
+                <button
+                  type="button"
+                  onClick={() => { setIsLogin(false); setUsePassword(false); setSentOtp(false); setFormData(f=>({...f, otp:'', password:''})); }} // Reset state
+                  className="font-semibold text-orange-600 hover:text-orange-700 underline focus:outline-none"
+                >
+                  Sign up
+                </button>
+              </p>
+            ) : (
+              <p className="text-gray-600">
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => { setIsLogin(true); setUsePassword(false); setSentOtp(false); setFormData(f=>({...f, otp:'', password:''})); }} // Reset state
+                  className="font-semibold text-orange-600 hover:text-orange-700 underline focus:outline-none"
+                >
+                  Log in
+                </button>
+              </p>
+            )}
+          </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 
