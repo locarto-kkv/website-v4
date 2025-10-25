@@ -1,39 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* src/index.css */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+@font-face {
+  font-family: "Degular Display";
+  src: url("/src/assets/fonts/Degular-Display-Regular.woff2") format("woff2"); /* Adjust path if needed */
+  font-weight: normal;
+  font-style: normal;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* src/index.css */
-
-@font-face {
-  font-family: 'Degular Display';
-  src: url('/src/assets/fonts/Degular-Display-Regular.woff2') format('woff2'); /* Adjust path if needed */
-  font-weight: normal;
-  font-style: normal;
-}
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f9f9f9;
-}
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f9f9f9;
-}
 
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f9f9f9;
+  font-family: "Inter", sans-serif;
+  /* background-color: #f9f9f9;  Tailwind usually handles background colors via classes */
 }
 
-/* ... (rest of your custom CSS rules) ... */
-/* Keep all the styles you defined for hero-gradient, card-hover, etc. */
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f9f9f9;
-}
-
+/* Keep your other custom styles below */
 .hero-gradient {
-  background: linear-gradient(135deg, #FF6B00 0%, #FF8E00 100%);
+  background: linear-gradient(135deg, #ff6b00 0%, #ff8e00 100%);
 }
 
 .card-hover {
@@ -42,11 +34,12 @@ body {
 
 .card-hover:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .btn-primary {
-  background-color: #FF6B00;
+  background-color: #ff6b00;
   transition: all 0.3s ease;
 }
 
@@ -70,13 +63,13 @@ body {
 }
 
 .nav-link::after {
-  content: '';
+  content: "";
   position: absolute;
-  bottom: -5px;
+  bottom: -5px; /* Adjust if needed */
   left: 0;
   width: 0;
   height: 2px;
-  background-color: #FF6B00;
+  background-color: #ff6b00; /* Or theme('colors.primary') if defined in Tailwind config */
   transition: width 0.3s ease;
 }
 
@@ -97,7 +90,7 @@ body {
 }
 
 .dashboard-card:hover {
-  border-color: #FF6B00;
+  border-color: #ff6b00; /* Or theme('colors.primary') */
 }
 
 .product-card {
@@ -113,8 +106,14 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .slide-in {
@@ -122,8 +121,14 @@ body {
 }
 
 @keyframes slideIn {
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .pulse {
@@ -131,23 +136,27 @@ body {
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(255, 107, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 107, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 0, 0);
+  }
 }
 
+/* Consider removing these if not used or handled differently */
 .dashboard-section {
   display: none;
 }
-
 .dashboard-section.active {
   display: block !important;
 }
-
 .dashboard-nav {
   display: none;
 }
-
 .dashboard-nav.active {
   display: flex !important;
 }
@@ -156,7 +165,7 @@ body {
   position: absolute;
   top: -5px;
   right: -5px;
-  background-color: #FF6B00;
+  background-color: #ff6b00; /* Or theme('colors.primary') */
   color: white;
   border-radius: 50%;
   width: 20px;
