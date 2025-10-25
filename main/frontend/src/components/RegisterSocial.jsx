@@ -11,7 +11,7 @@ function RegisterSocial() {
   };
 
   return (
-    <div>
+    <div id="register-social">
       {/* New Banner Section */}
       <div className="mt-24 bg-tranparent py-12 md:py-16 px-4 text-center relative z-10">
         <h2 className="text-4xl md:text-6xl text-[#0D1539] mb-4">
