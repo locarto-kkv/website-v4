@@ -15,6 +15,7 @@ import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import ShopProducts from "./pages/consumer/ShopProducts";
+import ProductViewPage from "./pages/consumer/ProductViewPage"; // <-- Import the new page
 
 import VendorRoutes from "./pages/vendor/vendorRoutes";
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
@@ -49,10 +50,12 @@ function App() {
             path="/shops/:vendorId/products/:category"
             element={<ShopProducts />}
           />
+          <Route path="/product/:productId" element={<ProductViewPage />} /> {/* <-- Add new route */}
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          {/* <-- Add this route */}
+
           {/* --- ADMIN ROUTES --- */}
           <Route path="admin/*" element={<AdminRoutes />} />
+
           {/* --- VENDOR ROUTES --- */}
           <Route
             path="vendor/*"
@@ -62,6 +65,7 @@ function App() {
               </VendorDataProvider>
             }
           />
+
           {/* --- CONSUMER ROUTES --- */}
           <Route
             path="consumer/*"

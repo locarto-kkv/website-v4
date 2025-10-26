@@ -8,7 +8,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import toast from "react-hot-toast";
 
 const ShopProducts = () => {
-  const { vendorId, category } = useParams(); // vendor.id from URL
+  const { vendorId, category } = useParams();
   const { currentUser } = useAuthStore();
   const { blogs, fetchProductsInBatch } = useData();
   const { updateList, removeFromList } = ConsumerListService;
@@ -18,7 +18,6 @@ const ShopProducts = () => {
 
   if (currentUser?.type === "consumer") {
     var { lists, fetchLists } = useConsumerData();
-
     cart = lists?.cart || [];
     wishlist = lists?.wishlist || [];
   }
@@ -27,15 +26,12 @@ const ShopProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Find vendor by ID from blogs
   useEffect(() => {
     const foundVendor = blogs?.find((v) => String(v.id) === String(vendorId));
-
     setVendor(foundVendor || null);
     setProducts(foundVendor?.products || []);
   }, [blogs, vendorId]);
 
-  // Fetch vendor products
   useEffect(() => {
     const fetchProducts = async () => {
       if (!vendorId) return;
@@ -64,8 +60,10 @@ const ShopProducts = () => {
       </div>
     );
 
-  // Handle wishlist toggle
-  const toggleWishlist = async (productId) => {
+  const toggleWishlist = async (e, productId) => {
+    e.preventDefault(); // Prevent navigation when clicking wishlist
+    e.stopPropagation();
+    
     if (currentUser?.type !== "consumer") {
       toast.error("Please Login as Consumer");
       return;
@@ -83,8 +81,10 @@ const ShopProducts = () => {
     }
   };
 
-  // Handle add/remove cart quantity
-  const handleCartChange = async (productId, currentQty, delta) => {
+  const handleCartChange = async (e, productId, currentQty, delta) => {
+    e.preventDefault(); // Prevent navigation when clicking cart buttons
+    e.stopPropagation();
+    
     if (currentUser?.type !== "consumer") {
       toast.error("Please Login as Consumer");
       return;
@@ -195,15 +195,16 @@ const ShopProducts = () => {
               );
 
               return (
-                <div
+                <Link
                   key={product.id}
-                  className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 flex flex-col group hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20 hover:-translate-y-2 hover:shadow-3xl"
+                  to={`/product/${product.id}`}
+                  className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 flex flex-col group hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20 hover:-translate-y-2 hover:shadow-3xl cursor-pointer"
                 >
                   {/* Product Image */}
                   <div className="relative mb-4">
                     <div className="overflow-hidden rounded-xl bg-white/5">
                       <img
-                        src={product.product_images?.[0].url || null}
+                        src={product.product_images?.[0]?.url || 'https://placehold.co/300x300/e2e8f0/e2e8f0?text=IMG'}
                         alt={product.name}
                         className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500"
                       />
@@ -211,8 +212,8 @@ const ShopProducts = () => {
 
                     {/* Wishlist Button */}
                     <button
-                      onClick={() => toggleWishlist(product.id)}
-                      className="absolute top-3 right-3 bg-black/50 backdrop-blur-md rounded-full p-2.5 shadow-lg hover:scale-110 transition-all duration-200 border border-white/20"
+                      onClick={(e) => toggleWishlist(e, product.id)}
+                      className="absolute top-3 right-3 bg-black/50 backdrop-blur-md rounded-full p-2.5 shadow-lg hover:scale-110 transition-all duration-200 border border-white/20 z-10"
                     >
                       <i
                         className={`fas fa-heart text-lg transition-colors ${
@@ -234,7 +235,7 @@ const ShopProducts = () => {
                     </p>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-white/80">
-                        ⭐ {product.avg_review || 0} ({product.count_reviews})
+                        ⭐ {product.avg_review || 0} ({product.count_reviews || 0})
                       </span>
                     </div>
                   </div>
@@ -243,15 +244,15 @@ const ShopProducts = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between pt-3 border-t border-white/10">
                       <span className="text-2xl font-bold text-white drop-shadow-lg">
-                        {product.price}
+                        ₹{product.price}
                       </span>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() =>
-                            handleCartChange(product.id, quantity, -1)
+                          onClick={(e) =>
+                            handleCartChange(e, product.id, quantity, -1)
                           }
                           disabled={quantity <= 0}
-                          className="rounded-full w-8 h-8 flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-all duration-200 border border-white/20"
+                          className="rounded-full w-8 h-8 flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-all duration-200 border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           -
                         </button>
@@ -259,8 +260,8 @@ const ShopProducts = () => {
                           {quantity}
                         </span>
                         <button
-                          onClick={() =>
-                            handleCartChange(product.id, quantity, +1)
+                          onClick={(e) =>
+                            handleCartChange(e, product.id, quantity, +1)
                           }
                           className="rounded-full w-8 h-8 flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-all duration-200 border border-white/20"
                         >
@@ -282,7 +283,7 @@ const ShopProducts = () => {
                       </div>
                     )}
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -293,7 +294,7 @@ const ShopProducts = () => {
               No Products Available
             </h3>
             <p className="text-white/60">
-              This vendor doesn’t have any products yet.
+              This vendor doesn't have any products yet.
             </p>
           </div>
         )}
