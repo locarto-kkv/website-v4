@@ -20,6 +20,7 @@ import ProductViewPage from "./pages/consumer/ProductViewPage"; // <-- Import th
 import VendorRoutes from "./pages/vendor/vendorRoutes";
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
 import AdminRoutes from "./pages/admin/adminRoutes";
+import AlertsPage from "./pages/AlertsPage"; // <-- Import the new page
 
 function App() {
   const { authLoading, checkAuth } = useAuthStore();
@@ -52,7 +53,7 @@ function App() {
           />
           <Route path="/product/:productId" element={<ProductViewPage />} /> {/* <-- Add new route */}
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-
+          <Route path="/alerts" element={<AlertsPage />} /> {/* <-- ADD THIS ROUTE */}
           {/* --- ADMIN ROUTES --- */}
           <Route path="admin/*" element={<AdminRoutes />} />
 

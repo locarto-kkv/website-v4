@@ -10,6 +10,15 @@ import { useAuthStore } from "../store/useAuthStore.jsx";
 import { ConsumerProfileService } from "../services/consumer/consumerProfileService.js";
 import { VendorProfileService } from "../services/vendor/vendorProfileService.js";
 
+// Background Assets
+// Import assets as before
+import asset1 from "../assets/1.png"; //
+import asset2 from "../assets/2.png"; //
+import asset3 from "../assets/3.png"; //
+import asset4 from "../assets/4.png"; //
+import asset5 from "../assets/5.png"; //
+
+
 const Homepage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showError, setShowError] = useState(false);
@@ -20,10 +29,11 @@ const Homepage = () => {
   const navigate = useNavigate();
 
   // Available categories (Only these will be searchable/navigable)
-  const availableCategories = ["personal care", "accessories"];
+  const availableCategories = ["personal care", "accessories"]; //
 
   // Popular Products Data
-  const popularProducts = [
+  const popularProducts = [ //
+    // ... (keep popularProducts array as is) ...
     {
       id: 1,
       name: "Healthy Salad Bowl",
@@ -62,85 +72,125 @@ const Homepage = () => {
     },
   ];
 
-  const handleSearch = (e) => {
-    e.preventDefault();
+  // --- Keep handlers (handleSearch, handleInputChange, etc.) as they are ---
+  const handleSearch = (e) => { //
+    e.preventDefault(); //
 
-    if (searchQuery.trim() === "") {
-      return;
+    if (searchQuery.trim() === "") { //
+      return; //
     }
 
-    const normalizedQuery = searchQuery.toLowerCase().trim();
-    const foundCategory = availableCategories.find(
-      (category) => category.includes(normalizedQuery)
+    const normalizedQuery = searchQuery.toLowerCase().trim(); //
+    const foundCategory = availableCategories.find( //
+      (category) => category.includes(normalizedQuery) //
     );
 
-    if (foundCategory) {
+    if (foundCategory) { //
       // Redirect to map with selected category
-      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`);
+      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`); //
     } else {
       // Show error message with suggestion
-      setShowError(true);
-      setSuggestedCategory(availableCategories[0]);
+      setShowError(true); //
+      setSuggestedCategory(availableCategories[0]); //
     }
   };
 
-  const handleInputChange = (e) => {
-    setSearchQuery(e.target.value);
+  const handleInputChange = (e) => { //
+    setSearchQuery(e.target.value); //
     // Clear error when typing
-    if (showError) {
-      setShowError(false);
+    if (showError) { //
+      setShowError(false); //
     }
   };
 
-  const handleSuggestionClick = (category) => {
-    navigate(`/map?category=${category.replace(" ", "%20")}`);
-    closeError();
+  const handleSuggestionClick = (category) => { //
+    navigate(`/map?category=${category.replace(" ", "%20")}`); //
+    closeError(); //
   };
 
-  const closeError = () => {
-    setShowError(false);
-    setSearchQuery("");
+  const closeError = () => { //
+    setShowError(false); //
+    setSearchQuery(""); //
   };
 
-  const handleProductClick = (product) => {
+  const handleProductClick = (product) => { //
     // Check if the product's category is one of the allowed ones before navigating
-    if (availableCategories.includes(product.category.toLowerCase())) {
-      navigate(`/map?category=${product.category.replace(" ", "%20")}`);
+    if (availableCategories.includes(product.category.toLowerCase())) { //
+      navigate(`/map?category=${product.category.replace(" ", "%20")}`); //
     } else {
-      console.log(
+      console.log( //
         `Category "${product.category}" is not directly navigable via suggestions.`
       );
     }
   };
 
-  useEffect(() => {
-    const funcConsumer = async () => {
-      const profile = await ConsumerProfileService.getProfile();
-      setName(profile.name);
+   useEffect(() => { //
+    const funcConsumer = async () => { //
+      const profile = await ConsumerProfileService.getProfile(); //
+      setName(profile.name); //
     };
-    const funcVendor = async () => {
-      const profile = await VendorProfileService.getProfile();
-      setName(profile.name);
+    const funcVendor = async () => { //
+      const profile = await VendorProfileService.getProfile(); //
+      setName(profile.name); //
     };
-    if (currentUser?.type === "consumer") {
-      funcConsumer();
-    } else if (currentUser?.type === "vendor") {
-      funcVendor();
+    if (currentUser?.type === "consumer") { //
+      funcConsumer(); //
+    } else if (currentUser?.type === "vendor") { //
+      funcVendor(); //
     }
-  }, [currentUser]);
+  }, [currentUser]); //
+   // --- End handlers ---
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden"> {/* Added overflow-hidden */}
       <Navbar pageType="homepage" />
-      
+
+       {/* MODIFIED Background Assets - Reduced negative offsets */}
+       {/* Use percentages or smaller fixed values to keep within bounds */}
+       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10"> {/* Ensure assets are behind content */}
+         <img
+           src={asset1} //
+           alt=""
+           className="absolute top-[-5%] left-[-5%] w-[250px] h-[250px] md:w-[400px] md:h-[400px] opacity-[0.15] animate-[spin_40s_linear_infinite]"
+           style={{ filter: "blur(1px)" }} //
+         />
+         <img
+           src={asset4} //
+           alt=""
+           className="absolute top-[5%] right-[-5%] w-[300px] h-[300px] md:w-[450px] md:h-[450px] opacity-[0.12] animate-[spin_50s_linear_infinite_reverse]"
+           style={{ filter: "blur(1px)" }} //
+         />
+         <img
+           src={asset2} //
+           alt=""
+           className="absolute top-[30%] left-[5%] w-[280px] h-[280px] md:w-[450px] md:h-[450px] opacity-[0.18] animate-[spin_45s_linear_infinite]"
+           style={{ filter: "blur(1px)" }} //
+         />
+          <img
+            src={asset5} //
+            alt=""
+            className="absolute top-[50%] right-[5%] w-[310px] h-[310px] md:w-[490px] md:h-[490px] opacity-[0.14] animate-[spin_55s_linear_infinite_reverse]"
+            style={{ filter: "blur(1px)" }} //
+         />
+         <img
+           src={asset3} //
+           alt=""
+           className="absolute top-[70%] left-[-8%] w-[290px] h-[290px] md:w-[460px] md:h-[460px] opacity-[0.16] animate-[spin_42s_linear_infinite_reverse]"
+            style={{ filter: "blur(1px)" }} //
+         />
+         {/* Add more adjusted assets if needed, keeping offsets small */}
+       </div>
+       {/* END MODIFIED Background Assets */}
+
       {/* Main Content - Added pt-16 for top nav and pb-24 for mobile bottom nav */}
-      <main className="flex-1 flex flex-col items-center justify-center px-3 sm:px-4 py-6 sm:py-8 pt-16 sm:pt-20 pb-24 sm:pb-8">
+      <main className="flex-1 flex flex-col items-center justify-center px-3 sm:px-4 py-6 sm:py-8 pt-20 sm:pt-24 pb-24 sm:pb-8 relative z-10"> {/* Ensure main content is above background */}
         <div className="max-w-6xl w-full mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-16 sm:mb-20">
             {/* Multi-Logo Gallery */}
             <div className="relative mx-auto mb-6 sm:mb-8 mt-6 sm:mt-8">
-              <div className="w-full max-w-5xl mx-auto">
+               {/* ... (Keep the logo gallery structure as is) ... */}
+               <div className="w-full max-w-5xl mx-auto">
                 {/* Massive animated background effects */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-red-500 via-pink-500 via-purple-500 to-blue-500 rounded-3xl blur-2xl sm:blur-3xl opacity-10 sm:opacity-15 animate-pulse scale-110"></div>
                 <div
@@ -151,10 +201,11 @@ const Homepage = () => {
                   className="absolute inset-16 bg-gradient-to-r from-orange-500 via-red-400 to-pink-500 rounded-xl blur-lg sm:blur-xl opacity-10 animate-pulse"
                   style={{ animationDelay: "1s" }}
                 ></div>
-                
-                {/* MOBILE: 3-2 Grid Layout (2,3,4 on first row, 1,5 on second row) */}
+
+                {/* MOBILE: 3-2 Grid Layout */}
                 <div className="sm:hidden relative z-10 py-6 px-3">
-                  {/* First Row - 3 Logos (2, 3, 4) */}
+                  {/* ... (mobile logo layout) ... */}
+                   {/* First Row - 3 Logos (2, 3, 4) */}
                   <div className="flex justify-center items-center gap-4 mb-4">
                     {[2, 3, 4].map((logoNumber, index) => (
                       <div
@@ -188,7 +239,7 @@ const Homepage = () => {
                       </div>
                     ))}
                   </div>
-                  
+
                   {/* Second Row - 2 Logos (1, 5) */}
                   <div className="flex justify-center items-center gap-4">
                     {[1, 5].map((logoNumber, index) => (
@@ -225,10 +276,10 @@ const Homepage = () => {
                   </div>
                 </div>
 
-                {/* DESKTOP: Horizontal Layout (UNCHANGED) */}
+                {/* DESKTOP: Horizontal Layout */}
                 <div className="hidden sm:flex relative z-10 justify-center items-center gap-4 sm:gap-6 lg:gap-12 py-6 sm:py-8 px-3 sm:px-4">
-                  {/* Logo Images Array */}
-                  {[1, 2, 3, 4, 5].map((logoNumber, index) => (
+                    {/* ... (desktop logo layout) ... */}
+                     {[1, 2, 3, 4, 5].map((logoNumber, index) => (
                     <div
                       key={logoNumber}
                       className="relative transform hover:scale-110 transition-all duration-700 cursor-pointer group"
@@ -289,8 +340,9 @@ const Homepage = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Global floating particles */}
+                 {/* ... (floating particles) ... */}
                 <div
                   className="absolute -top-6 sm:-top-8 left-1/4 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-60"
                   style={{ animationDelay: "0.2s" }}
@@ -339,10 +391,11 @@ const Homepage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Enhanced Main Heading */}
             <div className="relative mb-4 sm:mb-6 px-2">
-              <div className="text-center space-y-2 sm:space-y-3">
+              {/* ... (heading content) ... */}
+               <div className="text-center space-y-2 sm:space-y-3">
                 {/* Larger gradient headline */}
                 <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-black relative">
                   <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent relative z-10 block animate-pulse leading-tight sm:leading-normal">
@@ -361,9 +414,10 @@ const Homepage = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-200 via-pink-200 to-purple-200 blur-3xl opacity-10 scale-110"></div>
               </div>
             </div>
-            
+
             {/* Enhanced Subtitle */}
             <p className="text-sm sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed font-light px-2">
+              {/* ... (subtitle content) ... */}
               <span className="inline-block animate-fade-in-up">
                 Discover the
               </span>
@@ -371,7 +425,7 @@ const Homepage = () => {
                 className="inline-block animate-fade-in-up text-transparent bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text font-semibold"
                 style={{ animationDelay: "0.2s" }}
               >
-                {" "}best emerging brands{" "}
+                {" "} best emerging brands {" "}
               </span>
               <span
                 className="inline-block animate-fade-in-up"
@@ -380,12 +434,13 @@ const Homepage = () => {
                 across the country
               </span>
             </p>
-            
-            {/* Premium Search Bar - Mobile Optimized */}
+
+            {/* Premium Search Bar */}
             <form
               onSubmit={handleSearch}
-              className="relative inline-block group w-full max-w-2xl mx-auto px-2 sm:px-0"
+              className="relative inline-block group w-full max-w-2xl mx-auto px-2 sm:px-0" //
             >
+             {/* ... (search bar content) ... */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-full blur-lg sm:blur-xl opacity-20 scale-105 group-hover:opacity-30 transition-all duration-500"></div>
                 <div className="relative bg-white rounded-full shadow-xl sm:shadow-2xl group-hover:shadow-3xl transition-all duration-500 border border-gray-100 group-hover:border-orange-200 flex items-center">
@@ -439,9 +494,10 @@ const Homepage = () => {
               </div>
             </form>
           </div>
-          
+
           <style>{`
-            @keyframes fade-in-up {
+             /* ... (keep existing keyframes and styles) ... */
+             @keyframes fade-in-up {
               from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -476,10 +532,11 @@ const Homepage = () => {
               box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 30px -10px rgba(0, 0, 0, 0.1);
             }
           `}</style>
-          
+
           {/* Popular Products Section */}
           <section className="mb-12 sm:mb-16 px-2 sm:px-0">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-12">
+             {/* ... (keep popular products section as is) ... */}
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-12">
               Featured Products
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
@@ -525,10 +582,11 @@ const Homepage = () => {
               )}
             </div>
           </section>
-          
+
           {/* Beta Signup Section */}
           <section className="bg-gradient-to-br from-[#353695] via-[#4a4db5] to-[#5b5fc7] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl mb-6 sm:mb-8 relative overflow-hidden mx-2 sm:mx-0">
-            <div className="absolute inset-0">
+             {/* ... (keep beta signup section as is) ... */}
+              <div className="absolute inset-0">
               <div className="absolute top-10 left-10 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
               <div
                 className="absolute bottom-10 right-10 w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-full blur-lg animate-pulse"
@@ -591,10 +649,11 @@ const Homepage = () => {
               </div>
             </div>
           </section>
-          
+
           {/* Newsletter Section */}
           <section className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl mb-12 sm:mb-16 mx-2 sm:mx-0">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
+             {/* ... (keep newsletter section as is) ... */}
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
               Stay Updated
             </h3>
             <p className="text-base sm:text-lg mb-6 sm:mb-8 opacity-90 max-w-2xl mx-auto px-2">
@@ -613,14 +672,15 @@ const Homepage = () => {
           </section>
         </div>
       </main>
-      
-      {/* Footer - Using the same Footer component as Landing Page */}
+
+      {/* Footer */}
       <Footer />
-      
+
       {/* Error Message Modal */}
       {showError && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 mx-4 transform animate-in">
+         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+           {/* ... (keep error modal content as is) ... */}
+           <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 mx-4 transform animate-in">
             <div className="flex justify-between items-start mb-4 sm:mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -641,7 +701,7 @@ const Homepage = () => {
               The category "
               <span className="font-semibold text-red-600">
                 {searchQuery}
-              </span>" 
+              </span>"
               is not available yet.
             </p>
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">

@@ -1,6 +1,6 @@
 // src/components/DashboardNavbar.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Make sure Link is imported
 import { useAuthStore } from "../store/useAuthStore.jsx";
 import { useConsumerData } from "../context/consumer/consumerDataContext.jsx";
 import locartoImg from "../assets/locarto.png";
@@ -8,26 +8,29 @@ import locartoImg from "../assets/locarto.png";
 const DashboardNavbar = ({ onMenuClick }) => {
   const { currentUser, logout, logoutLoading } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
   const navigate = useNavigate();
 
-  const isConsumer = currentUser?.type === "consumer";
-  const consumerDataContext = isConsumer ? useConsumerData() : null;
-  const lists = consumerDataContext?.lists;
-  const cartCount = isConsumer ? (lists?.cart?.length || 0) : 0;
+  const isConsumer = currentUser?.type === "consumer"; //
+  // Safely access consumer data context only if the user is a consumer
+  const consumerDataContext = isConsumer ? useConsumerData() : null; //
+  const lists = consumerDataContext?.lists; //
+  const cartCount = isConsumer ? (lists?.cart?.length || 0) : 0; //
 
   const handleLogout = async (e) => {
-    e.preventDefault();
-    if (currentUser?.type) {
-      await logout(currentUser.type);
+    e.preventDefault(); //
+    if (currentUser?.type) { //
+      await logout(currentUser.type); //
     }
-    setDropdownOpen(false);
-    setMobileMenuOpen(false);
+    setDropdownOpen(false); //
+    // Keep mobileMenuOpen state if it exists, otherwise remove this line
+    // setMobileMenuOpen(false);
   };
 
   const navbarTitle = () => {
+    //
+    // ... (navbarTitle function remains the same) ...
     switch (currentUser?.type) {
       case "vendor":
         return "Vendor Dashboard";
@@ -41,7 +44,9 @@ const DashboardNavbar = ({ onMenuClick }) => {
   };
 
   const profileLink = () => {
-    switch (currentUser?.type) {
+    //
+     // ... (profileLink function remains the same) ...
+     switch (currentUser?.type) {
       case "vendor":
         return "/vendor/dashboard/profile";
       case "consumer":
@@ -57,34 +62,45 @@ const DashboardNavbar = ({ onMenuClick }) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        dropdownOpen &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
+        dropdownOpen && //
+        dropdownRef.current && //
+        !dropdownRef.current.contains(event.target) && //
+        buttonRef.current && //
+        !buttonRef.current.contains(event.target) //
       ) {
-        setDropdownOpen(false);
+        setDropdownOpen(false); //
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [dropdownOpen]);
+    document.addEventListener("mousedown", handleClickOutside); //
+    return () => document.removeEventListener("mousedown", handleClickOutside); //
+  }, [dropdownOpen]); //
 
   const handleCartClick = () => {
-    if (currentUser?.type === "consumer") {
-      navigate("/consumer/dashboard/lists");
+    //
+    if (currentUser?.type === "consumer") { //
+      navigate("/consumer/dashboard/lists"); //
     }
   };
 
   return (
     <>
-      {/* DESKTOP & TABLET NAVBAR - Fixed Top (UNCHANGED) */}
-      <nav className="hidden sm:flex bg-white shadow-md h-[70px] px-3 sm:px-4 md:px-6 items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-gray-100">
-        {/* Logo - Left most */}
+      {/* DESKTOP & MOBILE NAVBAR - Fixed Top */}
+      <nav className="flex bg-white shadow-md h-[70px] px-3 sm:px-4 md:px-6 items-center justify-between fixed top-0 left-0 w-full z-50 border-b border-gray-100">
+        {/* ... (Left Section remains the same) ... */}
+         {/* Left Section: Hamburger (mobile) / Logo (desktop) */}
         <div className="flex items-center flex-shrink-0">
+          {/* Hamburger Menu - Visible only on mobile/tablet (hidden on lg and up) */}
+          <button
+            onClick={onMenuClick}
+            className="lg:hidden p-2 -ml-2 mr-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            aria-label="Toggle menu"
+          >
+            <i className="fas fa-bars text-lg sm:text-xl text-gray-700"></i>
+          </button>
+          {/* Logo - Hidden on mobile/tablet (visible on lg and up) */}
           <Link
             to="/"
-            className="flex items-center hover:opacity-80 transition-opacity"
+            className="hidden lg:flex items-center hover:opacity-80 transition-opacity"
           >
             <img
               src={locartoImg}
@@ -92,24 +108,38 @@ const DashboardNavbar = ({ onMenuClick }) => {
               className="h-12 sm:h-14 w-auto object-contain scale-110 sm:scale-125 translate-y-[2px]"
             />
           </Link>
+           {/* Logo - Visible only on mobile/tablet (hidden on lg and up) */}
+           <Link to="/" className="lg:hidden flex items-center hover:opacity-80 transition-opacity">
+               <img
+                 src={locartoImg}
+                 alt="Locarto"
+                 className="h-10 w-auto object-contain scale-110"
+               />
+            </Link>
         </div>
-
-        {/* Center Section: Hamburger (mobile) / Title (desktop) */}
+        {/* ... (Center Section remains the same) ... */}
+        {/* Center Section: Title */}
         <div className="absolute left-1/2 transform -translate-x-1/2 lg:static lg:transform-none lg:translate-x-0 lg:flex-1 lg:ml-4 flex items-center justify-center lg:justify-start">
-          <button
-            onClick={onMenuClick}
-            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-            aria-label="Toggle menu"
-          >
-            <i className="fas fa-bars text-lg sm:text-xl text-gray-700"></i>
-          </button>
+          {/* Dashboard Title - Hidden on mobile */}
           <span className="bg-gradient-to-r from-orange-50 to-red-50 text-orange-700 text-sm font-semibold px-3 py-1.5 rounded-full border border-orange-100 hidden lg:inline-block shadow-sm">
             {navbarTitle()}
           </span>
         </div>
 
-        {/* Right side: Actions */}
+        {/* ... (Right Section remains the same - Alerts icon is already a Link here) ... */}
+         {/* Right side: Actions - ALERTS FIRST */}
         <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 flex-shrink-0">
+           {/* Notifications Link */}
+          <Link
+            to="/alerts"
+            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0 text-gray-700 hover:text-orange-500"
+            aria-label="View Notifications"
+          >
+            <i className="fas fa-bell text-lg sm:text-xl"></i>
+             {/* Add notification count badge here if needed */}
+          </Link>
+
+          {/* Cart Button (Consumer Only) */}
           {isConsumer && (
             <button
               onClick={handleCartClick}
@@ -125,15 +155,10 @@ const DashboardNavbar = ({ onMenuClick }) => {
             </button>
           )}
 
-          <button
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-            aria-label="View Notifications"
-          >
-            <i className="fas fa-bell text-lg sm:text-xl text-gray-700"></i>
-          </button>
-
+          {/* Profile Dropdown */}
           <div className="relative flex-shrink-0">
-            <button
+             {/* Profile button and dropdown content */}
+             <button
               ref={buttonRef}
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-200 transition ring-1 ring-gray-200 hover:ring-orange-300"
@@ -190,34 +215,24 @@ const DashboardNavbar = ({ onMenuClick }) => {
         </div>
       </nav>
 
-      {/* MOBILE TOP BAR - Only Logo */}
-      <nav className="sm:hidden bg-white shadow-md h-[60px] px-4 flex items-center fixed top-0 left-0 w-full z-50 border-b border-gray-100">
-        <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
-          <img
-            src={locartoImg}
-            alt="Locarto"
-            className="h-10 w-auto object-contain scale-110"
-          />
-        </Link>
-      </nav>
-
-      {/* MOBILE BOTTOM NAVIGATION BAR - Always visible labels */}
+      {/* --- MOBILE BOTTOM NAVIGATION BAR --- */}
       <div className="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 shadow-lg safe-area-bottom">
         <div className="flex items-stretch justify-around px-2">
           {/* Menu Button */}
-          <button
+          {/* ... (Menu button remains the same) ... */}
+           <button
             onClick={() => {
-              setMobileMenuOpen(!mobileMenuOpen);
               if (onMenuClick) onMenuClick();
             }}
             className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]"
           >
-            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'} text-xl mb-1`}></i>
+            <i className={`fas fa-bars text-xl mb-1`}></i>
             <span className="text-xs font-medium leading-tight">Menu</span>
           </button>
 
           {/* Cart Button (Consumer Only) */}
-          {isConsumer && (
+          {/* ... (Cart button remains the same) ... */}
+           {isConsumer && (
             <button
               onClick={handleCartClick}
               className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors relative active:scale-95 min-h-[64px]"
@@ -234,16 +249,19 @@ const DashboardNavbar = ({ onMenuClick }) => {
             </button>
           )}
 
-          {/* Notifications Button */}
-          <button
-            className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]"
+          {/* Notifications Link - REPLACED BUTTON WITH LINK */}
+          <Link
+            to="/alerts" // <-- Link to the new page
+            className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]" // Apply styles to Link
           >
-            <i className="fas fa-bell text-xl mb-1"></i>
-            <span className="text-xs font-medium leading-tight">Alerts</span>
-          </button>
+            <i className="fas fa-bell text-xl mb-1"></i> {/* Icon */}
+            <span className="text-xs font-medium leading-tight">Alerts</span> {/* Label */}
+          </Link>
+          {/* END REPLACEMENT */}
 
           {/* Profile Button */}
-          <button
+          {/* ... (Profile button remains the same) ... */}
+           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]"
           >
@@ -253,10 +271,11 @@ const DashboardNavbar = ({ onMenuClick }) => {
         </div>
       </div>
 
-      {/* MOBILE PROFILE DROPDOWN OVERLAY */}
+      {/* MOBILE PROFILE DROPDOWN OVERLAY (Bottom Sheet - Keep as is) */}
+      {/* ... (profile overlay remains the same) ... */}
       {dropdownOpen && (
         <div className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in" onClick={() => setDropdownOpen(false)}>
-          <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 space-y-2">
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
@@ -274,7 +293,7 @@ const DashboardNavbar = ({ onMenuClick }) => {
                   <i className="fas fa-times text-xl"></i>
                 </button>
               </div>
-              
+
               <Link
                 to={profileLink()}
                 className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
@@ -283,7 +302,7 @@ const DashboardNavbar = ({ onMenuClick }) => {
                 <i className={`fas ${currentUser?.type === "consumer" ? "fa-cog" : "fa-user"} w-5 text-center text-gray-500`}></i>
                 {currentUser?.type === "consumer" ? "Settings" : "Profile"}
               </Link>
-              
+
               <button
                 onClick={handleLogout}
                 disabled={logoutLoading}
@@ -298,28 +317,17 @@ const DashboardNavbar = ({ onMenuClick }) => {
       )}
 
       {/* Add animation styles */}
-      <style>{`
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-        .animate-fade-in {
-          animation: fade-in 0.2s ease-out;
+      {/* ... (styles remain the same) ... */}
+       <style>{`
+        /* ... (keep existing animation styles) ... */
+        @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        .animate-slide-up { animation: slide-up 0.3s ease-out; }
+        .animate-fade-in { animation: fade-in 0.2s ease-out; }
+
+        /* Safe area padding */
+        .safe-area-bottom {
+          padding-bottom: env(safe-area-inset-bottom);
         }
       `}</style>
     </>
