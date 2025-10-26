@@ -5,12 +5,10 @@ import { useAuthStore } from "../store/useAuthStore.jsx";
 import { useConsumerData } from "../context/consumer/consumerDataContext.jsx";
 import locartoImg from "../assets/locarto.png";
 
-const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick is now only used by the bottom bar
+const DashboardNavbar = ({ onMenuClick }) => {
   const { currentUser, logout, logoutLoading } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  // buttonRef might not be needed anymore if the profile button is removed from the top bar
-  // const buttonRef = useRef(null);
   const navigate = useNavigate();
 
   const isConsumer = currentUser?.type === "consumer";
@@ -27,7 +25,6 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick is now only used b
   };
 
   const navbarTitle = () => {
-    // This function remains but isn't used in the top bar anymore
     switch (currentUser?.type) {
       case "vendor": return "Vendor Dashboard";
       case "consumer": return "Customer Dashboard";
@@ -45,15 +42,12 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick is now only used b
     }
   };
 
-  // Close dropdown on outside click (Keep for bottom sheet)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Remove buttonRef check if profile button removed from top
       if (
         dropdownOpen &&
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target)
-        // && buttonRef.current && !buttonRef.current.contains(event.target) // Remove this part
       ) {
         setDropdownOpen(false);
       }
@@ -70,36 +64,30 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick is now only used b
 
   return (
     <>
-      {/* --- MODIFIED TOP NAVBAR --- */}
+      {/* TOP NAVBAR */}
       <nav className="flex bg-white shadow-md h-[70px] px-3 sm:px-4 md:px-6 items-center justify-start fixed top-0 left-0 w-full z-50 border-b border-gray-100">
-        {/* Logo ONLY - Left most */}
+        {/* Logo ONLY */}
         <div className="flex items-center flex-shrink-0">
-          {/* Logo - Always visible */}
           <Link
             to="/"
             className="flex items-center hover:opacity-80 transition-opacity"
           >
-            {/* Conditional Logo Size */}
             <img
               src={locartoImg}
               alt="Locarto"
-              className="h-10 lg:h-12 w-auto object-contain scale-110 lg:scale-125 lg:translate-y-[2px]" // Adjusted size
+              className="h-10 lg:h-12 w-auto object-contain scale-110 lg:scale-125 lg:translate-y-[2px]"
             />
           </Link>
         </div>
-        {/* REMOVED Center Section */}
-        {/* REMOVED Right side Actions */}
       </nav>
-      {/* --- END MODIFIED TOP NAVBAR --- */}
 
-
-      {/* --- MOBILE BOTTOM NAVIGATION BAR (Keep As Is) --- */}
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
       <div className="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 shadow-lg safe-area-bottom">
         <div className="flex items-stretch justify-around px-2">
-          {/* Menu Button - Still triggers sidebar via prop */}
-           <button
+          {/* Menu Button */}
+          <button
             onClick={() => {
-              if (onMenuClick) onMenuClick(); // Trigger sidebar toggle
+              if (onMenuClick) onMenuClick();
             }}
             className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]"
           >
@@ -108,7 +96,7 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick is now only used b
           </button>
 
           {/* Cart Button (Consumer Only) */}
-           {isConsumer && (
+          {isConsumer && (
             <button
               onClick={handleCartClick}
               className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors relative active:scale-95 min-h-[64px]"
@@ -135,8 +123,8 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick is now only used b
           </Link>
 
           {/* Profile Button */}
-           <button
-            onClick={() => setDropdownOpen(!dropdownOpen)} // Still opens bottom sheet
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]"
           >
             <i className="fas fa-user-circle text-xl mb-1"></i>
@@ -144,14 +132,11 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick is now only used b
           </button>
         </div>
       </div>
-      {/* --- END MOBILE BOTTOM BAR --- */}
 
-
-      {/* MOBILE PROFILE DROPDOWN OVERLAY (Bottom Sheet - Keep As Is) */}
+      {/* MOBILE PROFILE DROPDOWN OVERLAY (Bottom Sheet) */}
       {dropdownOpen && (
         <div className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in" onClick={() => setDropdownOpen(false)}>
-            {/* ... (profile overlay remains the same) ... */}
-            <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up" ref={dropdownRef} onClick={(e) => e.stopPropagation()}>
+          <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up" ref={dropdownRef} onClick={(e) => e.stopPropagation()}>
             <div className="p-6 space-y-2">
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
@@ -192,18 +177,23 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick is now only used b
         </div>
       )}
 
-      {/* Add animation styles */}
-      {/* ... (styles remain the same) ... */}
-       <style>{`
-        /* ... (keep existing animation styles) ... */
+      {/* Animation styles with bottom padding spacer */}
+      <style>{`
         @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
         .animate-slide-up { animation: slide-up 0.3s ease-out; }
         .animate-fade-in { animation: fade-in 0.2s ease-out; }
 
-        /* Safe area padding */
+        /* Safe area padding for notched devices */
         .safe-area-bottom {
           padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Add bottom padding to body when mobile navbar is present in dashboard */
+        @media (max-width: 639px) {
+          body {
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+          }
         }
       `}</style>
     </>
