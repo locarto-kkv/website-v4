@@ -1,43 +1,41 @@
 // src/components/Navbar.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore.jsx"; // Added .jsx
-import SideCart from "../components/consumer/SideCart.jsx"; // Added .jsx
+import { useAuthStore } from "../store/useAuthStore.jsx";
+import SideCart from "../components/consumer/SideCart.jsx";
 import { ConsumerListService } from "../services/consumer/consumerListService.js";
 import locartoImg from "../assets/locarto.png";
-import toast from 'react-hot-toast'; // <-- Import toast
+import toast from 'react-hot-toast';
 
 const Navbar = ({ pageType = "landing" }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false); // State to control SideCart visibility
-  const [cartItemsCount, setCartItemsCount] = useState(0); // State for cart count
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItemsCount, setCartItemsCount] = useState(0);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
 
   const { currentUser, logout } = useAuthStore();
-  const { getLists } = ConsumerListService; // Changed from getList
+  const { getLists } = ConsumerListService;
 
   // Load cart count
   useEffect(() => {
     const loadCart = async () => {
-      // Only fetch if user is a consumer
       if (currentUser?.type === 'consumer') {
         try {
           const res = await getLists();
-          setCartItemsCount(res?.cart?.length || 0); // Safely get cart length
+          setCartItemsCount(res?.cart?.length || 0);
         } catch (error) {
           console.log("Error loading cart items count:", error);
-          setCartItemsCount(0); // Reset count on error
+          setCartItemsCount(0);
         }
       } else {
-        setCartItemsCount(0); // Reset count if not a consumer
+        setCartItemsCount(0);
       }
     };
     loadCart();
-    // Re-fetch when user changes or cart opens (to ensure it's up-to-date)
   }, [currentUser, getLists, isCartOpen]);
 
   // Close dropdown on outside click
@@ -63,7 +61,7 @@ const Navbar = ({ pageType = "landing" }) => {
   // Close mobile menu when resizing to desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 640) {
         setMobileMenuOpen(false);
       }
     };
@@ -77,11 +75,10 @@ const Navbar = ({ pageType = "landing" }) => {
     setIsCartOpen((prev) => !prev);
   };
 
-  // Handle navigation to sections (only used for non-category items now)
+  // Handle navigation to sections
   const handleSectionNavigation = (sectionId) => {
     setMobileMenuOpen(false);
 
-    // If already on landing page, scroll to section
     if (location.pathname === "/landing" || location.pathname === "/") {
       setTimeout(() => {
         const element = document.getElementById(sectionId);
@@ -90,17 +87,16 @@ const Navbar = ({ pageType = "landing" }) => {
         }
       }, 100);
     } else {
-      // Navigate to landing page with hash
       navigate(`/landing#${sectionId}`);
     }
   };
 
-  // Handle dashboard navigation based on user role with auto-scroll to top
+  // Handle dashboard navigation based on user role
   const handleDashboardNavigation = () => {
     setDropdownOpen(false);
     setMobileMenuOpen(false);
 
-    if (currentUser) { // Check if user is logged in
+    if (currentUser) {
       window.scrollTo({ top: 0, behavior: "smooth" });
 
       if (currentUser.type === "vendor") {
@@ -110,15 +106,10 @@ const Navbar = ({ pageType = "landing" }) => {
       } else if (currentUser.type === "admin") {
         navigate("/admin/dashboard");
       }
-      // No 'else' needed here as we handle logged-out case below
     } else {
-      // User is not logged in, show toast message
       toast.error("Please log in or sign up to access the dashboard.");
-      // Optionally navigate to login page after toast:
-      // setTimeout(() => navigate('/consumer/login'), 1500);
     }
   };
-
 
   const handleLogout = () => {
     if (currentUser?.type) {
@@ -129,122 +120,261 @@ const Navbar = ({ pageType = "landing" }) => {
   };
 
   return (
-    // Added pt-[70px] to body/main container where App is rendered if navbar is fixed
-    <nav className="bg-white shadow-md h-[70px] px-4 flex justify-between items-center fixed top-0 left-0 w-full z-50 border-b border-gray-100">
-      {/* --- RESPONSIVE 3-COLUMN LAYOUT --- */}
-      {/* Left Column (Logo) */}
-      <div className="flex-1 flex justify-start">
+    <>
+      {/* DESKTOP & TABLET NAVBAR - Fixed Top (UNCHANGED) */}
+      <nav className="hidden sm:flex bg-white shadow-md h-[70px] px-4 justify-between items-center fixed top-0 left-0 w-full z-50 border-b border-gray-100">
+        {/* Left Column (Logo) */}
+        <div className="flex-1 flex justify-start">
+          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <img
+              src={locartoImg}
+              alt="Locarto"
+              className="h-12 sm:h-14 w-auto object-contain scale-110 sm:scale-125 translate-y-[2px]"
+            />
+          </Link>
+        </div>
+
+        {/* Center Column (Nav Links) */}
+        <div className="flex-1 flex justify-center items-center">
+          <div className="flex items-center space-x-6 lg:space-x-8">
+            <Link
+              to={pageType === "homepage" ? "/landing" : "/"}
+              className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link"
+            >
+              {pageType === "homepage" ? "About Us" : "Home"}
+            </Link>
+            <Link
+              to="/map"
+              className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link"
+            >
+              Categories
+            </Link>
+            <button
+              onClick={handleDashboardNavigation}
+              className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link"
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => handleSectionNavigation("testimonials")}
+              className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link"
+            >
+              Testimonials
+            </button>
+          </div>
+        </div>
+
+        {/* Right Column (Cart & Profile) */}
+        <div className="flex-1 flex justify-end items-center space-x-3 sm:space-x-4">
+          {/* Cart Button */}
+          <button
+            onClick={toggleCart}
+            className="text-gray-700 hover:text-orange-500 transition-colors relative p-2 hover:bg-gray-100 rounded-lg"
+            aria-label={`View Cart (${cartItemsCount} items)`}
+          >
+            <i className="fas fa-shopping-cart text-lg sm:text-xl"></i>
+            {cartItemsCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-md">
+                {cartItemsCount}
+              </span>
+            )}
+          </button>
+
+          {/* Profile Dropdown */}
+          <div className="relative">
+            <button
+              ref={buttonRef}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="bg-gray-100 text-gray-700 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-gray-200 transition ring-1 ring-gray-200 hover:ring-orange-300"
+              aria-label="User menu"
+              aria-haspopup="true"
+              aria-expanded={dropdownOpen}
+            >
+              {currentUser ? (
+                <i className="fas fa-user text-sm sm:text-base"></i>
+              ) : (
+                <i className="fas fa-user-plus text-sm sm:text-base"></i>
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {dropdownOpen && (
+              <div
+                ref={dropdownRef}
+                className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50 border border-gray-100 overflow-hidden"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="user-menu-button"
+              >
+                {currentUser ? (
+                  <>
+                    <button
+                      onClick={handleDashboardNavigation}
+                      className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors flex items-center gap-2"
+                      role="menuitem"
+                    >
+                      <i className="fas fa-th-large w-4 text-center text-gray-500"></i>
+                      Dashboard
+                    </button>
+                    <button
+                      className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                      onClick={handleLogout}
+                      role="menuitem"
+                    >
+                      <i className="fas fa-sign-out-alt w-4 text-center text-gray-500"></i>
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/consumer/login"
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                      role="menuitem"
+                    >
+                      <i className="fas fa-user w-4 text-center text-gray-500"></i> Login as Customer
+                    </Link>
+                    <Link
+                      to="/vendor/login"
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                      role="menuitem"
+                    >
+                      <i className="fas fa-store w-4 text-center text-gray-500"></i> Login as Vendor
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      {/* MOBILE TOP BAR - Only Logo */}
+      <nav className="sm:hidden bg-white shadow-md h-[60px] px-4 flex items-center fixed top-0 left-0 w-full z-50 border-b border-gray-100">
         <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
           <img
             src={locartoImg}
             alt="Locarto"
-            className="h-12 sm:h-14 w-auto object-contain scale-110 sm:scale-125 translate-y-[2px]" // Adjusted scale and position slightly
+            className="h-10 w-auto object-contain scale-110"
           />
         </Link>
-      </div>
+      </nav>
 
-      {/* Center Column (Nav Links on Desktop, Hamburger on Mobile) */}
-      <div className="flex-1 flex justify-center items-center">
-        {/* Mobile Hamburger Menu Button */}
-        <button
-          className="md:hidden text-gray-700 p-2 hover:bg-gray-100 rounded-lg transition-colors" // Added padding and hover effect
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileMenuOpen}
-        >
-          <i
-            className={`fas ${mobileMenuOpen ? "fa-times" : "fa-bars"} text-xl`}
-          ></i>
-        </button>
-
-        {/* Desktop Navigation Links */}
-        <div className="hidden md:flex items-center space-x-6 lg:space-x-8"> {/* Increased spacing slightly */}
-          <Link
-            to={pageType === "homepage" ? "/landing" : "/"}
-            className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link" // Added nav-link class
-          >
-            {pageType === "homepage" ? "About Us" : "Home"}
-          </Link>
-          <Link
-            to="/map"
-            className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link" // Added nav-link class
-          >
-            Categories
-          </Link>
-          {/* Dashboard Link (Conditional) */}
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <div className="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 shadow-lg">
+        <div className="flex items-center justify-around h-16 px-2">
+          {/* Menu Button */}
           <button
-            onClick={handleDashboardNavigation} // Use the existing function
-            className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95"
           >
-            Dashboard
+            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'} text-xl mb-1`}></i>
+            <span className="text-xs font-medium">Menu</span>
           </button>
+
+          {/* Cart Button */}
           <button
-            onClick={() => handleSectionNavigation("testimonials")}
-            className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link" // Added nav-link class
+            onClick={toggleCart}
+            className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors relative active:scale-95"
           >
-            Testimonials
+            <i className="fas fa-shopping-cart text-xl mb-1"></i>
+            {cartItemsCount > 0 && (
+              <span className="absolute top-1 right-1/2 translate-x-3 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-md">
+                {cartItemsCount}
+              </span>
+            )}
+            <span className="text-xs font-medium">Cart</span>
+          </button>
+
+          {/* Profile Button */}
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95"
+          >
+            <i className={`fas ${currentUser ? 'fa-user' : 'fa-user-plus'} text-xl mb-1`}></i>
+            <span className="text-xs font-medium">Profile</span>
           </button>
         </div>
       </div>
 
-      {/* Right Column (Cart & Profile) */}
-      <div className="flex-1 flex justify-end items-center space-x-3 sm:space-x-4">
-         {/* Cart Button */}
-        <button
-          onClick={toggleCart} // <-- Opens the SideCart
-          className="text-gray-700 hover:text-orange-500 transition-colors relative p-2 hover:bg-gray-100 rounded-lg" // Added padding and hover
-          aria-label={`View Cart (${cartItemsCount} items)`}
-        >
-          <i className="fas fa-shopping-cart text-lg sm:text-xl"></i>
-          {cartItemsCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-md">
-              {cartItemsCount}
-            </span>
-          )}
-        </button>
+      {/* MOBILE MENU OVERLAY - Slides up from bottom */}
+      {mobileMenuOpen && (
+        <div className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in" onClick={() => setMobileMenuOpen(false)}>
+          <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl max-h-[60vh] overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 space-y-2">
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800">Menu</h3>
+                <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
+                  <i className="fas fa-times text-xl"></i>
+                </button>
+              </div>
+              
+              <Link
+                to={pageType === "homepage" ? "/landing" : "/"}
+                className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-orange-50 hover:text-orange-500 rounded-lg transition-colors font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <i className="fas fa-home w-5 text-center"></i>
+                {pageType === "homepage" ? "About Us" : "Home"}
+              </Link>
+              
+              <Link
+                to="/map"
+                className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-orange-50 hover:text-orange-500 rounded-lg transition-colors font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <i className="fas fa-th-large w-5 text-center"></i>
+                Categories
+              </Link>
+              
+              <button
+                onClick={handleDashboardNavigation}
+                className="w-full flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-orange-50 hover:text-orange-500 rounded-lg transition-colors font-medium text-left"
+              >
+                <i className="fas fa-tachometer-alt w-5 text-center"></i>
+                Dashboard
+              </button>
+              
+              <button
+                onClick={() => { handleSectionNavigation("testimonials"); setMobileMenuOpen(false); }}
+                className="w-full flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-orange-50 hover:text-orange-500 rounded-lg transition-colors font-medium text-left"
+              >
+                <i className="fas fa-star w-5 text-center"></i>
+                Testimonials
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-        {/* Profile Dropdown */}
-        <div className="relative"> {/* Removed hidden md:block to show on mobile too */}
-          <button
-            ref={buttonRef}
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="bg-gray-100 text-gray-700 rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-gray-200 transition ring-1 ring-gray-200 hover:ring-orange-300" // Adjusted size and added ring
-            aria-label="User menu"
-            aria-haspopup="true"
-            aria-expanded={dropdownOpen}
-          >
-            {currentUser ? (
-              <i className="fas fa-user text-sm sm:text-base"></i>
-            ) : (
-              <i className="fas fa-user-plus text-sm sm:text-base"></i> // Icon for logged out state
-            )}
-          </button>
-
-          {/* Dropdown Menu */}
-          {dropdownOpen && (
-            <div
-              ref={dropdownRef}
-              className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50 border border-gray-100 overflow-hidden"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="user-menu-button"
-            >
+      {/* MOBILE PROFILE DROPDOWN OVERLAY */}
+      {dropdownOpen && (
+        <div className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in" onClick={() => setDropdownOpen(false)}>
+          <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 space-y-2">
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800">Account</h3>
+                <button onClick={() => setDropdownOpen(false)} className="text-gray-400 hover:text-gray-600">
+                  <i className="fas fa-times text-xl"></i>
+                </button>
+              </div>
+              
               {currentUser ? (
                 <>
                   <button
                     onClick={handleDashboardNavigation}
-                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors flex items-center gap-2" // Added flex items-center gap-2
-                    role="menuitem"
+                    className="w-full flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium text-left"
                   >
-                    <i className="fas fa-th-large w-4 text-center text-gray-500"></i>{" "}
+                    <i className="fas fa-th-large w-5 text-center text-gray-500"></i>
                     Dashboard
                   </button>
                   <button
-                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2" // Added flex items-center gap-2
                     onClick={handleLogout}
-                    role="menuitem"
+                    className="w-full flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium text-left"
                   >
-                    <i className="fas fa-sign-out-alt w-4 text-center text-gray-500"></i>{" "}
+                    <i className="fas fa-sign-out-alt w-5 text-center text-gray-500"></i>
                     Logout
                   </button>
                 </>
@@ -252,74 +382,58 @@ const Navbar = ({ pageType = "landing" }) => {
                 <>
                   <Link
                     to="/consumer/login"
-                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors flex items-center gap-2" // Added flex items-center gap-2
+                    className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
                     onClick={() => setDropdownOpen(false)}
-                    role="menuitem"
                   >
-                    <i className="fas fa-user w-4 text-center text-gray-500"></i> Login as Customer
+                    <i className="fas fa-user w-5 text-center text-gray-500"></i>
+                    Login as Customer
                   </Link>
                   <Link
                     to="/vendor/login"
-                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2" // Added flex items-center gap-2
+                    className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
                     onClick={() => setDropdownOpen(false)}
-                    role="menuitem"
                   >
-                    <i className="fas fa-store w-4 text-center text-gray-500"></i> Login as Vendor
+                    <i className="fas fa-store w-5 text-center text-gray-500"></i>
+                    Login as Vendor
                   </Link>
                 </>
               )}
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* --- Mobile Menu Overlay --- */}
-      <div
-        className={`absolute md:hidden top-[70px] left-0 w-full bg-white shadow-lg z-40 transition-transform duration-300 ease-in-out ${
-          mobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden" // Smooth transition
-        }`}
-      >
-        <div className="flex flex-col p-4 space-y-1"> {/* Reduced spacing */}
-          <Link
-            to={pageType === "homepage" ? "/landing" : "/"}
-            className="py-3 px-3 text-gray-700 hover:text-orange-500 font-medium transition-colors rounded-lg hover:bg-gray-50" // Added padding and hover bg
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            {pageType === "homepage" ? "About Us" : "Home"}
-          </Link>
-          <Link
-            to="/map"
-            className="py-3 px-3 text-gray-700 hover:text-orange-500 font-medium transition-colors rounded-lg hover:bg-gray-50" // Added padding and hover bg
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Categories
-          </Link>
-          {/* Mobile Dashboard Link (Conditional) */}
-          <button
-            onClick={handleDashboardNavigation} // Use the existing function
-            className="py-3 px-3 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left rounded-lg hover:bg-gray-50" // Adjusted class for button style
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => handleSectionNavigation("testimonials")}
-            className="py-3 px-3 text-gray-700 hover:text-orange-500 font-medium transition-colors text-left rounded-lg hover:bg-gray-50" // Added padding and hover bg
-          >
-            Testimonials
-          </button>
-          {/* Divider and Auth links for mobile */}
-          <div className="mt-4 pt-4 border-t border-gray-100 space-y-1">
-             {/* Profile button already exists outside, no need to duplicate here */}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Side Cart - State managed here */}
+      {/* Side Cart - Keep existing desktop version */}
       <SideCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
-      {/* Add styles for nav-link underline effect if not already present */}
+      {/* Add animation styles */}
       <style>{`
-        .nav-link { position: relative; padding-bottom: 4px; }
+        @keyframes slide-up {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+        .animate-fade-in {
+          animation: fade-in 0.2s ease-out;
+        }
+        .nav-link { 
+          position: relative; 
+          padding-bottom: 4px; 
+        }
         .nav-link::after {
           content: '';
           position: absolute;
@@ -327,12 +441,14 @@ const Navbar = ({ pageType = "landing" }) => {
           left: 0;
           width: 0;
           height: 2px;
-          background-color: #f97316; /* Orange color */
+          background-color: #f97316;
           transition: width 0.3s ease-out;
         }
-        .nav-link:hover::after { width: 100%; }
+        .nav-link:hover::after { 
+          width: 100%; 
+        }
       `}</style>
-    </nav>
+    </>
   );
 };
 
