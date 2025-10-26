@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from "react";
+import React, { useRef, useState , useEffect} from "react";
 import { Link } from "react-router-dom";
 
 
@@ -43,6 +43,14 @@ const LandingPage = () => {
   const handleNo = () => {
     setShowPopup(false);
   };
+
+const videoRef = useRef(null);
+
+useEffect(() => {
+  if (videoRef.current) {
+    videoRef.current.playbackRate = 0.3; // half speed
+  }
+}, []);
 
   return (
     <div className="font-sans flex flex-col text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
@@ -103,7 +111,7 @@ const LandingPage = () => {
       <section className="flex flex-col items-center justify-center relative">
         <div className="w-full max-w-7xl px-4 md:px-6">
           {/* REVISED: Smaller base font and padding for mobile, with more steps for smooth scaling. */}
-          <h1 className="mb-2 pt-20 sm:pt-24 md:pt-32 pb-12 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-left relative z-10 animate-[fadeIn_0.8s_ease-in]">
+          <h1 className="mb-2 pt-16 sm:pt-24 md:pt-32 pb-10 text-2xl sm:text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-left relative z-10 animate-[fadeIn_1s_ease-in]">
             THE PLATFORM THAT GETS IT...
           </h1>
 
@@ -115,30 +123,21 @@ const LandingPage = () => {
             listen.
           </p>
 
-          <div className="flex flex-col items-center -mt-40 sm:mt-8 md:mt-16 relative">
+          <div className="flex flex-col items-center -mt-20 xs:-mt-10 sm:mt-4 md:mt-8 lg:mt-16 relative">
             {/* Tag Image + Overlay */}
-            <div className="relative grid place-items-center animate-[fadeIn_1.2s_ease-in]">
+            <div className="relative grid place-items-center animate-[fadeIn_1s_ease-in] ">
               <img
                 src={tagImg}
                 alt="Tag"
-                className="col-start-1 row-start-1 h-[700px] w-full max-w-[1800px] object-contain md:h-[850px]"
+                className="col-start-1 row-start-1 h-[500px] sm:h-[650px] md:h-[850px] w-full max-w-[1800px] object-contain mb-[-60px] sm:mb-0"
               />
-              {/* REVISED: Smoother font scaling for the text on the tag image. */}
-              <p className="col-start-1 row-start-1 translate-y-2 font-bold text-center text-xs sm:text-sm md:text-2xl lg:text-4xl xl:text-5xl text-[#FBF5E5] whitespace-nowrap [text-shadow:3px_3px_6px_rgba(0,0,0,0.7)]">
-                We get what's missing. so we made.
-              </p>
             </div>
 
-            <img
-              src={locartoImg}
-              alt="Locarto"
-              className="-mt-[345px] sm:-mt-[270px] md:-mt-[340px] lg:-mt-[385px] w-full max-w-[180px] sm:max-w-[260px] md:max-w-[380px] lg:max-w-[500px] h-auto relative z-10 animate-[fadeIn_1.4s_ease-in]"
-            />
-            <p className="mt-8 text-center text-2xl font-semibold md:text-3xl relative z-10 animate-[fadeIn_1.6s_ease-in]">
+            <p className="mt-2 sm:mt-8 text-center text-2xl font-semibold md:text-3xl relative z-10 animate-[fadeIn_1s_ease-in]">
               A Community where
             </p>
 
-            <div className="mt-20 sm:mt-24 md:mt-28 text-center space-y-4 sm:space-y-6 md:space-y-8 relative z-10 animate-[fadeIn_1.8s_ease-in]">
+            <div className="mt-12 sm:mt-24 md:mt-28 text-center space-y-4 sm:space-y-6 md:space-y-8 relative z-10 animate-[fadeIn_1s_ease-in]">
               <p className="[color:#f15b28] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-wider">
                 EMERGING BRANDS
               </p>
@@ -149,14 +148,13 @@ const LandingPage = () => {
                 SMART CUSTOMERS
               </p>
             </div>
-            
-           
 
             {/* Video Section */}
-            <div className="mt-28 w-full px-4 flex justify-center relative z-10 animate-[fadeIn_2s_ease-in]">
+            <div className="mt-28 w-full px-4 flex justify-center relative z-10 animate-[fadeIn_1s_ease-in]">
               <div className="relative group">
                 <div className="absolute -inset-2 bg-[#0D1539]/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <video
+                  ref={videoRef} // <-- add this
                   autoPlay
                   muted
                   loop
@@ -169,8 +167,9 @@ const LandingPage = () => {
               </div>
             </div>
 
+
             {/* REVISED: Smoother font scaling for this section. */}
-            <div className="mt-28 text-center px-8 relative z-10 animate-[fadeIn_2.2s_ease-in]">
+            <div className="mt-28 text-center px-8 relative z-10 animate-[fadeIn_1s_ease-in]">
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold">
                 Every Big Brand Started Somewhere
               </h2>
@@ -183,7 +182,7 @@ const LandingPage = () => {
             </div>
 
             {/* REVISED: Smoother font scaling. */}
-            <div className="mt-24 text-center px-6 relative z-10 animate-[fadeIn_2.4s_ease-in]">
+            <div className="mt-24 text-center px-6 relative z-10 animate-[fadeIn_1s_ease-in]">
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
                 Brands You've been searching for
               </h2>
