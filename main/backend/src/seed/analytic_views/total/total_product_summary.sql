@@ -7,6 +7,7 @@ SELECT
     p.vendor_id AS vendor_id,
     p.quantity AS quantity,
     p.price AS price,
+    p.weight AS weight,
     p.category AS category,
     p.product_images AS product_images,
     p.status AS status,

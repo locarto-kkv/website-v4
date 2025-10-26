@@ -47,7 +47,7 @@ export const sendVerification = async (req, res) => {
 
 export const signup = async (req, res) => {
   try {
-    const { email = null, phone_no = null, otp } = req.body;
+    const { name, email = null, phone_no = null, otp } = req.body;
 
     const isValid = verifyOtp(email || phone_no, otp);
 
@@ -55,7 +55,7 @@ export const signup = async (req, res) => {
 
     const { data: user, error } = await db
       .from("consumers")
-      .insert({ email, phone_no })
+      .insert({ name, email, phone_no })
       .select()
       .single();
 
