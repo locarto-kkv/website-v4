@@ -16,6 +16,7 @@ import VendorsMemberHub from "./dashboard/VendorsMemberHub";
 import VendorLocationSetup from "./dashboard/VendorLocationSetup";
 import VendorOrders from "./dashboard/VendorOrders";
 import VendorMilestones from "./dashboard/VendorMilestones";
+import VendorEditProfile from "./dashboard/VendorEditProfile"; // <-- Import the new component
 
 const ProtectedRoute = () => {
   const { clearCache, dataLoading } = useVendorData();
@@ -68,6 +69,7 @@ const VendorRoutes = () => {
           {/* <-- ADD THIS ROUTE */}
           <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
+           <Route path="profile/edit" element={<VendorEditProfile />} /> {/* <-- Add Edit Profile Route */}
           <Route path="analytics" element={<VendorAnalytics />} />
           <Route path="settings" element={<VendorSettings />} />
           <Route path="support" element={<VendorSupport />} />
