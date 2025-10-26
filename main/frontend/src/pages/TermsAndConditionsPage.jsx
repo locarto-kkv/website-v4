@@ -14,61 +14,61 @@ const TermsAndConditionsPage = () => {
     {
       title: "Introduction",
       icon: "fas fa-info-circle", // Example icon, change if desired
-      content: `Welcome to Locarto.in (“Locarto”, “we”, “our”, or “us”)[cite: 1]. [cite_start]These Terms and Conditions (“Terms”) govern your access to and use of our website and related services[cite: 2]. [cite_start]By accessing or using the site, you agree to comply with these Terms[cite: 3]. [cite_start]If you do not agree, please discontinue use of the website[cite: 4].`
+      content: `Welcome to Locarto.in (“Locarto”, “we”, “our”, or “us”).These Terms and Conditions (“Terms”) govern your access to and use of our website and related services. By accessing or using the site, you agree to comply with these Terms. If you do not agree, please discontinue use of the website.`
     },
     {
       title: "1. Eligibility",
       icon: "fas fa-user-check", // Example icon
-      content: `By using Locarto.in, you represent that you are at least 18 years of age and have the legal capacity to enter into these Terms under applicable law[cite: 6].`
+      content: `By using Locarto.in, you represent that you are at least 18 years of age and have the legal capacity to enter into these Terms under applicable law.`
     },
     {
       title: "2. Account Registration",
       icon: "fas fa-user-plus", // Example icon
-      content: `Certain features require you to create an account. [cite_start]You agree to provide accurate, complete, and updated information[cite: 8]. [cite_start]You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account[cite: 9]. [cite_start]Notify us immediately of any unauthorized access or breach[cite: 10].`
+      content: `Certain features require you to create an account. You agree to provide accurate, complete, and updated information. You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account. Notify us immediately of any unauthorized access or breach.`
     },
     {
       title: "3. Acceptable Use",
       icon: "fas fa-check-double", // Example icon
-      content: `You agree to use the website only for lawful purposes and not to[cite: 12]:
-[cite_start]• Engage in any activity that disrupts or interferes with the website’s operation[cite: 13];
-[cite_start]• Upload or transmit harmful code, spam, or illegal content[cite: 14];
-[cite_start]• Infringe upon the rights or privacy of others[cite: 15].
-[cite_start]We reserve the right to suspend or terminate your access if you violate these Terms[cite: 16].`
+      content: `You agree to use the website only for lawful purposes and not to:
+• Engage in any activity that disrupts or interferes with the website’s operation;
+• Upload or transmit harmful code, spam, or illegal content;
+• Infringe upon the rights or privacy of others.
+We reserve the right to suspend or terminate your access if you violate these Terms.`
     },
     {
       title: "4. Intellectual Property",
       icon: "fas fa-copyright", // Example icon
-      content: `All content, features, design, and materials on locarto.in are the property of Locarto or its licensors and are protected under applicable intellectual property laws[cite: 18]. [cite_start]You may not reproduce, distribute, or modify any content without prior written consent[cite: 19].`
+      content: `All content, features, design, and materials on locarto.in are the property of Locarto or its licensors and are protected under applicable intellectual property laws. You may not reproduce, distribute, or modify any content without prior written consent.`
     },
     {
       title: "5. Modification of Terms",
       icon: "fas fa-edit", // Example icon
-      content: `Locarto may amend these Terms at any time by posting the updated version on the website[cite: 21]. [cite_start]Continued use of the site after changes are posted constitutes acceptance of the revised Terms[cite: 22].`
+      content: `Locarto may amend these Terms at any time by posting the updated version on the website . Continued use of the site after changes are posted constitutes acceptance of the revised Terms.`
     },
     {
       title: "6. Termination",
       icon: "fas fa-ban", // Example icon
-      content: `We may terminate or suspend access to the website at our discretion, without prior notice, if we believe you have violated these Terms or engaged in unlawful activity[cite: 24].`
+      content: `We may terminate or suspend access to the website at our discretion, without prior notice, if we believe you have violated these Terms or engaged in unlawful activity.`
     },
     {
       title: "7. Limitation of Liability",
       icon: "fas fa-exclamation-triangle", // Example icon
-      content: `To the maximum extent permitted by law, Locarto shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use or inability to use the website, including but not limited to data loss, loss of profits, or unauthorized access to information[cite: 26].`
+      content: `To the maximum extent permitted by law, Locarto shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use or inability to use the website, including but not limited to data loss, loss of profits, or unauthorized access to information.`
     },
     {
       title: "8. Governing Law",
       icon: "fas fa-gavel", // Example icon
-      content: `These Terms shall be governed by and construed in accordance with the laws of India[cite: 28]. [cite_start]Any disputes shall be subject to the exclusive jurisdiction of the courts in Mumbai, India[cite: 29].`
+      content: `These Terms shall be governed by and construed in accordance with the laws of India . Any disputes shall be subject to the exclusive jurisdiction of the courts in Mumbai, India.`
     },
     {
       title: "9. Dispute Resolution",
       icon: "fas fa-balance-scale", // Example icon
-      content: `In case of any dispute, the parties shall first attempt to resolve it amicably[cite: 31]. [cite_start]If unresolved, the matter shall be referred to arbitration under the Indian Arbitration and Conciliation Act, 1996. The arbitration shall be conducted in English, in Mumbai, and the decision shall be final and binding[cite: 32].`
+      content: `In case of any dispute, the parties shall first attempt to resolve it amicably . If unresolved, the matter shall be referred to arbitration under the Indian Arbitration and Conciliation Act, 1996. The arbitration shall be conducted in English, in Mumbai, and the decision shall be final and binding.`
     },
     {
       title: "10. Contact Us",
       icon: "fas fa-envelope", // Example icon
-      content: `For any questions, please contact: Email: team@locarto.in [cite: 34]`
+      content: `For any questions, please contact: Email: team@locarto.in `
     }
   ];
 
