@@ -38,43 +38,43 @@ export const updateProfile = async (req, res) => {
     const imgUploadUrls = {};
     const fileUploadUrls = [];
 
-    if (newProfileData.password) {
+    if (newProfileData.profile.password) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
-      newProfileData.password = hashedPassword;
+      newProfileData.profile.password = hashedPassword;
     }
 
-    if (newProfileData.brand_logo_1) {
+    if (newProfileData.profile.brand_logo_1) {
       const imgUploadUrl = await getFileUploadUrl(
         userId,
-        newProfileData.brand_logo_1,
+        newProfileData.profile.brand_logo_1,
         "brand_logos"
       );
 
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
 
       imgUploadUrls.brand_logo_1 = imgUploadUrl;
-      newProfileData.brand_logo_1 = imgPublicUrl;
+      newProfileData.profile.brand_logo_1 = imgPublicUrl;
     }
 
-    if (newProfileData.brand_logo_2) {
+    if (newProfileData.profile.brand_logo_2) {
       const imgUploadUrl = await getFileUploadUrl(
         userId,
-        newProfileData.brand_logo_2,
+        newProfileData.profile.brand_logo_2,
         "brand_logos"
       );
 
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
 
       imgUploadUrls.brand_logo_2 = imgUploadUrl;
-      newProfileData.brand_logo_2 = imgPublicUrl;
+      newProfileData.profile.brand_logo_2 = imgPublicUrl;
     }
 
-    if (newProfileData.documents) {
+    if (newProfileData.profile.documents) {
       const filePublicUrls = {};
 
       for (const [key, fileMetadata] of Object.entries(
-        newProfileData.documents
+        newProfileData.profile.documents
       )) {
         const fileUploadUrl = await getFileUploadUrl(
           userId,
@@ -89,7 +89,7 @@ export const updateProfile = async (req, res) => {
         filePublicUrls[key] = publicUrl;
       }
 
-      newProfileData.documents = filePublicUrls;
+      newProfileData.profile.documents = filePublicUrls;
     }
 
     if (newProfileData.address) {
@@ -104,7 +104,7 @@ export const updateProfile = async (req, res) => {
 
     const { data: updatedUser, error } = await db
       .from("vendors")
-      .update({ ...newProfileData.profile })
+      .update(newProfileData.profile)
       .eq("id", userId)
       .select()
       .single();
@@ -130,6 +130,7 @@ export const deleteProfile = async (req, res) => {
     const userId = req.user.id;
 
     await db.from("vendors").delete().eq("id", userId);
+    await db.from("addresses").delete().eq("vendor_id", userId);
     await deleteFolder(userId, "brand-logos");
     await deleteFolder(userId, "vendor-documents");
 

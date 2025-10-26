@@ -2,7 +2,7 @@ import { axiosInstance } from "../../lib/axios.js";
 
 const BASE_URL = "/consumer/review";
 
-export const ReviewService = {
+export const ConsumerReviewService = {
   getReviews: async () => {
     const response = await axiosInstance.get(`${BASE_URL}/`);
     return response.data;
