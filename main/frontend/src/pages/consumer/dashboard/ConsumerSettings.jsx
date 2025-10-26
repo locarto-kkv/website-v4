@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useConsumerData } from "../../../context/consumer/consumerDataContext";
 
-// Reusable Toggle Switch Component with responsive sizing
 const ToggleSwitch = ({ enabled, onChange, color = "orange" }) => (
   <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
     <input
@@ -24,7 +23,6 @@ const ToggleSwitch = ({ enabled, onChange, color = "orange" }) => (
   </label>
 );
 
-// Input field component with responsive padding and text size
 const EditableInput = ({
   label,
   id,
@@ -50,7 +48,7 @@ const EditableInput = ({
       onChange={onChange}
       readOnly={!isEditing}
       placeholder={placeholder}
-      className={`w-full p-3 text-sm sm:text-base border rounded-xl transition-colors focus:outline-none ${
+      className={`w-full p-2.5 md:p-3 text-sm sm:text-base border rounded-xl transition-colors focus:outline-none ${
         isEditing
           ? "border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 bg-white"
           : "border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed"
@@ -90,7 +88,7 @@ const CustomerSettings = () => {
     setLoading(true);
     console.log("Saving Profile Data:", profileData);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setIsEditingAccountInfo(false);
       alert("Settings saved successfully!");
     } catch (error) {
@@ -115,20 +113,21 @@ const CustomerSettings = () => {
   }`.replace(/ ,|, $/g, "");
 
   return (
-    // Main grid stacks vertically on mobile, switches to 4 columns on extra-large screens
-    <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">
-      {/* Main content area */}
+    // Reduced gap on mobile: gap-3 instead of gap-4
+    <div className="grid grid-cols-1 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
       <div className="xl:col-span-3">
-        <form onSubmit={handleSaveChanges} className="space-y-4 sm:space-y-6">
-          {/* Account Information Section with responsive padding */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100">
-            <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                  <i className="fas fa-user-edit text-white text-base"></i>
+        {/* Reduced spacing on mobile: space-y-3 instead of space-y-4 */}
+        <form onSubmit={handleSaveChanges} className="space-y-3 md:space-y-4 lg:space-y-6">
+          {/* Reduced padding on mobile: p-3 instead of p-4 */}
+          <div className="bg-white rounded-2xl shadow-lg p-3 md:p-4 lg:p-6 border border-gray-100">
+            {/* Reduced gap and margin on mobile */}
+            <div className="flex items-center justify-between gap-2 md:gap-3 mb-3 md:mb-4 lg:mb-6">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <i className="fas fa-user-edit text-white text-sm md:text-base"></i>
                 </div>
                 <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                  <h2 className="text-base md:text-lg lg:text-xl font-bold text-gray-900">
                     Account Information
                   </h2>
                   <p className="text-gray-600 text-xs sm:text-sm">
@@ -140,15 +139,16 @@ const CustomerSettings = () => {
                 <button
                   type="button"
                   onClick={() => setIsEditingAccountInfo(true)}
-                  className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-xs sm:text-sm font-semibold flex items-center gap-2"
+                  className="px-2.5 py-1.5 md:px-3 md:py-1.5 lg:px-4 lg:py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-xs sm:text-sm font-semibold flex items-center gap-1.5 md:gap-2"
                 >
                   <i className="fas fa-pencil-alt text-xs"></i> Edit
                 </button>
               )}
             </div>
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Reduced spacing: space-y-3 instead of space-y-4 */}
+            <div className="space-y-3 md:space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <EditableInput
                   label="Full Name" id="name" name="name"
                   value={profileData.name} onChange={handleInputChange} isEditing={isEditingAccountInfo}
@@ -162,7 +162,8 @@ const CustomerSettings = () => {
                   value={profileData.phone} onChange={handleInputChange} isEditing={isEditingAccountInfo} type="tel"
                 />
               </div>
-              <h3 className="text-md font-semibold text-gray-800 pt-4 border-t mt-4">
+              {/* Reduced padding and margin */}
+              <h3 className="text-sm md:text-md font-semibold text-gray-800 pt-3 md:pt-4 border-t mt-3 md:mt-4">
                 Shipping Address
               </h3>
               <EditableInput
@@ -173,7 +174,7 @@ const CustomerSettings = () => {
                 label="Address Line 2 (Optional)" id="addressLine2" name="addressLine2"
                 value={profileData.addressLine2} onChange={handleInputChange} isEditing={isEditingAccountInfo}
               />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
                 <EditableInput
                   label="City" id="city" name="city"
                   value={profileData.city} onChange={handleInputChange} isEditing={isEditingAccountInfo}
@@ -192,7 +193,7 @@ const CustomerSettings = () => {
                   <button
                     type="button"
                     onClick={() => setIsEditingAccountInfo(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition text-sm font-medium"
+                    className="px-3 py-1.5 md:px-4 md:py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition text-sm font-medium"
                   >
                     Cancel
                   </button>
@@ -201,14 +202,14 @@ const CustomerSettings = () => {
             </div>
           </div>
 
-          {/* Notifications Section with responsive padding */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100">
-            <div className="flex items-center gap-3 mb-4 sm:mb-6">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <i className="fas fa-bell text-white"></i>
+          {/* Notifications Section - reduced padding */}
+          <div className="bg-white rounded-2xl shadow-lg p-3 md:p-4 lg:p-6 border border-gray-100">
+            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4 lg:mb-6">
+              <div className="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <i className="fas fa-bell text-white text-sm md:text-base"></i>
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                <h2 className="text-base md:text-lg lg:text-xl font-bold text-gray-900">
                   Notifications
                 </h2>
                 <p className="text-gray-600 text-xs sm:text-sm">
@@ -216,20 +217,21 @@ const CustomerSettings = () => {
                 </p>
               </div>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            {/* Reduced spacing: space-y-2 instead of space-y-3 */}
+            <div className="space-y-2 md:space-y-3">
+              <div className="flex items-center justify-between p-2.5 md:p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700 font-medium text-sm">
                   Order updates via Email
                 </span>
                 <ToggleSwitch enabled={emailNotifications} onChange={() => toggleSetting(setEmailNotifications)} color="purple" />
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-2.5 md:p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700 font-medium text-sm">
                   Order updates via SMS
                 </span>
                 <ToggleSwitch enabled={smsNotifications} onChange={() => toggleSetting(setSmsNotifications)} color="purple" />
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-2.5 md:p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700 font-medium text-sm">
                   Promotional & Marketing Emails
                 </span>
@@ -238,12 +240,12 @@ const CustomerSettings = () => {
             </div>
           </div>
 
-          {/* Save Button with responsive padding */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 flex justify-end">
+          {/* Save Button - reduced padding */}
+          <div className="bg-white rounded-2xl shadow-lg p-3 md:p-4 lg:p-6 border border-gray-100 flex justify-end">
             <button
               type="submit"
               disabled={loading || !isEditingAccountInfo}
-              className={`py-3 px-6 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2 ${
+              className={`py-2.5 px-5 md:py-3 md:px-6 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2 ${
                 loading || !isEditingAccountInfo ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -257,15 +259,15 @@ const CustomerSettings = () => {
         </form>
       </div>
 
-      {/* Sidebar Area with responsive padding */}
-      <div className="xl:col-span-1 space-y-4 sm:space-y-6">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
-          <div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md flex-shrink-0">
+      {/* Sidebar Area - reduced spacing */}
+      <div className="xl:col-span-1 space-y-3 md:space-y-4 lg:space-y-6">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-3 md:p-4 lg:p-6">
+          <div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:items-center gap-3 md:gap-4 mb-3 md:mb-4">
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-md flex-shrink-0">
               {profileData.name ? profileData.name.charAt(0).toUpperCase() : "?"}
             </div>
             <div>
-              <h3 className="font-bold text-lg text-gray-900">
+              <h3 className="font-bold text-base md:text-lg text-gray-900">
                 {profileData.name || "User"}
               </h3>
               <p className="text-sm text-gray-500 truncate">
@@ -283,53 +285,55 @@ const CustomerSettings = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
-          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center">
-              <i className="fas fa-chart-pie text-green-600"></i>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-3 md:p-4 lg:p-6">
+          <h3 className="font-bold text-gray-900 mb-3 md:mb-4 flex items-center gap-2 text-base md:text-lg">
+            <div className="w-7 h-7 md:w-8 md:h-8 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center">
+              <i className="fas fa-chart-pie text-green-600 text-sm md:text-base"></i>
             </div>
             Your Stats
           </h3>
-          <div className="space-y-3">
-            <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+          {/* Reduced spacing: space-y-2 instead of space-y-3 */}
+          <div className="space-y-2 md:space-y-3">
+            <div className="p-2.5 md:p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
               <p className="text-sm text-gray-600 font-medium">Total Orders</p>
-              <p className="text-2xl font-bold text-gray-900">{totalOrders}</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{totalOrders}</p>
             </div>
-            <div className="p-3 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl border border-yellow-100">
+            <div className="p-2.5 md:p-3 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl border border-yellow-100">
               <p className="text-sm text-gray-600 font-medium">
                 Loyalty Points
               </p>
-              <p className="text-2xl font-bold text-gray-900 flex items-center gap-1">
-                <i className="fas fa-star text-yellow-500 text-xl"></i>
+              <p className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-1">
+                <i className="fas fa-star text-yellow-500 text-lg md:text-xl"></i>
                 {loyaltyPoints}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
-          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center">
-              <i className="fas fa-link text-orange-600"></i>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-3 md:p-4 lg:p-6">
+          <h3 className="font-bold text-gray-900 mb-3 md:mb-4 flex items-center gap-2 text-base md:text-lg">
+            <div className="w-7 h-7 md:w-8 md:h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center">
+              <i className="fas fa-link text-orange-600 text-sm md:text-base"></i>
             </div>
             Quick Links
           </h3>
-          <div className="space-y-2">
+          {/* Reduced spacing: space-y-1.5 instead of space-y-2 */}
+          <div className="space-y-1.5 md:space-y-2">
             <button
               onClick={() => navigate("/consumer/dashboard/orders")}
-              className="w-full text-left p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
+              className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
               <i className="fas fa-box w-4 text-center text-gray-500"></i> My Orders
             </button>
             <button
               onClick={() => navigate("/consumer/dashboard/lists")}
-              className="w-full text-left p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
+              className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
               <i className="fas fa-list w-4 text-center text-gray-500"></i> My Lists
             </button>
             <button
               onClick={() => navigate("/consumer/dashboard/support")}
-              className="w-full text-left p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
+              className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
               <i className="fas fa-headset w-4 text-center text-gray-500"></i> Support
             </button>
