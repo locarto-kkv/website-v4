@@ -2,9 +2,113 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/android-chrome-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="/android-chrome-512x512.png"
+    />
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#ff6b35" />
+    <meta name="msapplication-TileColor" content="#ff6b35" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Locarto - Local Marketplace</title>
+
+    <!-- SEO Meta Tags -->
+    <meta
+      name="description"
+      content="Locarto - Discover and shop from local vendors in your area. Support local businesses and find unique products near you."
+    />
+    <meta
+      name="keywords"
+      content="local marketplace, local shopping, nearby vendors, support local business"
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://locarto.in/" />
+    <meta property="og:title" content="Locarto" />
+    <meta
+      property="og:description"
+      content="Discover and shop from local vendors in your area"
+    />
+    <meta property="og:image" content="https://locarto.in/logo-square.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://locarto.in/" />
+    <meta property="twitter:title" content="Locarto" />
+    <meta
+      property="twitter:description"
+      content="Discover and shop from local vendors in your area"
+    />
+    <meta
+      property="twitter:image"
+      content="https://locarto.in/logo-square.png"
+    />
+
+    <title>Locarto</title>
+
+    <!-- Organization Schema for Google Search Logo -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Locarto",
+        "alternateName": "Locarto Local Marketplace",
+        "url": "https://locarto.in",
+        "logo": "https://locarto.in/logo-square.png",
+        "description": "Locarto is a local marketplace connecting customers with nearby vendors and local businesses.",
+        "foundingDate": "2024",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+91-XXX-XXX-XXXX",
+          "contactType": "Customer Service",
+          "email": "support@locarto.com",
+          "availableLanguage": ["English"]
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Mumbai",
+          "addressRegion": "Maharashtra",
+          "addressCountry": "IN"
+        },
+        "sameAs": [
+          "https://www.facebook.com/locarto",
+          "https://www.twitter.com/locarto",
+          "https://www.instagram.com/locarto",
+          "https://www.linkedin.com/company/locarto"
+        ]
+      }
+    </script>
+
+    <!-- Website Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Locarto",
+        "url": "https://locarto.in",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://locarto.in/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"

@@ -14,6 +14,7 @@ const Homepage = () => {
   const [showError, setShowError] = useState(false);
   const [suggestedCategory, setSuggestedCategory] = useState("");
   const [name, setName] = useState("");
+  const { currentUser } = useAuthStore();
 
   const navigate = useNavigate();
 
@@ -134,7 +135,9 @@ const Homepage = () => {
       const profile = await ConsumerProfileService.getProfile();
       setName(profile.name);
     };
-    func();
+    if (currentUser?.type === "consumer") {
+      func();
+    }
   }, []);
 
   return (

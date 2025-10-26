@@ -54,7 +54,7 @@ export const VendorProductService = {
           response.imgUploadUrls
         );
       }
-
+      toast.success("Product Added");
       return response.product;
     } catch (error) {
       toast.error(error.response?.data?.message || "Add Product failed");
@@ -64,6 +64,8 @@ export const VendorProductService = {
 
   editProduct: async (productId, productData, imagesUpdated) => {
     try {
+      console.log(productData);
+
       let product_images_files = [];
 
       if (imagesUpdated) {
@@ -103,7 +105,7 @@ export const VendorProductService = {
           response.imgUploadUrls
         );
       }
-
+      toast.success("Product Edited");
       return response.product;
     } catch (error) {
       toast.error(error.response?.data?.message || "Edit Product failed");
@@ -116,6 +118,7 @@ export const VendorProductService = {
       const response = await axiosInstance.delete(
         `${BASE_URL}/delete/${productId}`
       );
+      toast.success("Product Deleted");
       return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || "Delete Product failed");

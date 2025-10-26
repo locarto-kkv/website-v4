@@ -13,6 +13,7 @@ export const addProduct = async (req, res) => {
       quantity,
       description,
       price,
+      weight,
       category,
       product_images = null,
     } = req.body;
@@ -26,6 +27,7 @@ export const addProduct = async (req, res) => {
       name,
       quantity,
       price,
+      weight,
       description,
       vendor_id: userId,
       category,
@@ -124,7 +126,7 @@ export const editProduct = async (req, res) => {
 
             const { data: moveData, error: moveError } = await db.storage
               .from("product-images")
-              .move("113/113_product_image_2", newFilePath);
+              .move(currentPath, newFilePath);
 
             if (moveError) throw moveError;
 
@@ -146,9 +148,17 @@ export const editProduct = async (req, res) => {
           }
         }
 
-        // ✅ Case 3: No URL — upload new file
+        // ✅ Case 3: No URL — upload file
         if (!image.url) {
           console.log("CASE 3: ", image);
+          // remove the file if it exists
+          const newFilePath = `${productId}/${productId}_${image.name}`;
+
+          console.log(newFilePath);
+          const resp = await db.storage
+            .from("product-images")
+            .remove([newFilePath]);
+          console.log(resp.data, resp.error);
 
           const imgUploadUrl = await getFileUploadUrl(
             productId,
@@ -156,6 +166,7 @@ export const editProduct = async (req, res) => {
             image,
             "product-images"
           );
+          console.log(imgUploadUrl);
 
           const filePath = imgUploadUrl.filePath;
           const newUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/product-images/${filePath}`;
