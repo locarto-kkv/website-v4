@@ -95,7 +95,7 @@ const CustomerDashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* The DashboardNavbar receives the 'onMenuClick' prop. 
+      {/* The DashboardNavbar receives the 'onMenuClick' prop.
         This function will be called by the hamburger icon on mobile to toggle the sidebar.
         This does not affect the desktop UI as the hamburger icon is hidden on larger screens.
       */}
@@ -115,7 +115,8 @@ const CustomerDashboardLayout = () => {
         />
 
         {/* Main content area */}
-        <main className="flex-1 h-[calc(100vh-70px)] overflow-y-auto">
+        {/* Removed fixed height calculation h-[calc(100vh-70px)] */}
+        <main className="flex-1 overflow-y-auto">
           <div className="p-6 md:p-8">
             {/* Dynamic Page Header */}
             <div className="flex items-center gap-4 mb-8">

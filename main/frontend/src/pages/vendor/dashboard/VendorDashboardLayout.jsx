@@ -132,10 +132,9 @@ const VendorDashboardLayout = () => {
           onClose={closeSidebar}
         />
         {/* The main content area is now the scrollable container */}
-        <main className="flex-1 h-[calc(100vh-70px)] overflow-y-auto">
-          <div className="p-6 md:p-8">
-            {" "}
-            {/* Standardized padding */}
+        {/* Removed fixed height calculation h-[calc(100vh-70px)] */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6 md:p-8"> {/* Standardized padding */}
             {/* Dynamic Page Header */}
             <div className="flex items-center gap-4 mb-8">
               {/* Dynamic Icon */}
