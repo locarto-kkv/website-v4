@@ -6,10 +6,11 @@ import { useAuthStore } from "../store/useAuthStore.jsx";
 import { useConsumerData } from "../context/consumer/consumerDataContext.jsx"; // Adjust if needed
 import { ConsumerListService } from "../services/consumer/consumerListService.js"; // Adjust if needed for cart count
 import locartoImg from "../assets/locarto.png";
-import toast from 'react-hot-toast'; // Ensure toast is imported
+import toast from "react-hot-toast"; // Ensure toast is imported
 import SideCart from "../components/consumer/SideCart.jsx"; // Import SideCart if used
 
-const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling sidebar from layout
+const DashboardNavbar = ({ onMenuClick }) => {
+  // onMenuClick prop for toggling sidebar from layout
   const [dropdownOpen, setDropdownOpen] = useState(false);
   // No need for mobileMenuOpen state here as menu is handled by layout sidebar
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -46,43 +47,10 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
       }
     };
     loadCart();
-  // Ensure ConsumerListService is included if it might change (though unlikely)
+    // Ensure ConsumerListService is included if it might change (though unlikely)
   }, [currentUser, isConsumer, isCartOpen]);
 
-
   // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      // Close desktop dropdown
-      if (
-        dropdownOpen &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setDropdownOpen(false);
-      }
-      // Close mobile bottom sheet
-      if (
-        dropdownOpen && // Reuse dropdownOpen state for mobile overlay
-        mobileDropdownRef.current &&
-        !mobileDropdownRef.current.contains(event.target)
-      ) {
-         // Check if the click target is NOT one of the bottom nav buttons themselves
-         const bottomNavButton = event.target.closest('.safe-area-bottom button');
-         if (!bottomNavButton) {
-             setDropdownOpen(false); // Close if click is outside sheet and not on a bottom button
-         }
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownOpen]); // Re-run when dropdownOpen changes
-
 
   // Close mobile dropdown on navigation
   useEffect(() => {
@@ -133,20 +101,28 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
   // Dynamic Navbar Title (Used in mobile overlay)
   const navbarTitle = () => {
     switch (currentUser?.type) {
-      case "vendor": return "Vendor Dashboard";
-      case "consumer": return "Customer Dashboard";
-      case "admin": return "Admin Dashboard";
-      default: return "Dashboard";
+      case "vendor":
+        return "Vendor Dashboard";
+      case "consumer":
+        return "Customer Dashboard";
+      case "admin":
+        return "Admin Dashboard";
+      default:
+        return "Dashboard";
     }
   };
 
   // Dynamic Profile/Settings Link (Used in mobile overlay)
   const profileLink = () => {
     switch (currentUser?.type) {
-      case "vendor": return "/vendor/dashboard/profile";
-      case "consumer": return "/consumer/dashboard/settings";
-      case "admin": return "/admin/dashboard";
-      default: return "/";
+      case "vendor":
+        return "/vendor/dashboard/profile";
+      case "consumer":
+        return "/consumer/dashboard/settings";
+      case "admin":
+        return "/admin/dashboard";
+      default:
+        return "/";
     }
   };
 
@@ -212,10 +188,14 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
               {currentUser ? (
                 // Display user initial or generic icon if no name/email
                 <span className="font-semibold text-xs sm:text-sm">
-                  {(currentUser?.name?.charAt(0) || currentUser?.email?.charAt(0) || '?').toUpperCase()}
+                  {(
+                    currentUser?.name?.charAt(0) ||
+                    currentUser?.email?.charAt(0) ||
+                    "?"
+                  ).toUpperCase()}
                 </span>
-                 // <i className="fas fa-user text-sm sm:text-base"></i> // Alternative icon
               ) : (
+                // <i className="fas fa-user text-sm sm:text-base"></i> // Alternative icon
                 <i className="fas fa-user-plus text-sm sm:text-base"></i> // Should not happen in dashboard
               )}
             </button>
@@ -238,7 +218,11 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
                       role="menuitem"
                     >
                       {/* Use dynamic icon/text */}
-                      <i className={`fas ${isConsumer ? "fa-cog" : "fa-user"} w-4 text-center text-gray-500`}></i>
+                      <i
+                        className={`fas ${
+                          isConsumer ? "fa-cog" : "fa-user"
+                        } w-4 text-center text-gray-500`}
+                      ></i>
                       {isConsumer ? "Settings" : "Profile"}
                     </Link>
 
@@ -254,43 +238,48 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
                     </button>
                   </>
                 ) : (
-                   // Logged out state - shouldn't appear in dashboard context
-                   // Kept for robustness, uses parentheses around fragment
-                  (
-                    <>
-                      <Link
-                        to="/consumer/login"
-                        className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors flex items-center gap-2"
-                        onClick={() => setDropdownOpen(false)}
-                        role="menuitem"
-                      >
-                        <i className="fas fa-user w-4 text-center text-gray-500"></i> Login as Customer
-                      </Link>
-                      <Link
-                        to="/vendor/login"
-                        className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
-                        onClick={() => setDropdownOpen(false)}
-                        role="menuitem"
-                      >
-                        <i className="fas fa-store w-4 text-center text-gray-500"></i> Login as Vendor
-                      </Link>
-                    </>
-                  )
+                  // Logged out state - shouldn't appear in dashboard context
+                  // Kept for robustness, uses parentheses around fragment
+                  <>
+                    <Link
+                      to="/consumer/login"
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                      role="menuitem"
+                    >
+                      <i className="fas fa-user w-4 text-center text-gray-500"></i>{" "}
+                      Login as Customer
+                    </Link>
+                    <Link
+                      to="/vendor/login"
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                      role="menuitem"
+                    >
+                      <i className="fas fa-store w-4 text-center text-gray-500"></i>{" "}
+                      Login as Vendor
+                    </Link>
+                  </>
                 )}
               </div>
             )}
           </div>
         </div>
-         {/* --- END: Right Side Icons --- */}
+        {/* --- END: Right Side Icons --- */}
       </nav>
 
       {/* --- MOBILE BOTTOM NAVIGATION BAR (Remains the same) --- */}
       <div className="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 shadow-lg safe-area-bottom">
-         {/* ... (Content of mobile bottom bar remains unchanged) ... */}
-         <div className="flex items-stretch justify-around px-2">
+        {/* ... (Content of mobile bottom bar remains unchanged) ... */}
+        <div className="flex items-stretch justify-around px-2">
           {/* Menu Button (Toggles Sidebar via prop) */}
           <button
-            onClick={() => { if (onMenuClick) { onMenuClick(); setDropdownOpen(false); } }}
+            onClick={() => {
+              if (onMenuClick) {
+                onMenuClick();
+                setDropdownOpen(false);
+              }
+            }}
             className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]"
           >
             <i className={`fas fa-bars text-xl mb-1`}></i>
@@ -327,7 +316,12 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
           {/* Account Button (Toggles Mobile Profile Overlay) */}
           <button
             ref={mobileButtonRef} // Optional ref for mobile button
-            onClick={() => { setDropdownOpen(!dropdownOpen); if (onMenuClick) { /* Optionally close sidebar if open */ } }}
+            onClick={() => {
+              setDropdownOpen(!dropdownOpen);
+              if (onMenuClick) {
+                /* Optionally close sidebar if open */
+              }
+            }}
             className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]"
           >
             <i className="fas fa-user-circle text-xl mb-1"></i>
@@ -338,23 +332,39 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
 
       {/* --- MOBILE PROFILE DROPDOWN OVERLAY (Bottom Sheet - Remains the same) --- */}
       {dropdownOpen && (
-        <div className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-[60] animate-fade-in" onClick={() => setDropdownOpen(false)}>
-            {/* ... (Content of mobile profile overlay remains unchanged) ... */}
-            <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up" ref={mobileDropdownRef} onClick={(e) => e.stopPropagation()}>
+        <div
+          className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-[60] animate-fade-in"
+          onClick={() => setDropdownOpen(false)}
+        >
+          {/* ... (Content of mobile profile overlay remains unchanged) ... */}
+          <div
+            className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up"
+            ref={mobileDropdownRef}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6 space-y-2">
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                    {(currentUser?.name?.charAt(0) || currentUser?.email?.charAt(0) || "U").toUpperCase()}
+                    {(
+                      currentUser?.name?.charAt(0) ||
+                      currentUser?.email?.charAt(0) ||
+                      "U"
+                    ).toUpperCase()}
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-800">
-                      {currentUser?.name?.split(" ")[0] || currentUser?.email?.split("@")[0] || "Account"}
+                      {currentUser?.name?.split(" ")[0] ||
+                        currentUser?.email?.split("@")[0] ||
+                        "Account"}
                     </h3>
                     <p className="text-xs text-gray-500">{navbarTitle()}</p>
                   </div>
                 </div>
-                <button onClick={() => setDropdownOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => setDropdownOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
                   <i className="fas fa-times text-xl"></i>
                 </button>
               </div>
@@ -362,13 +372,17 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
               {currentUser ? (
                 <>
                   <Link
-                     to={profileLink()}
-                     className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
-                     onClick={() => setDropdownOpen(false)}
-                   >
-                     <i className={`fas ${isConsumer ? "fa-cog" : "fa-user"} w-5 text-center text-gray-500`}></i>
-                     {isConsumer ? "Settings" : "Profile"}
-                   </Link>
+                    to={profileLink()}
+                    className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <i
+                      className={`fas ${
+                        isConsumer ? "fa-cog" : "fa-user"
+                      } w-5 text-center text-gray-500`}
+                    ></i>
+                    {isConsumer ? "Settings" : "Profile"}
+                  </Link>
                   <button
                     onClick={handleLogout}
                     disabled={logoutLoading}
@@ -379,26 +393,25 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
                   </button>
                 </>
               ) : (
-                 ( // Added parentheses
-                    <>
-                        <Link
-                            to="/consumer/login"
-                            className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
-                            onClick={() => setDropdownOpen(false)}
-                        >
-                            <i className="fas fa-user w-5 text-center text-gray-500"></i>
-                            Login as Customer
-                        </Link>
-                        <Link
-                            to="/vendor/login"
-                            className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
-                            onClick={() => setDropdownOpen(false)}
-                        >
-                            <i className="fas fa-store w-5 text-center text-gray-500"></i>
-                            Login as Vendor
-                        </Link>
-                    </>
-                 )
+                // Added parentheses
+                <>
+                  <Link
+                    to="/consumer/login"
+                    className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <i className="fas fa-user w-5 text-center text-gray-500"></i>
+                    Login as Customer
+                  </Link>
+                  <Link
+                    to="/vendor/login"
+                    className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <i className="fas fa-store w-5 text-center text-gray-500"></i>
+                    Login as Vendor
+                  </Link>
+                </>
               )}
             </div>
           </div>
@@ -406,7 +419,9 @@ const DashboardNavbar = ({ onMenuClick }) => { // onMenuClick prop for toggling 
       )}
 
       {/* Side Cart (Only rendered if consumer and service exists) */}
-      {isConsumer && ConsumerListService && <SideCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />}
+      {isConsumer && ConsumerListService && (
+        <SideCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      )}
 
       {/* --- Styles (Remains the same) --- */}
       <style>{`
