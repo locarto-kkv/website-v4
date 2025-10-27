@@ -451,10 +451,7 @@ const VendorAnalytics = () => {
           </select> 
 
           {/* Export Button */}
-          <button className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"> {/* */}
-            <i className="fas fa-download"></i> {/* */}
-            Export {/* */}
-          </button> {/* */}
+          
         </div>
       </div>
 
@@ -745,17 +742,7 @@ const VendorAnalytics = () => {
           </div>
 
           {/* Enhanced Action Buttons */}
-          <div className="space-y-3">
-            <button className="w-full flex items-center justify-center gap-2 sm:gap-3 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"> {/* Adjusted size & gap */}
-              <i className="fas fa-download"></i> {/* */}
-              Download Report {/* Simplified text */}
-            </button> {/* */}
-
-            <button className="w-full flex items-center justify-center gap-2 sm:gap-3 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all duration-300 text-sm sm:text-base"> {/* Adjusted size & gap */}
-              <i className="fas fa-share-alt"></i> {/* */}
-              Share Insights {/* */}
-            </button> {/* */}
-          </div>
+         
         </div>
       </div>
     </div>
