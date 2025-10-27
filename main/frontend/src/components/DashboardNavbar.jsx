@@ -186,17 +186,11 @@ const DashboardNavbar = ({ onMenuClick }) => {
               aria-expanded={dropdownOpen}
             >
               {currentUser ? (
-                // Display user initial or generic icon if no name/email
-                <span className="font-semibold text-xs sm:text-sm">
-                  {(
-                    currentUser?.name?.charAt(0) ||
-                    currentUser?.email?.charAt(0) ||
-                    "?"
-                  ).toUpperCase()}
-                </span>
+                // *** MODIFIED PART: Replaced span with i tag for the icon ***
+                <i className="fas fa-user text-sm sm:text-base"></i>
+                // *** END OF MODIFICATION ***
               ) : (
-                // <i className="fas fa-user text-sm sm:text-base"></i> // Alternative icon
-                <i className="fas fa-user-plus text-sm sm:text-base"></i> // Should not happen in dashboard
+                <i className="fas fa-user-plus text-sm sm:text-base"></i> // Icon if not logged in
               )}
             </button>
 
@@ -346,11 +340,8 @@ const DashboardNavbar = ({ onMenuClick }) => {
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                    {(
-                      currentUser?.name?.charAt(0) ||
-                      currentUser?.email?.charAt(0) ||
-                      "U"
-                    ).toUpperCase()}
+                    {/* Display user icon instead of initial for mobile too */}
+                    <i className="fas fa-user text-lg"></i>
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-gray-800">
