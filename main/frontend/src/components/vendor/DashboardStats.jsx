@@ -16,7 +16,9 @@ const StatCard = ({ title, value, iconClass, trend, trendValue, gradient }) => (
           {title}
         </p>
         <div className="flex items-baseline gap-2 mt-2 sm:mt-3">
-          <h3 className="text-2xl sm:text-3xl font-black text-gray-900">{value}</h3>
+          <h3 className="text-2xl sm:text-3xl font-black text-gray-900">
+            {value}
+          </h3>
           {trend && (
             <div
               className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold ${
@@ -42,13 +44,16 @@ const StatCard = ({ title, value, iconClass, trend, trendValue, gradient }) => (
       <div
         className={`relative w-10 h-10 sm:w-14 sm:h-14 ${gradient} rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-110 flex-shrink-0`}
       >
-        <i className={`${iconClass} text-white text-base sm:text-xl drop-shadow-sm`}></i>
+        <i
+          className={`${iconClass} text-white text-base sm:text-xl drop-shadow-sm`}
+        ></i>
       </div>
     </div>
   </div>
 );
 
-const DashboardStats = ({ products = [], vendor = {} }) => { // Default vendor to {}
+const DashboardStats = ({ products = [], vendor = {} }) => {
+  // Default vendor to {}
   const navigate = useNavigate();
 
   const totalRevenue = vendor.total_amount || 0;
@@ -96,12 +101,31 @@ const DashboardStats = ({ products = [], vendor = {} }) => { // Default vendor t
 
   // Quick Actions configuration
   const quickActions = [
-    { label: "Add Product", icon: "fas fa-plus", color: "bg-blue-500", path: "/vendor/products" },
-    { label: "View Orders", icon: "fas fa-list", color: "bg-green-500", path: "/vendor/orders" },
-    { label: "Analytics", icon: "fas fa-chart-bar", color: "bg-purple-500", path: "/vendor/analytics" },
-    { label: "Settings", icon: "fas fa-cog", color: "bg-gray-500", path: "/vendor/settings" },
+    {
+      label: "Add Product",
+      icon: "fas fa-plus",
+      color: "bg-blue-500",
+      path: "/vendor/dashboard/products",
+    },
+    {
+      label: "View Orders",
+      icon: "fas fa-list",
+      color: "bg-green-500",
+      path: "/vendor/dashboard/orders",
+    },
+    {
+      label: "Analytics",
+      icon: "fas fa-chart-bar",
+      color: "bg-purple-500",
+      path: "/vendor/dashboard/analytics",
+    },
+    {
+      label: "Settings",
+      icon: "fas fa-cog",
+      color: "bg-gray-500",
+      path: "/vendor/dashboard/settings",
+    },
   ];
-
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -136,7 +160,9 @@ const DashboardStats = ({ products = [], vendor = {} }) => { // Default vendor t
               <div
                 className={`w-8 h-8 sm:w-10 sm:h-10 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}
               >
-                <i className={`${action.icon} text-white text-xs sm:text-sm`}></i>
+                <i
+                  className={`${action.icon} text-white text-xs sm:text-sm`}
+                ></i>
               </div>
               <span className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-gray-900 text-center">
                 {action.label}
@@ -150,4 +176,3 @@ const DashboardStats = ({ products = [], vendor = {} }) => { // Default vendor t
 };
 
 export default DashboardStats;
-

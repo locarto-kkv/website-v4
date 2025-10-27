@@ -111,7 +111,6 @@ const MapView = () => {
       }
     ).addTo(mapInstance);
 
-    
     markerLayer.current.addTo(mapInstance);
 
     setMap(mapInstance);

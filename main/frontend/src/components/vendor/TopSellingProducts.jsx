@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import {
-  formatCurrency,
-  getProductIcon,
-} from "../../lib/utils.js";
+import { formatCurrency, getProductIcon } from "../../lib/utils.js";
 import { useVendorData } from "../../context/vendor/vendorDataContext";
 
 const TopSellingProducts = () => {
@@ -12,11 +9,25 @@ const TopSellingProducts = () => {
 
   const getRankBadge = (index) => {
     const badges = {
-      0: { color: "bg-gradient-to-r from-yellow-400 to-yellow-600", icon: "fas fa-crown" },
-      1: { color: "bg-gradient-to-r from-gray-400 to-gray-600", icon: "fas fa-medal" },
-      2: { color: "bg-gradient-to-r from-amber-600 to-amber-800", icon: "fas fa-award" },
+      0: {
+        color: "bg-gradient-to-r from-yellow-400 to-yellow-600",
+        icon: "fas fa-crown",
+      },
+      1: {
+        color: "bg-gradient-to-r from-gray-400 to-gray-600",
+        icon: "fas fa-medal",
+      },
+      2: {
+        color: "bg-gradient-to-r from-amber-600 to-amber-800",
+        icon: "fas fa-award",
+      },
     };
-    return badges[index] || { color: "bg-gradient-to-r from-blue-500 to-blue-700", icon: "fas fa-star" };
+    return (
+      badges[index] || {
+        color: "bg-gradient-to-r from-blue-500 to-blue-700",
+        icon: "fas fa-star",
+      }
+    );
   };
 
   const timeRanges = [
@@ -63,7 +74,9 @@ const TopSellingProducts = () => {
             <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
               No sales data available
             </h3>
-            <p className="text-gray-500 text-xs sm:text-sm">Start selling to see top performers.</p>
+            <p className="text-gray-500 text-xs sm:text-sm">
+              Start selling to see top performers.
+            </p>
           </div>
         ) : (
           <div className="space-y-3 sm:space-y-4">
@@ -79,13 +92,19 @@ const TopSellingProducts = () => {
                   <div
                     className={`absolute -top-2.5 -left-2.5 w-7 h-7 ${rankBadge.color} rounded-full flex items-center justify-center shadow-lg z-10`}
                   >
-                    <i className={`${rankBadge.icon} text-white text-[10px]`}></i>
+                    <i
+                      className={`${rankBadge.icon} text-white text-[10px]`}
+                    ></i>
                   </div>
 
                   <div className="flex items-center gap-3 sm:gap-4">
                     <div className="relative flex-shrink-0">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center shadow-sm">
-                        <i className={`${getProductIcon(product.category)} text-indigo-600 text-lg sm:text-xl`}></i>
+                        <i
+                          className={`${getProductIcon(
+                            product.category
+                          )} text-indigo-600 text-lg sm:text-xl`}
+                        ></i>
                       </div>
                     </div>
 
@@ -96,12 +115,18 @@ const TopSellingProducts = () => {
                         </h3>
                         <div
                           className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-xs font-medium flex-shrink-0 ${
-                            growth > 0 ? "bg-green-100 text-green-800"
-                            : growth < 0 ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
+                            growth > 0
+                              ? "bg-green-100 text-green-800"
+                              : growth < 0
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
                           }`}
                         >
-                          <i className={`fas fa-arrow-${growth > 0 ? "up" : growth < 0 ? "down" : "right"} text-[8px] sm:text-[10px]`}></i>
+                          <i
+                            className={`fas fa-arrow-${
+                              growth > 0 ? "up" : growth < 0 ? "down" : "right"
+                            } text-[8px] sm:text-[10px]`}
+                          ></i>
                           {Math.abs(growth)}%
                         </div>
                       </div>
@@ -119,7 +144,9 @@ const TopSellingProducts = () => {
                           <div className="text-base sm:text-lg font-bold text-gray-900">
                             {formatCurrency(product.total_amount)}
                           </div>
-                          <div className="text-xs text-gray-500 -mt-1">revenue</div>
+                          <div className="text-xs text-gray-500 -mt-1">
+                            revenue
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -130,18 +157,8 @@ const TopSellingProducts = () => {
           </div>
         )}
       </div>
-
-      {/* Footer */}
-      <div className="bg-gray-50 px-4 py-2 sm:px-6 sm:py-3 border-t border-gray-200 flex items-center justify-between text-xs sm:text-sm text-gray-600 mt-auto">
-        <div>Top {topProducts.length} products</div>
-        <button className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 font-medium hover:underline transition-colors">
-          <span>Full Report</span>
-          <i className="fas fa-arrow-right text-[10px]"></i>
-        </button>
-      </div>
     </div>
   );
 };
 
 export default TopSellingProducts;
-
