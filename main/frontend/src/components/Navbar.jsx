@@ -5,7 +5,7 @@ import { useAuthStore } from "../store/useAuthStore.jsx";
 import SideCart from "../components/consumer/SideCart.jsx";
 import { ConsumerListService } from "../services/consumer/consumerListService.js";
 import locartoImg from "../assets/locarto.png";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 const Navbar = ({ pageType = "landing" }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -22,7 +22,7 @@ const Navbar = ({ pageType = "landing" }) => {
 
   useEffect(() => {
     const loadCart = async () => {
-      if (currentUser?.type === 'consumer') {
+      if (currentUser?.type === "consumer") {
         try {
           const res = await getLists();
           setCartItemsCount(res?.cart?.length || 0);
@@ -36,36 +36,6 @@ const Navbar = ({ pageType = "landing" }) => {
     };
     loadCart();
   }, [currentUser, getLists, isCartOpen]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownOpen &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownOpen]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 640) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const toggleCart = () => {
     setIsCartOpen((prev) => !prev);
@@ -119,7 +89,10 @@ const Navbar = ({ pageType = "landing" }) => {
       <nav className="hidden sm:flex bg-white shadow-md h-[70px] px-4 justify-between items-center fixed top-0 left-0 w-full z-50 border-b border-gray-100">
         {/* Left Column (Logo) */}
         <div className="flex-1 flex justify-start">
-          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <Link
+            to="/"
+            className="flex items-center hover:opacity-80 transition-opacity"
+          >
             <img
               src={locartoImg}
               alt="Locarto"
@@ -235,7 +208,8 @@ const Navbar = ({ pageType = "landing" }) => {
                       onClick={() => setDropdownOpen(false)}
                       role="menuitem"
                     >
-                      <i className="fas fa-user w-4 text-center text-gray-500"></i> Login as Customer
+                      <i className="fas fa-user w-4 text-center text-gray-500"></i>{" "}
+                      Login as Customer
                     </Link>
                     <Link
                       to="/vendor/login"
@@ -243,7 +217,8 @@ const Navbar = ({ pageType = "landing" }) => {
                       onClick={() => setDropdownOpen(false)}
                       role="menuitem"
                     >
-                      <i className="fas fa-store w-4 text-center text-gray-500"></i> Login as Vendor
+                      <i className="fas fa-store w-4 text-center text-gray-500"></i>{" "}
+                      Login as Vendor
                     </Link>
                   </>
                 )}
@@ -255,7 +230,10 @@ const Navbar = ({ pageType = "landing" }) => {
 
       {/* MOBILE TOP BAR - Fixed */}
       <nav className="sm:hidden bg-white shadow-md h-[60px] px-4 flex items-center fixed top-0 left-0 w-full z-50 border-b border-gray-100">
-        <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+        <Link
+          to="/"
+          className="flex items-center hover:opacity-80 transition-opacity"
+        >
           <img
             src={locartoImg}
             alt="Locarto"
@@ -274,7 +252,11 @@ const Navbar = ({ pageType = "landing" }) => {
             }}
             className="flex flex-col items-center justify-center flex-1 py-2 text-gray-600 hover:text-orange-500 transition-colors active:scale-95 min-h-[64px]"
           >
-            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'} text-xl mb-1`}></i>
+            <i
+              className={`fas ${
+                mobileMenuOpen ? "fa-times" : "fa-bars"
+              } text-xl mb-1`}
+            ></i>
             <span className="text-xs font-medium leading-tight">Menu</span>
           </button>
 
@@ -307,12 +289,21 @@ const Navbar = ({ pageType = "landing" }) => {
 
       {/* MOBILE MENU OVERLAY */}
       {mobileMenuOpen && (
-        <div className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in" onClick={() => setMobileMenuOpen(false)}>
-          <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl max-h-[60vh] overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div
+            className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl max-h-[60vh] overflow-y-auto animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6 space-y-2">
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                 <h3 className="text-lg font-bold text-gray-800">Menu</h3>
-                <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
                   <i className="fas fa-times text-xl"></i>
                 </button>
               </div>
@@ -344,7 +335,10 @@ const Navbar = ({ pageType = "landing" }) => {
               </button>
 
               <button
-                onClick={() => { handleSectionNavigation("testimonials"); setMobileMenuOpen(false); }}
+                onClick={() => {
+                  handleSectionNavigation("testimonials");
+                  setMobileMenuOpen(false);
+                }}
                 className="w-full flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-orange-50 hover:text-orange-500 rounded-lg transition-colors font-medium text-left"
               >
                 <i className="fas fa-star w-5 text-center"></i>
@@ -357,12 +351,21 @@ const Navbar = ({ pageType = "landing" }) => {
 
       {/* MOBILE PROFILE DROPDOWN OVERLAY */}
       {dropdownOpen && (
-        <div className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in" onClick={() => setDropdownOpen(false)}>
-          <div className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-40 animate-fade-in"
+          onClick={() => setDropdownOpen(false)}
+        >
+          <div
+            className="absolute bottom-16 left-0 w-full bg-white rounded-t-2xl shadow-xl animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6 space-y-2">
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
                 <h3 className="text-lg font-bold text-gray-800">Account</h3>
-                <button onClick={() => setDropdownOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => setDropdownOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
                   <i className="fas fa-times text-xl"></i>
                 </button>
               </div>
@@ -386,6 +389,7 @@ const Navbar = ({ pageType = "landing" }) => {
                 </>
               ) : (
                 <>
+                  {console.log("Open")}
                   <Link
                     to="/consumer/login"
                     className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
