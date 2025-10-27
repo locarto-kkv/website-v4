@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useData } from "../../context/dataContext";
-import { useConsumerData } from "../../context/consumer/consumerDataContext";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
 import { ConsumerProductService } from "../../services/consumer/consumerProductService";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -53,10 +52,8 @@ const ProductViewPage = () => {
   const { blogs } = useData();
 
   // Always call useConsumerData hook (React hooks must be called unconditionally)
-  const consumerDataContext = useConsumerData();
-  const { updateList, removeFromList } = ConsumerListService;
+  const { getLists, updateList, removeFromList } = ConsumerListService;
 
-  // Check if user is consumer for enabling features
   const isConsumer = currentUser?.type === "consumer";
 
   const [product, setProduct] = useState(null);
@@ -68,6 +65,20 @@ const ProductViewPage = () => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [cartItem, setCartItem] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
+
+  const fetchLists = async () => {
+    const lists = await getLists();
+    setIsInWishlist(
+      lists.wishlist?.some((item) => item.product_id === product.id) || false
+    );
+    const foundCartItem = lists.cart?.find((item) => item.id === product.id);
+    setCartItem(foundCartItem || null);
+    if (foundCartItem) {
+      setQuantity(foundCartItem.quantity);
+    } else {
+      setQuantity(1);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -82,34 +93,17 @@ const ProductViewPage = () => {
   }, [productId, blogs]);
 
   useEffect(() => {
-    if (
-      currentUser?.type === "consumer" &&
-      consumerDataContext?.lists &&
-      product
-    ) {
-      setIsInWishlist(
-        consumerDataContext.lists.wishlist?.some(
-          (item) => item.product_id === product.id
-        ) || false
-      );
-      const foundCartItem = consumerDataContext.lists.cart?.find(
-        (item) => item.id === product.id
-      );
-      setCartItem(foundCartItem || null);
-      if (foundCartItem) {
-        setQuantity(foundCartItem.quantity);
-      } else {
-        setQuantity(1);
-      }
+    if (isConsumer && product) {
+      fetchLists();
     } else {
       setIsInWishlist(false);
       setCartItem(null);
       setQuantity(1);
     }
-  }, [consumerDataContext?.lists, product, currentUser]);
+  }, [product, currentUser]);
 
   const handleWishlistToggle = async () => {
-    if (currentUser?.type !== "consumer" || !consumerDataContext) {
+    if (!isConsumer) {
       toast.error("Please log in as a customer to manage wishlist.");
       return;
     }
@@ -122,7 +116,7 @@ const ProductViewPage = () => {
         await updateList("wishlist", 1, product.id);
         toast.success("Added to Wishlist ❤️");
       }
-      await consumerDataContext.fetchLists();
+      await fetchLists();
     } catch (error) {
       toast.error("Could not update Wishlist.");
     }
@@ -133,7 +127,7 @@ const ProductViewPage = () => {
   };
 
   const handleAddToCart = async () => {
-    if (currentUser?.type !== "consumer" || !consumerDataContext) {
+    if (!isConsumer) {
       toast.error("Please log in as a customer to add items.");
       return;
     }
@@ -141,21 +135,21 @@ const ProductViewPage = () => {
     try {
       await updateList("cart", quantity, product.id);
       toast.success(`${quantity} x ${product.name} added to cart! 🛒`);
-      await consumerDataContext.fetchLists();
+      await fetchLists();
     } catch (error) {
       toast.error("Could not add to cart.");
     }
   };
 
   const handleBuyNow = async () => {
-    if (currentUser?.type !== "consumer" || !consumerDataContext) {
+    if (!isConsumer) {
       toast.error("Please log in as a customer to buy.");
       return;
     }
     if (!product) return;
     try {
       await updateList("cart", quantity, product.id);
-      await consumerDataContext.fetchLists();
+      await fetchLists();
       navigate("/consumer/checkout");
     } catch (error) {
       toast.error("Could not proceed to checkout.");

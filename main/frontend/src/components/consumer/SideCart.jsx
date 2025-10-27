@@ -1,6 +1,7 @@
 // src/components/consumer/SideCart.jsx
 import React, { useState, useEffect } from "react";
 // Corrected import path
+import { useAuthStore } from "../../store/useAuthStore";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
 import { useNavigate } from "react-router-dom";
 // Corrected import path
@@ -23,14 +24,16 @@ const SideCart = ({ isOpen, onClose }) => {
   // --- HOOKS ---
   const navigate = useNavigate();
   // Assuming ConsumerListService provides these functions:
+  const { currentUser } = useAuthStore();
   const { getLists, removeFromList, updateList } = ConsumerListService;
 
   // --- EFFECTS ---
   // Load cart items on mount or when isOpen changes
   useEffect(() => {
     if (isOpen) {
+      setLoading(true); // Start loading
+
       const loadCart = async () => {
-        setLoading(true); // Start loading
         try {
           const res = await getLists(); // Changed from getList to getLists
           const currentCartItems = res?.cart || []; // Safely access cart
@@ -40,10 +43,12 @@ const SideCart = ({ isOpen, onClose }) => {
           console.error("Error loading cart:", error);
           // Optionally show an error message to the user
         } finally {
-          setLoading(false); // Stop loading
         }
       };
-      loadCart();
+      if (currentUser?.type === "consumer") {
+        loadCart();
+      }
+      setLoading(false); // Stop loading
     }
   }, [isOpen]); // Depend on isOpen to refresh cart when opened
 
@@ -146,7 +151,10 @@ const SideCart = ({ isOpen, onClose }) => {
       >
         {/* Enhanced Header */}
         <div className="flex justify-between items-center p-5 sm:p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100 flex-shrink-0">
-          <h2 id="cart-title" className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2">
+          <h2
+            id="cart-title"
+            className="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2"
+          >
             <i className="fas fa-shopping-cart text-orange-500"></i>
             Your Cart
             {!loading && cartItems.length > 0 && (
@@ -169,11 +177,10 @@ const SideCart = ({ isOpen, onClose }) => {
           {/* Loading State */}
           {loading ? (
             <div className="text-center py-16 text-gray-500">
-               <i className="fas fa-spinner fa-spin text-3xl mb-4"></i>
-               <p>Loading cart...</p>
+              <i className="fas fa-spinner fa-spin text-3xl mb-4"></i>
+              <p>Loading cart...</p>
             </div>
-          ) :
-          /* Enhanced Empty Cart State */
+          ) : /* Enhanced Empty Cart State */
           cartItems.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -204,53 +211,59 @@ const SideCart = ({ isOpen, onClose }) => {
                     style={{
                       animation: `slideIn 0.3s ease-out ${index * 0.05}s both`, // Staggered animation
                     }}
+                    onClick={() => navigate(`/product/${item.product_id}`)}
                   >
                     {/* Image */}
                     <div className="relative flex-shrink-0">
                       <img
                         // Use product_images safely
-                        src={item.product_images?.[0]?.url || 'https://placehold.co/80x80/e2e8f0/e2e8f0?text=IMG'}
-                        alt={item.name || 'Product'} // Use name safely
+                        src={
+                          item.product_images?.[0]?.url ||
+                          "https://placehold.co/80x80/e2e8f0/e2e8f0?text=IMG"
+                        }
+                        alt={item.name || "Product"} // Use name safely
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg shadow-sm border border-gray-200"
                       />
                       {/* Quantity Badge */}
-                       <div className="absolute -top-2 -right-2 w-5 h-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow">
+                      <div className="absolute -top-2 -right-2 w-5 h-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow">
                         {item.quantity}
-                       </div>
+                      </div>
                     </div>
                     {/* Details and Actions */}
                     <div className="flex-1 min-w-0">
-                       <h3 className="font-semibold text-gray-800 truncate text-sm sm:text-base">
+                      <h3 className="font-semibold text-gray-800 truncate text-sm sm:text-base">
                         {item.name || "Product Name"}
-                       </h3>
-                       <p className="text-orange-600 font-bold text-sm sm:text-base">
-                         {formatCurrency(item.price)}
-                       </p>
-                        {/* Quantity Controls */}
-                       <div className="flex items-center gap-2 mt-2">
-                          <button
-                            className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-orange-600 border border-gray-300 rounded-md transition-colors duration-200 hover:border-orange-300"
-                            onClick={() => updateQuantity(item.product_id, -1)}
-                            aria-label={`Decrease quantity of ${item.name}`}
-                          >
-                            <i className="fas fa-minus text-xs"></i>
-                          </button>
-                          <span className="w-8 text-center font-medium text-gray-800 text-sm">{item.quantity}</span>
-                          <button
-                            className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-orange-600 border border-gray-300 rounded-md transition-colors duration-200 hover:border-orange-300"
-                            onClick={() => updateQuantity(item.product_id, 1)}
-                            aria-label={`Increase quantity of ${item.name}`}
-                          >
-                            <i className="fas fa-plus text-xs"></i>
-                          </button>
-                       </div>
+                      </h3>
+                      <p className="text-orange-600 font-bold text-sm sm:text-base">
+                        {formatCurrency(item.price)}
+                      </p>
+                      {/* Quantity Controls */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-orange-600 border border-gray-300 rounded-md transition-colors duration-200 hover:border-orange-300"
+                          onClick={() => updateQuantity(item.product_id, -1)}
+                          aria-label={`Decrease quantity of ${item.name}`}
+                        >
+                          <i className="fas fa-minus text-xs"></i>
+                        </button>
+                        <span className="w-8 text-center font-medium text-gray-800 text-sm">
+                          {item.quantity}
+                        </span>
+                        <button
+                          className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-orange-600 border border-gray-300 rounded-md transition-colors duration-200 hover:border-orange-300"
+                          onClick={() => updateQuantity(item.product_id, 1)}
+                          aria-label={`Increase quantity of ${item.name}`}
+                        >
+                          <i className="fas fa-plus text-xs"></i>
+                        </button>
+                      </div>
                     </div>
                     {/* Remove Button */}
                     <button
                       className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0"
                       onClick={() => removeFromCart(item.product_id)}
                       title="Remove item"
-                       aria-label={`Remove ${item.name} from cart`}
+                      aria-label={`Remove ${item.name} from cart`}
                     >
                       <i className="fas fa-trash text-sm"></i>
                     </button>
@@ -289,9 +302,13 @@ const SideCart = ({ isOpen, onClose }) => {
                     Apply
                   </button>
                 </div>
-                 {/* Coupon Message Area */}
+                {/* Coupon Message Area */}
                 {couponMessage && (
-                  <p className={`mt-2 text-xs font-medium ${couponApplied ? 'text-green-600' : 'text-red-600'}`}>
+                  <p
+                    className={`mt-2 text-xs font-medium ${
+                      couponApplied ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
                     {couponMessage}
                   </p>
                 )}
@@ -322,7 +339,7 @@ const SideCart = ({ isOpen, onClose }) => {
                       {formatCurrency(prices.tax)}
                     </span>
                   </div>
-                   {/* Example Discount - Add logic later */}
+                  {/* Example Discount - Add logic later */}
                   {/* {couponApplied && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>
@@ -335,7 +352,8 @@ const SideCart = ({ isOpen, onClose }) => {
                     <div className="flex justify-between font-bold text-base text-gray-900">
                       <span>Total</span>
                       <span className="text-orange-600">
-                        {formatCurrency(prices.total)} {/* Adjust if discount applied */}
+                        {formatCurrency(prices.total)}{" "}
+                        {/* Adjust if discount applied */}
                       </span>
                     </div>
                   </div>
@@ -360,12 +378,12 @@ const SideCart = ({ isOpen, onClose }) => {
             <span>Proceed to Checkout</span>
             <i className="fas fa-arrow-right text-sm"></i>
           </button>
-           <button
-             onClick={onClose}
-             className="w-full text-center text-gray-500 hover:text-gray-700 mt-3 text-sm font-medium"
-           >
-             or Continue Shopping
-           </button>
+          <button
+            onClick={onClose}
+            className="w-full text-center text-gray-500 hover:text-gray-700 mt-3 text-sm font-medium"
+          >
+            or Continue Shopping
+          </button>
         </div>
       </div>
 
@@ -386,4 +404,3 @@ const SideCart = ({ isOpen, onClose }) => {
 };
 
 export default SideCart;
-

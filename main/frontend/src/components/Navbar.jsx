@@ -389,7 +389,6 @@ const Navbar = ({ pageType = "landing" }) => {
                 </>
               ) : (
                 <>
-                  {console.log("Open")}
                   <Link
                     to="/consumer/login"
                     className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
