@@ -33,44 +33,7 @@ const Homepage = () => {
   // Popular Products Data
   const popularProducts = [
     //
-    // ... (keep popularProducts array as is) ...
-    {
-      id: 1,
-      name: "Healthy Salad Bowl",
-      description: "Fresh greens, quinoa, tomatoes, and avocado",
-      price: "$12.99",
-      image: "🥗",
-      category: "wellness",
-      bgColor: "from-green-400 to-emerald-500",
-    },
-    {
-      id: 2,
-      name: "Classic Pepperoni Pizza",
-      description: "Cheesy, saucy, and perfectly crispy crust",
-      price: "$18.50",
-      image: "🍕",
-      category: "lifestyle",
-      bgColor: "from-red-400 to-orange-500",
-    },
-    {
-      id: 3,
-      name: "Relaxing Spa Kit",
-      description:
-        "Essential oils and bath bombs for the ultimate day of pampering",
-      price: "$49.99",
-      image: "🧴",
-      category: "personal care",
-      bgColor: "from-purple-400 to-pink-500",
-    },
-    {
-      id: 4,
-      name: "Stylish Watch",
-      description: "Elegant timepiece for everyday wear.",
-      price: "$150.00",
-      image: "⌚️",
-      category: "accessories",
-      bgColor: "from-blue-400 to-indigo-500",
-    },
+   
   ];
 
   // --- Keep handlers (handleSearch, handleInputChange, etc.) as they are ---
@@ -562,9 +525,7 @@ const Homepage = () => {
           {/* Popular Products Section */}
           <section className="mb-12 sm:mb-16 px-2 sm:px-0">
             {/* ... (keep popular products section as is) ... */}
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-12">
-              Featured Products
-            </h2>
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               {popularProducts.map((product) => (
                 <div
