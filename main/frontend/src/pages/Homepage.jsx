@@ -1,11 +1,11 @@
 // src/pages/Homepage.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; // Import useState and useEffect
 import SearchIcon from "../components/SearchIcon";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { getGreeting } from "../lib/utils.js";
-import { getRandomMsg } from "../services/welcomeMsgs.js";
+import { getRandomMsg } from "../services/welcomeMsgs.js"; // Make sure this is imported
 import { useAuthStore } from "../store/useAuthStore.jsx";
 import { ConsumerProfileService } from "../services/consumer/consumerProfileService.js";
 import { VendorProfileService } from "../services/vendor/vendorProfileService.js";
@@ -24,6 +24,7 @@ const Homepage = () => {
   const [suggestedCategory, setSuggestedCategory] = useState("");
   const [name, setName] = useState("");
   const { currentUser } = useAuthStore();
+  const [welcomeMessage, setWelcomeMessage] = useState(""); // Add state for the welcome message
 
   const navigate = useNavigate();
 
@@ -32,9 +33,13 @@ const Homepage = () => {
 
   // Popular Products Data
   const popularProducts = [
-    //
    
   ];
+
+  // Set welcome message once on mount
+  useEffect(() => {
+    setWelcomeMessage(getRandomMsg()); // Set the message only once on mount
+  }, []); // Empty dependency array ensures it runs only once
 
   // --- Keep handlers (handleSearch, handleInputChange, etc.) as they are ---
   const handleSearch = (e) => {
@@ -385,19 +390,18 @@ const Homepage = () => {
 
             {/* Enhanced Main Heading */}
             <div className="relative mb-4 sm:mb-6 px-2">
-              {/* ... (heading content) ... */}
               <div className="text-center space-y-2 sm:space-y-3">
-                {/* Larger gradient headline */}
+                {/* Greeting */}
                 <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-black relative">
                   <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent relative z-10 block animate-pulse leading-tight sm:leading-normal">
                     {getGreeting(name)}
                   </span>
                 </h1>
 
-                {/* Slightly smaller secondary text */}
+                {/* Welcome Message */}
                 <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-extrabold relative">
                   <span className="bg-gradient-to-r from-gray-900 via-black to-gray-800 bg-clip-text text-transparent relative z-10 block leading-tight sm:leading-normal">
-                    {getRandomMsg()}
+                    {welcomeMessage} {/* Use the state variable here */}
                   </span>
                 </h2>
 
@@ -408,7 +412,6 @@ const Homepage = () => {
 
             {/* Enhanced Subtitle */}
             <p className="text-sm sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed font-light px-2">
-              {/* ... (subtitle content) ... */}
               <span className="inline-block animate-fade-in-up">
                 Discover the
               </span>{" "}
