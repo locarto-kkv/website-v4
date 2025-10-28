@@ -1,7 +1,7 @@
 // src/pages/consumer/ProductViewPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useData } from "../../context/dataContext";
+import { useDataStore } from "../../store/useDataStore";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
 import { ConsumerProductService } from "../../services/consumer/consumerProductService";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -49,7 +49,7 @@ const ProductViewPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
-  const { blogs } = useData();
+  const { blogs } = useDataStore();
 
   // Always call useConsumerData hook (React hooks must be called unconditionally)
   const { getLists, updateList, removeFromList } = ConsumerListService;

@@ -154,7 +154,6 @@ export const VendorDataProvider = ({ children }) => {
    * -------------------------- */
   const loadVendorData = async () => {
     setDataLoading(true);
-    console.log("DATA LOADING");
 
     try {
       // const cachedProfile = loadCache("vendor_profile");
@@ -178,8 +177,6 @@ export const VendorDataProvider = ({ children }) => {
     } catch (error) {
       console.error("Error loading vendor data:", error);
     } finally {
-      console.log("DATA LOADED");
-
       setDataLoading(false);
     }
   };

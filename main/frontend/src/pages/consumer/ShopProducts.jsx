@@ -1,7 +1,7 @@
 // src/pages/consumer/ShopProducts.jsx
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useData } from "../../context/dataContext";
+import { useDataStore } from "../../store/useDataStore";
 import { useConsumerData } from "../../context/consumer/consumerDataContext";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 const ShopProducts = () => {
   const { vendorId, category } = useParams();
   const { currentUser } = useAuthStore();
-  const { blogs, fetchProductsInBatch } = useData();
+  const { blogs, fetchProductsInBatch } = useDataStore();
   const { updateList, removeFromList } = ConsumerListService;
 
   let cart = [];
@@ -63,7 +63,7 @@ const ShopProducts = () => {
   const toggleWishlist = async (e, productId) => {
     e.preventDefault(); // Prevent navigation when clicking wishlist
     e.stopPropagation();
-    
+
     if (currentUser?.type !== "consumer") {
       toast.error("Please Login as Consumer");
       return;
@@ -84,7 +84,7 @@ const ShopProducts = () => {
   const handleCartChange = async (e, productId, currentQty, delta) => {
     e.preventDefault(); // Prevent navigation when clicking cart buttons
     e.stopPropagation();
-    
+
     if (currentUser?.type !== "consumer") {
       toast.error("Please Login as Consumer");
       return;
@@ -204,7 +204,10 @@ const ShopProducts = () => {
                   <div className="relative mb-4">
                     <div className="overflow-hidden rounded-xl bg-white/5">
                       <img
-                        src={product.product_images?.[0]?.url || 'https://placehold.co/300x300/e2e8f0/e2e8f0?text=IMG'}
+                        src={
+                          product.product_images?.[0]?.url ||
+                          "https://placehold.co/300x300/e2e8f0/e2e8f0?text=IMG"
+                        }
                         alt={product.name}
                         className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500"
                       />
@@ -235,7 +238,8 @@ const ShopProducts = () => {
                     </p>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-white/80">
-                        ⭐ {product.avg_review || 0} ({product.count_reviews || 0})
+                        ⭐ {product.avg_review || 0} (
+                        {product.count_reviews || 0})
                       </span>
                     </div>
                   </div>

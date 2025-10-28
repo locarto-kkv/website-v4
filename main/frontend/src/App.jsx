@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom"; // Ensure Navigate is imported if used
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
-import { DataProvider } from "./context/dataContext";
+import { useDataStore } from "./store/useDataStore";
 import { ConsumerDataProvider } from "./context/consumer/consumerDataContext";
 import { VendorDataProvider } from "./context/vendor/vendorDataContext";
 
@@ -27,18 +27,18 @@ import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   const { authLoading, checkAuth } = useAuthStore();
+  const { loadBlogs } = useDataStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  if (authLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
-  }
+  /** --------------------------
+   * Effect: Load blogs on mount
+   * -------------------------- */
+  useEffect(() => {
+    loadBlogs();
+  }, []);
 
   /** --------------------------
    * Effect: Load data on user change
@@ -51,55 +51,61 @@ function App() {
   //   }
   // }, [currentUser]);
 
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
-      <DataProvider>
-        <Routes>
-          {/* --- PUBLIC ROUTES --- */}
-          <Route path="/" element={<Homepage />} />
-          <Route path="/map" element={<MapView />} />
-          <Route path="/landing" element={<LandingPage />} />
-          <Route path="/discover" element={<DiscoverPage />} />
-          <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
-          <Route
-            path="/shops/:vendorId/products/:category"
-            element={<ShopProducts />}
-          />
-          <Route path="/product/:productId" element={<ProductViewPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          {/* --- MAKE SURE THIS LINE IS CORRECT --- */}
-          <Route
-            path="/terms-and-conditions"
-            element={<TermsAndConditionsPage />}
-          />
-          {/* -------------------------------------- */}
-          <Route path="/alerts" element={<AlertsPage />} />
+      <Routes>
+        {/* --- PUBLIC ROUTES --- */}
+        <Route path="/" element={<Homepage />} />
+        <Route path="/map" element={<MapView />} />
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/discover" element={<DiscoverPage />} />
+        <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
+        <Route
+          path="/shops/:vendorId/products/:category"
+          element={<ShopProducts />}
+        />
+        <Route path="/product/:productId" element={<ProductViewPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        {/* --- MAKE SURE THIS LINE IS CORRECT --- */}
+        <Route
+          path="/terms-and-conditions"
+          element={<TermsAndConditionsPage />}
+        />
+        {/* -------------------------------------- */}
+        <Route path="/alerts" element={<AlertsPage />} />
 
-          {/* --- ADMIN ROUTES --- */}
-          <Route path="admin/*" element={<AdminRoutes />} />
+        {/* --- ADMIN ROUTES --- */}
+        <Route path="admin/*" element={<AdminRoutes />} />
 
-          {/* --- VENDOR ROUTES --- */}
-          <Route
-            path="vendor/*"
-            element={
-              <VendorDataProvider>
-                <VendorRoutes />
-              </VendorDataProvider>
-            }
-          />
+        {/* --- VENDOR ROUTES --- */}
+        <Route
+          path="vendor/*"
+          element={
+            <VendorDataProvider>
+              <VendorRoutes />
+            </VendorDataProvider>
+          }
+        />
 
-          {/* --- CONSUMER ROUTES --- */}
-          <Route
-            path="consumer/*"
-            element={
-              <ConsumerDataProvider>
-                <ConsumerRoutes />
-              </ConsumerDataProvider>
-            }
-          />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </DataProvider>
+        {/* --- CONSUMER ROUTES --- */}
+        <Route
+          path="consumer/*"
+          element={
+            <ConsumerDataProvider>
+              <ConsumerRoutes />
+            </ConsumerDataProvider>
+          }
+        />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
 
       <Toaster />
     </div>

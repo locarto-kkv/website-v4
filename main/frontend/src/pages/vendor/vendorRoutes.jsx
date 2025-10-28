@@ -20,13 +20,8 @@ import VendorEditProfile from "./dashboard/VendorEditProfile"; // <-- Import the
 import { useEffect } from "react";
 
 const ProtectedRoute = () => {
-  const { dataLoading, loadVendorData } = useVendorData();
+  const { dataLoading } = useVendorData();
   const { currentUser } = useAuthStore();
-  console.log(dataLoading);
-
-  useEffect(() => {
-    if (currentUser?.type === "vendor") loadVendorData();
-  }, [currentUser]);
 
   if (currentUser?.type !== "vendor") {
     return <Navigate to="/vendor/login" replace />;

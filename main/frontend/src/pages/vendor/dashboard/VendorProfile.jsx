@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useVendorData } from "../../../context/vendor/vendorDataContext";
-import { useData } from "../../../context/dataContext";
+import { useDataStore } from "../../../store/useDataStore";
 import { formatCurrency } from "../../../lib/utils"; // Import formatCurrency
 
 const VendorProfile = () => {
-  const { blogs } = useData();
+  const { blogs } = useDataStore();
   const { vendor, profile, dataLoading } = useVendorData();
   const navigate = useNavigate();
 
@@ -15,7 +15,8 @@ const VendorProfile = () => {
   const [documents, setDocuments] = useState([]);
 
   useEffect(() => {
-    if (vendor && profile && blogs) { // Ensure blogs is also loaded
+    if (vendor && profile && blogs) {
+      // Ensure blogs is also loaded
       // Find the blog entry associated with the vendor profile
       // Using String comparison for robustness in case IDs are numbers in one place and strings elsewhere
       const vendorBlog = blogs.find((b) => String(b.id) === String(profile.id)); // Assuming profile ID matches blog/vendor ID
@@ -29,13 +30,17 @@ const VendorProfile = () => {
         companyName: profile?.name || "N/A", // Use profile name first
         email: profile?.email || "N/A",
         phone: profile?.primary_contact?.phone_no || profile?.phone_no || "N/A", // Check extra data
-        address: profile?.address?.find(addr => addr.label === 'Main') || profile?.address?.[0] || {}, // Prefer 'Main' address, fallback to first
+        address:
+          profile?.address?.find((addr) => addr.label === "Main") ||
+          profile?.address?.[0] ||
+          {}, // Prefer 'Main' address, fallback to first
         brandLogo: profile?.brand_logo_1 || "",
         established: profile?.created_at
           ? new Date(profile.created_at).getFullYear()
           : "N/A",
         // Get description from the matched blog entry
-        description: vendorBlog?.blog?.[0]?.description || "No description available.",
+        description:
+          vendorBlog?.blog?.[0]?.description || "No description available.",
       });
 
       setMetrics({
@@ -61,13 +66,29 @@ const VendorProfile = () => {
   const getDocumentStatus = (status) => {
     switch (status?.toLowerCase()) {
       case "verified":
-        return { color: "bg-green-100 text-green-800", icon: "fas fa-check-circle text-green-600", label: "Verified" };
+        return {
+          color: "bg-green-100 text-green-800",
+          icon: "fas fa-check-circle text-green-600",
+          label: "Verified",
+        };
       case "pending":
-        return { color: "bg-yellow-100 text-yellow-800", icon: "fas fa-clock text-yellow-600", label: "Pending" };
+        return {
+          color: "bg-yellow-100 text-yellow-800",
+          icon: "fas fa-clock text-yellow-600",
+          label: "Pending",
+        };
       case "rejected":
-        return { color: "bg-red-100 text-red-800", icon: "fas fa-times-circle text-red-600", label: "Rejected" };
+        return {
+          color: "bg-red-100 text-red-800",
+          icon: "fas fa-times-circle text-red-600",
+          label: "Rejected",
+        };
       default:
-        return { color: "bg-gray-100 text-gray-800", icon: "fas fa-file text-gray-500", label: "Unknown" };
+        return {
+          color: "bg-gray-100 text-gray-800",
+          icon: "fas fa-file text-gray-500",
+          label: "Unknown",
+        };
     }
   };
 
@@ -75,13 +96,33 @@ const VendorProfile = () => {
   const getAccountStatus = (status) => {
     switch (status?.toLowerCase()) {
       case "pending":
-        return { label: "Setup Incomplete", color: "bg-yellow-50 border-yellow-200 text-yellow-800", icon: "fas fa-clock text-yellow-600", desc: "Please complete your setup to access all facilities." };
+        return {
+          label: "Setup Incomplete",
+          color: "bg-yellow-50 border-yellow-200 text-yellow-800",
+          icon: "fas fa-clock text-yellow-600",
+          desc: "Please complete your setup to access all facilities.",
+        };
       case "complete": // Assuming 'complete' means submitted but not verified
-        return { label: "Waiting for Verification", color: "bg-orange-50 border-orange-200 text-orange-800", icon: "fas fa-hourglass-half text-orange-600", desc: "Please wait, our admins will contact you shortly to verify your identity." };
+        return {
+          label: "Waiting for Verification",
+          color: "bg-orange-50 border-orange-200 text-orange-800",
+          icon: "fas fa-hourglass-half text-orange-600",
+          desc: "Please wait, our admins will contact you shortly to verify your identity.",
+        };
       case "verified":
-        return { label: "Account Verified", color: "bg-green-50 border-green-200 text-green-800", icon: "fas fa-check-circle text-green-600", desc: "Your account is verified! You can now access all facilities. Visit the Member's Hub to learn more." };
+        return {
+          label: "Account Verified",
+          color: "bg-green-50 border-green-200 text-green-800",
+          icon: "fas fa-check-circle text-green-600",
+          desc: "Your account is verified! You can now access all facilities. Visit the Member's Hub to learn more.",
+        };
       default:
-        return { label: "Unknown Status", color: "bg-gray-50 border-gray-200 text-gray-700", icon: "fas fa-question-circle text-gray-500", desc: "Account status could not be determined." };
+        return {
+          label: "Unknown Status",
+          color: "bg-gray-50 border-gray-200 text-gray-700",
+          icon: "fas fa-question-circle text-gray-500",
+          desc: "Account status could not be determined.",
+        };
     }
   };
 
@@ -116,7 +157,9 @@ const VendorProfile = () => {
   if (!profileData) {
     return (
       <div className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen text-center">
-        <p className="text-gray-600 mb-4">Could not load profile data or profile is incomplete.</p>
+        <p className="text-gray-600 mb-4">
+          Could not load profile data or profile is incomplete.
+        </p>
         <button
           onClick={openSetup}
           className="bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition"
@@ -127,13 +170,11 @@ const VendorProfile = () => {
     );
   }
 
-
   return (
     // Main container uses responsive gaps
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       {/* Responsive Grid Layout */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">
-
         {/* Main Profile Information (Takes more columns on large screens) */}
         <div className="xl:col-span-3">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
@@ -184,17 +225,16 @@ const VendorProfile = () => {
                   <div className="flex items-center justify-center sm:justify-start gap-1 mt-3 sm:mt-4">
                     <div className="flex items-center gap-0.5">
                       {[...Array(5)].map((_, i) => (
-                          <i
-                            key={i}
-                            className={`fas fa-star text-sm sm:text-base ${
-                              // --- FIX: Use Math.floor on metrics.averageRating ---
-                              i < Math.floor(metrics.averageRating)
-                                ? "text-yellow-300"
-                                : "text-white/30"
-                            }`}
-                          ></i>
-                        )
-                      )}
+                        <i
+                          key={i}
+                          className={`fas fa-star text-sm sm:text-base ${
+                            // --- FIX: Use Math.floor on metrics.averageRating ---
+                            i < Math.floor(metrics.averageRating)
+                              ? "text-yellow-300"
+                              : "text-white/30"
+                          }`}
+                        ></i>
+                      ))}
                     </div>
                     <span className="ml-1 font-bold text-base sm:text-lg bg-white/20 px-2 py-0.5 rounded-lg backdrop-blur-sm">
                       {/* --- FIX: Ensure metrics.averageRating is treated as a number --- */}
@@ -270,7 +310,8 @@ const VendorProfile = () => {
                       </p>
                       <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-1 sm:mt-2">
                         {Object.keys(metrics.categoryCount || {}).length > 0 ? (
-                          Object.keys(metrics.categoryCount).map((category, index) => (
+                          Object.keys(metrics.categoryCount).map(
+                            (category, index) => (
                               <span
                                 key={index}
                                 className="px-2 py-0.5 sm:px-3 sm:py-1 bg-white rounded-full text-[10px] sm:text-xs font-semibold text-gray-700 border border-gray-200 whitespace-nowrap"
@@ -291,7 +332,8 @@ const VendorProfile = () => {
               </div>
 
               {/* Documents Section */}
-              {(accountStatus.label === "Account Verified" || documents.length > 0) && (
+              {(accountStatus.label === "Account Verified" ||
+                documents.length > 0) && (
                 <div className="border-t pt-4 sm:pt-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <h3 className="font-bold text-gray-900 flex items-center gap-2 text-base sm:text-lg">
@@ -333,7 +375,9 @@ const VendorProfile = () => {
                             <span
                               className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 whitespace-nowrap flex-shrink-0 ${statusInfo.color}`}
                             >
-                              <i className={`${statusInfo.icon} text-[10px] sm:text-xs`}></i>
+                              <i
+                                className={`${statusInfo.icon} text-[10px] sm:text-xs`}
+                              ></i>
                               {statusInfo.label}
                             </span>
                           </div>

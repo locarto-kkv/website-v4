@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AdminBlogService } from "../../../services/admin/adminBlogService";
-import { useData } from "../../../context/dataContext";
+import { useDataStore } from "../../../store/useDataStore";
 import BrandIdentityCard from "../../../components/landing/card";
 
 function BlogPage() {
@@ -17,7 +17,7 @@ function BlogPage() {
   const [editingBlog, setEditingBlog] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { blogs, fetchBlogs } = useData();
+  const { blogs, fetchBlogs } = useDataStore();
   const { editBlog, addBlog, deleteBlog } = AdminBlogService;
 
   const handleEdit = async (brand) => {

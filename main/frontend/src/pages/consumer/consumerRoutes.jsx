@@ -20,11 +20,7 @@ import { useEffect } from "react";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
-  const { dataLoading, loadConsumerData } = useConsumerData();
-
-  useEffect(() => {
-    if (currentUser?.type === "consumer") loadConsumerData();
-  }, [currentUser]);
+  const { dataLoading } = useConsumerData();
 
   if (currentUser?.type !== "consumer") {
     return <Navigate to="/consumer/login" replace />;

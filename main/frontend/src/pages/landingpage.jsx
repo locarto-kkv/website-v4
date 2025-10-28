@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useData } from "../context/dataContext.jsx";
+import { useDataStore } from "../store/useDataStore.jsx";
 
 // Components
 import Navbar from "../components/Navbar.jsx";
@@ -24,7 +24,7 @@ const asset4 = "/assets/4.png";
 const asset5 = "/assets/5.png";
 
 const LandingPage = () => {
-  const { blogs } = useData();
+  const { blogs } = useDataStore();
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {

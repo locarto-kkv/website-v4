@@ -1,7 +1,7 @@
 // src/pages/BrandInfoPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useData } from "../context/dataContext.jsx";
+import { useDataStore } from "../store/useDataStore.jsx";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -21,7 +21,7 @@ const asset5 = "/assets/5.png";
 const BrandInfoPage = () => {
   const { brandTitle } = useParams();
   const [brand, setBrand] = useState();
-  const { blogs } = useData();
+  const { blogs } = useDataStore();
   const brandData = blogs.filter((b) => b.blog.length > 0);
 
   // Scroll to top whenever brandId changes

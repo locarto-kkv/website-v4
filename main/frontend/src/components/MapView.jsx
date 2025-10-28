@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import locartoImg from "../assets/locarto.png";
-import { useData } from "../context/dataContext";
+import { useDataStore } from "../store/useDataStore";
 import { useAuthStore } from "../store/useAuthStore";
 
 const MapView = () => {
@@ -12,7 +12,7 @@ const MapView = () => {
   const categoryParam = queryParams.get("category");
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
-  const { blogs, fetchProductsInBatch } = useData();
+  const { blogs, fetchProductsInBatch } = useDataStore();
 
   const categories = [
     {

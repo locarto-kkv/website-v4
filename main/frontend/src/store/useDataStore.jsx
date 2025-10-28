@@ -1,19 +1,17 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { create } from "zustand";
 import toast from "react-hot-toast";
 import { ConsumerBlogService } from "../services/consumer/consumerBlogService.js";
 import { ConsumerProductService } from "../services/consumer/consumerProductService.js";
 
-const DataContext = createContext();
-
-export function DataProvider({ children }) {
-  const [blogs, setBlogs] = useState([]);
-  const [start, setStart] = useState(0);
-  const [dataLoading, setDataLoading] = useState(true);
+export const useDataStore = create((set, get) => ({
+  blogs: [],
+  start: 0,
+  dataLoading: true,
 
   /** --------------------------
    * ✅ Helper: Load cached data
    * -------------------------- */
-  const loadCache = (name) => {
+  loadCache: (name) => {
     try {
       const cached = localStorage.getItem(name);
       if (!cached) return null;
@@ -23,12 +21,12 @@ export function DataProvider({ children }) {
       console.error(`Error loading cache for ${name}:`, error);
       return null;
     }
-  };
+  },
 
   /** --------------------------
    * ✅ Helper: Set cache data
    * -------------------------- */
-  const setCache = (name, data) => {
+  setCache: (name, data) => {
     try {
       localStorage.setItem(
         name,
@@ -37,108 +35,81 @@ export function DataProvider({ children }) {
     } catch (error) {
       console.error(`Error setting cache for ${name}:`, error);
     }
-  };
+  },
 
   /** --------------------------
    * Clear all cached blogs
    * -------------------------- */
-  const clearBlogs = () => {
-    setDataLoading(true);
+  clearBlogs: () => {
+    set({ dataLoading: true });
     try {
       localStorage.removeItem("blogs");
-      setBlogs([]);
+      set({ blogs: [] });
     } finally {
-      setDataLoading(false);
+      set({ dataLoading: false });
     }
-  };
+  },
 
   /** --------------------------
    * Fetch products and merge them with blogs
    * -------------------------- */
-  const fetchProductsInBatch = async (query = {}) => {
-    setDataLoading(true);
+  fetchProductsInBatch: async (query = {}) => {
+    set({ dataLoading: true });
     try {
+      const { start, blogs } = get();
       const response = await ConsumerProductService.getProductsByFilter(
         query,
         start
       );
 
-      // Merge products with blogs by vendor_id
-      setBlogs((prevBlogs) =>
-        prevBlogs.map((blog) => {
-          const vendorProducts = response.filter(
-            (product) => product.vendor_id === blog.id
-          );
-          return {
-            ...blog,
-            products: vendorProducts,
-          };
-        })
-      );
+      const updatedBlogs = blogs.map((blog) => {
+        const vendorProducts = response.filter(
+          (product) => product.vendor_id === blog.id
+        );
+        return { ...blog, products: vendorProducts };
+      });
+
+      set({ blogs: updatedBlogs });
     } catch (error) {
       toast.error("Failed to fetch products");
       console.error("Error fetching products:", error);
     } finally {
-      setDataLoading(false);
+      set({ dataLoading: false });
     }
-  };
+  },
 
   /** --------------------------
    * Fetch blogs (and set cache)
    * -------------------------- */
-  const fetchBlogs = async () => {
-    setDataLoading(true);
+  fetchBlogs: async () => {
+    set({ dataLoading: true });
     try {
       const data = await ConsumerBlogService.getBlogs(0);
-      setBlogs(data);
-      // setCache("blogs", data);
+      set({ blogs: data });
+      // get().setCache("blogs", data);
     } catch (error) {
       toast.error("Failed to fetch blogs");
       console.error("Error fetching blogs:", error);
     } finally {
-      setDataLoading(false);
+      set({ dataLoading: false });
     }
-  };
+  },
 
   /** --------------------------
    * Load blogs from cache or API
    * -------------------------- */
-  const loadBlogs = async () => {
-    setDataLoading(true);
+  loadBlogs: async () => {
+    set({ dataLoading: true });
     try {
-      // const cachedBlogs = loadCache("blogs");
-      // if (cachedBlogs) setBlogs(cachedBlogs);
+      // const cachedBlogs = get().loadCache("blogs");
+      // if (cachedBlogs) set({ blogs: cachedBlogs });
       // else
-      await fetchBlogs();
+      await get().fetchBlogs();
     } catch (error) {
       console.error("Error loading cached blogs:", error);
-      await fetchBlogs();
+      await get().fetchBlogs();
     } finally {
-      setDataLoading(false);
+      set({ dataLoading: false });
     }
-  };
-
-  /** --------------------------
-   * Effect: Load blogs on mount
-   * -------------------------- */
-  useEffect(() => {
-    loadBlogs();
-  }, []);
-
-  return (
-    <DataContext.Provider
-      value={{
-        blogs,
-        dataLoading,
-        fetchBlogs,
-        fetchProductsInBatch,
-      }}
-    >
-      {children}
-    </DataContext.Provider>
-  );
-}
-
-export function useData() {
-  return useContext(DataContext);
-}
+  },
+}));

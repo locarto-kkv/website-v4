@@ -47,13 +47,6 @@ export function ConsumerDataProvider({ children }) {
    * Clear all cache
    * -------------------------- */
   const clearCache = () => {
-    console.log("CLEARING");
-    console.log("CLEARING");
-    console.log("CLEARING");
-    console.log("CLEARING");
-    console.log("CLEARING");
-    console.log("CLEARING");
-
     setDataLoading(true);
     try {
       ["consumer_profile", "consumer_orders", "consumer_lists"].forEach((key) =>
