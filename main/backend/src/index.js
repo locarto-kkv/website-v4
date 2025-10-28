@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import compression from "compression";
 import path from "path";
 import { env } from "./lib/env.js";
 
@@ -18,6 +19,7 @@ const __dirname = path.resolve();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: frontendURL, credentials: true }));
+app.use(compression());
 
 app.use("/api/vendor", vendorRoutes);
 app.use("/api/consumer", consumerRoutes);

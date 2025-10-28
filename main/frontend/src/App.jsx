@@ -14,11 +14,10 @@ import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
-import TermsAndConditionsPage from "./pages/TermsAndConditionsPage"; // <-- VERIFY THIS IMPORT
+import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import ShopProducts from "./pages/consumer/ShopProducts";
 import ProductViewPage from "./pages/consumer/ProductViewPage";
 import AlertsPage from "./pages/AlertsPage";
-
 
 // Other Routes
 import VendorRoutes from "./pages/vendor/vendorRoutes";
@@ -40,6 +39,17 @@ function App() {
     );
   }
 
+  /** --------------------------
+   * Effect: Load data on user change
+   * -------------------------- */
+  // useEffect(() => {
+  //   if (currentUser?.type === "consumer") {
+  //     loadConsumerData();
+  //   } else if (currentUser?.type === "vendor" ){
+  //     loadVendorData();
+  //   }
+  // }, [currentUser]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <DataProvider>
@@ -57,9 +67,12 @@ function App() {
           <Route path="/product/:productId" element={<ProductViewPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           {/* --- MAKE SURE THIS LINE IS CORRECT --- */}
-          <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
+          <Route
+            path="/terms-and-conditions"
+            element={<TermsAndConditionsPage />}
+          />
           {/* -------------------------------------- */}
-           <Route path="/alerts" element={<AlertsPage />} />
+          <Route path="/alerts" element={<AlertsPage />} />
 
           {/* --- ADMIN ROUTES --- */}
           <Route path="admin/*" element={<AdminRoutes />} />

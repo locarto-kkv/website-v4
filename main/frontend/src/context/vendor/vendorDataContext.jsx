@@ -17,12 +17,44 @@ export const VendorDataProvider = ({ children }) => {
 
   const { currentUser } = useAuthStore();
 
+  /** --------------------------
+   * ✅ Helper: Load cached data
+   * -------------------------- */
+  const loadCache = (name) => {
+    try {
+      const cached = localStorage.getItem(name);
+      if (!cached) return null;
+      const parsed = JSON.parse(cached);
+      return parsed?.data || null;
+    } catch (error) {
+      console.error(`Error loading cache for ${name}:`, error);
+      return null;
+    }
+  };
+
+  /** --------------------------
+   * ✅ Helper: Set cache data
+   * -------------------------- */
+  const setCache = (name, data) => {
+    try {
+      localStorage.setItem(
+        name,
+        JSON.stringify({ data, timestamp: Date.now() })
+      );
+    } catch (error) {
+      console.error(`Error setting cache for ${name}:`, error);
+    }
+  };
+
+  /** --------------------------
+   * Clear all cache
+   * -------------------------- */
   const clearCache = () => {
     setDataLoading(true);
     try {
-      localStorage.removeItem("vendor_profile");
-      localStorage.removeItem("vendor_analytics");
-      localStorage.removeItem("vendor_orders");
+      ["vendor_profile", "vendor_analytics", "vendor_orders"].forEach((key) =>
+        localStorage.removeItem(key)
+      );
 
       setAnalyticData([]);
       setOrders([]);
@@ -34,6 +66,9 @@ export const VendorDataProvider = ({ children }) => {
     }
   };
 
+  /** --------------------------
+   * Change analytics range
+   * -------------------------- */
   const changeDataRange = (range) => {
     setDataLoading(true);
     try {
@@ -58,14 +93,14 @@ export const VendorDataProvider = ({ children }) => {
     }
   };
 
-  const getProfile = async () => {
+  /** --------------------------
+   * Fetch profile
+   * -------------------------- */
+  const fetchProfile = async () => {
     setDataLoading(true);
     try {
       const response = await VendorProfileService.getProfile();
-      localStorage.setItem(
-        "vendor_profile",
-        JSON.stringify({ data: response, timestamp: Date.now() })
-      );
+      // setCache("vendor_profile", response);
       setProfile(response);
       return response;
     } catch (error) {
@@ -76,14 +111,14 @@ export const VendorDataProvider = ({ children }) => {
     }
   };
 
-  const getAnalytics = async () => {
+  /** --------------------------
+   * Fetch analytics
+   * -------------------------- */
+  const fetchAnalytics = async () => {
     setDataLoading(true);
     try {
       const response = await VendorAnalyticService.getAnalytics();
-      localStorage.setItem(
-        "vendor_analytics",
-        JSON.stringify({ data: response, timestamp: Date.now() })
-      );
+      // setCache("vendor_analytics", response);
       setAnalyticData(response);
       setProducts(response.products?.total);
       setVendor(response.vendor?.total);
@@ -96,14 +131,14 @@ export const VendorDataProvider = ({ children }) => {
     }
   };
 
-  const getOrders = async () => {
+  /** --------------------------
+   * Fetch orders
+   * -------------------------- */
+  const fetchOrders = async () => {
     setDataLoading(true);
     try {
       const response = await VendorOrderService.getOrders();
-      localStorage.setItem(
-        "vendor_orders",
-        JSON.stringify({ data: response, timestamp: Date.now() })
-      );
+      // setCache("vendor_orders", response);
       setOrders(response);
       return response;
     } catch (error) {
@@ -114,49 +149,40 @@ export const VendorDataProvider = ({ children }) => {
     }
   };
 
+  /** --------------------------
+   * Load vendor data from cache or API
+   * -------------------------- */
   const loadVendorData = async () => {
     setDataLoading(true);
+    console.log("DATA LOADING");
+
     try {
-      const cachedProfile = localStorage.getItem("vendor_profile");
-      const cachedAnalytics = localStorage.getItem("vendor_analytics");
-      const cachedOrders = localStorage.getItem("vendor_orders");
+      // const cachedProfile = loadCache("vendor_profile");
+      // if (cachedProfile) setProfile(cachedProfile);
+      // else
+      await fetchProfile();
 
-      if (cachedProfile) {
-        const parsed = JSON.parse(cachedProfile);
-        setProfile(parsed.data);
-      } else {
-        await getProfile();
-      }
+      // const cachedAnalytics = loadCache("vendor_analytics");
+      // if (cachedAnalytics) {
+      //   setAnalyticData(cachedAnalytics);
+      //   setProducts(cachedAnalytics.products?.total);
+      //   setVendor(cachedAnalytics.vendor?.total);
+      // } else {
+      await fetchAnalytics();
+      // }
 
-      if (cachedAnalytics) {
-        const parsed = JSON.parse(cachedAnalytics);
-        setAnalyticData(parsed.data);
-        setProducts(parsed.data.products?.total);
-        setVendor(parsed.data.vendor?.total);
-      } else {
-        await getAnalytics();
-      }
-
-      if (cachedOrders) {
-        const parsed = JSON.parse(cachedOrders);
-        setOrders(parsed.data);
-      } else {
-        await getOrders();
-      }
+      // const cachedOrders = loadCache("vendor_orders");
+      // if (cachedOrders) setOrders(cachedOrders);
+      // else
+      await fetchOrders();
     } catch (error) {
       console.error("Error loading vendor data:", error);
     } finally {
+      console.log("DATA LOADED");
+
       setDataLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (currentUser?.type === "vendor") {
-      loadVendorData();
-    } else {
-      clearCache();
-    }
-  }, [currentUser]);
 
   return (
     <DataContext.Provider
@@ -167,11 +193,11 @@ export const VendorDataProvider = ({ children }) => {
         orders,
         profile,
         dataLoading,
-        getAnalytics,
-        getOrders,
-        getProfile,
+        fetchAnalytics,
+        fetchOrders,
+        fetchProfile,
+        loadVendorData,
         changeDataRange,
-        clearCache,
       }}
     >
       {children}

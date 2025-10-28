@@ -85,9 +85,6 @@ export const useAuthStore = create(
           set({ currentUser: null });
 
           toast.success("Logout Successful");
-
-          // Redirect to main home page after logout
-          window.location.href = "/";
         } catch (error) {
           toast.error(error.response?.data?.message || "Logout failed");
           console.log("Error in logout:", error);

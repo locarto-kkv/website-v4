@@ -17,13 +17,18 @@ import VendorLocationSetup from "./dashboard/VendorLocationSetup";
 import VendorOrders from "./dashboard/VendorOrders";
 import VendorMilestones from "./dashboard/VendorMilestones";
 import VendorEditProfile from "./dashboard/VendorEditProfile"; // <-- Import the new component
+import { useEffect } from "react";
 
 const ProtectedRoute = () => {
-  const { clearCache, dataLoading } = useVendorData();
+  const { dataLoading, loadVendorData } = useVendorData();
   const { currentUser } = useAuthStore();
+  console.log(dataLoading);
+
+  useEffect(() => {
+    if (currentUser?.type === "vendor") loadVendorData();
+  }, [currentUser]);
 
   if (currentUser?.type !== "vendor") {
-    clearCache();
     return <Navigate to="/vendor/login" replace />;
   } else {
     if (dataLoading) {
@@ -69,7 +74,8 @@ const VendorRoutes = () => {
           {/* <-- ADD THIS ROUTE */}
           <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
-           <Route path="profile/edit" element={<VendorEditProfile />} /> {/* <-- Add Edit Profile Route */}
+          <Route path="profile/edit" element={<VendorEditProfile />} />{" "}
+          {/* <-- Add Edit Profile Route */}
           <Route path="analytics" element={<VendorAnalytics />} />
           <Route path="settings" element={<VendorSettings />} />
           <Route path="support" element={<VendorSupport />} />
