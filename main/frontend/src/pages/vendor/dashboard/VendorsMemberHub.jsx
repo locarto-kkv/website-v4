@@ -1,7 +1,7 @@
 // src/pages/vendor/dashboard/VendorsMemberHub.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useVendorData } from "../../../context/vendor/vendorDataContext"; // Import vendor data context
+import { useVendorDataStore } from "../../../store/vendor/vendorDataStore"; // Import vendor data context
 import { formatCurrency } from "../../../lib/utils"; // Import currency formatting
 
 // --- Define Quantity Milestone Logic ---
@@ -36,7 +36,7 @@ const premiumStats = {
 
 const VendorsMemberHub = () => {
   const navigate = useNavigate();
-  const { vendor } = useVendorData(); // Get vendor data
+  const { vendor } = useVendorDataStore(); // Get vendor data
 
   const currentQuantitySold = vendor?.orders_count || 0; // Get current quantity sold
 
@@ -55,7 +55,9 @@ const VendorsMemberHub = () => {
   };
 
   return (
-    <div className="space-y-6"> {/* Consistent gap */}
+    <div className="space-y-6">
+      {" "}
+      {/* Consistent gap */}
       {/* Premium Plan Overview */}
       <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl shadow-xl p-6 md:p-8 text-white">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -76,11 +78,14 @@ const VendorsMemberHub = () => {
           </div>
           {/* --- MODIFIED Price Display --- */}
           <div className="text-right flex-shrink-0 flex items-baseline gap-2">
-            <p className="text-4xl font-black line-through text-white/50"> {/* Added line-through and reduced opacity */}
-              ₹{currentPlan.price}
+            <p className="text-4xl font-black line-through text-white/50">
+              {" "}
+              {/* Added line-through and reduced opacity */}₹{currentPlan.price}
               <span className="text-xl font-medium">/mo</span>
             </p>
-            <p className="text-3xl font-extrabold text-green-300 animate-pulse"> {/* Added new 'Free !!' text */}
+            <p className="text-3xl font-extrabold text-green-300 animate-pulse">
+              {" "}
+              {/* Added new 'Free !!' text */}
               Free !!
             </p>
           </div>
@@ -108,7 +113,6 @@ const VendorsMemberHub = () => {
           </button>
         </div>
       </div>
-
       {/* Premium Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Enhanced Analytics Card (Keep as is) */}
@@ -138,7 +142,8 @@ const VendorsMemberHub = () => {
               <span className="font-medium text-gray-700">
                 Customer Return Rate:
               </span>
-              <span className="font-bold text-gray-800">25%</span> {/* Example */}
+              <span className="font-bold text-gray-800">25%</span>{" "}
+              {/* Example */}
             </div>
           </div>
           <button
@@ -178,8 +183,11 @@ const VendorsMemberHub = () => {
               <span className="font-medium text-gray-700">
                 Next Milestone Target (Revenue): {/* Changed Label */}
               </span>
-              <span className="font-bold text-gray-800 blur-[3px]"> {/* Added blur */}
-                 {formatCurrency(premiumStats.nextMilestoneTargetRevenue)} {/* Changed to revenue and formatted */}
+              <span className="font-bold text-gray-800 blur-[3px]">
+                {" "}
+                {/* Added blur */}
+                {formatCurrency(premiumStats.nextMilestoneTargetRevenue)}{" "}
+                {/* Changed to revenue and formatted */}
               </span>
             </div>
             {/* --- END MODIFIED Next Milestone Target --- */}

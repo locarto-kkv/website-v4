@@ -4,7 +4,7 @@ import {
   formatDate,
   getOrderStatusConfig,
 } from "../../lib/utils.js";
-import { useVendorData } from "../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../store/vendor/vendorDataStore.jsx";
 
 const StatusBadge = ({ status }) => {
   const config = getOrderStatusConfig(status);
@@ -20,7 +20,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const RecentOrdersTable = () => {
-  const { orders } = useVendorData();
+  const { orders } = useVendorDataStore();
 
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("desc");
@@ -57,9 +57,27 @@ const RecentOrdersTable = () => {
 
   const statusFilters = [
     { value: "all", label: "All Orders", count: (orders || []).length },
-    { value: "pending", label: "Pending", count: (orders || []).filter(o => o.order_status?.toLowerCase() === "pending").length },
-    { value: "delivered", label: "Delivered", count: (orders || []).filter(o => o.order_status?.toLowerCase() === "delivered").length },
-    { value: "shipped", label: "Shipped", count: (orders || []).filter(o => o.order_status?.toLowerCase() === "shipped").length },
+    {
+      value: "pending",
+      label: "Pending",
+      count: (orders || []).filter(
+        (o) => o.order_status?.toLowerCase() === "pending"
+      ).length,
+    },
+    {
+      value: "delivered",
+      label: "Delivered",
+      count: (orders || []).filter(
+        (o) => o.order_status?.toLowerCase() === "delivered"
+      ).length,
+    },
+    {
+      value: "shipped",
+      label: "Shipped",
+      count: (orders || []).filter(
+        (o) => o.order_status?.toLowerCase() === "shipped"
+      ).length,
+    },
   ];
 
   return (
@@ -120,50 +138,89 @@ const RecentOrdersTable = () => {
                 >
                   <div className="flex items-center gap-2">
                     Order
-                    <i className={`fas fa-sort text-xs ${sortField === "id" ? "text-orange-500" : "text-gray-400"}`}></i>
+                    <i
+                      className={`fas fa-sort text-xs ${
+                        sortField === "id" ? "text-orange-500" : "text-gray-400"
+                      }`}
+                    ></i>
                   </div>
                 </th>
-                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
-                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">Customer</th>
+                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Product
+                </th>
+                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">
+                  Customer
+                </th>
                 <th
                   className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort("amount")}
                 >
                   <div className="flex items-center gap-2">
                     Amount
-                    <i className={`fas fa-sort text-xs ${sortField === "amount" ? "text-orange-500" : "text-gray-400"}`}></i>
+                    <i
+                      className={`fas fa-sort text-xs ${
+                        sortField === "amount"
+                          ? "text-orange-500"
+                          : "text-gray-400"
+                      }`}
+                    ></i>
                   </div>
                 </th>
-                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                <th className="text-center px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                <th className="text-left px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="text-center px-4 py-3 sm:px-6 sm:py-4 text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
               {sortedOrders.slice(0, 5).map((order, index) => (
-                <tr key={order.id} className="hover:bg-gray-50 transition-colors group">
+                <tr
+                  key={order.id}
+                  className="hover:bg-gray-50 transition-colors group"
+                >
                   <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                    <div className="font-semibold text-gray-900 text-xs sm:text-sm">#{order.id}</div>
-                    <div className="text-[10px] sm:text-xs text-gray-500">{formatDate(order.created_at)}</div>
+                    <div className="font-semibold text-gray-900 text-xs sm:text-sm">
+                      #{order.id}
+                    </div>
+                    <div className="text-[10px] sm:text-xs text-gray-500">
+                      {formatDate(order.created_at)}
+                    </div>
                   </td>
                   <td className="px-4 py-3 sm:px-6 sm:py-4">
-                    <div className="font-medium text-gray-900 text-xs sm:text-sm">{order.product?.name || "Product Name"}</div>
-                    <div className="text-xs text-gray-500">Qty: {order.quantity || 1}</div>
+                    <div className="font-medium text-gray-900 text-xs sm:text-sm">
+                      {order.product?.name || "Product Name"}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Qty: {order.quantity || 1}
+                    </div>
                   </td>
                   <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                     <div className="font-medium text-gray-900 text-xs sm:text-sm">{order.customer?.name}</div>
+                    <div className="font-medium text-gray-900 text-xs sm:text-sm">
+                      {order.customer?.name}
+                    </div>
                   </td>
                   <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                    <div className="font-bold text-sm sm:text-base text-gray-900">{formatCurrency(order.amount)}</div>
+                    <div className="font-bold text-sm sm:text-base text-gray-900">
+                      {formatCurrency(order.amount)}
+                    </div>
                   </td>
                   <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                     <StatusBadge status={order.order_status} />
                   </td>
                   <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                     <div className="flex items-center justify-center gap-1 sm:gap-2">
-                      <button className="p-1.5 sm:p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all" title="View Details">
+                      <button
+                        className="p-1.5 sm:p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                        title="View Details"
+                      >
                         <i className="fas fa-eye text-xs sm:text-sm"></i>
                       </button>
-                      <button className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit Order">
+                      <button
+                        className="p-1.5 sm:p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                        title="Edit Order"
+                      >
                         <i className="fas fa-edit text-xs sm:text-sm"></i>
                       </button>
                     </div>
@@ -179,4 +236,3 @@ const RecentOrdersTable = () => {
 };
 
 export default RecentOrdersTable;
-

@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 import { useDataStore } from "./store/useDataStore";
 import { ConsumerDataProvider } from "./context/consumer/consumerDataContext";
-import { VendorDataProvider } from "./context/vendor/vendorDataContext";
+import { useVendorDataStore } from "./store/vendor/vendorDataStore";
 
 // Public Pages
 import Homepage from "./pages/Homepage";
@@ -26,8 +26,9 @@ import AdminRoutes from "./pages/admin/adminRoutes";
 import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
-  const { authLoading, checkAuth } = useAuthStore();
+  const { authLoading, checkAuth, currentUser } = useAuthStore();
   const { loadBlogs } = useDataStore();
+  const { loadVendorData, clearVendorData } = useVendorDataStore();
 
   useEffect(() => {
     checkAuth();
@@ -43,13 +44,14 @@ function App() {
   /** --------------------------
    * Effect: Load data on user change
    * -------------------------- */
-  // useEffect(() => {
-  //   if (currentUser?.type === "consumer") {
-  //     loadConsumerData();
-  //   } else if (currentUser?.type === "vendor" ){
-  //     loadVendorData();
-  //   }
-  // }, [currentUser]);
+  useEffect(() => {
+    if (currentUser?.type === "consumer") {
+      clearVendorData();
+      // loadConsumerData();
+    } else if (currentUser?.type === "vendor") {
+      loadVendorData();
+    }
+  }, [currentUser]);
 
   if (authLoading) {
     return (
@@ -86,14 +88,7 @@ function App() {
         <Route path="admin/*" element={<AdminRoutes />} />
 
         {/* --- VENDOR ROUTES --- */}
-        <Route
-          path="vendor/*"
-          element={
-            <VendorDataProvider>
-              <VendorRoutes />
-            </VendorDataProvider>
-          }
-        />
+        <Route path="vendor/*" element={<VendorRoutes />} />
 
         {/* --- CONSUMER ROUTES --- */}
         <Route

@@ -1,13 +1,13 @@
 // src/pages/vendor/dashboard/VendorEditProfile.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useVendorData } from "../../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 import { VendorProfileService } from "../../../services/vendor/vendorProfileService";
 import toast from "react-hot-toast";
 
 const VendorEditProfile = () => {
   const navigate = useNavigate();
-  const { profile, getProfile, dataLoading } = useVendorData();
+  const { profile, getProfile, dataLoading } = useVendorDataStore();
   const [formData, setFormData] = useState({
     name: "",
     email: "",

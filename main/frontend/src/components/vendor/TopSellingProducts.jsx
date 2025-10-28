@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { formatCurrency, getProductIcon } from "../../lib/utils.js";
-import { useVendorData } from "../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../store/vendor/vendorDataStore.jsx";
 
 const TopSellingProducts = () => {
   const [viewMode, setViewMode] = useState("list"); // Default to list for mobile-first
-  const { products, changeDataRange } = useVendorData();
+  const { products, changeDataRange } = useVendorDataStore();
   const topProducts = (products || []).slice(0, 3);
 
   const getRankBadge = (index) => {

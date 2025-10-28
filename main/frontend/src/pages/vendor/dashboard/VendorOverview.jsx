@@ -1,10 +1,10 @@
 import DashboardStats from "../../../components/vendor/DashboardStats";
 import RecentOrdersTable from "../../../components/vendor/RecentOrdersTable";
 import TopSellingProducts from "../../../components/vendor/TopSellingProducts";
-import { useVendorData } from "../../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 
 const VendorDashboard = () => {
-  const { products, vendor } = useVendorData();
+  const { products, vendor } = useVendorDataStore();
 
   return (
     // The main layout for the dashboard page.

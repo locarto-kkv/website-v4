@@ -1,7 +1,7 @@
 // src/pages/vendor/vendorRoutes.jsx
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useVendorData } from "../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../store/vendor/vendorDataStore";
 
 import AuthVendor from "./authVendor";
 import VendorDashboardLayout from "./dashboard/VendorDashboardLayout";
@@ -16,11 +16,10 @@ import VendorsMemberHub from "./dashboard/VendorsMemberHub";
 import VendorLocationSetup from "./dashboard/VendorLocationSetup";
 import VendorOrders from "./dashboard/VendorOrders";
 import VendorMilestones from "./dashboard/VendorMilestones";
-import VendorEditProfile from "./dashboard/VendorEditProfile"; // <-- Import the new component
-import { useEffect } from "react";
+import VendorEditProfile from "./dashboard/VendorEditProfile";
 
 const ProtectedRoute = () => {
-  const { dataLoading } = useVendorData();
+  const { dataLoading } = useVendorDataStore();
   const { currentUser } = useAuthStore();
 
   if (currentUser?.type !== "vendor") {

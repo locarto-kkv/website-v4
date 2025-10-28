@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useVendorData } from "../../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 
 const VendorSetupWizard = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const VendorSetupWizard = () => {
     coordinates: {},
   });
 
-  const { profile } = useVendorData();
+  const { profile } = useVendorDataStore();
 
   // ✅ Handle input changes dynamically
   const handleChange = (e) => {

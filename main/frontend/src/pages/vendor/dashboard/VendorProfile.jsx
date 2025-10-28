@@ -1,13 +1,13 @@
 // src/pages/vendor/dashboard/VendorProfile.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useVendorData } from "../../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 import { useDataStore } from "../../../store/useDataStore";
 import { formatCurrency } from "../../../lib/utils"; // Import formatCurrency
 
 const VendorProfile = () => {
   const { blogs } = useDataStore();
-  const { vendor, profile, dataLoading } = useVendorData();
+  const { vendor, profile, dataLoading } = useVendorDataStore();
   const navigate = useNavigate();
 
   const [profileData, setProfileData] = useState(null);

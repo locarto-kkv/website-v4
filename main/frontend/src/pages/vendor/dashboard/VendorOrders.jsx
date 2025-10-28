@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useVendorData } from "../../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 import {
   formatCurrency,
   formatDate,
@@ -20,7 +20,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const VendorOrders = () => {
-  const { orders } = useVendorData(); // ✅ Real order data from context
+  const { orders } = useVendorDataStore(); // ✅ Real order data from context
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");

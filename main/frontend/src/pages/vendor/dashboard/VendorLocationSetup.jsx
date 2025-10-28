@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useVendorData } from "../../../context/vendor/vendorDataContext";
+import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 import { VendorProfileService } from "../../../services/vendor/vendorProfileService";
 
 const VendorLocationSetup = () => {
@@ -35,7 +35,7 @@ const VendorLocationSetup = () => {
     coordinates: { lat: "", lng: "" },
   });
 
-  const { profile, getProfile } = useVendorData();
+  const { profile, getProfile } = useVendorDataStore();
 
   // ✅ Fetch approximate location from pincode (forward geocoding)
   const fetchLocationByPincode = async (pincode) => {

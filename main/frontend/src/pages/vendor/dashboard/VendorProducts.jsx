@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { formatCurrency } from "../../../lib/utils.js";
 import { VendorProductService } from "../../../services/vendor/vendorProductService.js";
-import { useVendorData } from "../../../context/vendor/vendorDataContext.jsx";
+import { useVendorDataStore } from "../../../store/vendor/vendorDataStore.jsx";
 
 const VendorProducts = () => {
   const [showModal, setShowModal] = useState(false);
@@ -24,7 +24,7 @@ const VendorProducts = () => {
     product_images: [], // Stores { file: File } or { name: string, url: string }
   });
 
-  const { products, getAnalytics } = useVendorData(); // Assuming products is an array
+  const { products, getAnalytics } = useVendorDataStore(); // Assuming products is an array
   console.log(products);
 
   // Example categories - adjust as needed or fetch dynamically
