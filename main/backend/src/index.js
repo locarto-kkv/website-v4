@@ -25,7 +25,7 @@ app.use("/api/admin", adminRoutes);
 
 app.get("/api/auth/check", protectRoute(null), checkAuth);
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.BACKEND_NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
   app.get(/(.*)/, (req, res) => {
@@ -35,7 +35,7 @@ if (process.env.NODE_ENV === "production") {
 
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
-  console.log("NODE ENV: " + process.env.NODE_ENV);
+  console.log("NODE ENV: " + process.env.BACKEND_NODE_ENV);
 });
 
 // npm run dev

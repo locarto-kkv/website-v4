@@ -16,12 +16,12 @@ import tagImg from "../assets/tag.png";
 import locartoImg from "../assets/locarto.png";
 import landingVid from "../assets/landing_vid.mp4";
 
-// Background Assets
-import asset1 from "../../src/assets/1.png";
-import asset2 from "../../src/assets/2.png";
-import asset3 from "../../src/assets/3.png";
-import asset4 from "../../src/assets/4.png";
-import asset5 from "../../src/assets/5.png";
+// Background Assets - Now using public folder paths
+const asset1 = "/assets/1.png";
+const asset2 = "/assets/2.png";
+const asset3 = "/assets/3.png";
+const asset4 = "/assets/4.png";
+const asset5 = "/assets/5.png";
 
 const LandingPage = () => {
   const { blogs } = useData();

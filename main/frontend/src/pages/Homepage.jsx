@@ -1,22 +1,21 @@
 // src/pages/Homepage.jsx
-import React, { useEffect, useState } from "react"; // Import useState and useEffect
+import React, { useEffect, useState } from "react";
 import SearchIcon from "../components/SearchIcon";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { getGreeting } from "../lib/utils.js";
-import { getRandomMsg } from "../services/welcomeMsgs.js"; // Make sure this is imported
+import { getRandomMsg } from "../services/welcomeMsgs.js";
 import { useAuthStore } from "../store/useAuthStore.jsx";
 import { ConsumerProfileService } from "../services/consumer/consumerProfileService.js";
 import { VendorProfileService } from "../services/vendor/vendorProfileService.js";
 
-// Background Assets
-// Import assets as before
-import asset1 from "../assets/1.png"; //
-import asset2 from "../assets/2.png"; //
-import asset3 from "../assets/3.png"; //
-import asset4 from "../assets/4.png"; //
-import asset5 from "../assets/5.png"; //
+// Background Assets - Now using public folder paths
+const asset1 = "/assets/1.png";
+const asset2 = "/assets/2.png";
+const asset3 = "/assets/3.png";
+const asset4 = "/assets/4.png";
+const asset5 = "/assets/5.png";
 
 const Homepage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,163 +23,127 @@ const Homepage = () => {
   const [suggestedCategory, setSuggestedCategory] = useState("");
   const [name, setName] = useState("");
   const { currentUser } = useAuthStore();
-  const [welcomeMessage, setWelcomeMessage] = useState(""); // Add state for the welcome message
+  const [welcomeMessage, setWelcomeMessage] = useState("");
 
   const navigate = useNavigate();
 
-  // Available categories (Only these will be searchable/navigable)
-  const availableCategories = ["personal care", "accessories"]; //
+  const availableCategories = ["personal care", "accessories"];
+  const popularProducts = [];
 
-  // Popular Products Data
-  const popularProducts = [
-   
-  ];
-
-  // Set welcome message once on mount
   useEffect(() => {
-    setWelcomeMessage(getRandomMsg()); // Set the message only once on mount
-  }, []); // Empty dependency array ensures it runs only once
+    setWelcomeMessage(getRandomMsg());
+  }, []);
 
-  // --- Keep handlers (handleSearch, handleInputChange, etc.) as they are ---
   const handleSearch = (e) => {
-    //
-    e.preventDefault(); //
+    e.preventDefault();
 
     if (searchQuery.trim() === "") {
-      //
-      return; //
+      return;
     }
 
-    const normalizedQuery = searchQuery.toLowerCase().trim(); //
-    const foundCategory = availableCategories.find(
-      //
-      (category) => category.includes(normalizedQuery) //
+    const normalizedQuery = searchQuery.toLowerCase().trim();
+    const foundCategory = availableCategories.find((category) =>
+      category.includes(normalizedQuery)
     );
 
     if (foundCategory) {
-      //
-      // Redirect to map with selected category
-      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`); //
+      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`);
     } else {
-      // Show error message with suggestion
-      setShowError(true); //
-      setSuggestedCategory(availableCategories[0]); //
+      setShowError(true);
+      setSuggestedCategory(availableCategories[0]);
     }
   };
 
   const handleInputChange = (e) => {
-    //
-    setSearchQuery(e.target.value); //
-    // Clear error when typing
+    setSearchQuery(e.target.value);
     if (showError) {
-      //
-      setShowError(false); //
+      setShowError(false);
     }
   };
 
   const handleSuggestionClick = (category) => {
-    //
-    navigate(`/map?category=${category.replace(" ", "%20")}`); //
-    closeError(); //
+    navigate(`/map?category=${category.replace(" ", "%20")}`);
+    closeError();
   };
 
   const closeError = () => {
-    //
-    setShowError(false); //
-    setSearchQuery(""); //
+    setShowError(false);
+    setSearchQuery("");
   };
 
   const handleProductClick = (product) => {
-    //
-    // Check if the product's category is one of the allowed ones before navigating
     if (availableCategories.includes(product.category.toLowerCase())) {
-      //
-      navigate(`/map?category=${product.category.replace(" ", "%20")}`); //
+      navigate(`/map?category=${product.category.replace(" ", "%20")}`);
     } else {
       console.log(
-        //
         `Category "${product.category}" is not directly navigable via suggestions.`
       );
     }
   };
 
   useEffect(() => {
-    //
     const funcConsumer = async () => {
-      //
-      const profile = await ConsumerProfileService.getProfile(); //
-      setName(profile.name); //
+      const profile = await ConsumerProfileService.getProfile();
+      setName(profile.name);
     };
     const funcVendor = async () => {
-      //
-      const profile = await VendorProfileService.getProfile(); //
-      setName(profile.name); //
+      const profile = await VendorProfileService.getProfile();
+      setName(profile.name);
     };
     if (currentUser?.type === "consumer") {
-      //
-      funcConsumer(); //
+      funcConsumer();
     } else if (currentUser?.type === "vendor") {
-      //
-      funcVendor(); //
+      funcVendor();
     }
-  }, [currentUser]); //
-  // --- End handlers ---
+  }, [currentUser]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
-      {" "}
-      {/* Added overflow-hidden */}
       <Navbar pageType="homepage" />
-      {/* MODIFIED Background Assets - Reduced negative offsets */}
-      {/* Use percentages or smaller fixed values to keep within bounds */}
+
+      {/* Background Assets */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
-        {" "}
-        {/* Ensure assets are behind content */}
         <img
-          src={asset1} //
+          src={asset1}
           alt=""
           className="absolute top-[-5%] left-[-5%] w-[250px] h-[250px] md:w-[400px] md:h-[400px] opacity-[0.15] animate-[spin_40s_linear_infinite]"
-          style={{ filter: "blur(1px)" }} //
+          style={{ filter: "blur(1px)" }}
         />
         <img
-          src={asset4} //
+          src={asset4}
           alt=""
           className="absolute top-[5%] right-[-5%] w-[300px] h-[300px] md:w-[450px] md:h-[450px] opacity-[0.12] animate-[spin_50s_linear_infinite_reverse]"
-          style={{ filter: "blur(1px)" }} //
+          style={{ filter: "blur(1px)" }}
         />
         <img
-          src={asset2} //
+          src={asset2}
           alt=""
           className="absolute top-[30%] left-[5%] w-[280px] h-[280px] md:w-[450px] md:h-[450px] opacity-[0.18] animate-[spin_45s_linear_infinite]"
-          style={{ filter: "blur(1px)" }} //
+          style={{ filter: "blur(1px)" }}
         />
         <img
-          src={asset5} //
+          src={asset5}
           alt=""
           className="absolute top-[50%] right-[5%] w-[310px] h-[310px] md:w-[490px] md:h-[490px] opacity-[0.14] animate-[spin_55s_linear_infinite_reverse]"
-          style={{ filter: "blur(1px)" }} //
+          style={{ filter: "blur(1px)" }}
         />
         <img
-          src={asset3} //
+          src={asset3}
           alt=""
           className="absolute top-[70%] left-[-8%] w-[290px] h-[290px] md:w-[460px] md:h-[460px] opacity-[0.16] animate-[spin_42s_linear_infinite_reverse]"
-          style={{ filter: "blur(1px)" }} //
+          style={{ filter: "blur(1px)" }}
         />
-        {/* Add more adjusted assets if needed, keeping offsets small */}
       </div>
-      {/* END MODIFIED Background Assets */}
-      {/* Main Content - Added pt-16 for top nav and pb-24 for mobile bottom nav */}
+
+      {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-3 sm:px-4 py-6 sm:py-8 pt-20 sm:pt-24 pb-24 sm:pb-8 relative z-10">
-        {" "}
-        {/* Ensure main content is above background */}
         <div className="max-w-6xl w-full mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-16 sm:mb-20">
             {/* Multi-Logo Gallery */}
             <div className="relative mx-auto mb-6 sm:mb-8 mt-6 sm:mt-8">
-              {/* ... (Keep the logo gallery structure as is) ... */}
               <div className="w-full max-w-5xl mx-auto">
-                {/* Massive animated background effects */}
+                {/* Background effects */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-red-500 via-pink-500 via-purple-500 to-blue-500 rounded-3xl blur-2xl sm:blur-3xl opacity-10 sm:opacity-15 animate-pulse scale-110"></div>
                 <div
                   className="absolute inset-8 bg-gradient-to-r from-orange-300 via-pink-400 to-purple-400 rounded-2xl blur-xl sm:blur-2xl opacity-15 sm:opacity-20 animate-pulse scale-105"
@@ -193,7 +156,6 @@ const Homepage = () => {
 
                 {/* MOBILE: 3-2 Grid Layout */}
                 <div className="sm:hidden relative z-10 py-6 px-3">
-                  {/* ... (mobile logo layout) ... */}
                   {/* First Row - 3 Logos (2, 3, 4) */}
                   <div className="flex justify-center items-center gap-4 mb-4">
                     {[2, 3, 4].map((logoNumber, index) => (
@@ -207,7 +169,7 @@ const Homepage = () => {
                       >
                         <div className="w-16 h-16 flex items-center justify-center relative">
                           <img
-                            src={`/src/assets/${logoNumber}.png`}
+                            src={`/assets/${logoNumber}.png`}
                             alt={`Locarto Logo ${logoNumber}`}
                             className="relative z-10 w-14 h-14 object-contain transition-all duration-700 transform group-hover:rotate-12 group-hover:scale-110"
                             style={{
@@ -215,7 +177,6 @@ const Homepage = () => {
                                 "drop-shadow(0 15px 35px rgba(255,100,50,0.4)) drop-shadow(0 5px 15px rgba(255,120,60,0.3))",
                             }}
                           />
-                          {/* Orbiting dots */}
                           <div
                             className="absolute inset-0 animate-spin"
                             style={{
@@ -244,7 +205,7 @@ const Homepage = () => {
                       >
                         <div className="w-16 h-16 flex items-center justify-center relative">
                           <img
-                            src={`/src/assets/${logoNumber}.png`}
+                            src={`/assets/${logoNumber}.png`}
                             alt={`Locarto Logo ${logoNumber}`}
                             className="relative z-10 w-14 h-14 object-contain transition-all duration-700 transform group-hover:rotate-12 group-hover:scale-110"
                             style={{
@@ -252,7 +213,6 @@ const Homepage = () => {
                                 "drop-shadow(0 15px 35px rgba(255,100,50,0.4)) drop-shadow(0 5px 15px rgba(255,120,60,0.3))",
                             }}
                           />
-                          {/* Orbiting dots */}
                           <div
                             className="absolute inset-0 animate-spin"
                             style={{
@@ -271,7 +231,6 @@ const Homepage = () => {
 
                 {/* DESKTOP: Horizontal Layout */}
                 <div className="hidden sm:flex relative z-10 justify-center items-center gap-4 sm:gap-6 lg:gap-12 py-6 sm:py-8 px-3 sm:px-4">
-                  {/* ... (desktop logo layout) ... */}
                   {[1, 2, 3, 4, 5].map((logoNumber, index) => (
                     <div
                       key={logoNumber}
@@ -281,11 +240,9 @@ const Homepage = () => {
                         animation: "float 4s ease-in-out infinite",
                       }}
                     >
-                      {/* Logo container */}
                       <div className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 flex items-center justify-center relative">
-                        {/* Logo Image */}
                         <img
-                          src={`/src/assets/${logoNumber}.png`}
+                          src={`/assets/${logoNumber}.png`}
                           alt={`Locarto Logo ${logoNumber}`}
                           className="relative z-10 w-16 h-16 md:w-20 md:h-20 lg:w-22 lg:h-22 xl:w-24 xl:h-24 object-contain transition-all duration-700 transform group-hover:rotate-12 group-hover:scale-110"
                           style={{
@@ -293,7 +250,7 @@ const Homepage = () => {
                               "drop-shadow(0 15px 35px rgba(255,100,50,0.4)) drop-shadow(0 5px 15px rgba(255,120,60,0.3))",
                           }}
                         />
-                        {/* Orbiting animated dots */}
+                        {/* Orbiting dots */}
                         <div
                           className="absolute inset-0 animate-spin"
                           style={{
@@ -337,8 +294,7 @@ const Homepage = () => {
                   ))}
                 </div>
 
-                {/* Global floating particles */}
-                {/* ... (floating particles) ... */}
+                {/* Floating particles */}
                 <div
                   className="absolute -top-6 sm:-top-8 left-1/4 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-60"
                   style={{ animationDelay: "0.2s" }}
@@ -355,62 +311,29 @@ const Homepage = () => {
                   className="absolute top-1/4 -left-4 sm:-left-6 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-gradient-to-r from-red-400 to-orange-500 rounded-full animate-bounce opacity-60"
                   style={{ animationDelay: "1.6s" }}
                 ></div>
-                <div
-                  className="absolute bottom-1/3 left-1/6 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-bounce opacity-40"
-                  style={{ animationDelay: "2s" }}
-                ></div>
-                <div
-                  className="absolute top-1/2 right-1/6 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-bounce opacity-70"
-                  style={{ animationDelay: "2.4s" }}
-                ></div>
-                {/* Large orbiting elements */}
-                <div
-                  className="absolute inset-0 animate-spin opacity-20"
-                  style={{ animationDuration: "25s" }}
-                >
-                  <div className="absolute top-4 left-1/2 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-full transform -translate-x-1/2"></div>
-                </div>
-                <div
-                  className="absolute inset-0 animate-spin opacity-15"
-                  style={{
-                    animationDuration: "20s",
-                    animationDirection: "reverse",
-                  }}
-                >
-                  <div className="absolute bottom-4 left-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gradient-to-r from-red-400 to-orange-500 rounded-full transform -translate-x-1/2"></div>
-                </div>
-                <div
-                  className="absolute inset-0 animate-spin opacity-25"
-                  style={{ animationDuration: "30s" }}
-                >
-                  <div className="absolute top-1/2 right-6 sm:right-8 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r from-orange-300 to-red-400 rounded-full transform -translate-y-1/2"></div>
-                </div>
               </div>
             </div>
 
             {/* Enhanced Main Heading */}
             <div className="relative mb-4 sm:mb-6 px-2">
               <div className="text-center space-y-2 sm:space-y-3">
-                {/* Greeting */}
                 <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-black relative">
                   <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent relative z-10 block animate-pulse leading-tight sm:leading-normal">
                     {getGreeting(name)}
                   </span>
                 </h1>
 
-                {/* Welcome Message */}
                 <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-extrabold relative">
                   <span className="bg-gradient-to-r from-gray-900 via-black to-gray-800 bg-clip-text text-transparent relative z-10 block leading-tight sm:leading-normal">
-                    {welcomeMessage} {/* Use the state variable here */}
+                    {welcomeMessage}
                   </span>
                 </h2>
 
-                {/* Subtle background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-200 via-pink-200 to-purple-200 blur-3xl opacity-10 scale-110"></div>
               </div>
             </div>
 
-            {/* Enhanced Subtitle */}
+            {/* Subtitle */}
             <p className="text-sm sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed font-light px-2">
               <span className="inline-block animate-fade-in-up">
                 Discover the
@@ -429,12 +352,11 @@ const Homepage = () => {
               </span>
             </p>
 
-            {/* Premium Search Bar */}
+            {/* Search Bar */}
             <form
               onSubmit={handleSearch}
-              className="relative inline-block group w-full max-w-2xl mx-auto px-2 sm:px-0" //
+              className="relative inline-block group w-full max-w-2xl mx-auto px-2 sm:px-0"
             >
-              {/* ... (search bar content) ... */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-full blur-lg sm:blur-xl opacity-20 scale-105 group-hover:opacity-30 transition-all duration-500"></div>
                 <div className="relative bg-white rounded-full shadow-xl sm:shadow-2xl group-hover:shadow-3xl transition-all duration-500 border border-gray-100 group-hover:border-orange-200 flex items-center">
@@ -445,7 +367,6 @@ const Homepage = () => {
                     placeholder="Search for personal care, accessories..."
                     className="flex-grow px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 md:py-5 pr-2 rounded-l-full focus:outline-none text-gray-900 placeholder-gray-400 bg-transparent text-xs sm:text-base md:text-lg font-medium"
                   />
-                  {/* Explore Button */}
                   <Link
                     to="/map"
                     className="mx-1.5 sm:mx-3 h-7 sm:h-9 md:h-10 px-3 sm:px-5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:scale-105 transform shadow-lg hover:shadow-xl text-[10px] sm:text-sm font-semibold whitespace-nowrap"
@@ -453,7 +374,6 @@ const Homepage = () => {
                   >
                     Explore
                   </Link>
-                  {/* Search Button */}
                   <div className="pr-1.5 sm:pr-3 md:pr-4 group-hover:scale-110 transition-transform duration-300">
                     <button
                       type="submit"
@@ -463,33 +383,12 @@ const Homepage = () => {
                     </button>
                   </div>
                 </div>
-                {/* Floating suggestion pills */}
-                <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 hidden md:flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                  {["Personal Care", "Accessories"].map((category, index) => (
-                    <button
-                      key={category}
-                      type="button"
-                      onClick={() =>
-                        navigate(
-                          `/map?category=${category
-                            .toLowerCase()
-                            .replace(" ", "%20")}`
-                        )
-                      }
-                      className="px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-600 text-sm rounded-full shadow-lg border border-gray-200 animate-fade-in-up hover:bg-white hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
               </div>
             </form>
           </div>
 
           <style>{`
-             /* ... (keep existing keyframes and styles) ... */
-             @keyframes fade-in-up {
+            @keyframes fade-in-up {
               from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -528,7 +427,7 @@ const Homepage = () => {
           {/* Popular Products Section */}
           <section className="mb-12 sm:mb-16 px-2 sm:px-0">
             {/* ... (keep popular products section as is) ... */}
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               {popularProducts.map((product) => (
                 <div
