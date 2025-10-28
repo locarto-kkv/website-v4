@@ -23,6 +23,7 @@ import AlertsPage from "./pages/AlertsPage";
 import VendorRoutes from "./pages/vendor/vendorRoutes";
 import ConsumerRoutes from "./pages/consumer/consumerRoutes";
 import AdminRoutes from "./pages/admin/adminRoutes";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   const { authLoading, checkAuth } = useAuthStore();
@@ -96,6 +97,7 @@ function App() {
               </ConsumerDataProvider>
             }
           />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </DataProvider>
 

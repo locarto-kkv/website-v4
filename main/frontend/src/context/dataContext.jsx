@@ -10,6 +10,38 @@ export function DataProvider({ children }) {
   const [start, setStart] = useState(0);
   const [dataLoading, setDataLoading] = useState(true);
 
+  /** --------------------------
+   * ✅ Helper: Load cached data
+   * -------------------------- */
+  const loadCache = (name) => {
+    try {
+      const cached = localStorage.getItem(name);
+      if (!cached) return null;
+      const parsed = JSON.parse(cached);
+      return parsed?.data || null;
+    } catch (error) {
+      console.error(`Error loading cache for ${name}:`, error);
+      return null;
+    }
+  };
+
+  /** --------------------------
+   * ✅ Helper: Set cache data
+   * -------------------------- */
+  const setCache = (name, data) => {
+    try {
+      localStorage.setItem(
+        name,
+        JSON.stringify({ data, timestamp: Date.now() })
+      );
+    } catch (error) {
+      console.error(`Error setting cache for ${name}:`, error);
+    }
+  };
+
+  /** --------------------------
+   * Clear all cached blogs
+   * -------------------------- */
   const clearBlogs = () => {
     setDataLoading(true);
     try {
@@ -20,10 +52,9 @@ export function DataProvider({ children }) {
     }
   };
 
-  /**
+  /** --------------------------
    * Fetch products and merge them with blogs
-   * Each blog (vendor) gets a `products` array of their products
-   */
+   * -------------------------- */
   const fetchProductsInBatch = async (query = {}) => {
     setDataLoading(true);
     try {
@@ -32,10 +63,7 @@ export function DataProvider({ children }) {
         start
       );
 
-      //const batchSize = 10
-      //setStart((prev) => prev + batchSize)
-
-      // Merge products with blogs based on vendor_id
+      // Merge products with blogs by vendor_id
       setBlogs((prevBlogs) =>
         prevBlogs.map((blog) => {
           const vendorProducts = response.filter(
@@ -55,16 +83,15 @@ export function DataProvider({ children }) {
     }
   };
 
+  /** --------------------------
+   * Fetch blogs (and set cache)
+   * -------------------------- */
   const fetchBlogs = async () => {
     setDataLoading(true);
     try {
       const data = await ConsumerBlogService.getBlogs(0);
       setBlogs(data);
-
-      localStorage.setItem(
-        "blogs",
-        JSON.stringify({ data, timestamp: Date.now() })
-      );
+      // setCache("blogs", data);
     } catch (error) {
       toast.error("Failed to fetch blogs");
       console.error("Error fetching blogs:", error);
@@ -73,30 +100,29 @@ export function DataProvider({ children }) {
     }
   };
 
-  useEffect(() => {
+  /** --------------------------
+   * Load blogs from cache or API
+   * -------------------------- */
+  const loadBlogs = async () => {
     setDataLoading(true);
     try {
-      const cached = localStorage.getItem("blogs");
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        // const cacheAge = Date.now() - parsed.timestamp;
-        // const maxAge = 1000 * 60 * 30; // 30 minutes
-
-        // if (cacheAge < maxAge) {
-        setBlogs(parsed.data);
-        return;
-        // } else {
-        //   console.log("Cache expired — refetching blogs...");
-        // }
-      }
-
-      fetchBlogs();
+      // const cachedBlogs = loadCache("blogs");
+      // if (cachedBlogs) setBlogs(cachedBlogs);
+      // else
+      await fetchBlogs();
     } catch (error) {
       console.error("Error loading cached blogs:", error);
-      fetchBlogs();
+      await fetchBlogs();
     } finally {
       setDataLoading(false);
     }
+  };
+
+  /** --------------------------
+   * Effect: Load blogs on mount
+   * -------------------------- */
+  useEffect(() => {
+    loadBlogs();
   }, []);
 
   return (
@@ -106,7 +132,6 @@ export function DataProvider({ children }) {
         dataLoading,
         fetchBlogs,
         fetchProductsInBatch,
-        clearBlogs,
       }}
     >
       {children}
