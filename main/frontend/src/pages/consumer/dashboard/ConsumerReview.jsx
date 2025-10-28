@@ -1,39 +1,38 @@
-// src/pages/consumer/dashboard/CustomerReviews.jsx
+// src/pages/consumer/dashboard/ConsumerReview.jsx
 import React, { useState, useEffect } from "react";
 import { formatDate } from "../../../lib/utils";
+import { ConsumerReviewService } from "../../../services/consumer/consumerReviewService"; // Import service
+import toast from 'react-hot-toast';
 
 const CustomerReviews = () => {
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      product: "Mechanical Keyboard",
-      rating: 5,
-      comment:
-        "Excellent product! Very clicky and satisfying to type on. Great build quality.",
-      date: "2024-01-16",
-    },
-    {
-      id: 2,
-      product: "Gaming Mouse",
-      rating: 4,
-      comment:
-        "Good quality mouse, comfortable grip, but the software could be better.",
-      date: "2024-01-18",
-    },
-    {
-      id: 3,
-      product: "Wireless Headphones",
-      rating: 5,
-      comment: "Amazing sound quality and battery life!",
-      date: "2024-02-01",
-    },
-  ]);
-  const [loading, setLoading] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true); // Changed initial state to true
+
+  // --- Fetch reviews when component mounts ---
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setLoading(true);
+      try {
+        const fetchedReviews = await ConsumerReviewService.getReviews();
+        // Assuming the API returns an array of reviews
+        setReviews(fetchedReviews || []);
+      } catch (error) {
+        toast.error("Failed to load your reviews.");
+        console.error("Error fetching reviews:", error);
+        setReviews([]); // Set to empty array on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []); // Empty dependency array means this runs once on mount
+
 
   if (loading) {
     return (
       <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100 text-center">
-        <p className="text-gray-500">Loading reviews...</p>
+        <p className="text-gray-500">Loading your reviews...</p>
       </div>
     );
   }
@@ -45,7 +44,7 @@ const CustomerReviews = () => {
           <i className="fas fa-star-half-alt text-3xl md:text-4xl mb-3 md:mb-4 text-gray-300"></i>
           <p>You haven't written any reviews yet.</p>
           <p className="text-sm mt-2">
-            Share your thoughts on products you've purchased!
+            Reviews you write after orders are delivered will appear here.
           </p>
         </div>
       ) : (
@@ -53,39 +52,46 @@ const CustomerReviews = () => {
         <div className="space-y-3 md:space-y-4">
           {reviews.map((review) => (
             <div
-              key={review.id}
+              // Use review.id if available, otherwise fallback might be needed
+              key={review.id || `review-${review.product_id}-${review.created_at}`}
               className="border border-gray-200 rounded-xl p-4 md:p-5 lg:p-6 hover:border-orange-300 transition-colors hover:shadow-sm bg-gray-50"
             >
               {/* Reduced margin on mobile */}
               <div className="flex flex-col sm:flex-row justify-between items-start mb-2 md:mb-3">
-                <h3 className="font-bold text-base md:text-lg text-gray-900 mb-1 sm:mb-0">
-                  {review.product || "Product Name"}
-                </h3>
+                 {/* Link to product if possible - needs product info in review data */}
+                 <h3 className="font-bold text-base md:text-lg text-gray-900 mb-1 sm:mb-0">
+                   {review.product_name || "Product Name"} {/* Display product name if available */}
+                 </h3>
                 <div className="flex text-yellow-400 flex-shrink-0">
                   {[...Array(5)].map((_, i) => (
                     <i
                       key={i}
                       className={`fas fa-star text-sm md:text-base ${
-                        i < review.rating ? "" : "text-gray-300"
+                        // Use review.rating
+                        i < (review.rating || 0) ? "" : "text-gray-300"
                       }`}
                     ></i>
                   ))}
                   <span className="ml-2 text-sm text-gray-600 font-medium">
-                    ({review.rating}/5)
+                     {/* Use review.rating */}
+                    ({review.rating || 0}/5)
                   </span>
                 </div>
               </div>
               {/* Reduced margin on mobile */}
               <p className="text-gray-700 mb-2 md:mb-3 italic text-sm md:text-base">
+                 {/* Use review.comment */}
                 "{review.comment || "No comment provided."}"
               </p>
               <div className="flex justify-between items-center text-xs md:text-sm">
                 <p className="text-gray-500">
-                  Reviewed on: {formatDate(review.date)}
+                   {/* Use review.created_at */}
+                  Reviewed on: {formatDate(review.created_at)}
                 </p>
-                <button className="text-blue-500 hover:text-blue-700 font-medium text-xs px-2.5 py-1 md:px-3 rounded hover:bg-blue-50 transition-colors">
+                 {/* Add Edit/Delete functionality later if needed */}
+                {/* <button className="text-blue-500 hover:text-blue-700 font-medium text-xs px-2.5 py-1 md:px-3 rounded hover:bg-blue-50 transition-colors">
                   <i className="fas fa-edit mr-1"></i> Edit Review
-                </button>
+                </button> */}
               </div>
             </div>
           ))}
