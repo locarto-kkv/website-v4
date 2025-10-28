@@ -207,7 +207,7 @@ const SideCart = ({ isOpen, onClose }) => {
                 {cartItems.map((item, index) => (
                   <div
                     key={item.product_id} // Use product_id as key
-                    className="group bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200 border border-gray-100 flex items-center gap-4"
+                    className="group bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200 border border-gray-100 flex items-center gap-4 hover:cursor-pointer"
                     style={{
                       animation: `slideIn 0.3s ease-out ${index * 0.05}s both`, // Staggered animation
                     }}

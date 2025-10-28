@@ -48,10 +48,9 @@ const SimilarProductCard = ({ product }) => (
 const ProductViewPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
-  const { blogs } = useDataStore();
 
-  // Always call useConsumerDataStore hook (React hooks must be called unconditionally)
+  const currentUser = useAuthStore((s) => s.currentUser);
+  const blogs = useDataStore((s) => s.blogs);
   const { getLists, updateList, removeFromList } = ConsumerListService;
 
   const isConsumer = currentUser?.type === "consumer";

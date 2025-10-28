@@ -7,7 +7,8 @@ import { useNavigate } from "react-router-dom";
 
 const CustomerLists = () => {
   const [listView, setListView] = useState("cart");
-  const { lists, fetchLists } = useConsumerDataStore();
+  const lists = useConsumerDataStore((s) => s.lists);
+  const fetchLists = useConsumerDataStore((s) => s.fetchLists);
   const { updateList, removeFromList } = ConsumerListService;
   const navigate = useNavigate();
 

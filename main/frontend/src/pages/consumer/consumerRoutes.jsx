@@ -1,7 +1,6 @@
 // src/pages/consumer/consumerRoutes.jsx
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useConsumerDataStore } from "../../store/consumer/consumerDataStore.jsx";
 
 import CustomerDashboardLayout from "./dashboard/CustomerDashboardLayout";
 
@@ -16,31 +15,19 @@ import CustomerSettings from "./dashboard/ConsumerSettings.jsx";
 import RuleChatbot from "../Chatbot";
 import ShopProducts from "./ShopProducts";
 import CheckoutPage from "./CheckoutPage";
-import { useEffect } from "react";
 
 const ProtectedRoute = () => {
-  const { currentUser } = useAuthStore();
-  const { dataLoading } = useConsumerDataStore();
+  const currentUser = useAuthStore((s) => s.currentUser);
 
   if (currentUser?.type !== "consumer") {
     return <Navigate to="/consumer/login" replace />;
   } else {
-    if (dataLoading && !["/consumer/checkout"].includes(location.pathname)) {
-      return (
-        <div className="flex items-center justify-center min-h-screen pt-[70px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading consumer data...</p>
-          </div>
-        </div>
-      );
-    }
     return <Outlet />;
   }
 };
 
 const ConsumerRoutes = () => {
-  const { currentUser } = useAuthStore();
+  const currentUser = useAuthStore((s) => s.currentUser);
 
   return (
     <Routes>

@@ -6,30 +6,32 @@ import locartoImg from "../assets/locarto.png";
 import { useDataStore } from "../store/useDataStore";
 import { useAuthStore } from "../store/useAuthStore";
 
+const categories = [
+  {
+    name: "Personal Care",
+    color: "#10B981",
+    icon: "fas fa-leaf",
+    description:
+      "Discover unique Skin Care, Beauty, and Fragrance brands near you.",
+  },
+  {
+    name: "Accessories",
+    color: "#EF4444",
+    icon: "fas fa-gem",
+    description:
+      "Explore local creators of Fashion, Daily, and Tech accessories.",
+  },
+];
+
 const MapView = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const categoryParam = queryParams.get("category");
   const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
-  const { blogs, fetchProductsInBatch } = useDataStore();
-
-  const categories = [
-    {
-      name: "Personal Care",
-      color: "#10B981",
-      icon: "fas fa-leaf",
-      description:
-        "Discover unique Skin Care, Beauty, and Fragrance brands near you.",
-    },
-    {
-      name: "Accessories",
-      color: "#EF4444",
-      icon: "fas fa-gem",
-      description:
-        "Explore local creators of Fashion, Daily, and Tech accessories.",
-    },
-  ];
+  const currentUser = useAuthStore((s) => s.currentUser);
+  const blogs = useDataStore((s) => s.blogs);
+  const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
+  const productLoading = useDataStore((s) => s.productLoading);
 
   const [showOverlay, setShowOverlay] = useState(true);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(() => {
@@ -124,17 +126,20 @@ const MapView = () => {
 
   useEffect(() => {
     const fetchCategoryProducts = async () => {
-      if (showOverlay) return;
+      if (showOverlay || productLoading) return;
       const category = categories[currentCategoryIndex].name;
       try {
+        console.log(category);
+
         await fetchProductsInBatch({ category });
       } catch (err) {
         console.error("Error fetching products for category:", err);
       }
     };
+    console.log(showOverlay, productLoading);
 
     fetchCategoryProducts();
-  }, [currentCategoryIndex, showOverlay]);
+  }, [showOverlay, currentCategoryIndex]);
 
   useEffect(() => {
     if (!map) return;
@@ -143,6 +148,7 @@ const MapView = () => {
 
     if (!showOverlay) {
       const currentCategory = categories[currentCategoryIndex];
+
       const customIcon = createCustomIcon(currentCategory);
 
       const vendorsToDisplay = (blogs || []).filter((vendor) => {
@@ -229,7 +235,7 @@ const MapView = () => {
 
       map.invalidateSize({ animate: true });
     }
-  }, [blogs, showOverlay, currentCategoryIndex]);
+  }, [showOverlay, currentCategoryIndex, blogs]);
 
   const currentCategory = categories[currentCategoryIndex];
 

@@ -6,11 +6,9 @@ import { ConsumerProductService } from "../services/consumer/consumerProductServ
 export const useDataStore = create((set, get) => ({
   blogs: [],
   start: 0,
-  dataLoading: true,
+  dataLoading: false,
+  productLoading: false,
 
-  /** --------------------------
-   * ✅ Helper: Load cached data
-   * -------------------------- */
   loadCache: (name) => {
     try {
       const cached = localStorage.getItem(name);
@@ -23,9 +21,6 @@ export const useDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * ✅ Helper: Set cache data
-   * -------------------------- */
   setCache: (name, data) => {
     try {
       localStorage.setItem(
@@ -37,9 +32,6 @@ export const useDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * Clear all cached blogs
-   * -------------------------- */
   clearBlogs: () => {
     set({ dataLoading: true });
     try {
@@ -50,17 +42,15 @@ export const useDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * Fetch products and merge them with blogs
-   * -------------------------- */
   fetchProductsInBatch: async (query = {}) => {
-    set({ dataLoading: true });
+    set({ productLoading: true });
     try {
       const { start, blogs } = get();
       const response = await ConsumerProductService.getProductsByFilter(
         query,
         start
       );
+      console.log(blogs);
 
       const updatedBlogs = blogs.map((blog) => {
         const vendorProducts = response.filter(
@@ -68,19 +58,17 @@ export const useDataStore = create((set, get) => ({
         );
         return { ...blog, products: vendorProducts };
       });
+      console.log(updatedBlogs);
 
       set({ blogs: updatedBlogs });
     } catch (error) {
       toast.error("Failed to fetch products");
       console.error("Error fetching products:", error);
     } finally {
-      set({ dataLoading: false });
+      set({ productLoading: false });
     }
   },
 
-  /** --------------------------
-   * Fetch blogs (and set cache)
-   * -------------------------- */
   fetchBlogs: async () => {
     set({ dataLoading: true });
     try {
@@ -95,9 +83,6 @@ export const useDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * Load blogs from cache or API
-   * -------------------------- */
   loadBlogs: async () => {
     set({ dataLoading: true });
     try {

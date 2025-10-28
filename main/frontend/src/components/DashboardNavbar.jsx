@@ -2,12 +2,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore.jsx";
-// Import ConsumerDataContext conditionally or ensure safe access
-import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx"; // Adjust if needed
-import { ConsumerListService } from "../services/consumer/consumerListService.js"; // Adjust if needed for cart count
+import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx";
+import { ConsumerListService } from "../services/consumer/consumerListService.js";
 import locartoImg from "../assets/locarto.png";
-import toast from "react-hot-toast"; // Ensure toast is imported
-import SideCart from "../components/consumer/SideCart.jsx"; // Import SideCart if used
+import toast from "react-hot-toast";
+import SideCart from "../components/consumer/SideCart.jsx";
 
 const DashboardNavbar = ({ onMenuClick }) => {
   // onMenuClick prop for toggling sidebar from layout
@@ -25,9 +24,7 @@ const DashboardNavbar = ({ onMenuClick }) => {
   const { currentUser, logout, logoutLoading } = useAuthStore(); // Get logoutLoading state
   const isConsumer = currentUser?.type === "consumer";
 
-  // Safely get consumer data and services only if consumer
-  const consumerDataContext = isConsumer ? useConsumerDataStore() : null;
-  const lists = consumerDataContext?.lists;
+  const lists = useConsumerDataStore((s) => s.lists);
 
   // Fetch Cart Count only if consumer
   useEffect(() => {
@@ -35,9 +32,7 @@ const DashboardNavbar = ({ onMenuClick }) => {
       // Check for isConsumer AND ConsumerListService to avoid errors if not consumer context
       if (isConsumer && ConsumerListService) {
         try {
-          const { getLists } = ConsumerListService;
-          const res = await getLists();
-          setCartItemsCount(res?.cart?.length || 0);
+          setCartItemsCount(lists?.cart?.length || 0);
         } catch (error) {
           console.log("Error loading cart items count:", error);
           setCartItemsCount(0); // Reset on error

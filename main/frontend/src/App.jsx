@@ -6,7 +6,6 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useDataStore } from "./store/useDataStore";
 import { useConsumerDataStore } from "./store/consumer/consumerDataStore";
 import { useVendorDataStore } from "./store/vendor/vendorDataStore";
-import { shallow } from "zustand/shallow";
 
 // Public Pages
 import Homepage from "./pages/Homepage";
@@ -61,6 +60,8 @@ function App() {
   }, [currentUser]);
 
   if (authLoading || dataLoading || consumerLoading || vendorLoading) {
+    console.log(authLoading, dataLoading, consumerLoading, vendorLoading);
+
     return (
       <div className="flex items-center justify-center min-h-screen pt-[70px]">
         {" "}

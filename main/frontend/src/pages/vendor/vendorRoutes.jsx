@@ -1,7 +1,6 @@
 // src/pages/vendor/vendorRoutes.jsx
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useVendorDataStore } from "../../store/vendor/vendorDataStore";
 
 import AuthVendor from "./authVendor";
 import VendorDashboardLayout from "./dashboard/VendorDashboardLayout";
@@ -19,30 +18,17 @@ import VendorMilestones from "./dashboard/VendorMilestones";
 import VendorEditProfile from "./dashboard/VendorEditProfile";
 
 const ProtectedRoute = () => {
-  const { dataLoading } = useVendorDataStore();
-  const { currentUser } = useAuthStore();
+  const currentUser = useAuthStore((s) => s.currentUser);
 
   if (currentUser?.type !== "vendor") {
     return <Navigate to="/vendor/login" replace />;
   } else {
-    if (dataLoading) {
-      return (
-        <div className="flex items-center justify-center min-h-screen pt-[70px]">
-          {" "}
-          {/* Adjusted min-height */}
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading vendor data...</p>
-          </div>
-        </div>
-      );
-    }
     return <Outlet />;
   }
 };
 
 const VendorRoutes = () => {
-  const { currentUser } = useAuthStore();
+  const currentUser = useAuthStore((s) => s.currentUser);
 
   return (
     <Routes>
