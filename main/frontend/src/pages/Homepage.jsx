@@ -442,7 +442,7 @@ const Homepage = () => {
                     type="text"
                     value={searchQuery}
                     onChange={handleInputChange}
-                    placeholder="Search for food, services..."
+                    placeholder="Search for personal care, accessories..."
                     className="flex-grow px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 md:py-5 pr-2 rounded-l-full focus:outline-none text-gray-900 placeholder-gray-400 bg-transparent text-xs sm:text-base md:text-lg font-medium"
                   />
                   {/* Explore Button */}
