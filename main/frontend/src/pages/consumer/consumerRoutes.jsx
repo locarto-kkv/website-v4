@@ -1,7 +1,7 @@
 // src/pages/consumer/consumerRoutes.jsx
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useConsumerData } from "../../context/consumer/consumerDataContext";
+import { useConsumerDataStore } from "../../store/consumer/consumerDataStore.jsx";
 
 import CustomerDashboardLayout from "./dashboard/CustomerDashboardLayout";
 
@@ -20,7 +20,7 @@ import { useEffect } from "react";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
-  const { dataLoading } = useConsumerData();
+  const { dataLoading } = useConsumerDataStore();
 
   if (currentUser?.type !== "consumer") {
     return <Navigate to="/consumer/login" replace />;

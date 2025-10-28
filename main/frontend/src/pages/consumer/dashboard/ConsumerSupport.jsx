@@ -1,12 +1,12 @@
 // src/pages/consumer/dashboard/CustomerSupport.jsx
 import React, { useState } from "react"; // Import useState
 import { Navigate, useNavigate } from "react-router-dom"; // Removed useNavigate, useLocation, useEffect, React
-import { useConsumerData } from "../../../context/consumer/consumerDataContext";
+import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore";
 
 const CustomerSupport = () => {
   const [expandedFAQ, setExpandedFAQ] = useState(null);
   const navigate = useNavigate();
-  const { orders } = useConsumerData();
+  const { orders } = useConsumerDataStore();
   console.log(orders);
 
   const faqItems = [

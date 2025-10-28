@@ -51,7 +51,7 @@ const ProductViewPage = () => {
   const { currentUser } = useAuthStore();
   const { blogs } = useDataStore();
 
-  // Always call useConsumerData hook (React hooks must be called unconditionally)
+  // Always call useConsumerDataStore hook (React hooks must be called unconditionally)
   const { getLists, updateList, removeFromList } = ConsumerListService;
 
   const isConsumer = currentUser?.type === "consumer";

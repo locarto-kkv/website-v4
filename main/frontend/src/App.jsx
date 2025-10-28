@@ -4,8 +4,9 @@ import { Routes, Route, Navigate } from "react-router-dom"; // Ensure Navigate i
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 import { useDataStore } from "./store/useDataStore";
-import { ConsumerDataProvider } from "./context/consumer/consumerDataContext";
+import { useConsumerDataStore } from "./store/consumer/consumerDataStore";
 import { useVendorDataStore } from "./store/vendor/vendorDataStore";
+import { shallow } from "zustand/shallow";
 
 // Public Pages
 import Homepage from "./pages/Homepage";
@@ -26,37 +27,48 @@ import AdminRoutes from "./pages/admin/adminRoutes";
 import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
-  const { authLoading, checkAuth, currentUser } = useAuthStore();
-  const { loadBlogs } = useDataStore();
-  const { loadVendorData, clearVendorData } = useVendorDataStore();
+  const authLoading = useAuthStore((s) => s.authLoading);
+  const checkAuth = useAuthStore((s) => s.checkAuth);
+  const currentUser = useAuthStore((s) => s.currentUser);
+
+  const dataLoading = useDataStore((s) => s.dataLoading);
+  const loadBlogs = useDataStore((s) => s.loadBlogs);
+
+  const consumerLoading = useConsumerDataStore((s) => s.dataLoading);
+  const loadConsumerData = useConsumerDataStore((s) => s.loadConsumerData);
+  const clearConsumerData = useConsumerDataStore((s) => s.clearConsumerData);
+
+  const vendorLoading = useVendorDataStore((s) => s.dataLoading);
+  const loadVendorData = useVendorDataStore((s) => s.loadVendorData);
+  const clearVendorData = useVendorDataStore((s) => s.clearVendorData);
 
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+  }, []);
 
-  /** --------------------------
-   * Effect: Load blogs on mount
-   * -------------------------- */
   useEffect(() => {
     loadBlogs();
   }, []);
 
-  /** --------------------------
-   * Effect: Load data on user change
-   * -------------------------- */
   useEffect(() => {
     if (currentUser?.type === "consumer") {
       clearVendorData();
-      // loadConsumerData();
+      loadConsumerData();
     } else if (currentUser?.type === "vendor") {
+      clearConsumerData();
       loadVendorData();
     }
   }, [currentUser]);
 
-  if (authLoading) {
+  if (authLoading || dataLoading || consumerLoading || vendorLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
+      <div className="flex items-center justify-center min-h-screen pt-[70px]">
+        {" "}
+        {/* Adjusted min-height */}
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading data...</p>
+        </div>
       </div>
     );
   }
@@ -91,14 +103,7 @@ function App() {
         <Route path="vendor/*" element={<VendorRoutes />} />
 
         {/* --- CONSUMER ROUTES --- */}
-        <Route
-          path="consumer/*"
-          element={
-            <ConsumerDataProvider>
-              <ConsumerRoutes />
-            </ConsumerDataProvider>
-          }
-        />
+        <Route path="consumer/*" element={<ConsumerRoutes />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 

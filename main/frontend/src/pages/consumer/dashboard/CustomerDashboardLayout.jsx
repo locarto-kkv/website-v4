@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import DashboardNavbar from "../../../components/DashboardNavbar"; // Adjust path if needed
 import Sidebar from "../../../components/Sidebar"; // Adjust path if needed
-import { useConsumerData } from "../../../context/consumer/consumerDataContext"; // Adjust path if needed
+import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore"; // Adjust path if needed
 
 const CustomerDashboardLayout = () => {
   const navigate = useNavigate();

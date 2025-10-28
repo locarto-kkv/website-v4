@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 // Corrected import path
 import { useAuthStore } from "../../store/useAuthStore";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
+import { useConsumerDataStore } from "../../store/consumer/consumerDataStore";
 import { useNavigate } from "react-router-dom";
 // Corrected import path
 import { formatCurrency } from "../../lib/utils"; // Import formatCurrency
@@ -24,8 +25,9 @@ const SideCart = ({ isOpen, onClose }) => {
   // --- HOOKS ---
   const navigate = useNavigate();
   // Assuming ConsumerListService provides these functions:
-  const { currentUser } = useAuthStore();
-  const { getLists, removeFromList, updateList } = ConsumerListService;
+  const currentUser = useAuthStore((s) => s.currentUser);
+  const { removeFromList, updateList } = ConsumerListService;
+  const lists = useConsumerDataStore((state) => state.lists);
 
   // --- EFFECTS ---
   // Load cart items on mount or when isOpen changes
@@ -35,8 +37,7 @@ const SideCart = ({ isOpen, onClose }) => {
 
       const loadCart = async () => {
         try {
-          const res = await getLists(); // Changed from getList to getLists
-          const currentCartItems = res?.cart || []; // Safely access cart
+          const currentCartItems = lists?.cart || [];
           setCartItems(currentCartItems);
           updatePrices(currentCartItems);
         } catch (error) {
@@ -48,11 +49,10 @@ const SideCart = ({ isOpen, onClose }) => {
       if (currentUser?.type === "consumer") {
         loadCart();
       }
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
-  }, [isOpen]); // Depend on isOpen to refresh cart when opened
+  }, [isOpen]);
 
-  // --- FUNCTIONS ---
   // Update prices based on cart items
   const updatePrices = (items) => {
     const subtotal = items.reduce(

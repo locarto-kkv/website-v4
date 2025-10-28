@@ -1,7 +1,7 @@
 // src/pages/consumer/dashboard/ConsumerSettings.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useConsumerData } from "../../../context/consumer/consumerDataContext";
+import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore";
 
 const ToggleSwitch = ({ enabled, onChange, color = "orange" }) => (
   <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
@@ -76,7 +76,7 @@ const CustomerSettings = () => {
   const [marketingEmails, setMarketingEmails] = useState(true);
 
   const navigate = useNavigate();
-  const { orders } = useConsumerData();
+  const { orders } = useConsumerDataStore();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -117,7 +117,10 @@ const CustomerSettings = () => {
     <div className="grid grid-cols-1 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
       <div className="xl:col-span-3">
         {/* Reduced spacing on mobile: space-y-3 instead of space-y-4 */}
-        <form onSubmit={handleSaveChanges} className="space-y-3 md:space-y-4 lg:space-y-6">
+        <form
+          onSubmit={handleSaveChanges}
+          className="space-y-3 md:space-y-4 lg:space-y-6"
+        >
           {/* Reduced padding on mobile: p-3 instead of p-4 */}
           <div className="bg-white rounded-2xl shadow-lg p-3 md:p-4 lg:p-6 border border-gray-100">
             {/* Reduced gap and margin on mobile */}
@@ -150,16 +153,30 @@ const CustomerSettings = () => {
             <div className="space-y-3 md:space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <EditableInput
-                  label="Full Name" id="name" name="name"
-                  value={profileData.name} onChange={handleInputChange} isEditing={isEditingAccountInfo}
+                  label="Full Name"
+                  id="name"
+                  name="name"
+                  value={profileData.name}
+                  onChange={handleInputChange}
+                  isEditing={isEditingAccountInfo}
                 />
                 <EditableInput
-                  label="Email" id="email" name="email"
-                  value={profileData.email} onChange={handleInputChange} isEditing={isEditingAccountInfo} type="email"
+                  label="Email"
+                  id="email"
+                  name="email"
+                  value={profileData.email}
+                  onChange={handleInputChange}
+                  isEditing={isEditingAccountInfo}
+                  type="email"
                 />
                 <EditableInput
-                  label="Phone" id="phone" name="phone"
-                  value={profileData.phone} onChange={handleInputChange} isEditing={isEditingAccountInfo} type="tel"
+                  label="Phone"
+                  id="phone"
+                  name="phone"
+                  value={profileData.phone}
+                  onChange={handleInputChange}
+                  isEditing={isEditingAccountInfo}
+                  type="tel"
                 />
               </div>
               {/* Reduced padding and margin */}
@@ -167,25 +184,45 @@ const CustomerSettings = () => {
                 Shipping Address
               </h3>
               <EditableInput
-                label="Address Line 1" id="addressLine1" name="addressLine1"
-                value={profileData.addressLine1} onChange={handleInputChange} isEditing={isEditingAccountInfo}
+                label="Address Line 1"
+                id="addressLine1"
+                name="addressLine1"
+                value={profileData.addressLine1}
+                onChange={handleInputChange}
+                isEditing={isEditingAccountInfo}
               />
               <EditableInput
-                label="Address Line 2 (Optional)" id="addressLine2" name="addressLine2"
-                value={profileData.addressLine2} onChange={handleInputChange} isEditing={isEditingAccountInfo}
+                label="Address Line 2 (Optional)"
+                id="addressLine2"
+                name="addressLine2"
+                value={profileData.addressLine2}
+                onChange={handleInputChange}
+                isEditing={isEditingAccountInfo}
               />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
                 <EditableInput
-                  label="City" id="city" name="city"
-                  value={profileData.city} onChange={handleInputChange} isEditing={isEditingAccountInfo}
+                  label="City"
+                  id="city"
+                  name="city"
+                  value={profileData.city}
+                  onChange={handleInputChange}
+                  isEditing={isEditingAccountInfo}
                 />
                 <EditableInput
-                  label="State" id="state" name="state"
-                  value={profileData.state} onChange={handleInputChange} isEditing={isEditingAccountInfo}
+                  label="State"
+                  id="state"
+                  name="state"
+                  value={profileData.state}
+                  onChange={handleInputChange}
+                  isEditing={isEditingAccountInfo}
                 />
                 <EditableInput
-                  label="Pincode" id="pincode" name="pincode"
-                  value={profileData.pincode} onChange={handleInputChange} isEditing={isEditingAccountInfo}
+                  label="Pincode"
+                  id="pincode"
+                  name="pincode"
+                  value={profileData.pincode}
+                  onChange={handleInputChange}
+                  isEditing={isEditingAccountInfo}
                 />
               </div>
               {isEditingAccountInfo && (
@@ -223,19 +260,31 @@ const CustomerSettings = () => {
                 <span className="text-gray-700 font-medium text-sm">
                   Order updates via Email
                 </span>
-                <ToggleSwitch enabled={emailNotifications} onChange={() => toggleSetting(setEmailNotifications)} color="purple" />
+                <ToggleSwitch
+                  enabled={emailNotifications}
+                  onChange={() => toggleSetting(setEmailNotifications)}
+                  color="purple"
+                />
               </div>
               <div className="flex items-center justify-between p-2.5 md:p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700 font-medium text-sm">
                   Order updates via SMS
                 </span>
-                <ToggleSwitch enabled={smsNotifications} onChange={() => toggleSetting(setSmsNotifications)} color="purple" />
+                <ToggleSwitch
+                  enabled={smsNotifications}
+                  onChange={() => toggleSetting(setSmsNotifications)}
+                  color="purple"
+                />
               </div>
               <div className="flex items-center justify-between p-2.5 md:p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700 font-medium text-sm">
                   Promotional & Marketing Emails
                 </span>
-                <ToggleSwitch enabled={marketingEmails} onChange={() => toggleSetting(setMarketingEmails)} color="purple" />
+                <ToggleSwitch
+                  enabled={marketingEmails}
+                  onChange={() => toggleSetting(setMarketingEmails)}
+                  color="purple"
+                />
               </div>
             </div>
           </div>
@@ -246,13 +295,19 @@ const CustomerSettings = () => {
               type="submit"
               disabled={loading || !isEditingAccountInfo}
               className={`py-2.5 px-5 md:py-3 md:px-6 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2 ${
-                loading || !isEditingAccountInfo ? "opacity-50 cursor-not-allowed" : ""
+                loading || !isEditingAccountInfo
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
             >
               {loading ? (
-                <><i className="fas fa-spinner fa-spin"></i> Saving...</>
+                <>
+                  <i className="fas fa-spinner fa-spin"></i> Saving...
+                </>
               ) : (
-                <><i className="fas fa-save"></i> Save Changes</>
+                <>
+                  <i className="fas fa-save"></i> Save Changes
+                </>
               )}
             </button>
           </div>
@@ -264,7 +319,9 @@ const CustomerSettings = () => {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-3 md:p-4 lg:p-6">
           <div className="flex flex-col items-center text-center sm:flex-row sm:text-left sm:items-center gap-3 md:gap-4 mb-3 md:mb-4">
             <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-md flex-shrink-0">
-              {profileData.name ? profileData.name.charAt(0).toUpperCase() : "?"}
+              {profileData.name
+                ? profileData.name.charAt(0).toUpperCase()
+                : "?"}
             </div>
             <div>
               <h3 className="font-bold text-base md:text-lg text-gray-900">
@@ -296,7 +353,9 @@ const CustomerSettings = () => {
           <div className="space-y-2 md:space-y-3">
             <div className="p-2.5 md:p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
               <p className="text-sm text-gray-600 font-medium">Total Orders</p>
-              <p className="text-xl md:text-2xl font-bold text-gray-900">{totalOrders}</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-900">
+                {totalOrders}
+              </p>
             </div>
             <div className="p-2.5 md:p-3 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl border border-yellow-100">
               <p className="text-sm text-gray-600 font-medium">
@@ -323,19 +382,22 @@ const CustomerSettings = () => {
               onClick={() => navigate("/consumer/dashboard/orders")}
               className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
-              <i className="fas fa-box w-4 text-center text-gray-500"></i> My Orders
+              <i className="fas fa-box w-4 text-center text-gray-500"></i> My
+              Orders
             </button>
             <button
               onClick={() => navigate("/consumer/dashboard/lists")}
               className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
-              <i className="fas fa-list w-4 text-center text-gray-500"></i> My Lists
+              <i className="fas fa-list w-4 text-center text-gray-500"></i> My
+              Lists
             </button>
             <button
               onClick={() => navigate("/consumer/dashboard/support")}
               className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
-              <i className="fas fa-headset w-4 text-center text-gray-500"></i> Support
+              <i className="fas fa-headset w-4 text-center text-gray-500"></i>{" "}
+              Support
             </button>
           </div>
         </div>

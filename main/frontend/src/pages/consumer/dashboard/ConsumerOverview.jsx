@@ -1,6 +1,6 @@
 // src/pages/consumer/dashboard/CustomerOverview.jsx
 import { useNavigate } from "react-router-dom";
-import { useConsumerData } from "../../../context/consumer/consumerDataContext";
+import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore";
 
 const StatCard = ({ title, value, icon, gradient, trend, trendValue }) => (
   <div className="group relative bg-white p-4 md:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-orange-200 transform hover:-translate-y-1">
@@ -13,7 +13,9 @@ const StatCard = ({ title, value, icon, gradient, trend, trendValue }) => (
           {title}
         </p>
         <div className="flex items-baseline gap-1.5 md:gap-2 mt-2 md:mt-3">
-          <h3 className="text-2xl md:text-3xl font-black text-gray-900">{value}</h3>
+          <h3 className="text-2xl md:text-3xl font-black text-gray-900">
+            {value}
+          </h3>
           {trend && (
             <div
               className={`flex items-center gap-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-xs font-semibold ${
@@ -37,7 +39,9 @@ const StatCard = ({ title, value, icon, gradient, trend, trendValue }) => (
       <div
         className={`relative w-12 h-12 md:w-14 md:h-14 ${gradient} rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-110`}
       >
-        <i className={`${icon} text-white text-lg md:text-xl drop-shadow-sm`}></i>
+        <i
+          className={`${icon} text-white text-lg md:text-xl drop-shadow-sm`}
+        ></i>
       </div>
     </div>
   </div>
@@ -45,7 +49,7 @@ const StatCard = ({ title, value, icon, gradient, trend, trendValue }) => (
 
 const CustomerOverview = () => {
   const navigate = useNavigate();
-  const { orders, lists } = useConsumerData();
+  const { orders, lists } = useConsumerDataStore();
 
   const pendingOrders = (orders || []).filter(
     (o) => o.status === "pending" || o.status === "shipped"
@@ -103,8 +107,12 @@ const CustomerOverview = () => {
               >
                 <div className="w-14 h-14 md:w-16 md:h-16 bg-gray-200 rounded-lg flex-shrink-0"></div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm md:text-base truncate">{rec.name}</h3>
-                  <p className="text-orange-500 font-bold text-sm md:text-base">₹{rec.price}</p>
+                  <h3 className="font-semibold text-gray-900 text-sm md:text-base truncate">
+                    {rec.name}
+                  </h3>
+                  <p className="text-orange-500 font-bold text-sm md:text-base">
+                    ₹{rec.price}
+                  </p>
                 </div>
                 <button className="w-9 h-9 md:w-10 md:h-10 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-lg transition-all flex-shrink-0">
                   <i className="fas fa-plus text-sm"></i>

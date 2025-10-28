@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDataStore } from "../../store/useDataStore";
-import { useConsumerData } from "../../context/consumer/consumerDataContext";
+import { useConsumerDataStore } from "../../store/consumer/consumerDataStore";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
 import { useAuthStore } from "../../store/useAuthStore";
 import toast from "react-hot-toast";
@@ -17,7 +17,7 @@ const ShopProducts = () => {
   let wishlist = [];
 
   if (currentUser?.type === "consumer") {
-    var { lists, fetchLists } = useConsumerData();
+    var { lists, fetchLists } = useConsumerDataStore();
     cart = lists?.cart || [];
     wishlist = lists?.wishlist || [];
   }

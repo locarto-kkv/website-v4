@@ -3,7 +3,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 // Import ConsumerDataContext conditionally or ensure safe access
-import { useConsumerData } from "../context/consumer/consumerDataContext";
+import { useConsumerDataStore } from "../store/consumer/consumerDataStore";
 
 // Accept isOpen and onClose props for mobile responsiveness
 const Sidebar = ({ onNavigate, isOpen, onClose }) => {
@@ -15,7 +15,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
   const isConsumer = currentUser?.type === "consumer";
 
   // Safely get consumer data
-  const consumerDataContext = isConsumer ? useConsumerData() : null;
+  const consumerDataContext = isConsumer ? useConsumerDataStore() : null;
   const lists = consumerDataContext?.lists;
 
   const cartCount = lists?.cart ? Object.keys(lists.cart).length : 0;
@@ -224,7 +224,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
         aria-label="Main navigation"
       >
         {/* Mobile Close Button - Moved inside the header for better layout */}
-        
+
         {/* Header */}
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -248,7 +248,6 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
             <i className="fas fa-times text-xl text-gray-600"></i>
           </button>
         </div>
-
 
         {/* Navigation Menu */}
         <nav className="flex-1 p-4 overflow-y-auto">

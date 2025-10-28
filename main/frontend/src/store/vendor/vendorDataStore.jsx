@@ -9,12 +9,9 @@ export const useVendorDataStore = create((set, get) => ({
   products: [],
   vendor: [],
   orders: [],
-  profile: null,
-  dataLoading: true,
+  profile: [],
+  dataLoading: false,
 
-  /** --------------------------
-   * ✅ Helper: Load cached data
-   * -------------------------- */
   loadCache: (name) => {
     try {
       const cached = localStorage.getItem(name);
@@ -27,9 +24,6 @@ export const useVendorDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * ✅ Helper: Set cache data
-   * -------------------------- */
   setCache: (name, data) => {
     try {
       localStorage.setItem(
@@ -41,9 +35,6 @@ export const useVendorDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * ✅ Clear all cached data
-   * -------------------------- */
   clearVendorData: () => {
     set({ dataLoading: true });
     try {
@@ -62,9 +53,6 @@ export const useVendorDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * ✅ Change analytics range
-   * -------------------------- */
   changeDataRange: (range) => {
     set({ dataLoading: true });
     try {
@@ -89,9 +77,6 @@ export const useVendorDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * ✅ Fetch profile
-   * -------------------------- */
   fetchProfile: async () => {
     set({ dataLoading: true });
     try {
@@ -107,9 +92,6 @@ export const useVendorDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * ✅ Fetch analytics
-   * -------------------------- */
   fetchAnalytics: async () => {
     set({ dataLoading: true });
     try {
@@ -129,9 +111,6 @@ export const useVendorDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * ✅ Fetch orders
-   * -------------------------- */
   fetchOrders: async () => {
     set({ dataLoading: true });
     try {
@@ -147,9 +126,6 @@ export const useVendorDataStore = create((set, get) => ({
     }
   },
 
-  /** --------------------------
-   * ✅ Load all vendor data (profile + analytics + orders)
-   * -------------------------- */
   loadVendorData: async () => {
     set({ dataLoading: true });
     try {

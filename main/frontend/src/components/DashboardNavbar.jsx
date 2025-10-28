@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore.jsx";
 // Import ConsumerDataContext conditionally or ensure safe access
-import { useConsumerData } from "../context/consumer/consumerDataContext.jsx"; // Adjust if needed
+import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx"; // Adjust if needed
 import { ConsumerListService } from "../services/consumer/consumerListService.js"; // Adjust if needed for cart count
 import locartoImg from "../assets/locarto.png";
 import toast from "react-hot-toast"; // Ensure toast is imported
@@ -26,7 +26,7 @@ const DashboardNavbar = ({ onMenuClick }) => {
   const isConsumer = currentUser?.type === "consumer";
 
   // Safely get consumer data and services only if consumer
-  const consumerDataContext = isConsumer ? useConsumerData() : null;
+  const consumerDataContext = isConsumer ? useConsumerDataStore() : null;
   const lists = consumerDataContext?.lists;
 
   // Fetch Cart Count only if consumer
@@ -188,8 +188,8 @@ const DashboardNavbar = ({ onMenuClick }) => {
               {currentUser ? (
                 // *** MODIFIED PART: Replaced span with i tag for the icon ***
                 <i className="fas fa-user text-sm sm:text-base"></i>
-                // *** END OF MODIFICATION ***
               ) : (
+                // *** END OF MODIFICATION ***
                 <i className="fas fa-user-plus text-sm sm:text-base"></i> // Icon if not logged in
               )}
             </button>

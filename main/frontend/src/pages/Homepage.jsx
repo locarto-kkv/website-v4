@@ -7,8 +7,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { getGreeting } from "../lib/utils.js";
 import { getRandomMsg } from "../services/welcomeMsgs.js";
 import { useAuthStore } from "../store/useAuthStore.jsx";
-import { ConsumerProfileService } from "../services/consumer/consumerProfileService.js";
-import { VendorProfileService } from "../services/vendor/vendorProfileService.js";
+import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx";
+import { useVendorDataStore } from "../store/vendor/vendorDataStore.jsx";
 
 // Background Assets - Now using public folder paths
 const asset1 = "/assets/1.png";
@@ -22,37 +22,12 @@ const Homepage = () => {
   const [showError, setShowError] = useState(false);
   const [suggestedCategory, setSuggestedCategory] = useState("");
   const [name, setName] = useState("");
-  const { currentUser } = useAuthStore();
   const [welcomeMessage, setWelcomeMessage] = useState("");
 
   const navigate = useNavigate();
 
   const availableCategories = ["personal care", "accessories"];
   const popularProducts = [];
-
-  useEffect(() => {
-    setWelcomeMessage(getRandomMsg());
-  }, []);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-
-    if (searchQuery.trim() === "") {
-      return;
-    }
-
-    const normalizedQuery = searchQuery.toLowerCase().trim();
-    const foundCategory = availableCategories.find((category) =>
-      category.includes(normalizedQuery)
-    );
-
-    if (foundCategory) {
-      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`);
-    } else {
-      setShowError(true);
-      setSuggestedCategory(availableCategories[0]);
-    }
-  };
 
   const handleInputChange = (e) => {
     setSearchQuery(e.target.value);
@@ -81,21 +56,44 @@ const Homepage = () => {
     }
   };
 
+  const currentUser = useAuthStore((s) => s.currentUser);
+
+  const consumerProfile = useConsumerDataStore((s) => s.profile);
+  const vendorProfile = useVendorDataStore((s) => s.profile);
+
   useEffect(() => {
-    const funcConsumer = async () => {
-      const profile = await ConsumerProfileService.getProfile();
-      setName(profile.name);
-    };
-    const funcVendor = async () => {
-      const profile = await VendorProfileService.getProfile();
-      setName(profile.name);
-    };
     if (currentUser?.type === "consumer") {
-      funcConsumer();
+      setName(consumerProfile.name);
     } else if (currentUser?.type === "vendor") {
-      funcVendor();
+      setName(vendorProfile.name);
+    } else {
+      setName("");
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    setWelcomeMessage(getRandomMsg());
+  }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    if (searchQuery.trim() === "") {
+      return;
+    }
+
+    const normalizedQuery = searchQuery.toLowerCase().trim();
+    const foundCategory = availableCategories.find((category) =>
+      category.includes(normalizedQuery)
+    );
+
+    if (foundCategory) {
+      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`);
+    } else {
+      setShowError(true);
+      setSuggestedCategory(availableCategories[0]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">

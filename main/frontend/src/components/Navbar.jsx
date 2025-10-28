@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore.jsx";
 import SideCart from "../components/consumer/SideCart.jsx";
-import { ConsumerListService } from "../services/consumer/consumerListService.js";
+import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx";
 import locartoImg from "../assets/locarto.png";
 import toast from "react-hot-toast";
 
@@ -17,15 +17,16 @@ const Navbar = ({ pageType = "landing" }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { currentUser, logout } = useAuthStore();
-  const { getLists } = ConsumerListService;
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const logout = useAuthStore((state) => state.logout);
+
+  const lists = useConsumerDataStore((state) => state.lists);
 
   useEffect(() => {
     const loadCart = async () => {
       if (currentUser?.type === "consumer") {
         try {
-          const res = await getLists();
-          setCartItemsCount(res?.cart?.length || 0);
+          setCartItemsCount(lists?.cart?.length || 0);
         } catch (error) {
           console.log("Error loading cart items count:", error);
           setCartItemsCount(0);
@@ -35,7 +36,7 @@ const Navbar = ({ pageType = "landing" }) => {
       }
     };
     loadCart();
-  }, [currentUser, getLists, isCartOpen]);
+  }, [currentUser, isCartOpen]);
 
   const toggleCart = () => {
     setIsCartOpen((prev) => !prev);
