@@ -32,6 +32,7 @@ const MapView = () => {
   const blogs = useDataStore((s) => s.blogs);
   const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
   const productLoading = useDataStore((s) => s.productLoading);
+  const dataLoading = useDataStore((s) => s.dataLoading);
 
   const [showOverlay, setShowOverlay] = useState(true);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(() => {
@@ -126,20 +127,17 @@ const MapView = () => {
 
   useEffect(() => {
     const fetchCategoryProducts = async () => {
-      if (showOverlay || productLoading) return;
+      if (!showOverlay && !productLoading && blogs.length === 0) return;
       const category = categories[currentCategoryIndex].name;
       try {
-        console.log(category);
-
         await fetchProductsInBatch({ category });
       } catch (err) {
         console.error("Error fetching products for category:", err);
       }
     };
-    console.log(showOverlay, productLoading);
 
     fetchCategoryProducts();
-  }, [showOverlay, currentCategoryIndex]);
+  }, [showOverlay, currentCategoryIndex, dataLoading]);
 
   useEffect(() => {
     if (!map) return;

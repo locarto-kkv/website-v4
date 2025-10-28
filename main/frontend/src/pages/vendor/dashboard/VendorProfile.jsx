@@ -6,8 +6,10 @@ import { useDataStore } from "../../../store/useDataStore";
 import { formatCurrency } from "../../../lib/utils"; // Import formatCurrency
 
 const VendorProfile = () => {
-  const { blogs } = useDataStore();
-  const { vendor, profile, dataLoading } = useVendorDataStore();
+  const blogs = useDataStore((s) => s.blogs);
+  const vendor = useVendorDataStore((s) => s.vendor);
+  const profile = useVendorDataStore((s) => s.profile);
+  const dataLoading = useVendorDataStore((s) => s.dataLoading);
   const navigate = useNavigate();
 
   const [profileData, setProfileData] = useState(null);
@@ -142,30 +144,13 @@ const VendorProfile = () => {
     : "N/A";
 
   // Loading State
-  if (dataLoading && !profileData) {
+  if (dataLoading || !profileData) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-150px)]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading Profile...</p>
         </div>
-      </div>
-    );
-  }
-
-  // Error/Empty State
-  if (!profileData) {
-    return (
-      <div className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen text-center">
-        <p className="text-gray-600 mb-4">
-          Could not load profile data or profile is incomplete.
-        </p>
-        <button
-          onClick={openSetup}
-          className="bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition"
-        >
-          Complete Setup
-        </button>
       </div>
     );
   }

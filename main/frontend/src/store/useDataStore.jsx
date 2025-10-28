@@ -46,11 +46,11 @@ export const useDataStore = create((set, get) => ({
     set({ productLoading: true });
     try {
       const { start, blogs } = get();
+
       const response = await ConsumerProductService.getProductsByFilter(
         query,
         start
       );
-      console.log(blogs);
 
       const updatedBlogs = blogs.map((blog) => {
         const vendorProducts = response.filter(
@@ -58,7 +58,6 @@ export const useDataStore = create((set, get) => ({
         );
         return { ...blog, products: vendorProducts };
       });
-      console.log(updatedBlogs);
 
       set({ blogs: updatedBlogs });
     } catch (error) {
