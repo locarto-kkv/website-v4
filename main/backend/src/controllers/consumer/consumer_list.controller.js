@@ -74,9 +74,10 @@ export const removeFromList = async (req, res) => {
       .delete()
       .eq("consumer_id", userId)
       .eq("list_type", list_type)
-      .eq("product_id", productId);
+      .eq("product_id", productId)
+      .select();
 
-    res.status(200).json("Item Removed From List");
+    getListItems(req, res);
   } catch (error) {
     logger({
       level: "error",

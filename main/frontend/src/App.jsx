@@ -16,7 +16,7 @@ import BrandInfoPage from "./pages/BrandInfoPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import ShopProducts from "./pages/consumer/ShopProducts";
-import ProductViewPage from "./pages/consumer/ProductViewPage";
+import ProductViewPage from "./pages/ProductViewPage";
 import AlertsPage from "./pages/AlertsPage";
 
 // Other Routes

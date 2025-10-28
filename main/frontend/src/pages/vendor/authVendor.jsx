@@ -4,9 +4,7 @@ import { Link } from "react-router-dom";
 import AuthLayout from "../../components/AuthLayout"; // Import the layout
 
 // Inputs remain mostly the same, maybe adjust styling if needed
-const OtpInput = (
-  { value, onChange } // [cite: src/pages/vendor/authVendor.jsx]
-) => (
+const OtpInput = ({ value, onChange }) => (
   <div>
     <label
       htmlFor="otp"
@@ -32,9 +30,7 @@ const OtpInput = (
   </div>
 );
 
-const PasswordInput = (
-  { value, onChange, showPassword, setShowPassword } // [cite: src/pages/vendor/authVendor.jsx]
-) => (
+const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => (
   <div>
     <label
       htmlFor="password"
@@ -46,7 +42,7 @@ const PasswordInput = (
       <input
         id="password"
         name="password"
-        type={showPassword ? "text" : "password"} // [cite: src/pages/vendor/authVendor.jsx]
+        type={showPassword ? "text" : "password"}
         required
         className="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-10 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
         value={value}
@@ -55,12 +51,12 @@ const PasswordInput = (
 
       <button
         type="button"
-        onClick={() => setShowPassword(!showPassword)} // [cite: src/pages/vendor/authVendor.jsx]
+        onClick={() => setShowPassword(!showPassword)}
         className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 focus:outline-none"
-        aria-label={showPassword ? "Hide password" : "Show password"} // [cite: src/pages/vendor/authVendor.jsx]
-        tabIndex={-1} // [cite: src/pages/vendor/authVendor.jsx]
+        aria-label={showPassword ? "Hide password" : "Show password"}
+        tabIndex={-1}
       >
-        {showPassword ? ( // [cite: src/pages/vendor/authVendor.jsx]
+        {showPassword ? (
           <i className="fas fa-eye-slash"></i>
         ) : (
           <i className="fas fa-eye"></i>
@@ -71,11 +67,10 @@ const PasswordInput = (
 );
 
 const AuthVendor = () => {
-  const [isLogin, setIsLogin] = useState(true); // [cite: src/pages/vendor/authVendor.jsx]
-  const [usePassword, setUsePassword] = useState(false); // [cite: src/pages/vendor/authVendor.jsx]
-  const [showPassword, setShowPassword] = useState(false); // [cite: src/pages/vendor/authVendor.jsx]
+  const [isLogin, setIsLogin] = useState(true);
+  const [usePassword, setUsePassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    // [cite: src/pages/vendor/authVendor.jsx]
     name: "",
     email: "",
     otp: "",
@@ -84,27 +79,25 @@ const AuthVendor = () => {
   });
 
   const {
-    sendVerification, // [cite: src/pages/vendor/authVendor.jsx]
-    login, // [cite: src/pages/vendor/authVendor.jsx]
-    signup, // [cite: src/pages/vendor/authVendor.jsx]
-    googleLogin, // [cite: src/pages/vendor/authVendor.jsx]
-    checkAuth, // [cite: src/pages/vendor/authVendor.jsx]
-    sentOtp, // [cite: src/pages/vendor/authVendor.jsx]
-    loginLoading, // [cite: src/pages/vendor/authVendor.jsx]
-    signupLoading, // [cite: src/pages/vendor/authVendor.jsx]
-    otpLoading, // [cite: src/pages/vendor/authVendor.jsx]
-    cooldown, // [cite: src/pages/vendor/authVendor.jsx]
+    sendVerification,
+    login,
+    signup,
+    googleLogin,
+    checkAuth,
+    sentOtp,
+    loginLoading,
+    signupLoading,
+    otpLoading,
+    cooldown,
   } = useAuthStore();
 
-  const setSentOtp = (val) => useAuthStore.setState({ sentOtp: val }); // [cite: src/pages/vendor/authVendor.jsx]
+  const setSentOtp = (val) => useAuthStore.setState({ sentOtp: val });
 
   const getButtonText = () => {
-    // [cite: src/pages/vendor/authVendor.jsx]
     if (usePassword)
-      return loginLoading ? "Logging in..." : "Login with Password"; // [cite: src/pages/vendor/authVendor.jsx]
+      return loginLoading ? "Logging in..." : "Login with Password";
     if (!usePassword) {
-      // [cite: src/pages/vendor/authVendor.jsx]
-      if (!sentOtp) return otpLoading ? "Sending OTP..." : "Get OTP"; // [cite: src/pages/vendor/authVendor.jsx]
+      if (!sentOtp) return otpLoading ? "Sending OTP..." : "Get OTP";
       if (sentOtp)
         return signupLoading || loginLoading
           ? "Verifying..."
@@ -113,68 +106,58 @@ const AuthVendor = () => {
   };
 
   const handleAuthType = () => {
-    // [cite: src/pages/vendor/authVendor.jsx]
-    setUsePassword((prev) => !prev); // [cite: src/pages/vendor/authVendor.jsx]
+    setUsePassword((prev) => !prev);
     setFormData((prev) => ({ ...prev, otp: "", password: "" })); // Clear other field on switch
     setSentOtp(false); // Reset OTP state when switching
   };
 
   const handleChange = (e) => {
-    // [cite: src/pages/vendor/authVendor.jsx]
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value })); // [cite: src/pages/vendor/authVendor.jsx]
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
-    // [cite: src/pages/vendor/authVendor.jsx]
-    e.preventDefault(); // [cite: src/pages/vendor/authVendor.jsx]
+    e.preventDefault();
 
     if (sentOtp || usePassword) {
-      // [cite: src/pages/vendor/authVendor.jsx]
-      isLogin // [cite: src/pages/vendor/authVendor.jsx]
-        ? await login(formData, "vendor") // [cite: src/pages/vendor/authVendor.jsx]
-        : await signup(formData, "vendor"); // [cite: src/pages/vendor/authVendor.jsx]
-      setSentOtp(false); // [cite: src/pages/vendor/authVendor.jsx]
+      isLogin
+        ? await login(formData, "vendor")
+        : await signup(formData, "vendor");
+      setSentOtp(false);
     } else {
-      await sendVerification(formData, "vendor"); // [cite: src/pages/vendor/authVendor.jsx]
-      setSentOtp(true); // [cite: src/pages/vendor/authVendor.jsx]
+      await sendVerification(formData, "vendor");
+      setSentOtp(true);
     }
   };
 
   const handleGoogleSubmit = async () => {
-    // Removed 'e' // [cite: src/pages/vendor/authVendor.jsx]
-    googleLogin("vendor"); // [cite: src/pages/vendor/authVendor.jsx]
+    // Removed 'e'
+    googleLogin("vendor");
     // Removed checkAuth(), as redirection should happen via backend flow
   };
 
   const resendOtp = async () => {
-    // [cite: src/pages/vendor/authVendor.jsx]
-    if (cooldown > 0) return; // [cite: src/pages/vendor/authVendor.jsx]
-    await sendVerification(formData, "vendor"); // [cite: src/pages/vendor/authVendor.jsx]
-    setSentOtp(true); // [cite: src/pages/vendor/authVendor.jsx]
-    setFormData({ ...formData, otp: "" }); // [cite: src/pages/vendor/authVendor.jsx]
+    if (cooldown > 0) return;
+    await sendVerification(formData, "vendor");
+    setSentOtp(true);
+    setFormData({ ...formData, otp: "" });
   };
 
   // Cooldown timer remains the same
   useEffect(() => {
-    // [cite: src/pages/vendor/authVendor.jsx]
     if (cooldown === 0) {
-      // [cite: src/pages/vendor/authVendor.jsx]
       return;
     }
     const interval = setInterval(() => {
-      // [cite: src/pages/vendor/authVendor.jsx]
       useAuthStore.setState((state) => {
-        // [cite: src/pages/vendor/authVendor.jsx]
         if (state.cooldown <= 1) {
-          // [cite: src/pages/vendor/authVendor.jsx]
           clearInterval(interval); // Clear interval when cooldown reaches 0
           return { cooldown: 0 };
         }
-        return { cooldown: state.cooldown - 1 }; // [cite: src/pages/vendor/authVendor.jsx]
+        return { cooldown: state.cooldown - 1 };
       });
     }, 1000);
-    return () => clearInterval(interval); // [cite: src/pages/vendor/authVendor.jsx]
-  }, [cooldown]); // [cite: src/pages/vendor/authVendor.jsx]
+    return () => clearInterval(interval);
+  }, [cooldown]);
 
   return (
     <AuthLayout pageTitle="Vendor Portal">

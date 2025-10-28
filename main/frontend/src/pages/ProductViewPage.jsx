@@ -1,14 +1,15 @@
 // src/pages/consumer/ProductViewPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useDataStore } from "../../store/useDataStore";
-import { ConsumerListService } from "../../services/consumer/consumerListService";
-import { ConsumerProductService } from "../../services/consumer/consumerProductService";
-import { useAuthStore } from "../../store/useAuthStore";
-import { formatCurrency } from "../../lib/utils";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
+import { useDataStore } from "../store/useDataStore";
+import { ConsumerListService } from "../services/consumer/consumerListService";
+import { ConsumerProductService } from "../services/consumer/consumerProductService";
+import { useAuthStore } from "../store/useAuthStore";
+import { formatCurrency } from "../lib/utils";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import toast from "react-hot-toast";
+import { useConsumerDataStore } from "../store/consumer/consumerDataStore";
 
 const SimilarProductCard = ({ product }) => (
   <Link
@@ -51,32 +52,27 @@ const ProductViewPage = () => {
 
   const currentUser = useAuthStore((s) => s.currentUser);
   const blogs = useDataStore((s) => s.blogs);
-  const { getLists, updateList, removeFromList } = ConsumerListService;
+  const { updateList, removeFromList } = ConsumerListService;
+
+  const lists = useConsumerDataStore((s) => s.lists);
 
   const isConsumer = currentUser?.type === "consumer";
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [cartItem, setCartItem] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
 
-  const fetchLists = async () => {
-    const lists = await getLists();
+  const setLists = async () => {
     setIsInWishlist(
       lists.wishlist?.some((item) => item.product_id === product.id) || false
     );
     const foundCartItem = lists.cart?.find((item) => item.id === product.id);
     setCartItem(foundCartItem || null);
-    if (foundCartItem) {
-      setQuantity(foundCartItem.quantity);
-    } else {
-      setQuantity(1);
-    }
   };
 
   useEffect(() => {
@@ -93,48 +89,68 @@ const ProductViewPage = () => {
 
   useEffect(() => {
     if (isConsumer && product) {
-      fetchLists();
+      setLists();
     } else {
       setIsInWishlist(false);
       setCartItem(null);
-      setQuantity(1);
     }
-  }, [product, currentUser]);
+  }, [product, currentUser, lists]);
 
   const handleWishlistToggle = async () => {
     if (!isConsumer) {
       toast.error("Please log in as a customer to manage wishlist.");
       return;
     }
-    if (!product) return;
     try {
       if (isInWishlist) {
-        await removeFromList("wishlist", product.id);
+        const newList = await removeFromList("wishlist", product.id);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
         toast.success("Removed from Wishlist");
       } else {
-        await updateList("wishlist", 1, product.id);
+        const newList = await updateList("wishlist", 1, product.id);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
         toast.success("Added to Wishlist ❤️");
       }
-      await fetchLists();
     } catch (error) {
       toast.error("Could not update Wishlist.");
     }
   };
 
-  const handleQuantityChange = (delta) => {
-    setQuantity((prev) => Math.max(1, prev + delta));
-  };
-
-  const handleAddToCart = async () => {
+  const handleQuantityChange = async (delta) => {
     if (!isConsumer) {
       toast.error("Please log in as a customer to add items.");
       return;
     }
-    if (!product) return;
     try {
-      await updateList("cart", quantity, product.id);
-      toast.success(`${quantity} x ${product.name} added to cart! 🛒`);
-      await fetchLists();
+      if (cartItem?.quantity === 1 && delta < 1) {
+        const newList = await removeFromList("cart", product.id);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
+      } else if (!cartItem?.quantity) {
+        const newList = await updateList("cart", "1", product.id);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
+      } else {
+        const newList = await updateList(
+          "cart",
+          cartItem.quantity + delta,
+          product.id
+        );
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
+      }
     } catch (error) {
       toast.error("Could not add to cart.");
     }
@@ -145,11 +161,17 @@ const ProductViewPage = () => {
       toast.error("Please log in as a customer to buy.");
       return;
     }
-    if (!product) return;
     try {
-      await updateList("cart", quantity, product.id);
-      await fetchLists();
-      navigate("/consumer/checkout");
+      if (!cartItem?.quantity) {
+        const newList = await updateList("cart", "1", product.id);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
+        navigate("/consumer/checkout");
+      } else {
+        navigate("/consumer/checkout");
+      }
     } catch (error) {
       toast.error("Could not proceed to checkout.");
     }
@@ -478,7 +500,7 @@ const ProductViewPage = () => {
                       <i className="fas fa-minus text-lg"></i>
                     </button>
                     <span className="w-16 text-center font-bold text-2xl text-gray-800">
-                      {quantity}
+                      {cartItem?.quantity || 0}
                     </span>
                     <button
                       onClick={() => handleQuantityChange(1)}
@@ -487,27 +509,8 @@ const ProductViewPage = () => {
                       <i className="fas fa-plus text-lg"></i>
                     </button>
                   </div>
-                  {cartItem && (
-                    <div className="flex-1 bg-blue-50 border-2 border-blue-200 rounded-xl px-4 py-2 text-center">
-                      <p className="text-xs text-blue-600 font-semibold">
-                        In Cart
-                      </p>
-                      <p className="text-sm font-bold text-blue-700">
-                        {cartItem.quantity} items
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
-
-              {/* Add to Cart Button */}
-              <button
-                onClick={handleAddToCart}
-                className="w-full bg-gradient-to-r from-orange-100 to-red-100 text-orange-600 hover:from-orange-200 hover:to-red-200 border-2 border-orange-300 font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-lg hover:shadow-xl hover:scale-[1.02]"
-              >
-                <i className="fas fa-cart-plus text-xl"></i>
-                {cartItem ? "Update Cart" : "Add to Cart"}
-              </button>
 
               {/* Buy Now & Share */}
               <div className="grid grid-cols-2 gap-3">

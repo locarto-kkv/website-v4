@@ -38,9 +38,8 @@ const mockSavedAddresses = [
 // --- End Mock Data ---
 
 const CheckoutPage = () => {
-  // Use fetchLists from context to refresh cart data
-  const { lists, fetchLists } = useConsumerDataStore();
-  const { updateList, removeFromList } = ConsumerListService; // Destructure service methods
+  const lists = useConsumerDataStore((s) => s.lists);
+  const { updateList, removeFromList } = ConsumerListService;
   const navigate = useNavigate();
 
   // State for form data (can be used for 'Add New Address' or editing)
@@ -153,13 +152,20 @@ const CheckoutPage = () => {
     try {
       if (newQty === 0) {
         // If new quantity is 0, remove the item
-        await removeFromList("cart", productId);
+        const newList = await removeFromList("cart", productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
         toast.success(`${currentItem.name || "Item"} removed from cart`);
       } else {
         // Otherwise, update the quantity
-        await updateList("cart", newQty, productId);
+        const newList = await updateList("cart", newQty, productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
       }
-      await fetchLists(); // Refresh cart data from context
     } catch (err) {
       console.error("Error updating cart quantity:", err);
       toast.error("Could not update cart quantity.");
@@ -171,8 +177,11 @@ const CheckoutPage = () => {
       window.confirm(`Remove ${productName || "this item"} from your cart?`)
     ) {
       try {
-        await removeFromList("cart", productId);
-        await fetchLists(); // Refresh cart data
+        const newList = await removeFromList("cart", productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
         toast.success(`${productName || "Item"} removed from cart`);
       } catch (err) {
         console.error("Error removing item from cart:", err);

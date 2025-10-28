@@ -27,6 +27,8 @@ const SideCart = ({ isOpen, onClose }) => {
   // Assuming ConsumerListService provides these functions:
   const currentUser = useAuthStore((s) => s.currentUser);
   const { removeFromList, updateList } = ConsumerListService;
+  const fetchLists = useConsumerDataStore((state) => state.fetchLists);
+
   const lists = useConsumerDataStore((state) => state.lists);
 
   // --- EFFECTS ---
@@ -66,37 +68,15 @@ const SideCart = ({ isOpen, onClose }) => {
     setPrices({ subtotal, shipping, tax, total });
   };
 
-  // Update quantity in cart
-  const updateQuantity = async (productId, delta) => {
-    const currentItem = cartItems.find((item) => item.product_id === productId); // Match product_id
-    if (!currentItem) return;
-
-    const newQty = Math.max(0, (currentItem.quantity || 0) + delta); // Ensure quantity is >= 0
-
-    try {
-      if (newQty <= 0) {
-        await removeFromList("cart", productId);
-      } else {
-        await updateList("cart", newQty, productId);
-      }
-      // Re-fetch cart data to reflect changes
-      const updatedData = await getLists();
-      const updatedCartItems = updatedData?.cart || [];
-      setCartItems(updatedCartItems);
-      updatePrices(updatedCartItems);
-    } catch (err) {
-      console.error("Error updating cart quantity:", err);
-      // Optionally show error feedback
-    }
-  };
-
   // Remove item from cart
   const removeFromCart = async (productId) => {
     try {
-      await removeFromList("cart", productId);
-      // Re-fetch cart data
-      const updatedData = await getLists();
-      const updatedCartItems = updatedData?.cart || [];
+      const newList = await removeFromList("cart", productId);
+      useConsumerDataStore.setState((state) => ({
+        ...state,
+        lists: { ...newList },
+      }));
+      const updatedCartItems = newList?.cart || [];
       setCartItems(updatedCartItems);
       updatePrices(updatedCartItems);
     } catch (err) {
@@ -239,23 +219,12 @@ const SideCart = ({ isOpen, onClose }) => {
                       </p>
                       {/* Quantity Controls */}
                       <div className="flex items-center gap-2 mt-2">
-                        <button
-                          className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-orange-600 border border-gray-300 rounded-md transition-colors duration-200 hover:border-orange-300"
-                          onClick={() => updateQuantity(item.product_id, -1)}
-                          aria-label={`Decrease quantity of ${item.name}`}
-                        >
-                          <i className="fas fa-minus text-xs"></i>
-                        </button>
-                        <span className="w-8 text-center font-medium text-gray-800 text-sm">
+                        <span className="font-medium text-gray-800 text-sm">
+                          Quantity:
+                        </span>
+                        <span className="text-gray-800 text-sm font-semibold">
                           {item.quantity}
                         </span>
-                        <button
-                          className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-orange-600 border border-gray-300 rounded-md transition-colors duration-200 hover:border-orange-300"
-                          onClick={() => updateQuantity(item.product_id, 1)}
-                          aria-label={`Increase quantity of ${item.name}`}
-                        >
-                          <i className="fas fa-plus text-xs"></i>
-                        </button>
                       </div>
                     </div>
                     {/* Remove Button */}
@@ -292,6 +261,7 @@ const SideCart = ({ isOpen, onClose }) => {
                     type="text"
                     placeholder="Enter coupon code"
                     value={couponCode}
+                    disabled
                     onChange={(e) => setCouponCode(e.target.value)}
                     className="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-sm"
                   />

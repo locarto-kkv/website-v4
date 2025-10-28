@@ -4,9 +4,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import AuthLayout from "../../components/AuthLayout"; // Import the layout
 
 // Inputs remain mostly the same, maybe adjust styling if needed
-const OtpInput = (
-  { value, onChange } // [cite: src/pages/consumer/authConsumer.jsx]
-) => (
+const OtpInput = ({ value, onChange }) => (
   <div>
     <label
       htmlFor="otp"
@@ -32,9 +30,7 @@ const OtpInput = (
   </div>
 );
 
-const PasswordInput = (
-  { value, onChange, showPassword, setShowPassword } // [cite: src/pages/consumer/authConsumer.jsx]
-) => (
+const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => (
   <div>
     <label
       htmlFor="password"
@@ -46,7 +42,7 @@ const PasswordInput = (
       <input
         id="password"
         name="password"
-        type={showPassword ? "text" : "password"} // [cite: src/pages/consumer/authConsumer.jsx]
+        type={showPassword ? "text" : "password"}
         required
         className="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-10 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
         value={value}
@@ -55,11 +51,11 @@ const PasswordInput = (
 
       <button
         type="button"
-        onClick={() => setShowPassword(!showPassword)} // [cite: src/pages/consumer/authConsumer.jsx]
+        onClick={() => setShowPassword(!showPassword)}
         className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 focus:outline-none"
-        aria-label={showPassword ? "Hide password" : "Show password"} // [cite: src/pages/consumer/authConsumer.jsx]
+        aria-label={showPassword ? "Hide password" : "Show password"}
       >
-        {showPassword ? ( // [cite: src/pages/consumer/authConsumer.jsx]
+        {showPassword ? (
           <i className="fas fa-eye-slash"></i>
         ) : (
           <i className="fas fa-eye"></i>
@@ -70,9 +66,9 @@ const PasswordInput = (
 );
 
 const AuthConsumer = () => {
-  const [isLogin, setIsLogin] = useState(true); // [cite: src/pages/consumer/authConsumer.jsx]
-  const [usePassword, setUsePassword] = useState(false); // [cite: src/pages/consumer/authConsumer.jsx]
-  const [showPassword, setShowPassword] = useState(false); // [cite: src/pages/consumer/authConsumer.jsx]
+  const [isLogin, setIsLogin] = useState(true);
+  const [usePassword, setUsePassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -82,27 +78,25 @@ const AuthConsumer = () => {
   });
 
   const {
-    sendVerification, // [cite: src/pages/consumer/authConsumer.jsx]
-    login, // [cite: src/pages/consumer/authConsumer.jsx]
-    signup, // [cite: src/pages/consumer/authConsumer.jsx]
-    googleLogin, // [cite: src/pages/consumer/authConsumer.jsx]
-    checkAuth, // [cite: src/pages/consumer/authConsumer.jsx]
-    sentOtp, // [cite: src/pages/consumer/authConsumer.jsx]
-    loginLoading, // [cite: src/pages/consumer/authConsumer.jsx]
-    signupLoading, // [cite: src/pages/consumer/authConsumer.jsx]
-    otpLoading, // [cite: src/pages/consumer/authConsumer.jsx]
-    cooldown, // [cite: src/pages/consumer/authConsumer.jsx]
+    sendVerification,
+    login,
+    signup,
+    googleLogin,
+    checkAuth,
+    sentOtp,
+    loginLoading,
+    signupLoading,
+    otpLoading,
+    cooldown,
   } = useAuthStore();
 
-  const setSentOtp = (val) => useAuthStore.setState({ sentOtp: val }); // [cite: src/pages/consumer/authConsumer.jsx]
+  const setSentOtp = (val) => useAuthStore.setState({ sentOtp: val });
 
   const getButtonText = () => {
-    // [cite: src/pages/consumer/authConsumer.jsx]
     if (usePassword)
-      return loginLoading ? "Logging in..." : "Login with Password"; // [cite: src/pages/consumer/authConsumer.jsx]
+      return loginLoading ? "Logging in..." : "Login with Password";
     if (!usePassword) {
-      // [cite: src/pages/consumer/authConsumer.jsx]
-      if (!sentOtp) return otpLoading ? "Sending OTP..." : "Get OTP"; // [cite: src/pages/consumer/authConsumer.jsx]
+      if (!sentOtp) return otpLoading ? "Sending OTP..." : "Get OTP";
       if (sentOtp)
         return signupLoading || loginLoading
           ? "Verifying..."
@@ -111,68 +105,58 @@ const AuthConsumer = () => {
   };
 
   const handleAuthType = () => {
-    // [cite: src/pages/consumer/authConsumer.jsx]
-    setUsePassword((prev) => !prev); // [cite: src/pages/consumer/authConsumer.jsx]
+    setUsePassword((prev) => !prev);
     setFormData((prev) => ({ ...prev, otp: "", password: "" })); // Clear other field on switch
     setSentOtp(false); // Reset OTP state when switching
   };
 
   const handleChange = (e) => {
-    // [cite: src/pages/consumer/authConsumer.jsx]
-    setFormData({ ...formData, [e.target.name]: e.target.value }); // [cite: src/pages/consumer/authConsumer.jsx]
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
-    // [cite: src/pages/consumer/authConsumer.jsx]
-    e.preventDefault(); // [cite: src/pages/consumer/authConsumer.jsx]
+    e.preventDefault();
 
     if (sentOtp || usePassword) {
-      // [cite: src/pages/consumer/authConsumer.jsx]
-      isLogin // [cite: src/pages/consumer/authConsumer.jsx]
-        ? await login(formData, "consumer") // [cite: src/pages/consumer/authConsumer.jsx]
-        : await signup(formData, "consumer"); // [cite: src/pages/consumer/authConsumer.jsx]
-      setSentOtp(false); // [cite: src/pages/consumer/authConsumer.jsx]
+      isLogin
+        ? await login(formData, "consumer")
+        : await signup(formData, "consumer");
+      setSentOtp(false);
     } else {
-      await sendVerification(formData, "consumer"); // [cite: src/pages/consumer/authConsumer.jsx]
-      setSentOtp(true); // [cite: src/pages/consumer/authConsumer.jsx]
+      await sendVerification(formData, "consumer");
+      setSentOtp(true);
     }
   };
 
   const handleGoogleSubmit = async () => {
-    // Removed 'e' // [cite: src/pages/consumer/authConsumer.jsx]
-    googleLogin("consumer"); // [cite: src/pages/consumer/authConsumer.jsx]
+    // Removed 'e'
+    googleLogin("consumer");
     // Removed checkAuth(), as redirection should happen via backend flow
   };
 
   const resendOtp = async () => {
-    // [cite: src/pages/consumer/authConsumer.jsx]
     if (cooldown > 0) return;
-    await sendVerification(formData, "consumer"); // [cite: src/pages/consumer/authConsumer.jsx]
-    setSentOtp(true); // [cite: src/pages/consumer/authConsumer.jsx]
-    setFormData({ ...formData, otp: "" }); // [cite: src/pages/consumer/authConsumer.jsx]
+    await sendVerification(formData, "consumer");
+    setSentOtp(true);
+    setFormData({ ...formData, otp: "" });
   };
 
   // Cooldown timer remains the same
   useEffect(() => {
-    // [cite: src/pages/consumer/authConsumer.jsx]
     if (cooldown === 0) {
-      // [cite: src/pages/consumer/authConsumer.jsx]
       return;
     }
     const interval = setInterval(() => {
-      // [cite: src/pages/consumer/authConsumer.jsx]
       useAuthStore.setState((state) => {
-        // [cite: src/pages/consumer/authConsumer.jsx]
         if (state.cooldown <= 1) {
-          // [cite: src/pages/consumer/authConsumer.jsx]
           clearInterval(interval); // Clear interval when cooldown reaches 0
           return { cooldown: 0 };
         }
-        return { cooldown: state.cooldown - 1 }; // [cite: src/pages/consumer/authConsumer.jsx]
+        return { cooldown: state.cooldown - 1 };
       });
     }, 1000);
-    return () => clearInterval(interval); // [cite: src/pages/consumer/authConsumer.jsx]
-  }, [cooldown]); // [cite: src/pages/consumer/authConsumer.jsx]
+    return () => clearInterval(interval);
+  }, [cooldown]);
 
   return (
     <AuthLayout pageTitle="Customer Portal">

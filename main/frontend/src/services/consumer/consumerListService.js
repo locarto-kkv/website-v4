@@ -31,6 +31,7 @@ export const ConsumerListService = {
         quantity,
       }
     );
+
     return response.data;
   },
 
@@ -40,7 +41,7 @@ export const ConsumerListService = {
     const response = await axiosInstance.delete(
       `${BASE_URL}/delete/${productId}`,
       {
-        data: { type }, // axios.delete requires `data` for request body
+        data: { type },
       }
     );
     return response.data;
