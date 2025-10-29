@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDataStore } from "../store/useDataStore.jsx";
-import { submitEmail } from "../services/betaService.js";
+import { submitBeta } from "../services/betaService.js";
 
 // Components
 import Navbar from "../components/Navbar.jsx";
@@ -27,7 +27,7 @@ const asset5 = "/assets/5.png";
 const LandingPage = () => {
   const { blogs } = useDataStore();
   const [showPopup, setShowPopup] = useState(false);
-  const [email, setEmail] = useState("");
+  const [betaForm, setBetaForm] = useState({ name: "", email: "" }); // Added email state for the new form
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -49,8 +49,8 @@ const LandingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await submitEmail(email);
-    setEmail("");
+    await submitBeta(betaForm);
+    setBetaForm({ name: "", email: "" });
   };
 
   const videoRef = useRef(null);
@@ -240,89 +240,105 @@ const LandingPage = () => {
 
         {/* --- Beta Signup Section Container (Matching Width) --- */}
         <div
-            // Added matching width and margin classes
-            className="w-full max-w-[400px] sm:max-w-[1200px] mx-auto px-2 sm:px-0 mt-12 sm:mt-16"
+          // Added matching width and margin classes
+          className="w-full max-w-[400px] sm:max-w-[1200px] mx-auto px-2 sm:px-0 mt-12 sm:mt-16"
         >
-            <section
-              id="beta-signup-section" // Keep ID for scrolling
-              // Removed width/margin classes from here
-              className="bg-gradient-to-br from-[#353695] via-[#4a4db5] to-[#5b5fc7] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl relative overflow-hidden"
-            >
-              {/* Background effects */}
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-10 left-10 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-                <div
-                  className="absolute bottom-10 right-10 w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-full blur-lg animate-pulse"
-                  style={{ animationDelay: "0.5s" }}
-                ></div>
-                <div
-                  className="absolute top-1/2 left-1/4 w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-full blur-md animate-pulse"
-                  style={{ animationDelay: "1s" }}
-                ></div>
+          <section
+            id="beta-signup-section"
+            className="bg-gradient-to-br from-[#353695] via-[#4a4db5] to-[#5b5fc7] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl relative overflow-hidden"
+          >
+            {/* Background effects */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-10 left-10 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+              <div
+                className="absolute bottom-10 right-10 w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-full blur-lg animate-pulse"
+                style={{ animationDelay: "0.5s" }}
+              ></div>
+              <div
+                className="absolute top-1/2 left-1/4 w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-full blur-md animate-pulse"
+                style={{ animationDelay: "1s" }}
+              ></div>
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                Limited Beta Access
               </div>
-              {/* Content */}
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium mb-4 sm:mb-6">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  Limited Beta Access
+
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent px-2">
+                Reserve your spot, Sign up for our Beta
+              </h3>
+
+              <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 opacity-90 max-w-2xl mx-auto leading-relaxed px-2">
+                Be one of the first to explore the future of local discovery.
+                Gain exclusive early access and help shape Locarto the way you
+                want it
+              </p>
+
+              {/* Signup Form */}
+              <form
+                onSubmit={handleSubmit}
+                className="max-w-lg mx-auto space-y-3 sm:space-y-4"
+              >
+                <div className="relative group">
+                  <input
+                    type="text"
+                    placeholder="Your full name"
+                    name="name"
+                    value={betaForm.name}
+                    onChange={(e) =>
+                      setBetaForm((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    required
+                    className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 bg-white/95 backdrop-blur-sm font-medium shadow-lg transition-all duration-300 group-hover:bg-white text-sm sm:text-base"
+                  />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent px-2">
-                  Reserve your spot, Sign up for our Beta
-                </h3>
-                <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 opacity-90 max-w-2xl mx-auto leading-relaxed px-2">
-                  Be one of the first to explore the future of local discovery.
-                  Gain exclusive early access and help shape Locarto the way you
-                  want it
-                </p>
-                {/* Form using handleSubmit from LandingPage */}
-                <form
-                  onSubmit={handleSubmit}
-                  className="max-w-lg mx-auto space-y-3 sm:space-y-4"
+
+                <div className="relative group">
+                  <input
+                    type="email"
+                    placeholder="Your email address"
+                    name="email"
+                    value={betaForm.email}
+                    onChange={(e) =>
+                      setBetaForm((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
+                    required
+                    className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 bg-white/95 backdrop-blur-sm font-medium shadow-lg transition-all duration-300 group-hover:bg-white text-sm sm:text-base"
+                  />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-yellow-300 hover:via-orange-400 hover:to-red-400 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1"
                 >
-                  <div className="relative group">
-                    {/* Name input (visual only) */}
-                    <input
-                      type="text"
-                      placeholder="Your full name"
-                      className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 bg-white/95 backdrop-blur-sm font-medium shadow-lg transition-all duration-300 group-hover:bg-white text-sm sm:text-base"
-                    />
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                  </div>
-                  <div className="relative group">
-                    {/* Email input */}
-                    <input
-                      type="email"
-                      placeholder="Your email address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 bg-white/95 backdrop-blur-sm font-medium shadow-lg transition-all duration-300 group-hover:bg-white text-sm sm:text-base"
-                    />
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-yellow-300 hover:via-orange-400 hover:to-red-400 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1"
-                  >
-                    <span className="flex items-center justify-center gap-2">
-                      <i className="fas fa-rocket"></i>
-                      Reserve My Spot
-                    </span>
-                  </button>
-                </form>
-                {/* Footer text */}
-                <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm opacity-80">
-                  <div className="flex items-center gap-2">
-                    <i className="fas fa-check text-green-300"></i>
-                    <span>No spam, ever</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <i className="fas fa-users text-blue-300"></i>
-                    <span>Join 1,000+ early adopters</span>
-                  </div>
+                  <span className="flex items-center justify-center gap-2">
+                    <i className="fas fa-rocket"></i>
+                    Reserve My Spot
+                  </span>
+                </button>
+              </form>
+
+              {/* Footer text */}
+              <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm opacity-80">
+                <div className="flex items-center gap-2">
+                  <i className="fas fa-check text-green-300"></i>
+                  <span>No spam, ever</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <i className="fas fa-users text-blue-300"></i>
+                  <span>Join 1,000+ early adopters</span>
                 </div>
               </div>
-            </section>
+            </div>
+          </section>
         </div>
         {/* --- End Beta Signup Section Container --- */}
 

@@ -6,6 +6,8 @@ import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { getGreeting } from "../lib/utils.js";
 import { getRandomMsg } from "../services/welcomeMsgs.js";
+import { submitBeta } from "../services/betaService.js";
+
 import { useAuthStore } from "../store/useAuthStore.jsx";
 import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx";
 import { useVendorDataStore } from "../store/vendor/vendorDataStore.jsx";
@@ -23,11 +25,19 @@ const Homepage = () => {
   const [suggestedCategory, setSuggestedCategory] = useState("");
   const [name, setName] = useState("");
   const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [betaForm, setBetaForm] = useState({ name: "", email: "" }); // Added email state for the new form
 
   const navigate = useNavigate();
 
   const availableCategories = ["personal care", "accessories"];
   const popularProducts = [];
+
+  // Function to handle email submission (copied from RegisterSocial)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await submitBeta(betaForm);
+    setBetaForm({ name: "", email: "" }); // Optionally clear email field after submission
+  };
 
   const handleInputChange = (e) => {
     setSearchQuery(e.target.value);
@@ -495,11 +505,20 @@ const Homepage = () => {
                 Gain exclusive early access and help shape Locarto the way you
                 want it
               </p>
-              <form className="max-w-lg mx-auto space-y-3 sm:space-y-4">
+              <form
+                onSubmit={handleSubmit}
+                className="max-w-lg mx-auto space-y-3 sm:space-y-4"
+              >
                 <div className="relative group">
                   <input
                     type="text"
                     placeholder="Your full name"
+                    name="name"
+                    value={betaForm.name} // Connect to state
+                    onChange={(e) =>
+                      setBetaForm((prev) => ({ ...prev, name: e.target.value }))
+                    } // Connect to handler
+                    required // Keep required
                     className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 bg-white/95 backdrop-blur-sm font-medium shadow-lg transition-all duration-300 group-hover:bg-white text-sm sm:text-base"
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -507,7 +526,16 @@ const Homepage = () => {
                 <div className="relative group">
                   <input
                     type="email"
+                    name="email"
                     placeholder="Your email address"
+                    value={betaForm.email} // Connect to state
+                    onChange={(e) =>
+                      setBetaForm((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    } // Connect to handler
+                    required // Keep required
                     className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 bg-white/95 backdrop-blur-sm font-medium shadow-lg transition-all duration-300 group-hover:bg-white text-sm sm:text-base"
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>

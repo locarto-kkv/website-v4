@@ -7,7 +7,6 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import locartoImg from "../assets/locarto.png";
-import RegisterSocial from "../components/RegisterSocial.jsx";
 
 // Background Assets - Now using public folder paths
 const asset1 = "/assets/1.png";
@@ -168,8 +167,6 @@ const DiscoverPage = () => {
             </div>
           ))}
         </div>
-
-        <RegisterSocial />
       </main>
 
       {/* Locarto Logo Banner - Bottom */}
