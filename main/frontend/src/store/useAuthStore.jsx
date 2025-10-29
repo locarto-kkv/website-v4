@@ -3,6 +3,11 @@ import { persist } from "zustand/middleware";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 
+const BACKEND_URL =
+  import.meta.env.MODE === "development"
+    ? import.meta.env.VITE_BACKEND_URL
+    : window.location.origin;
+
 export const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -68,8 +73,7 @@ export const useAuthStore = create(
       googleLogin: (type) => {
         set({ authLoading: true });
         try {
-          window.location.href =
-            import.meta.env.VITE_BACKEND_URL + `/api/${type}/auth/login-google`;
+          window.location.href = BACKEND_URL + `/api/${type}/auth/login-google`;
         } catch (error) {
           toast.error(error.response?.data?.message || "Google failed");
           console.log("Error in googleLogin:", error.response?.data?.message);

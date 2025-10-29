@@ -13,7 +13,10 @@ import { sendOtp, verifyOtp } from "../../services/otp.service.js";
 const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_REDIRECT_URI = env.GOOGLE_CONSUMER_REDIRECT_URI;
-const FRONTEND_URL = env.FRONTEND_URL;
+const FRONTEND_URL =
+  env.BACKEND_NODE_ENV === "development"
+    ? env.FRONTEND_URL
+    : env.PRODUCTION_URL;
 
 const client = new OAuth2Client(
   GOOGLE_CLIENT_ID,

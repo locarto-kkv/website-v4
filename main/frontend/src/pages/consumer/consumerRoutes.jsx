@@ -63,10 +63,6 @@ const ConsumerRoutes = () => {
         {/* Other protected consumer routes (outside the dashboard layout) */}
         <Route path="checkout" element={<CheckoutPage />} />{" "}
         {/* <-- Add Checkout Route */}
-        <Route
-          path="shops/:vendorId/products/:category"
-          element={<ShopProducts />}
-        />
       </Route>
       {/* --- End Protected Routes --- */}
 

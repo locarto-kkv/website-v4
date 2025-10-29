@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { env } from "../lib/env.js";
 
 const otpStore = new Map();
 
@@ -35,7 +36,13 @@ export function verifyOtp(userKey, otp) {
 async function sendEmail(to, otp) {
   const transporter = nodemailer.createTransport({
     service: "gmail",
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    auth: {
+      type: "OAuth2",
+      user: "it@locarto.in",
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      refreshToken: env.GOOGLE_REFRESH_TOKEN,
+    },
   });
 
   console.log("Reciever: " + to + " OTP : " + otp);

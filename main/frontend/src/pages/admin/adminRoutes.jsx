@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 
 import AuthAdmin from "./authAdmin";
-import AdminDashboardLayout from "./dashboard/AdminDashboardLayout";
+import AdminDashboardLayout from "./dashboard/adminDashboardLayout";
 import AdminDashboard from "./adminDashboard";
 // import AdminProfile from "./dashboard/AdminProfile";
 // import AdminAnalytics from "./dashboard/AdminAnalytics";
