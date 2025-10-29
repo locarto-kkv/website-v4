@@ -26,7 +26,7 @@ export default function RuleChatbot() {
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-4">
       <h2 className="text-xl font-semibold mb-3 text-center text-blue-600">
-        🧠 Rule-based Chatbot
+        🧠 Locarto Chatbot
       </h2>
 
       {/* Chat History */}
