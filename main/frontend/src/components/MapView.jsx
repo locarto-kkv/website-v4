@@ -150,8 +150,11 @@ const MapView = () => {
       const customIcon = createCustomIcon(currentCategory);
 
       const vendorsToDisplay = (blogs || []).filter((vendor) => {
+        // console.log(vendor.id, vendor.address[0]?.coordinates);
+
         const hasValidPosition =
-          Array.isArray(vendor.position) && vendor.position.length === 2;
+          Array.isArray(vendor.address[0]?.coordinates) &&
+          vendor.address[0]?.coordinates.length === 2;
         const hasProducts =
           vendor.products &&
           Array.isArray(vendor.products) &&
@@ -160,7 +163,9 @@ const MapView = () => {
       });
 
       vendorsToDisplay.forEach((vendor) => {
-        const marker = L.marker(vendor.position, { icon: customIcon });
+        const marker = L.marker(vendor.address[0]?.coordinates, {
+          icon: customIcon,
+        });
 
         marker.bindTooltip(vendor.name || "Unnamed Vendor", {
           permanent: false,
@@ -222,10 +227,10 @@ const MapView = () => {
 
       if (vendorsToDisplay.length > 0) {
         if (vendorsToDisplay.length === 1) {
-          map.setView(vendorsToDisplay[0].position, 13);
+          map.setView(vendorsToDisplay[0].address[0]?.coordinates, 13);
         } else {
           const bounds = L.latLngBounds(
-            vendorsToDisplay.map((v) => v.position)
+            vendorsToDisplay.map((v) => v.address[0]?.coordinates)
           );
           map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
         }

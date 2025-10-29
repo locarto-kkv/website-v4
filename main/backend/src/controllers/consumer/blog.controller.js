@@ -3,7 +3,6 @@ import logger from "../../lib/logger.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
-const batchSize = 10;
 
 export const getBlogs = async (req, res) => {
   try {
@@ -14,9 +13,9 @@ export const getBlogs = async (req, res) => {
       .from("vendors")
       .select(
         `*,
-      blog: brands(*)`
+      blog: brands_vendor_id_fkey(*),
+      address: addresses_vendor_id_fkey(*)`
       )
-      .range(start_index, start_index + batchSize)
       .order("id", { ascending: true });
 
     res.status(200).json(blogs);
