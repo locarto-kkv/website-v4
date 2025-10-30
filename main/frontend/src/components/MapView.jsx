@@ -31,8 +31,10 @@ const MapView = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
   const blogs = useDataStore((s) => s.blogs);
   const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
-  const productLoading = useDataStore((s) => s.productLoading);
   const dataLoading = useDataStore((s) => s.dataLoading);
+
+  console.log(blogs);
+  
 
   const [showOverlay, setShowOverlay] = useState(true);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(() => {
@@ -51,7 +53,9 @@ const MapView = () => {
   const [map, setMap] = useState(null);
   const markerLayer = useRef(L.layerGroup());
   const mapContainerRef = useRef(null);
+  const invalidateSizeRequestRef = useRef(null);
 
+  // Navigation functions
   const nextCategory = () =>
     setCurrentCategoryIndex((prev) => (prev + 1) % categories.length);
 
@@ -60,6 +64,7 @@ const MapView = () => {
       (prev) => (prev - 1 + categories.length) % categories.length
     );
 
+  // Select category and update URL
   const handleSelectCategory = (index) => {
     setCurrentCategoryIndex(index);
     setShowOverlay(false);
@@ -67,11 +72,13 @@ const MapView = () => {
     navigate(`/map?category=${encodeURIComponent(categoryName)}`);
   };
 
+  // Go back to category selection view
   const handleBackToCategories = () => {
     setShowOverlay(true);
     navigate("/map");
   };
 
+  // Function to create custom Leaflet marker icons
   const createCustomIcon = (category) =>
     L.divIcon({
       className: "custom-marker",
@@ -96,19 +103,25 @@ const MapView = () => {
       popupAnchor: [0, -38],
     });
 
-  // Initialize map effect
+  // Initialize map effect (runs only once)
   useEffect(() => {
-    if (map) return;
+    // Prevent map re-initialization if it already exists or container isn't ready
+    if (map || !mapContainerRef.current) return;
 
-    const mapInstance = L.map("map-container", {
-      zoomControl: false,
-      tap: true, // Enable tap for iOS
-      tapTolerance: 15, // Increase tap tolerance for touch
-      touchZoom: true, // Enable touch zoom
-      dragging: true, // Enable dragging
-      scrollWheelZoom: false, // Disable scroll wheel zoom initially
-    }).setView([19.076, 72.8777], 12);
+    // Create map instance using the ref
+    const mapInstance = L.map(mapContainerRef.current, {
+        zoomControl: false,
+        tap: false,
+        touchZoom: true,
+        dragging: true,
+        scrollWheelZoom: true,
+        preferCanvas: true,
+    }).setView(
+      [19.076, 72.8777],
+      12
+    );
 
+    // Add dark tile layer
     L.tileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
@@ -119,16 +132,13 @@ const MapView = () => {
       }
     ).addTo(mapInstance);
 
+    // Add the layer group for markers to the map
     markerLayer.current.addTo(mapInstance);
+
+    // Store map instance in state
     setMap(mapInstance);
 
-    // Fix for iOS: Force map to recognize its container size after a short delay
-    setTimeout(() => {
-      if (mapInstance) {
-        mapInstance.invalidateSize();
-      }
-    }, 100);
-
+    // Cleanup function to remove map when component unmounts
     return () => {
       if (mapInstance) {
         mapInstance.remove();
@@ -137,136 +147,168 @@ const MapView = () => {
     };
   }, []);
 
-  // Fetch products effect
-  useEffect(() => {
-    const fetchCategoryProducts = async () => {
-      if (!showOverlay && (blogs.length > 0 || !dataLoading)) {
-        const category = categories[currentCategoryIndex].name;
-        try {
-          await fetchProductsInBatch({ category });
-        } catch (err) {
-          console.error("Error fetching products for category:", err);
-        }
-      }
-    };
+  // Effect to fetch products when category changes or overlay is hidden
+   useEffect(() => {
+     const fetchCategoryProducts = async () => {
+       if (!showOverlay && (blogs.length > 0 || !dataLoading)) {
+         const category = categories[currentCategoryIndex].name;
+         try {
+           await fetchProductsInBatch({ category });
+         } catch (err) {
+           console.error("Error fetching products for category:", err);
+         }
+       }
+     };
 
-    fetchCategoryProducts();
-  }, [showOverlay, currentCategoryIndex, blogs, dataLoading, fetchProductsInBatch]);
+     fetchCategoryProducts();
+   }, [showOverlay, currentCategoryIndex, blogs, dataLoading, fetchProductsInBatch]);
 
-  // Update map markers effect
+
+  // Effect to update map markers when category changes or overlay state changes
   useEffect(() => {
+    // Ensure map instance exists
     if (!map) return;
 
-    const timerId = setTimeout(() => {
-      if (!map) return;
+    // Cancel any pending invalidateSize call
+    if (invalidateSizeRequestRef.current) {
+        cancelAnimationFrame(invalidateSizeRequestRef.current);
+    }
 
-      map.invalidateSize({ animate: false }); // Changed to false for iOS stability
+    // Clear existing markers from the layer group
+    markerLayer.current.clearLayers();
 
-      markerLayer.current.clearLayers();
+    // Only add markers if the overlay is hidden (a category is selected)
+    if (!showOverlay) {
+      const currentCategory = categories[currentCategoryIndex];
+      const customIcon = createCustomIcon(currentCategory);
 
-      if (!showOverlay) {
-        const currentCategory = categories[currentCategoryIndex];
-        const customIcon = createCustomIcon(currentCategory);
+      // Filter vendors that have coordinates and products in the current category
+      const vendorsToDisplay = (blogs || []).filter((vendor) => {
+        const hasValidPosition =
+          vendor.address?.[0]?.coordinates &&
+          Array.isArray(vendor.address[0].coordinates) &&
+          vendor.address[0].coordinates.length === 2;
+        const hasProductsInCategory =
+          vendor.products &&
+          Array.isArray(vendor.products) &&
+          vendor.products.length > 0;
+        return hasValidPosition && hasProductsInCategory;
+      });
 
-        const vendorsToDisplay = (blogs || []).filter((vendor) => {
-          const hasValidPosition =
-            vendor.address?.[0]?.coordinates &&
-            Array.isArray(vendor.address[0].coordinates) &&
-            vendor.address[0].coordinates.length === 2;
-          const hasProductsInCategory =
-            vendor.products &&
-            Array.isArray(vendor.products) &&
-            vendor.products.length > 0;
-          return hasValidPosition && hasProductsInCategory;
+      // Add markers for each vendor to display
+      vendorsToDisplay.forEach((vendor) => {
+         const coordinates = vendor.address?.[0]?.coordinates;
+         if (!coordinates) return;
+
+        const marker = L.marker(coordinates, { icon: customIcon });
+
+        // Bind tooltip (hover text)
+        marker.bindTooltip(vendor.name || "Unnamed Vendor", {
+          permanent: false,
+          direction: "top",
+          offset: [0, -38],
+          className: "custom-tooltip",
+          opacity: 0.9,
         });
 
-        vendorsToDisplay.forEach((vendor) => {
-          const coordinates = vendor.address?.[0]?.coordinates;
-          if (!coordinates) return;
+        // Prepare popup content
+        const logo = vendor.brand_logo_1
+          ? `<img src="${vendor.brand_logo_1}" alt="${vendor.name}" style="width:100%; max-height: 100px; object-fit: contain; border-radius:8px; margin-bottom:10px; background: #eee;" />`
+          : "";
+        const email = vendor.email
+          ? `<div style="font-size:12px; color:#6b7280; margin-top:4px; word-break: break-all;">
+              <i class="fas fa-envelope" style="margin-right: 5px;"></i> ${vendor.email}
+             </div>`
+          : "";
 
-          const marker = L.marker(coordinates, { icon: customIcon });
-
-          marker.bindTooltip(vendor.name || "Unnamed Vendor", {
-            permanent: false,
-            direction: "top",
-            offset: [0, -38],
-            className: "custom-tooltip",
-            opacity: 0.9,
-          });
-
-          const logo = vendor.brand_logo_1
-            ? `<img src="${vendor.brand_logo_1}" alt="${vendor.name}" style="width:100%; max-height: 100px; object-fit: contain; border-radius:8px; margin-bottom:10px; background: #eee;" />`
-            : "";
-          const email = vendor.email
-            ? `<div style="font-size:12px; color:#6b7280; margin-top:4px; word-break: break-all;">
-                <i class="fas fa-envelope" style="margin-right: 5px;"></i> ${vendor.email}
-               </div>`
-            : "";
-
-          marker.bindPopup(
-            `
-            <div class="custom-popup">
-              ${logo}
-              <div class="popup-header">
-                <h3 style="font-size: 16px; font-weight: bold; margin: 0; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${vendor.name}</h3>
-                <div class="category-badge" style="background:${currentCategory.color}; font-size: 10px; padding: 3px 6px;">
-                  <i class="${currentCategory.icon}" style="margin-right: 4px;"></i> ${currentCategory.name}
-                </div>
-              </div>
-              <div class="popup-content">
-                ${email}
-                <button class="view-products-btn" data-vendor-id="${vendor.id}">
-                  <i class="fas fa-eye"></i> View Products
-                </button>
+        // Bind popup (click content)
+        marker.bindPopup(
+          `
+          <div class="custom-popup">
+            ${logo}
+            <div class="popup-header">
+              <h3 style="font-size: 16px; font-weight: bold; margin: 0; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${vendor.name}</h3>
+              <div class="category-badge" style="background:${currentCategory.color}; font-size: 10px; padding: 3px 6px;">
+                <i class="${currentCategory.icon}" style="margin-right: 4px;"></i> ${currentCategory.name}
               </div>
             </div>
-          `,
-            { maxWidth: 240, className: "modern-popup" }
+            <div class="popup-content">
+              ${email}
+              <button class="view-products-btn" data-vendor-id="${vendor.id}">
+                <i class="fas fa-eye"></i> View Products
+              </button>
+            </div>
+          </div>
+        `,
+          { maxWidth: 240, className: "modern-popup" }
+        );
+
+        // Add event listener for the button inside the popup
+        marker.on("popupopen", () => {
+          const button = document.querySelector(
+            `.view-products-btn[data-vendor-id="${vendor.id}"]`
           );
-
-          marker.on("popupopen", () => {
-            const button = document.querySelector(
-              `.view-products-btn[data-vendor-id="${vendor.id}"]`
-            );
-            if (button) {
-              button.onclick = () => {
-                const shopPath = `/shops/${vendor.id}/products/${encodeURIComponent(currentCategory.name)}`;
-                navigate(currentUser?.type === "consumer" ? `/consumer${shopPath}` : shopPath);
-              };
-            }
-          });
-
-          markerLayer.current.addLayer(marker);
+          if (button) {
+            button.onclick = () => {
+              const shopPath = `/shops/${vendor.id}/products/${encodeURIComponent(currentCategory.name)}`;
+              navigate(currentUser?.type === "consumer" ? `/consumer${shopPath}` : shopPath);
+            };
+          }
         });
 
-        if (vendorsToDisplay.length > 0) {
-          if (vendorsToDisplay.length === 1) {
-            const coordinates = vendorsToDisplay[0].address?.[0]?.coordinates;
-            if (coordinates) map.setView(coordinates, 13);
-          } else {
-            const validCoordinates = vendorsToDisplay
-              .map(v => v.address?.[0]?.coordinates)
-              .filter(Boolean);
-            if (validCoordinates.length > 0) {
-              const bounds = L.latLngBounds(validCoordinates);
-              map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
-            }
-          }
+        // Add the configured marker to the layer group
+        markerLayer.current.addLayer(marker);
+      });
+
+      // Adjust map view to fit markers
+      if (vendorsToDisplay.length > 0) {
+        if (vendorsToDisplay.length === 1) {
+           const coordinates = vendorsToDisplay[0].address?.[0]?.coordinates;
+           if (coordinates) map.setView(coordinates, 13);
         } else {
-          map.setView([19.076, 72.8777], 12);
+           const validCoordinates = vendorsToDisplay
+             .map(v => v.address?.[0]?.coordinates)
+             .filter(Boolean);
+           if (validCoordinates.length > 0) {
+             const bounds = L.latLngBounds(validCoordinates);
+             map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+           }
         }
       } else {
-        map.setView([19.076, 72.8777], 12);
+         map.setView([19.076, 72.8777], 12);
       }
-    }, 100); // Increased timeout for iOS
+      
+      invalidateSizeRequestRef.current = requestAnimationFrame(() => {
+          if (map) {
+              map.invalidateSize({ animate: false });
+          }
+      });
 
-    return () => clearTimeout(timerId);
+    } else {
+       map.setView([19.076, 72.8777], 12);
+       invalidateSizeRequestRef.current = requestAnimationFrame(() => {
+           if (map) {
+               map.invalidateSize({ animate: false });
+           }
+       });
+    }
+
+    // Cleanup function for the requestAnimationFrame
+    return () => {
+        if (invalidateSizeRequestRef.current) {
+            cancelAnimationFrame(invalidateSizeRequestRef.current);
+        }
+    };
+
   }, [showOverlay, currentCategoryIndex, blogs, map, navigate, currentUser]);
 
+
+  // Get the currently selected category object
   const currentCategory = categories[currentCategoryIndex];
 
   return (
     <div className="min-h-screen bg-gray-900 relative">
+      {/* Logo */}
       <div className="absolute top-4 left-4 z-[9999]">
         <Link to="/" className="group">
           <img
@@ -277,21 +319,20 @@ const MapView = () => {
         </Link>
       </div>
 
+      {/* Map and UI container */}
       <div className="h-screen relative">
-        <div 
-          id="map-container" 
-          ref={mapContainerRef}
-          className="w-full h-full bg-gray-800"
-          style={{
-            position: 'relative',
-            touchAction: 'none', // Critical for iOS touch handling
-            WebkitTouchCallout: 'none',
-            WebkitUserSelect: 'none'
-          }}
-        ></div>
+        {/* Leaflet Map container */}
+        <div id="map-container" ref={mapContainerRef} className="w-full h-full bg-gray-800" style={{
+          position: 'relative',
+          touchAction: 'none',
+          WebkitTouchCallout: 'none',
+          WebkitUserSelect: 'none'
+        }}></div>
 
+        {/* --- UI CONTROLS (Floating elements over the map) --- */}
         {!showOverlay && (
           <>
+            {/* Desktop: Top Center "Back to Categories" Button */}
             <div className="hidden lg:block absolute top-6 left-1/2 transform -translate-x-1/2 z-[9999]">
               <button
                 onClick={handleBackToCategories}
@@ -302,6 +343,7 @@ const MapView = () => {
               </button>
             </div>
 
+            {/* Mobile: Top Right Category Change Button */}
             <div className="lg:hidden absolute top-4 right-4 z-[9999]">
               <button
                 onClick={handleBackToCategories}
@@ -315,6 +357,9 @@ const MapView = () => {
           </>
         )}
 
+        {/* --- CATEGORY SELECTION OVERLAYS --- */}
+
+        {/* Mobile Overlay Container (Slides up from bottom) */}
         <div
           className={`
             fixed bottom-0 left-0 right-0 z-[9998] lg:hidden
@@ -322,51 +367,55 @@ const MapView = () => {
             ${showOverlay ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full pointer-events-none"}
           `}
         >
+          {/* Mobile Card Content */}
           <div className="bg-gray-900/80 backdrop-blur-xl border-t border-white/10 p-5 rounded-t-2xl">
+            {/* Prev/Next Buttons and Icon */}
             <div className="flex justify-between items-center mb-4">
-              <button
-                onClick={prevCategory}
-                className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
-                aria-label="Previous Category"
-              >
-                <i className="fas fa-chevron-left"></i>
-              </button>
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
-                }}
-              >
-                <i className={`${currentCategory.icon} text-2xl text-white`}></i>
-              </div>
-              <button
-                onClick={nextCategory}
-                className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
-                aria-label="Next Category"
-              >
-                <i className="fas fa-chevron-right"></i>
-              </button>
-            </div>
-            <div className="text-center">
-              <h2
-                className="text-3xl font-bold mb-2"
-                style={{ color: currentCategory.color }}
-              >
-                {currentCategory.name}
-              </h2>
-              <p className="text-gray-300 text-sm mb-5 max-w-xs mx-auto">
-                {currentCategory.description}
-              </p>
-              <button
-                onClick={() => handleSelectCategory(currentCategoryIndex)}
-                className="w-full bg-white/90 text-gray-900 font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-white transition-colors"
-              >
-                Explore
-              </button>
-            </div>
+               <button
+                 onClick={prevCategory}
+                 className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
+                 aria-label="Previous Category"
+               >
+                 <i className="fas fa-chevron-left"></i>
+               </button>
+               <div
+                 className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+                 style={{
+                   background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
+                 }}
+               >
+                 <i className={`${currentCategory.icon} text-2xl text-white`}></i>
+               </div>
+               <button
+                 onClick={nextCategory}
+                 className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
+                 aria-label="Next Category"
+               >
+                 <i className="fas fa-chevron-right"></i>
+               </button>
+             </div>
+             {/* Category Name, Description, Explore Button */}
+             <div className="text-center">
+               <h2
+                 className="text-3xl font-bold mb-2"
+                 style={{ color: currentCategory.color }}
+               >
+                 {currentCategory.name}
+               </h2>
+               <p className="text-gray-300 text-sm mb-5 max-w-xs mx-auto">
+                 {currentCategory.description}
+               </p>
+               <button
+                 onClick={() => handleSelectCategory(currentCategoryIndex)}
+                 className="w-full bg-white/90 text-gray-900 font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-white transition-colors"
+               >
+                 Explore
+               </button>
+             </div>
           </div>
         </div>
 
+        {/* Desktop Overlay Container (Fades in/out, centered) */}
         <div
           className={`
             fixed inset-0 z-[9998] hidden lg:flex items-center justify-center
@@ -375,60 +424,62 @@ const MapView = () => {
             ${showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"}
           `}
         >
-          <div className="relative w-full max-w-6xl mx-auto text-center px-6">
-            <button
-              onClick={prevCategory}
-              className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
-              aria-label="Previous Category"
-            >
-              <i className="fas fa-chevron-left text-xl"></i>
-            </button>
-            <button
-              onClick={nextCategory}
-              className="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
-              aria-label="Next Category"
-            >
-              <i className="fas fa-chevron-right text-xl"></i>
-            </button>
-            <div className="relative">
-              <div
-                className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6 mx-auto"
-                style={{
-                  background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
-                }}
-              >
-                <i className={`${currentCategory.icon} text-3xl text-white`}></i>
-              </div>
-              <button
-                onClick={() => handleSelectCategory(currentCategoryIndex)}
-                className="text-7xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-300 bg-transparent border-none"
-                style={{
-                  color: currentCategory.color,
-                  textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20`,
-                }}
-              >
-                {currentCategory.name}
-              </button>
-              <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                {currentCategory.description}
-              </p>
-            </div>
-          </div>
+           {/* Desktop Overlay Content */}
+           <div className="relative w-full max-w-6xl mx-auto text-center px-6">
+             {/* Prev Button */}
+             <button
+               onClick={prevCategory}
+               className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
+               aria-label="Previous Category"
+             >
+               <i className="fas fa-chevron-left text-xl"></i>
+             </button>
+             {/* Next Button */}
+             <button
+               onClick={nextCategory}
+               className="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
+               aria-label="Next Category"
+             >
+               <i className="fas fa-chevron-right text-xl"></i>
+             </button>
+             {/* Category Icon, Name, Description */}
+             <div className="relative">
+               <div
+                 className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6 mx-auto"
+                 style={{
+                   background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
+                 }}
+               >
+                 <i className={`${currentCategory.icon} text-3xl text-white`}></i>
+               </div>
+               {/* Category Name (Clickable) */}
+               <button
+                 onClick={() => handleSelectCategory(currentCategoryIndex)}
+                 className="text-7xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-300 bg-transparent border-none"
+                 style={{
+                   color: currentCategory.color,
+                   textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20`,
+                 }}
+               >
+                 {currentCategory.name}
+               </button>
+               {/* Description */}
+               <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                 {currentCategory.description}
+               </p>
+             </div>
+           </div>
         </div>
+
       </div>
 
+      {/* --- STYLES --- */}
       <style>{`
-        /* iOS-specific fixes */
-        #map-container {
-          -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
-        }
-        
         .leaflet-container {
           -webkit-tap-highlight-color: transparent;
           tap-highlight-color: transparent;
         }
-        
+
         .leaflet-marker-icon,
         .leaflet-marker-shadow {
           -webkit-user-select: none;
@@ -501,7 +552,7 @@ const MapView = () => {
           -webkit-tap-highlight-color: transparent;
         }
         .view-products-btn:active {
-          transform: scale(0.97);
+            transform: scale(0.97);
         }
         .view-products-btn:hover {
           transform: scale(1.03);
@@ -509,17 +560,17 @@ const MapView = () => {
         }
 
         @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
         .animate-slide-up {
-          animation: slide-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            animation: slide-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
       `}</style>
     </div>
