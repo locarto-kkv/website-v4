@@ -1,6 +1,7 @@
 // src/pages/vendor/vendorRoutes.jsx
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useVendorDataStore } from "../../store/vendor/vendorDataStore";
 
 import AuthVendor from "./authVendor";
 import VendorDashboardLayout from "./dashboard/VendorDashboardLayout";
@@ -19,12 +20,22 @@ import VendorEditProfile from "./dashboard/VendorEditProfile";
 
 const ProtectedRoute = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
+  const profile = useVendorDataStore((s) => s.profile);
+  const location = useLocation();
 
   if (currentUser?.type !== "vendor") {
     return <Navigate to="/vendor/login" replace />;
-  } else {
+  }
+
+  const isProfileRoute = location.pathname.includes(
+    "/vendor/dashboard/profile"
+  );
+
+  if (profile?.status === "verified" || isProfileRoute) {
     return <Outlet />;
   }
+
+  return <Navigate to="/vendor/dashboard/profile" replace />;
 };
 
 const VendorRoutes = () => {

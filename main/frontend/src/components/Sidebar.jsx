@@ -2,8 +2,8 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-// Import ConsumerDataContext conditionally or ensure safe access
 import { useConsumerDataStore } from "../store/consumer/consumerDataStore";
+import { useVendorDataStore } from "../store/vendor/vendorDataStore";
 
 // Accept isOpen and onClose props for mobile responsiveness
 const Sidebar = ({ onNavigate, isOpen, onClose }) => {
@@ -13,14 +13,21 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
 
   const { currentUser } = useAuthStore();
   const isConsumer = currentUser?.type === "consumer";
+  const isVendor = currentUser?.type === "vendor";
 
-  // Safely get consumer data
-  const consumerDataContext = isConsumer ? useConsumerDataStore() : null;
-  const lists = consumerDataContext?.lists;
+  const lists = useConsumerDataStore((s) => s.lists);
 
   const cartCount = lists?.cart ? Object.keys(lists.cart).length : 0;
   const wishlistCount = lists?.wishlist?.size ?? 0;
   const listBadgeCount = cartCount + wishlistCount;
+
+  const profile = useVendorDataStore((s) => s.profile);
+  const isVerified = (path) => {
+    if (profile?.status !== "verified") {
+      if (path !== "/vendor/dashboard/profile") return false;
+    }
+    return true;
+  };
 
   let menuItems = [];
   let headerDetails = {
@@ -30,7 +37,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
   };
 
   // Define menu items based on user type
-  if (currentUser?.type === "vendor") {
+  if (isVendor) {
     headerDetails = {
       title: "Vendor Portal",
       icon: "fas fa-store",
@@ -83,7 +90,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
       // { id: "settings", label: "Settings", icon: "fas fa-cog", path: "/vendor/settings" },
       // { id: "support", label: "Support", icon: "fas fa-headset", path: "/vendor/support" },
     ];
-  } else if (currentUser?.type === "consumer") {
+  } else if (isConsumer) {
     headerDetails = {
       title: "Customer Portal",
       icon: "fas fa-user",
@@ -160,32 +167,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
     ];
   }
 
-  // Determine if a menu item is active
   const isActive = (itemPath) => {
-    if (
-      itemPath === "/consumer/dashboard/overview" &&
-      (activePath === "/consumer/dashboard" ||
-        activePath === "/consumer/dashboard/")
-    ) {
-      return true;
-    }
-    if (
-      itemPath === "/vendor/dashboard" &&
-      (activePath === "/vendor" || activePath === "/vendor/")
-    ) {
-      return true;
-    }
-    if (
-      itemPath === "/consumer/dashboard" ||
-      itemPath === "/vendor/dashboard" ||
-      itemPath === "/admin/dashboard"
-    ) {
-      return (
-        activePath === itemPath ||
-        (itemPath.endsWith("/dashboard") &&
-          activePath === itemPath.replace("/dashboard", ""))
-      );
-    }
     return activePath.startsWith(itemPath);
   };
 
@@ -256,39 +238,54 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
               <li key={item.id}>
                 <button
                   onClick={() => handleNavigation(item.path)}
-                  className={`group w-full text-left py-3 px-4 rounded-xl transition-all duration-300 font-medium flex items-center gap-3 ${
-                    isActive(item.path)
-                      ? `bg-gradient-to-r ${headerDetails.gradient} text-white shadow-lg transform scale-105`
-                      : "hover:bg-gray-100 text-gray-700 hover:text-gray-900 hover:shadow-sm"
-                  }`}
+                  disabled={!isVerified(item.path)}
+                  className={`group w-full text-left py-3 px-4 rounded-xl transition-all duration-300 font-medium flex items-center gap-3
+        ${
+          !isVerified(item.path)
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : isActive(item.path)
+            ? `bg-gradient-to-r ${headerDetails.gradient} text-white shadow-lg transform scale-105`
+            : "hover:bg-gray-100 text-black hover:text-gray-900 hover:shadow-sm"
+        }
+      `}
                 >
                   <i
-                    className={`${item.icon} text-lg w-5 text-center ${
-                      isActive(item.path)
-                        ? "text-white"
-                        : "text-gray-500 group-hover:text-orange-500"
-                    } transition-colors duration-300`}
+                    className={`${
+                      item.icon
+                    } text-lg w-5 text-center transition-colors duration-300
+          ${
+            !isVerified(item.path)
+              ? "text-gray-400"
+              : isActive(item.path)
+              ? "text-white"
+              : "text-gray-500 group-hover:text-orange-500"
+          }
+        `}
                   ></i>
-                  <span className="font-semibold flex-1">{item.label}</span>
+
+                  <span
+                    className={`font-semibold flex-1 ${
+                      !isVerified ? "text-gray-400" : ""
+                    }`}
+                  >
+                    {item.label}
+                  </span>
 
                   {/* Badge */}
                   {item.badge != null && item.badge > 0 && (
                     <span
-                      className={`text-xs rounded-full h-5 min-w-[20px] px-2 flex items-center justify-center font-bold transition-colors ${
-                        isActive(item.path)
-                          ? "bg-white text-orange-500"
-                          : "bg-orange-500 text-white"
-                      }`}
+                      className={`text-xs rounded-full h-5 min-w-[20px] px-2 flex items-center justify-center font-bold transition-colors
+            ${
+              !isVerified
+                ? "bg-gray-300 text-gray-500"
+                : isActive(item.path)
+                ? "bg-white text-orange-500"
+                : "bg-orange-500 text-white"
+            }
+          `}
                     >
                       {item.badge}
                     </span>
-                  )}
-
-                  {/* Active Indicator */}
-                  {isActive(item.path) && (
-                    <div className="ml-auto opacity-75">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                    </div>
                   )}
                 </button>
               </li>
