@@ -161,8 +161,9 @@ const MapView = () => {
 
     // --- FIX: Wrap all map operations in a setTimeout to prevent race condition ---
     const timerId = setTimeout(() => {
-      if (!map) return; // Check again inside timeout in case map was removed
-
+      // Check again inside timeout in case map was removed while waiting
+      if (!map) return; 
+      
       // Clear existing markers from the layer group
       markerLayer.current.clearLayers();
 
@@ -278,7 +279,7 @@ const MapView = () => {
          // If overlay is shown, maybe reset view?
          map.setView([19.076, 72.8777], 12);
       }
-    }, 0);
+    }, 0); 
     // --- END FIX ---
 
     // Cleanup the timeout if the component unmounts or dependencies change
