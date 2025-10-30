@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -36,24 +36,44 @@ const MapView = () => {
   console.log(blogs);
   
 
+  // UI state
   const [showOverlay, setShowOverlay] = useState(true);
-  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(() => {
+
+  // Initialize currentCategoryIndex purely — no side-effects here
+  const initialIndex = (() => {
+    if (categoryParam) {
+      const idx = categories.findIndex(
+        (c) => c.name.toLowerCase() === categoryParam.toLowerCase()
+      );
+      return idx !== -1 ? idx : 0;
+    }
+    return 0;
+  })();
+  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(initialIndex);
+
+  // If a category param exists, hide overlay after mount (pure side-effect)
+  useEffect(() => {
     if (categoryParam) {
       const idx = categories.findIndex(
         (c) => c.name.toLowerCase() === categoryParam.toLowerCase()
       );
       if (idx !== -1) {
+        setCurrentCategoryIndex(idx);
         setShowOverlay(false);
-        return idx;
       }
     }
-    return 0;
-  });
+    // only depends on categoryParam (derived from location.search)
+  }, [categoryParam]);
 
+  // Map & layers
   const [map, setMap] = useState(null);
-  const markerLayer = useRef(L.layerGroup());
+  // Create markerLayer only once AFTER leaflet is available (null initial)
+  const markerLayer = useRef(null);
   const mapContainerRef = useRef(null);
   const invalidateSizeRequestRef = useRef(null);
+
+  // Keep track of last fetched category to avoid repeated fetches
+  const lastFetchedCategoryRef = useRef(null);
 
   // Navigation functions
   const nextCategory = () =>
@@ -79,7 +99,7 @@ const MapView = () => {
   };
 
   // Function to create custom Leaflet marker icons
-  const createCustomIcon = (category) =>
+  const createCustomIcon = useCallback((category) =>
     L.divIcon({
       className: "custom-marker",
       html: `
@@ -101,105 +121,108 @@ const MapView = () => {
       iconSize: [36, 36],
       iconAnchor: [18, 36],
       popupAnchor: [0, -38],
-    });
+    }), []);
 
   // Initialize map effect (runs only once)
   useEffect(() => {
-    // Prevent map re-initialization if it already exists or container isn't ready
     if (map || !mapContainerRef.current) return;
 
-    // Create map instance using the ref
     const mapInstance = L.map(mapContainerRef.current, {
-        zoomControl: false,
-        tap: false,
-        touchZoom: true,
-        dragging: true,
-        scrollWheelZoom: true,
-        preferCanvas: true,
-    }).setView(
-      [19.076, 72.8777],
-      12
-    );
+      zoomControl: false,
+      tap: false,
+      touchZoom: true,
+      dragging: true,
+      scrollWheelZoom: true,
+      preferCanvas: true,
+    }).setView([19.076, 72.8777], 12);
 
-    // Add dark tile layer
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19,
-        minZoom: 3,
-      }
-    ).addTo(mapInstance);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom: 19,
+      minZoom: 3,
+    }).addTo(mapInstance);
 
-    // Add the layer group for markers to the map
-    markerLayer.current.addTo(mapInstance);
+    // create and add the marker layer AFTER map is available
+    markerLayer.current = L.layerGroup().addTo(mapInstance);
 
-    // Store map instance in state
     setMap(mapInstance);
 
-    // Cleanup function to remove map when component unmounts
     return () => {
       if (mapInstance) {
         mapInstance.remove();
       }
       setMap(null);
+      markerLayer.current = null;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once
 
-  // Effect to fetch products when category changes or overlay is hidden
-   useEffect(() => {
-     const fetchCategoryProducts = async () => {
-       if (!showOverlay && (blogs.length > 0 || !dataLoading)) {
-         const category = categories[currentCategoryIndex].name;
-         try {
-           await fetchProductsInBatch({ category });
-         } catch (err) {
-           console.error("Error fetching products for category:", err);
-         }
-       }
-     };
-
-     fetchCategoryProducts();
-   }, [showOverlay, currentCategoryIndex, blogs, dataLoading, fetchProductsInBatch]);
-
-
-  // Effect to update map markers when category changes or overlay state changes
+  // Fetch products when category changes or overlay is hidden,
+  // but don't fetch repeatedly for the same category
   useEffect(() => {
-    // Ensure map instance exists
-    if (!map) return;
+    const fetchCategoryProducts = async () => {
+      if (!showOverlay) {
+        const category = categories[currentCategoryIndex].name;
+        // If we already fetched this category and dataLoading is false, skip
+        if (lastFetchedCategoryRef.current === category && !dataLoading) {
+          return;
+        }
+        try {
+          lastFetchedCategoryRef.current = category;
+          await fetchProductsInBatch({ category });
+        } catch (err) {
+          console.error("Error fetching products for category:", err);
+        }
+      }
+    };
+
+    fetchCategoryProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showOverlay, currentCategoryIndex]);
+
+  // memoize vendors to display to avoid re-computing each render
+  const vendorsToDisplay = useMemo(() => {
+    if (!blogs || !Array.isArray(blogs)) return [];
+    return blogs.filter((vendor) => {
+      const hasValidPosition =
+        vendor.address?.[0]?.coordinates &&
+        Array.isArray(vendor.address[0].coordinates) &&
+        vendor.address[0].coordinates.length === 2;
+      const hasProductsInCategory =
+        vendor.products && Array.isArray(vendor.products) && vendor.products.length > 0;
+      return hasValidPosition && hasProductsInCategory;
+    });
+  }, [blogs]);
+
+  // Effect to update map markers when category or overlay or blogs change
+  useEffect(() => {
+    if (!map || !markerLayer.current) return;
 
     // Cancel any pending invalidateSize call
     if (invalidateSizeRequestRef.current) {
-        cancelAnimationFrame(invalidateSizeRequestRef.current);
+      cancelAnimationFrame(invalidateSizeRequestRef.current);
+      invalidateSizeRequestRef.current = null;
     }
 
-    // Clear existing markers from the layer group
-    markerLayer.current.clearLayers();
+    // Clear existing markers
+    try {
+      markerLayer.current.clearLayers();
+    } catch (e) {
+      // ignore if layerGroup not ready
+    }
 
-    // Only add markers if the overlay is hidden (a category is selected)
     if (!showOverlay) {
       const currentCategory = categories[currentCategoryIndex];
       const customIcon = createCustomIcon(currentCategory);
 
-      // Filter vendors that have coordinates and products in the current category
-      const vendorsToDisplay = (blogs || []).filter((vendor) => {
-        const hasValidPosition =
-          vendor.address?.[0]?.coordinates &&
-          Array.isArray(vendor.address[0].coordinates) &&
-          vendor.address[0].coordinates.length === 2;
-        const hasProductsInCategory =
-          vendor.products &&
-          Array.isArray(vendor.products) &&
-          vendor.products.length > 0;
-        return hasValidPosition && hasProductsInCategory;
-      });
-
       // Add markers for each vendor to display
       vendorsToDisplay.forEach((vendor) => {
-         const coordinates = vendor.address?.[0]?.coordinates;
-         if (!coordinates) return;
+        const coordinates = vendor.address?.[0]?.coordinates;
+        if (!coordinates || coordinates.length !== 2) return;
 
+        // Leaflet expects [lat, lng]. If your stored coords are [lng, lat], flip them here.
+        // I'm assuming vendor.address[0].coordinates is [lat, lng] as per your previous usage.
         const marker = L.marker(coordinates, { icon: customIcon });
 
         // Bind tooltip (hover text)
@@ -221,29 +244,28 @@ const MapView = () => {
              </div>`
           : "";
 
-        // Bind popup (click content)
         marker.bindPopup(
           `
-          <div class="custom-popup">
-            ${logo}
-            <div class="popup-header">
-              <h3 style="font-size: 16px; font-weight: bold; margin: 0; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${vendor.name}</h3>
-              <div class="category-badge" style="background:${currentCategory.color}; font-size: 10px; padding: 3px 6px;">
-                <i class="${currentCategory.icon}" style="margin-right: 4px;"></i> ${currentCategory.name}
+            <div class="custom-popup">
+              ${logo}
+              <div class="popup-header">
+                <h3 style="font-size: 16px; font-weight: bold; margin: 0; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${vendor.name}</h3>
+                <div class="category-badge" style="background:${currentCategory.color}; font-size: 10px; padding: 3px 6px;">
+                  <i class="${currentCategory.icon}" style="margin-right: 4px;"></i> ${currentCategory.name}
+                </div>
+              </div>
+              <div class="popup-content">
+                ${email}
+                <button class="view-products-btn" data-vendor-id="${vendor.id}">
+                  <i class="fas fa-eye"></i> View Products
+                </button>
               </div>
             </div>
-            <div class="popup-content">
-              ${email}
-              <button class="view-products-btn" data-vendor-id="${vendor.id}">
-                <i class="fas fa-eye"></i> View Products
-              </button>
-            </div>
-          </div>
-        `,
+          `,
           { maxWidth: 240, className: "modern-popup" }
         );
 
-        // Add event listener for the button inside the popup
+        // When popup opens, attach button handler
         marker.on("popupopen", () => {
           const button = document.querySelector(
             `.view-products-btn[data-vendor-id="${vendor.id}"]`
@@ -256,54 +278,51 @@ const MapView = () => {
           }
         });
 
-        // Add the configured marker to the layer group
         markerLayer.current.addLayer(marker);
       });
 
       // Adjust map view to fit markers
       if (vendorsToDisplay.length > 0) {
         if (vendorsToDisplay.length === 1) {
-           const coordinates = vendorsToDisplay[0].address?.[0]?.coordinates;
-           if (coordinates) map.setView(coordinates, 13);
+          const coordinates = vendorsToDisplay[0].address?.[0]?.coordinates;
+          if (coordinates) map.setView(coordinates, 13);
         } else {
-           const validCoordinates = vendorsToDisplay
-             .map(v => v.address?.[0]?.coordinates)
-             .filter(Boolean);
-           if (validCoordinates.length > 0) {
-             const bounds = L.latLngBounds(validCoordinates);
-             map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
-           }
+          const validCoordinates = vendorsToDisplay
+            .map((v) => v.address?.[0]?.coordinates)
+            .filter(Boolean);
+          if (validCoordinates.length > 0) {
+            const bounds = L.latLngBounds(validCoordinates);
+            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
+          }
         }
       } else {
-         map.setView([19.076, 72.8777], 12);
+        map.setView([19.076, 72.8777], 12);
       }
-      
-      invalidateSizeRequestRef.current = requestAnimationFrame(() => {
-          if (map) {
-              map.invalidateSize({ animate: false });
-          }
-      });
 
+      invalidateSizeRequestRef.current = requestAnimationFrame(() => {
+        if (map) {
+          map.invalidateSize({ animate: false });
+        }
+      });
     } else {
-       map.setView([19.076, 72.8777], 12);
-       invalidateSizeRequestRef.current = requestAnimationFrame(() => {
-           if (map) {
-               map.invalidateSize({ animate: false });
-           }
-       });
+      // overlay shown -> default center
+      map.setView([19.076, 72.8777], 12);
+      invalidateSizeRequestRef.current = requestAnimationFrame(() => {
+        if (map) {
+          map.invalidateSize({ animate: false });
+        }
+      });
     }
 
-    // Cleanup function for the requestAnimationFrame
     return () => {
-        if (invalidateSizeRequestRef.current) {
-            cancelAnimationFrame(invalidateSizeRequestRef.current);
-        }
+      if (invalidateSizeRequestRef.current) {
+        cancelAnimationFrame(invalidateSizeRequestRef.current);
+        invalidateSizeRequestRef.current = null;
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showOverlay, currentCategoryIndex, vendorsToDisplay, map]);
 
-  }, [showOverlay, currentCategoryIndex, blogs, map, navigate, currentUser]);
-
-
-  // Get the currently selected category object
   const currentCategory = categories[currentCategoryIndex];
 
   return (
