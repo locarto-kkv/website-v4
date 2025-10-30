@@ -159,121 +159,131 @@ const MapView = () => {
     // Ensure map instance exists
     if (!map) return;
 
-    // Clear existing markers from the layer group
-    markerLayer.current.clearLayers();
+    // --- FIX: Wrap all map operations in a setTimeout to prevent race condition ---
+    const timerId = setTimeout(() => {
+      if (!map) return; // Check again inside timeout in case map was removed
 
-    // Only add markers if the overlay is hidden (a category is selected)
-    if (!showOverlay) {
-      const currentCategory = categories[currentCategoryIndex];
-      const customIcon = createCustomIcon(currentCategory);
+      // Clear existing markers from the layer group
+      markerLayer.current.clearLayers();
 
-      // Filter vendors that have coordinates and products in the current category
-      const vendorsToDisplay = (blogs || []).filter((vendor) => {
-        const hasValidPosition =
-          vendor.address?.[0]?.coordinates && // Check if address and coordinates exist
-          Array.isArray(vendor.address[0].coordinates) &&
-          vendor.address[0].coordinates.length === 2;
-        const hasProductsInCategory =
-          vendor.products &&
-          Array.isArray(vendor.products) &&
-          vendor.products.length > 0; // Check if products exist for the vendor (already filtered by category in fetch)
-        return hasValidPosition && hasProductsInCategory;
-      });
+      // Only add markers if the overlay is hidden (a category is selected)
+      if (!showOverlay) {
+        const currentCategory = categories[currentCategoryIndex];
+        const customIcon = createCustomIcon(currentCategory);
 
-      // Add markers for each vendor to display
-      vendorsToDisplay.forEach((vendor) => {
-         // Safely access coordinates
-         const coordinates = vendor.address?.[0]?.coordinates;
-         if (!coordinates) return; // Skip if no coordinates
-
-        const marker = L.marker(coordinates, { icon: customIcon });
-
-        // Bind tooltip (hover text)
-        marker.bindTooltip(vendor.name || "Unnamed Vendor", {
-          permanent: false, // Show only on hover
-          direction: "top",
-          offset: [0, -38], // Position above the marker point
-          className: "custom-tooltip", // Apply custom CSS class
-          opacity: 0.9,
+        // Filter vendors that have coordinates and products in the current category
+        const vendorsToDisplay = (blogs || []).filter((vendor) => {
+          const hasValidPosition =
+            vendor.address?.[0]?.coordinates && // Check if address and coordinates exist
+            Array.isArray(vendor.address[0].coordinates) &&
+            vendor.address[0].coordinates.length === 2;
+          const hasProductsInCategory =
+            vendor.products &&
+            Array.isArray(vendor.products) &&
+            vendor.products.length > 0; // Check if products exist for the vendor (already filtered by category in fetch)
+          return hasValidPosition && hasProductsInCategory;
         });
 
-        // Prepare popup content
-        const logo = vendor.brand_logo_1
-          ? `<img src="${vendor.brand_logo_1}" alt="${vendor.name}" style="width:100%; max-height: 100px; object-fit: contain; border-radius:8px; margin-bottom:10px; background: #eee;" />` // Added max-height, object-fit, bg
-          : "";
-        const email = vendor.email
-          ? `<div style="font-size:12px; color:#6b7280; margin-top:4px; word-break: break-all;">
-              <i class="fas fa-envelope" style="margin-right: 5px;"></i> ${vendor.email}
-             </div>`
-          : "";
+        // Add markers for each vendor to display
+        vendorsToDisplay.forEach((vendor) => {
+           // Safely access coordinates
+           const coordinates = vendor.address?.[0]?.coordinates;
+           if (!coordinates) return; // Skip if no coordinates
 
-        // Bind popup (click content)
-        marker.bindPopup(
-          `
-          <div class="custom-popup">
-            ${logo}
-            <div class="popup-header">
-              <h3 style="font-size: 16px; font-weight: bold; margin: 0; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${vendor.name}</h3>
-              <div class="category-badge" style="background:${currentCategory.color}; font-size: 10px; padding: 3px 6px;">
-                <i class="${currentCategory.icon}" style="margin-right: 4px;"></i> ${currentCategory.name}
+          const marker = L.marker(coordinates, { icon: customIcon });
+
+          // Bind tooltip (hover text)
+          marker.bindTooltip(vendor.name || "Unnamed Vendor", {
+            permanent: false, // Show only on hover
+            direction: "top",
+            offset: [0, -38], // Position above the marker point
+            className: "custom-tooltip", // Apply custom CSS class
+            opacity: 0.9,
+          });
+
+          // Prepare popup content
+          const logo = vendor.brand_logo_1
+            ? `<img src="${vendor.brand_logo_1}" alt="${vendor.name}" style="width:100%; max-height: 100px; object-fit: contain; border-radius:8px; margin-bottom:10px; background: #eee;" />` // Added max-height, object-fit, bg
+            : "";
+          const email = vendor.email
+            ? `<div style="font-size:12px; color:#6b7280; margin-top:4px; word-break: break-all;">
+                <i class="fas fa-envelope" style="margin-right: 5px;"></i> ${vendor.email}
+               </div>`
+            : "";
+
+          // Bind popup (click content)
+          marker.bindPopup(
+            `
+            <div class="custom-popup">
+              ${logo}
+              <div class="popup-header">
+                <h3 style="font-size: 16px; font-weight: bold; margin: 0; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${vendor.name}</h3>
+                <div class="category-badge" style="background:${currentCategory.color}; font-size: 10px; padding: 3px 6px;">
+                  <i class="${currentCategory.icon}" style="margin-right: 4px;"></i> ${currentCategory.name}
+                </div>
+              </div>
+              <div class="popup-content">
+                ${email}
+                <button class="view-products-btn" data-vendor-id="${vendor.id}">
+                  <i class="fas fa-eye"></i> View Products
+                </button>
               </div>
             </div>
-            <div class="popup-content">
-              ${email}
-              <button class="view-products-btn" data-vendor-id="${vendor.id}">
-                <i class="fas fa-eye"></i> View Products
-              </button>
-            </div>
-          </div>
-        `,
-          { maxWidth: 240, className: "modern-popup" } // Set max width for popup
-        );
-
-        // Add event listener for the button inside the popup
-        marker.on("popupopen", () => {
-          const button = document.querySelector(
-            `.view-products-btn[data-vendor-id="${vendor.id}"]`
+          `,
+            { maxWidth: 240, className: "modern-popup" } // Set max width for popup
           );
-          if (button) {
-            button.onclick = () => {
-              // Navigate to the shop products page
-              const shopPath = `/shops/${vendor.id}/products/${encodeURIComponent(currentCategory.name)}`;
-              navigate(currentUser?.type === "consumer" ? `/consumer${shopPath}` : shopPath);
-            };
-          }
+
+          // Add event listener for the button inside the popup
+          marker.on("popupopen", () => {
+            const button = document.querySelector(
+              `.view-products-btn[data-vendor-id="${vendor.id}"]`
+            );
+            if (button) {
+              button.onclick = () => {
+                // Navigate to the shop products page
+                const shopPath = `/shops/${vendor.id}/products/${encodeURIComponent(currentCategory.name)}`;
+                navigate(currentUser?.type === "consumer" ? `/consumer${shopPath}` : shopPath);
+              };
+            }
+          });
+
+          // Add the configured marker to the layer group
+          markerLayer.current.addLayer(marker);
         });
 
-        // Add the configured marker to the layer group
-        markerLayer.current.addLayer(marker);
-      });
-
-      // Adjust map view to fit markers
-      if (vendorsToDisplay.length > 0) {
-        if (vendorsToDisplay.length === 1) {
-          // If only one marker, center on it with a fixed zoom
-           const coordinates = vendorsToDisplay[0].address?.[0]?.coordinates;
-           if (coordinates) map.setView(coordinates, 13);
+        // Adjust map view to fit markers
+        if (vendorsToDisplay.length > 0) {
+          if (vendorsToDisplay.length === 1) {
+            // If only one marker, center on it with a fixed zoom
+             const coordinates = vendorsToDisplay[0].address?.[0]?.coordinates;
+             if (coordinates) map.setView(coordinates, 13);
+          } else {
+            // If multiple markers, fit bounds
+             const validCoordinates = vendorsToDisplay
+               .map(v => v.address?.[0]?.coordinates)
+               .filter(Boolean); // Filter out any null/undefined coordinates
+             if (validCoordinates.length > 0) {
+               const bounds = L.latLngBounds(validCoordinates);
+               map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 }); // Add padding
+             }
+          }
         } else {
-          // If multiple markers, fit bounds
-           const validCoordinates = vendorsToDisplay
-             .map(v => v.address?.[0]?.coordinates)
-             .filter(Boolean); // Filter out any null/undefined coordinates
-           if (validCoordinates.length > 0) {
-             const bounds = L.latLngBounds(validCoordinates);
-             map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 }); // Add padding
-           }
+          // Optional: If no vendors, reset view or show a message
+           map.setView([19.076, 72.8777], 12); // Reset to default view
         }
-      } else {
-        // Optional: If no vendors, reset view or show a message
-         map.setView([19.076, 72.8777], 12); // Reset to default view
-      }
+        
+        map.invalidateSize({ animate: true });
 
-      // Ensure map size is updated after potential layout changes
-      map.invalidateSize({ animate: true });
-    } else {
-       // If overlay is shown, maybe reset view?
-       map.setView([19.076, 72.8777], 12);
-    }
+      } else {
+         // If overlay is shown, maybe reset view?
+         map.setView([19.076, 72.8777], 12);
+      }
+    }, 0);
+    // --- END FIX ---
+
+    // Cleanup the timeout if the component unmounts or dependencies change
+    return () => clearTimeout(timerId);
+
   }, [showOverlay, currentCategoryIndex, blogs, map, navigate, currentUser]); // Added map, navigate, currentUser dependencies
 
 
@@ -313,25 +323,15 @@ const MapView = () => {
               </button>
             </div>
 
-            {/* Mobile: Bottom Floating Bar showing current category */}
-            <div className="lg:hidden absolute bottom-5 left-4 right-4 z-[9999] bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-3 flex items-center justify-between gap-3 animate-slide-up">
-              <div className="flex items-center gap-3 min-w-0"> {/* Icon and Text */}
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: currentCategory.color }}
-                >
-                  <i className={`${currentCategory.icon} text-white text-lg`}></i>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-gray-400">Showing</p>
-                  <p className="font-bold text-white truncate">{currentCategory.name}</p>
-                </div>
-              </div>
-              <button // "Change" button
+            {/* Mobile: Top Right Category Change Button */}
+            <div className="lg:hidden absolute top-4 right-4 z-[9999]">
+              <button
                 onClick={handleBackToCategories}
-                className="bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-4 py-2 rounded-lg border border-white/20 transition-colors flex-shrink-0"
+                className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 border-2 border-white/30"
+                style={{ backgroundColor: currentCategory.color }}
+                aria-label="Change category"
               >
-                Change
+                <i className={`${currentCategory.icon} text-white text-xl`}></i>
               </button>
             </div>
           </>
