@@ -164,6 +164,10 @@ const MapView = () => {
       // Check again inside timeout in case map was removed while waiting
       if (!map) return; 
       
+      // --- FIX: Invalidate size *before* any view-changing operations ---
+      // This forces Leaflet to re-measure its container, fixing Safari/iOS error
+      map.invalidateSize({ animate: true });
+
       // Clear existing markers from the layer group
       markerLayer.current.clearLayers();
 
@@ -272,8 +276,8 @@ const MapView = () => {
           // Optional: If no vendors, reset view or show a message
            map.setView([19.076, 72.8777], 12); // Reset to default view
         }
-        
-        map.invalidateSize({ animate: true });
+      
+        // map.invalidateSize({ animate: true }); // This was moved up
 
       } else {
          // If overlay is shown, maybe reset view?
