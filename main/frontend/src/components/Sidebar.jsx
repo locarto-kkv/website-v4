@@ -23,6 +23,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
 
   const profile = useVendorDataStore((s) => s.profile);
   const isVerified = (path) => {
+    if (currentUser?.type === "consumer") return true;
     if (profile?.status !== "verified") {
       if (path !== "/vendor/dashboard/profile") return false;
     }

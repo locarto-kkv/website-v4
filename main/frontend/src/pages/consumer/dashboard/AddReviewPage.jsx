@@ -1,7 +1,7 @@
 // src/pages/consumer/dashboard/AddReviewPage.jsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useParams, useNavigate } from "react-router-dom";
 import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore";
 import { ConsumerReviewService } from "../../../services/consumer/consumerReviewService";
 import { formatCurrency } from "../../../lib/utils";
@@ -32,12 +32,12 @@ const StarRating = ({ rating, setRating }) => {
 const AddReviewPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const { orders } = useConsumerDataStore(); // Get orders from context
+  const orders = useConsumerDataStore((s) => s.orders); // Get orders from context
   const { addReview } = ConsumerReviewService;
 
   const [order, setOrder] = useState(null);
   const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,12 +51,10 @@ const AddReviewPage = () => {
         if (foundOrder.order_status?.toLowerCase() === "delivered") {
           setOrder(foundOrder);
         } else {
-          toast.error("You can only review delivered orders.");
-          navigate("/consumer/dashboard/orders"); // Redirect if not delivered
+          navigate("/consumer/dashboard/orders");
         }
       } else {
-        toast.error("Order not found.");
-        navigate("/consumer/dashboard/orders"); // Redirect if order not found
+        navigate("/consumer/dashboard/orders");
       }
     }
     setLoading(false);
@@ -68,8 +66,8 @@ const AddReviewPage = () => {
       toast.error("Please select a rating.");
       return;
     }
-    if (!comment.trim()) {
-      toast.error("Please write a comment.");
+    if (!content.trim()) {
+      toast.error("Please write a content.");
       return;
     }
     if (!order || !order.product_id) {
@@ -78,25 +76,16 @@ const AddReviewPage = () => {
     }
 
     setSubmitting(true);
-    toast.loading("Submitting review...");
 
     try {
       await addReview(order.product_id, {
-        // Pass productId from the order
         rating: rating,
-        comment: comment,
-        // You might need to pass order_id as well depending on your backend
-        order_id: order.id,
+        content: content,
+        review_images: [],
       });
 
-      toast.dismiss();
-      toast.success("Review submitted successfully!");
-      // Optionally refetch reviews if your ConsumerReview page depends on context
-      // await fetchReviews(); // Assuming you add a fetchReviews to consumerDataContext
-      navigate("/consumer/dashboard/reviews"); // Navigate to the reviews page
+      navigate("/consumer/dashboard/reviews");
     } catch (error) {
-      toast.dismiss();
-      toast.error(error.response?.data?.message || "Failed to submit review.");
       console.error("Error submitting review:", error);
     } finally {
       setSubmitting(false);
@@ -157,18 +146,18 @@ const AddReviewPage = () => {
           <StarRating rating={rating} setRating={setRating} />
         </div>
 
-        {/* Comment Section */}
+        {/* content Section */}
         <div>
           <label
-            htmlFor="comment"
+            htmlFor="content"
             className="block text-base font-semibold text-gray-800 mb-2"
           >
             Your Review *
           </label>
           <textarea
-            id="comment"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
             rows="5"
             className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm md:text-base resize-none"
             placeholder="Share your experience with this product..."
