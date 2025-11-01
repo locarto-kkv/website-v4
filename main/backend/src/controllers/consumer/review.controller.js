@@ -6,35 +6,15 @@ import { getFileUploadUrl, deleteFolder } from "../../services/file.service.js";
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
-export const getReviews = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const { data: reviews } = await db
-      .from("reviews")
-      .select("*, product: reviews_product_id_fkey(*)")
-      .eq("consumer_id", userId);
-
-    res.status(200).json(reviews);
-  } catch (error) {
-    logger({
-      level: "error",
-      message: error.message,
-      location: __filename,
-      func: "getReviewsByProduct",
-    });
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 export const getReviewsByProduct = async (req, res) => {
   try {
     const { productId } = req.params;
 
     const { data: reviews } = await db
-      .from("reviews")
-      .select()
-      .eq("product_id", productId);
+      .from("orders")
+      .select("id, product_id, review: reviews_order_id_fkey(*)")
+      .eq("product_id", productId)
+      .not("review", "is", null);
 
     res.status(200).json(reviews);
   } catch (error) {
@@ -53,7 +33,7 @@ export const addReview = async (req, res) => {
     const { content, rating, review_images = null } = req.body;
 
     const userId = req.user.id;
-    const { productId } = req.params;
+    const { orderId } = req.params;
 
     const imgUploadUrls = [];
     const imgPublicUrls = [];
@@ -61,8 +41,7 @@ export const addReview = async (req, res) => {
     const reviewData = {
       content,
       rating,
-      consumer_id: userId,
-      product_id: productId,
+      order_id: orderId,
     };
 
     const { data: newReview } = await db

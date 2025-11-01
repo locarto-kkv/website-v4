@@ -12,8 +12,8 @@ export const getBlogs = async (req, res) => {
     const { data: blogs, error } = await db
       .from("vendors")
       .select(
-        `*,
-      blog: brands_vendor_id_fkey(*),
+        `name, email, phone_no, brand_logo_1, brand_logo_2, status, website,
+      blog: blogs_vendor_id_fkey(*),
       address: addresses_vendor_id_fkey(*)`
       )
       .order("id", { ascending: true });

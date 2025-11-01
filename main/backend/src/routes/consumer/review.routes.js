@@ -2,7 +2,6 @@ import { Router } from "express";
 import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
   getReviewsByProduct,
-  getReviews,
   addReview,
   deleteReview,
   editReview,
@@ -10,7 +9,6 @@ import {
 
 const router = Router();
 
-router.get("/", protectRoute("consumer"), getReviews);
 router.get("/:productId", getReviewsByProduct);
 router.post("/add/:productId", protectRoute("consumer"), addReview);
 router.put("/edit/:reviewId", protectRoute("consumer"), editReview);

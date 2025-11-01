@@ -14,20 +14,13 @@ export const getOrderHistory = async (req, res) => {
       .from("orders")
       .select(
         `*,
-        product:products (*)
+        product: orders_product_id_fkey(*),
+        review: reviews_order_id_fkey(*)
         `
       )
       .eq("consumer_id", userId);
 
-    if (error) {
-      logger({
-        level: "error",
-        message: error.message,
-        location: __filename,
-        func: "getOrderHistory",
-      });
-      return res.status(500).json({ error: "Failed to fetch transactions" });
-    }
+    if (error) throw error;
 
     res.status(200).json(orders);
   } catch (error) {

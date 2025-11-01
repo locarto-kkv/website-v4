@@ -13,7 +13,7 @@ export const getOrders = async (req, res) => {
       .from("orders")
       .select(
         `*,
-        product:products (*)
+        product: orders_product_id_fkey(*)
         `
       )
       .eq("product.vendor_id", vendorId)

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { formatDate } from "../../../lib/utils";
 import { ConsumerReviewService } from "../../../services/consumer/consumerReviewService";
+import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore";
 import toast from "react-hot-toast";
 
 const CustomerReviews = () => {
@@ -9,12 +10,14 @@ const CustomerReviews = () => {
   const [loading, setLoading] = useState(true);
   const [imageIndexes, setImageIndexes] = useState({}); // Track current image index for each review
 
+  const orders = useConsumerDataStore((s) => s.orders);
+
   // --- Fetch reviews when component mounts ---
   useEffect(() => {
     const fetchReviews = async () => {
       setLoading(true);
       try {
-        const fetchedReviews = await ConsumerReviewService.getReviews();
+        const fetchedReviews = orders.filter((order) => order.review);
 
         // Assuming the API returns an array of reviews
         setReviews(fetchedReviews || []);
@@ -34,8 +37,8 @@ const CustomerReviews = () => {
   useEffect(() => {
     if (reviews.length > 0) {
       const initialIndexes = {};
-      reviews.forEach((review) => {
-        initialIndexes[review.id] = 0;
+      reviews.forEach((order) => {
+        initialIndexes[order.review.id] = 0;
       });
       setImageIndexes(initialIndexes);
     }
@@ -75,36 +78,36 @@ const CustomerReviews = () => {
         </div>
       ) : (
         <div className="space-y-4 md:space-y-6">
-          {reviews.map((review) => {
+          {reviews.map((order) => {
             const hasImages =
-              review.review_images && review.review_images.length > 0;
-            const currentImageIndex = imageIndexes[review.id] || 0;
+              order.review.review_images &&
+              order.review.review_images.length > 0;
+            const currentImageIndex = imageIndexes[order.review.id] || 0;
 
             return (
               <div
-                key={review.id}
+                key={order.review.id}
                 className="border border-gray-200 rounded-2xl overflow-hidden hover:border-orange-300 transition-all hover:shadow-md bg-white"
               >
                 {/* Image Carousel Section */}
-                {console.log(
-                  review.id,
-                  review.review_images[currentImageIndex]?.url
-                )}
 
                 {hasImages && (
                   <div className="relative bg-gray-100 aspect-video md:aspect-[21/9]">
                     <img
-                      src={review.review_images[currentImageIndex]?.url}
+                      src={order.review.review_images[currentImageIndex]?.url}
                       alt={`Review image ${currentImageIndex + 1}`}
                       className="w-full h-full object-cover"
                     />
 
                     {/* Navigation Buttons */}
-                    {review.review_images.length > 1 && (
+                    {order.review.review_images.length > 1 && (
                       <>
                         <button
                           onClick={() =>
-                            prevImage(review.id, review.review_images.length)
+                            prevImage(
+                              order.review.id,
+                              order.review.review_images.length
+                            )
                           }
                           className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center transition-all backdrop-blur-sm"
                           aria-label="Previous image"
@@ -113,7 +116,10 @@ const CustomerReviews = () => {
                         </button>
                         <button
                           onClick={() =>
-                            nextImage(review.id, review.review_images.length)
+                            nextImage(
+                              order.review.id,
+                              order.review.review_images.length
+                            )
                           }
                           className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center transition-all backdrop-blur-sm"
                           aria-label="Next image"
@@ -124,12 +130,12 @@ const CustomerReviews = () => {
                         {/* Image Counter */}
                         <div className="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs md:text-sm backdrop-blur-sm">
                           {currentImageIndex + 1} /{" "}
-                          {review.review_images.length}
+                          {order.review.review_images.length}
                         </div>
 
                         {/* Dot Indicators */}
                         <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 md:gap-2">
-                          {review.review_images.map((_, idx) => (
+                          {order.review.review_images.map((_, idx) => (
                             <button
                               key={idx}
                               onClick={() =>
@@ -157,7 +163,7 @@ const CustomerReviews = () => {
                   {/* Header with Product Name and Rating */}
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-3 md:mb-4">
                     <h3 className="font-bold text-lg md:text-xl text-gray-900">
-                      {review.product.name || "Product Name"}
+                      {order.product.name || "Product Name"}
                     </h3>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <div className="flex text-yellow-400">
@@ -165,28 +171,30 @@ const CustomerReviews = () => {
                           <i
                             key={i}
                             className={`fas fa-star text-base md:text-lg ${
-                              i < (review.rating || 0) ? "" : "text-gray-300"
+                              i < (order.review.rating || 0)
+                                ? ""
+                                : "text-gray-300"
                             }`}
                           ></i>
                         ))}
                       </div>
                       <span className="text-sm md:text-base text-gray-600 font-semibold">
-                        {review.rating || 0}/5
+                        {order.review.rating || 0}/5
                       </span>
                     </div>
                   </div>
 
                   {/* Review Title */}
-                  {review.title && (
+                  {order.review.title && (
                     <h4 className="text-base md:text-lg font-semibold text-gray-800 mb-2">
-                      "{review.title}"
+                      "{order.review.title}"
                     </h4>
                   )}
 
                   {/* Review Content */}
-                  {review.content && (
+                  {order.review.content && (
                     <p className="text-gray-700 mb-3 md:mb-4 text-sm md:text-base leading-relaxed">
-                      {review.content}
+                      {order.review.content}
                     </p>
                   )}
 
@@ -194,7 +202,9 @@ const CustomerReviews = () => {
                   <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                     <p className="text-gray-500 text-xs md:text-sm flex items-center gap-2">
                       <i className="far fa-calendar text-gray-400"></i>
-                      <span>Reviewed on {formatDate(review.created_at)}</span>
+                      <span>
+                        Reviewed on {formatDate(order.review.created_at)}
+                      </span>
                     </p>
                   </div>
                 </div>

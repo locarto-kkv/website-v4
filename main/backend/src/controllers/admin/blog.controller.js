@@ -12,7 +12,7 @@ export const addBlog = async (req, res) => {
     const blogData = req.body;
 
     const { data: newBlog, error } = await db
-      .from("brands")
+      .from("blogs")
       .insert(blogData)
       .select()
       .single();
@@ -29,7 +29,7 @@ export const addBlog = async (req, res) => {
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
 
       const { data: updatedBlog, error } = await db
-        .from("brands")
+        .from("blogs")
         .update({ brand_logo: imgPublicUrl })
         .eq("id", newBlog.id)
         .select()
@@ -73,7 +73,7 @@ export const editBlog = async (req, res) => {
     }
 
     const { data: updatedBlog, error } = await db
-      .from("brands")
+      .from("blogs")
       .update(blogData)
       .eq("id", blogId)
       .select()
@@ -96,9 +96,8 @@ export const editBlog = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const { data, error } = await db.from("brands").delete().eq("id", blogId);
+    const { data, error } = await db.from("blogs").delete().eq("id", blogId);
 
-    await deleteFolder(blogId, "brand-logos");
     res.status(200).json({ message: "Blog Deleted Successfully" });
   } catch (error) {
     logger({
