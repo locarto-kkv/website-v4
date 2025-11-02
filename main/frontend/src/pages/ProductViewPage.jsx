@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDataStore } from "../store/useDataStore";
 import { ConsumerListService } from "../services/consumer/consumerListService";
 import { ConsumerProductService } from "../services/consumer/consumerProductService";
+import { ConsumerReviewService } from "../services/consumer/consumerReviewService";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatCurrency } from "../lib/utils";
 import Navbar from "../components/Navbar";
@@ -59,6 +60,7 @@ const ProductViewPage = () => {
   const isConsumer = currentUser?.type === "consumer";
 
   const [product, setProduct] = useState(null);
+  const [reviews, setReviews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -81,7 +83,11 @@ const ProductViewPage = () => {
       const prod = await ConsumerProductService.getProductsByFilter({
         id: productId,
       });
+      const revs = await ConsumerReviewService.getReviewsByProduct(productId);
+      console.log(revs);
+
       setProduct(prod[0]);
+      setReviews(revs);
       setLoading(false);
     };
     findProduct();
@@ -532,6 +538,80 @@ const ProductViewPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Customer Reviews Section */}
+        {reviews && reviews.length > 0 && (
+          <div className="mt-16 pt-12 border-t-2 border-gray-200">
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-6 flex items-center gap-3">
+              <i className="fas fa-star text-yellow-400"></i>
+              Customer Reviews
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reviews.map((r) => {
+                const review = r.review;
+                const hasImages =
+                  review.review_images && review.review_images.length > 0;
+
+                return (
+                  <div
+                    key={review.id}
+                    className="bg-white border border-gray-200 rounded-2xl shadow hover:shadow-lg transition-all duration-300 overflow-hidden group"
+                  >
+                    {/* Optional Review Image */}
+                    {hasImages && (
+                      <div className="relative aspect-video bg-gray-100">
+                        <img
+                          src={review.review_images[0].url}
+                          alt="Review"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {review.review_images.length > 1 && (
+                          <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                            +{review.review_images.length - 1} more
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Review Content */}
+                    <div className="p-4">
+                      {/* Rating */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-1 text-yellow-400">
+                          {[...Array(5)].map((_, i) => (
+                            <i
+                              key={i}
+                              className={`fas fa-star text-sm ${
+                                i < (review.rating || 0)
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                            ></i>
+                          ))}
+                        </div>
+                        <span className="text-xs font-semibold text-gray-500">
+                          {review.rating}/5
+                        </span>
+                      </div>
+
+                      {/* Review Text */}
+                      <p className="text-gray-700 text-sm mb-3 line-clamp-3">
+                        {review.content || "No review content provided."}
+                      </p>
+
+                      {/* Date */}
+                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <i className="far fa-calendar text-gray-400"></i>
+                        {new Date(review.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Similar Products */}
         {similarProducts.length > 0 && (

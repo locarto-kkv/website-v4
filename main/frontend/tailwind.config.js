@@ -10,15 +10,15 @@ export default {
         accent: "#fc944f", // Light Orange (neutrals)
       },
       animation: {
-        scroll: 'scroll 20s linear infinite',
+        scroll: "scroll 20s linear infinite",
       },
       keyframes: {
         scroll: {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' },
-        }
-      }
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/line-clamp")],
 };

@@ -21,18 +21,18 @@ SELECT
     -- dynamic order_status counts
     (
       SELECT 
-        COUNT(r.product_id)
+        COUNT(r.id)
         FROM public.reviews r
-        LEFT JOIN public.products p ON r.product_id = p.id
-        WHERE r.product_id = p.id
+        LEFT JOIN public.orders o ON r.order_id = o.id
+        WHERE o.product_id = p.id
     ) AS count_reviews,
 
     (
       SELECT 
-        AVG(r.stars)
+        AVG(r.rating)
         FROM public.reviews r
-        LEFT JOIN public.products p ON r.product_id = p.id
-        WHERE r.product_id = p.id
+        LEFT JOIN public.orders o ON r.order_id = o.id
+        WHERE o.product_id = p.id
     ) AS avg_review,  
 
     (
