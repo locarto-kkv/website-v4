@@ -50,8 +50,6 @@ export const addReview = async (req, res) => {
       .select()
       .single();
 
-    console.log(newReview);
-
     if (review_images) {
       if (review_images.length > 0) {
         for (const image of review_images) {

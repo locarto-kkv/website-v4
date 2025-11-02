@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.get("/:productId", getReviewsByProduct);
-router.post("/add/:productId", protectRoute("consumer"), addReview);
+router.post("/add/:orderId", protectRoute("consumer"), addReview);
 router.put("/edit/:reviewId", protectRoute("consumer"), editReview);
 router.delete("/delete/:reviewId", protectRoute("consumer"), deleteReview);
 

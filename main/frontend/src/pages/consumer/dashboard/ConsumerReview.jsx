@@ -4,6 +4,7 @@ import { formatDate } from "../../../lib/utils";
 import { ConsumerReviewService } from "../../../services/consumer/consumerReviewService";
 import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore";
 import toast from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 
 const CustomerReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -12,25 +13,43 @@ const CustomerReviews = () => {
 
   const orders = useConsumerDataStore((s) => s.orders);
 
-  // --- Fetch reviews when component mounts ---
+  const location = useLocation();
+
   useEffect(() => {
-    const fetchReviews = async () => {
-      setLoading(true);
-      try {
-        const fetchedReviews = orders.filter((order) => order.review);
+    const scrollToId = location.state?.scrollToId;
 
-        // Assuming the API returns an array of reviews
-        setReviews(fetchedReviews || []);
-      } catch (error) {
-        toast.error("Failed to load your reviews.");
-        console.error("Error fetching reviews:", error);
-        setReviews([]); // Set to empty array on error
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (scrollToId) {
+      // Helper to scroll and highlight
+      const scrollAndHighlight = () => {
+        const el = document.getElementById(scrollToId);
+        if (el) {
+          // Smooth scroll to the element
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
 
-    fetchReviews();
+          // Add highlight animation
+          el.classList.add(
+            "ring-4",
+            "ring-orange-500",
+            "transition",
+            "duration-500"
+          );
+
+          // Remove highlight after 2 seconds
+          setTimeout(() => {
+            el.classList.remove("ring-4", "ring-orange-500", "ring-offset-2");
+          }, 2000);
+        }
+      };
+
+      // Try immediately, then retry in case the element hasn't rendered yet
+      scrollAndHighlight();
+      setTimeout(scrollAndHighlight, 300);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    const fetchedReviews = orders.filter((order) => order.review);
+    setReviews(fetchedReviews || []);
   }, []);
 
   // Initialize image indexes when reviews are loaded
@@ -58,14 +77,6 @@ const CustomerReviews = () => {
     }));
   };
 
-  if (loading) {
-    return (
-      <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100 text-center">
-        <p className="text-gray-500">Loading your reviews...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100">
       {reviews.length === 0 ? (
@@ -87,6 +98,7 @@ const CustomerReviews = () => {
             return (
               <div
                 key={order.review.id}
+                id={order.review.id}
                 className="border border-gray-200 rounded-2xl overflow-hidden hover:border-orange-300 transition-all hover:shadow-md bg-white"
               >
                 {/* Image Carousel Section */}

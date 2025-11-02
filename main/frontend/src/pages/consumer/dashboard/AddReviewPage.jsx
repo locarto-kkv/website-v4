@@ -78,13 +78,23 @@ const AddReviewPage = () => {
     setSubmitting(true);
 
     try {
-      await addReview(order.product_id, {
+      const newReview = await addReview(order.id, {
         rating: rating,
         content: content,
         review_images: [],
       });
 
-      navigate("/consumer/dashboard/reviews");
+      const updatedOrder = { ...order, review: newReview };
+
+      useConsumerDataStore.setState((state) => ({
+        orders: state.orders.map((o) =>
+          String(o.id) === String(order.id) ? updatedOrder : o
+        ),
+      }));
+
+      navigate("/consumer/dashboard/reviews", {
+        state: { scrollToId: newReview.id },
+      });
     } catch (error) {
       console.error("Error submitting review:", error);
     } finally {
