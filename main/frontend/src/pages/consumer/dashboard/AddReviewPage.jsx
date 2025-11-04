@@ -5,6 +5,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore";
 import { ConsumerReviewService } from "../../../services/consumer/consumerReviewService";
 import { formatCurrency } from "../../../lib/utils";
+import Navbar from "../../../components/Navbar"; // Import Navbar
+import Footer from "../../../components/Footer"; // Import Footer
 
 // Star Rating Component
 const StarRating = ({ rating, setRating }) => {
@@ -33,16 +35,18 @@ const AddReviewPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const orders = useConsumerDataStore((s) => s.orders); // Get orders from context
-  const { addReview } = ConsumerReviewService;
+  const { addReview, editProduct } = ConsumerReviewService; // Use editProduct (aliased for editReview)
 
   const [order, setOrder] = useState(null);
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // <-- New state for edit mode
 
   // Find the specific order from context based on orderId
   useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to top on load
     setLoading(true);
     if (orders && orders.length > 0) {
       const foundOrder = orders.find((o) => String(o.id) === String(orderId));
@@ -50,10 +54,19 @@ const AddReviewPage = () => {
         // Check if the order status allows reviewing (e.g., delivered)
         if (foundOrder.order_status?.toLowerCase() === "delivered") {
           setOrder(foundOrder);
+          // --- Check for existing review ---
+          if (foundOrder.review) {
+            setRating(foundOrder.review.rating || 0);
+            setContent(foundOrder.review.content || "");
+            setIsEditing(true); // Enable edit mode
+          }
+          // --- End check ---
         } else {
+          toast.error("You can only review delivered orders.");
           navigate("/consumer/dashboard/orders");
         }
       } else {
+        toast.error("Order not found.");
         navigate("/consumer/dashboard/orders");
       }
     }
@@ -67,7 +80,7 @@ const AddReviewPage = () => {
       return;
     }
     if (!content.trim()) {
-      toast.error("Please write a content.");
+      toast.error("Please write a review.");
       return;
     }
     if (!order || !order.product_id) {
@@ -78,25 +91,47 @@ const AddReviewPage = () => {
     setSubmitting(true);
 
     try {
-      const newReview = await addReview(order.id, {
-        rating: rating,
-        content: content,
-        review_images: [],
-      });
+      let updatedReview;
+      if (isEditing) {
+        // --- EDIT LOGIC ---
+        const reviewData = {
+          ...order.review, // Start with existing review data
+          rating: rating,
+          content: content,
+          review_images: order.review.review_images || [], // Preserve existing images
+        };
+        // Use the misnamed 'editProduct' service function which edits reviews
+        updatedReview = await editProduct(
+          order.review.id,
+          reviewData,
+          false // False = we are not updating images in this form
+        );
+        toast.success("Review updated!");
+      } else {
+        // --- ADD LOGIC ---
+        updatedReview = await addReview(order.id, {
+          rating: rating,
+          content: content,
+          review_images: [], // Not handling image uploads in this form
+        });
+        toast.success("Review submitted!");
+      }
 
-      const updatedOrder = { ...order, review: newReview };
-
+      // Update the order in the global store
+      const updatedOrder = { ...order, review: updatedReview };
       useConsumerDataStore.setState((state) => ({
         orders: state.orders.map((o) =>
           String(o.id) === String(order.id) ? updatedOrder : o
         ),
       }));
 
+      // Navigate to reviews page and highlight
       navigate("/consumer/dashboard/reviews", {
-        state: { scrollToId: newReview.id },
+        state: { scrollToId: updatedReview.id },
       });
     } catch (error) {
       console.error("Error submitting review:", error);
+      toast.error(error.response?.data?.message || "Failed to submit review.");
     } finally {
       setSubmitting(false);
     }
@@ -113,90 +148,105 @@ const AddReviewPage = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 lg:p-8 border border-gray-100 max-w-2xl mx-auto">
-      <div className="flex justify-between items-center mb-4 md:mb-6 pb-4 border-b">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-          Write a Review
-        </h2>
-        <button
-          onClick={() => navigate(-1)}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          <i className="fas fa-times text-xl"></i>
-        </button>
-      </div>
+    // --- ADDED: Page wrapper with Navbar/Footer ---
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="flex-grow container mx-auto px-4 py-8 pt-24 max-w-4xl">
+        <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 lg:p-8 border border-gray-100 max-w-2xl mx-auto">
+          <div className="flex justify-between items-center mb-4 md:mb-6 pb-4 border-b">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+              {isEditing ? "Edit Your Review" : "Write a Review"}{" "}
+              {/* Dynamic Title */}
+            </h2>
+            <button
+              onClick={() => navigate(-1)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <i className="fas fa-times text-xl"></i>
+            </button>
+          </div>
 
-      {/* Order/Product Info */}
-      <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-xl border">
-        <img
-          src={
-            order.product?.product_images?.[0]?.url ||
-            "https://placehold.co/80x80/e2e8f0/94a3b8?text=IMG"
-          }
-          alt={order.product?.name || "Product"}
-          className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg flex-shrink-0 border"
-        />
-        <div className="flex-1">
-          <h3 className="font-bold text-gray-800 text-sm md:text-base">
-            {order.product?.name || "Product Name"}
-          </h3>
-          <p className="text-xs text-gray-500">Order #ORD{order.id}</p>
-          <p className="text-sm font-semibold text-orange-600 mt-1">
-            {formatCurrency(order.amount)}
-          </p>
-        </div>
-      </div>
+          {/* Order/Product Info */}
+          <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-xl border">
+            <img
+              src={
+                order.product?.product_images?.[0]?.url ||
+                "https://placehold.co/80x80/e2e8f0/94a3b8?text=IMG"
+              }
+              alt={order.product?.name || "Product"}
+              className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg flex-shrink-0 border"
+            />
+            <div className="flex-1">
+              <h3 className="font-bold text-gray-800 text-sm md:text-base">
+                {order.product?.name || "Product Name"}
+              </h3>
+              <p className="text-xs text-gray-500">Order #ORD{order.id}</p>
+              <p className="text-sm font-semibold text-orange-600 mt-1">
+                {formatCurrency(order.amount)}
+              </p>
+            </div>
+          </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Rating Section */}
-        <div>
-          <label className="block text-base font-semibold text-gray-800 mb-3">
-            Your Rating *
-          </label>
-          <StarRating rating={rating} setRating={setRating} />
-        </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Rating Section */}
+            <div>
+              <label className="block text-base font-semibold text-gray-800 mb-3">
+                Your Rating *
+              </label>
+              <StarRating rating={rating} setRating={setRating} />
+            </div>
 
-        {/* content Section */}
-        <div>
-          <label
-            htmlFor="content"
-            className="block text-base font-semibold text-gray-800 mb-2"
-          >
-            Your Review *
-          </label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows="5"
-            className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm md:text-base resize-none"
-            placeholder="Share your experience with this product..."
-            required
-          />
-        </div>
+            {/* content Section */}
+            <div>
+              <label
+                htmlFor="content"
+                className="block text-base font-semibold text-gray-800 mb-2"
+              >
+                Your Review *
+              </label>
+              <textarea
+                id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows="5"
+                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm md:text-base resize-none"
+                placeholder={
+                  isEditing
+                    ? "Edit your experience with this product..."
+                    : "Share your experience with this product..."
+                }
+                required
+              />
+            </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end pt-4">
-          <button
-            type="submit"
-            disabled={submitting}
-            className={`px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2 text-sm md:text-base ${
-              submitting ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
-            {submitting ? (
-              <>
-                <i className="fas fa-spinner fa-spin"></i> Submitting...
-              </>
-            ) : (
-              <>
-                <i className="fas fa-paper-plane"></i> Submit Review
-              </>
-            )}
-          </button>
+            {/* Submit Button */}
+            <div className="flex justify-end pt-4">
+              <button
+                type="submit"
+                disabled={submitting}
+                className={`px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2 text-sm md:text-base ${
+                  submitting ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+              >
+                {submitting ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i>{" "}
+                    {isEditing ? "Updating..." : "Submitting..."}
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-paper-plane"></i>{" "}
+                    {isEditing ? "Update Review" : "Submit Review"}
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </main>
+      <Footer />
     </div>
+    // --- END: Page wrapper ---
   );
 };
 

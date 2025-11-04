@@ -5,9 +5,6 @@ import { useDataStore } from "../store/useDataStore.jsx";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Insta from "../assets/insta.png";
-import Youtube from "../assets/yt.png";
-import Whatsapp from "../assets/whatsapp.png";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import locartoImg from "../assets/locarto.png";
 

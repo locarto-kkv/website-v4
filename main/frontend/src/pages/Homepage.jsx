@@ -563,9 +563,8 @@ const Homepage = () => {
             </div>
           </section>
 
-          {/* Newsletter Section */}
-          <section className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl mb-12 sm:mb-16 mx-2 sm:mx-0">
-            {/* ... (keep newsletter section as is) ... */}
+        {/* Newsletter Section */}
+{/*       <section className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl mb-12 sm:mb-16 mx-2 sm:mx-0">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
               Stay Updated
             </h3>
@@ -582,7 +581,7 @@ const Homepage = () => {
                 Subscribe
               </button>
             </div>
-          </section>
+          </section> */}
         </div>
       </main>
       {/* Footer */}

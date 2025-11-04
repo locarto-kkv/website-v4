@@ -4,15 +4,15 @@ import { formatDate } from "../../../lib/utils";
 import { ConsumerReviewService } from "../../../services/consumer/consumerReviewService";
 import { useConsumerDataStore } from "../../../store/consumer/consumerDataStore";
 import toast from "react-hot-toast";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
 
 const CustomerReviews = () => {
   const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Keep loading state if needed
   const [imageIndexes, setImageIndexes] = useState({}); // Track current image index for each review
 
   const orders = useConsumerDataStore((s) => s.orders);
-
+  const navigate = useNavigate(); // Initialize navigate
   const location = useLocation();
 
   useEffect(() => {
@@ -50,7 +50,8 @@ const CustomerReviews = () => {
   useEffect(() => {
     const fetchedReviews = orders.filter((order) => order.review);
     setReviews(fetchedReviews || []);
-  }, []);
+    setLoading(false); // Set loading to false after processing
+  }, [orders]); // Depend on orders from the store
 
   // Initialize image indexes when reviews are loaded
   useEffect(() => {
@@ -76,6 +77,44 @@ const CustomerReviews = () => {
       [reviewId]: (prev[reviewId] - 1 + totalImages) % totalImages,
     }));
   };
+
+  // --- NEW: Handle Delete Function ---
+  const handleDelete = async (reviewId, orderId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this review? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+    try {
+      toast.loading("Deleting review...");
+      await ConsumerReviewService.removeReview(reviewId); // API call
+
+      // Update the global Zustand store
+      useConsumerDataStore.setState((state) => ({
+        orders: state.orders.map((o) =>
+          String(o.id) === String(orderId) ? { ...o, review: null } : o
+        ),
+      }));
+      // The component will auto-update because its `useEffect` depends on `orders`
+
+      toast.dismiss();
+      toast.success("Review deleted!");
+    } catch (error) {
+      toast.dismiss();
+      console.error("Error deleting review:", error);
+      toast.error(error.response?.data?.message || "Failed to delete review.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-8 md:py-12 text-gray-500">
+        Loading reviews...
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-gray-100">
@@ -153,7 +192,7 @@ const CustomerReviews = () => {
                               onClick={() =>
                                 setImageIndexes((prev) => ({
                                   ...prev,
-                                  [review.id]: idx,
+                                  [order.review.id]: idx, // Corrected from review.id
                                 }))
                               }
                               className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full transition-all ${
@@ -210,15 +249,36 @@ const CustomerReviews = () => {
                     </p>
                   )}
 
-                  {/* Footer with Date */}
-                  <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                  {/* --- MODIFIED: Footer with Date and Action Buttons --- */}
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-3 border-t border-gray-100">
                     <p className="text-gray-500 text-xs md:text-sm flex items-center gap-2">
                       <i className="far fa-calendar text-gray-400"></i>
                       <span>
                         Reviewed on {formatDate(order.review.created_at)}
                       </span>
                     </p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() =>
+                          navigate(`/consumer/add-review/${order.id}`)
+                        }
+                        className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <i className="fas fa-edit"></i>
+                        Edit
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDelete(order.review.id, order.id)
+                        }
+                        className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-red-600 hover:text-red-800 transition-colors"
+                      >
+                        <i className="fas fa-trash"></i>
+                        Delete
+                      </button>
+                    </div>
                   </div>
+                  {/* --- END MODIFICATION --- */}
                 </div>
               </div>
             );
