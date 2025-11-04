@@ -13,7 +13,8 @@ const currentPlan = {
   name: "Locarto Premium",
   status: "Active", // Could be 'Active', 'Expiring Soon', 'Cancelled'
   renewalDate: "2026-10-20", // Example date
-  price: 499, // Example price
+  // MODIFIED: Price is now set to 3199/mo (as per request for Main Plan)
+  price: 3199, // Example price
   currency: "INR",
   keyBenefits: [
     "Enhanced Analytics Suite",
@@ -26,12 +27,15 @@ const currentPlan = {
 };
 
 const premiumStats = {
+  // NEW: Pricing as requested
+  analyticsPrice: 1600,
+  commissionPrice: 2600,
+  
+  // MODIFIED: Existing stats blurred or updated as placeholders
   featuredViews: 1250, // Example stat
   conversionBoost: "+3.5%", // Example stat
-  // Example Milestone/Commission Stats (Replace with actual logic/data)
   currentCommissionRate: "8%", // Placeholder
   nextMilestoneTargetRevenue: 750000, // Placeholder revenue target
-  // nextMilestoneTargetItems: 100, // Placeholder item target (if needed elsewhere)
 };
 
 const VendorsMemberHub = () => {
@@ -76,17 +80,13 @@ const VendorsMemberHub = () => {
                 : "Manage your subscription"}
             </p>
           </div>
-          {/* --- MODIFIED Price Display --- */}
+          {/* --- MODIFIED Price Display (Showing the new requested price) --- */}
           <div className="text-right flex-shrink-0 flex items-baseline gap-2">
-            <p className="text-4xl font-black line-through text-white/50">
+            <p className="text-4xl font-black text-white">
               {" "}
-              {/* Added line-through and reduced opacity */}₹{currentPlan.price}
+              {/* Removed line-through and green text */}
+              {formatCurrency(currentPlan.price)}
               <span className="text-xl font-medium">/mo</span>
-            </p>
-            <p className="text-3xl font-extrabold text-green-300 animate-pulse">
-              {" "}
-              {/* Added new 'Free !!' text */}
-              Free !!
             </p>
           </div>
           {/* --- END MODIFIED Price Display --- */}
@@ -115,26 +115,33 @@ const VendorsMemberHub = () => {
       </div>
       {/* Premium Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Enhanced Analytics Card (Keep as is) */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl flex items-center justify-center">
-              <i className="fas fa-chart-pie text-purple-600 text-lg"></i>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900">
-              Enhanced Analytics
-            </h3>
+        {/* Enhanced Analytics Card (Added Price and Blurred Stats) */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow flex flex-col">
+          <div className="flex items-center justify-between gap-3 mb-4">
+             <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl flex items-center justify-center">
+                  <i className="fas fa-chart-pie text-purple-600 text-lg"></i>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Enhanced Analytics
+                </h3>
+             </div>
+             {/* NEW: Price tag */}
+             <span className="text-sm font-bold text-purple-600 flex-shrink-0">
+               {formatCurrency(premiumStats.analyticsPrice)}/mo
+             </span>
           </div>
           <p className="text-gray-600 text-sm mb-4">
             Unlock deeper insights into customer behavior, sales trends, and
             product performance.
           </p>
+          {/* MODIFIED: Added blur effect to stats */}
           <div className="space-y-2 mb-4">
             <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
               <span className="font-medium text-gray-700">
                 Conversion Boost:
               </span>
-              <span className="font-bold text-green-600">
+              <span className="font-bold text-green-600 blur-[2px]">
                 {premiumStats.conversionBoost}
               </span>
             </div>
@@ -142,7 +149,7 @@ const VendorsMemberHub = () => {
               <span className="font-medium text-gray-700">
                 Customer Return Rate:
               </span>
-              <span className="font-bold text-gray-800">25%</span>{" "}
+              <span className="font-bold text-gray-800 blur-[2px]">25%</span>{" "}
               {/* Example */}
             </div>
           </div>
@@ -150,19 +157,25 @@ const VendorsMemberHub = () => {
             onClick={handleViewEnhancedAnalytics}
             className="w-full mt-auto py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm"
           >
-            View Full Analytics Suite
+            Buy Full Analytics Suite
           </button>
         </div>
 
-        {/* --- MODIFIED: Milestone Commission Card --- */}
+        {/* Milestone Commission Card (Added Price and Blurred Stats) */}
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow flex flex-col">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <i className="fas fa-flag-checkered text-orange-600 text-lg"></i>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <i className="fas fa-flag-checkered text-orange-600 text-lg"></i>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Milestone Commissions
+                </h3>
             </div>
-            <h3 className="text-xl font-bold text-gray-900">
-              Milestone Commissions
-            </h3>
+            {/* NEW: Price tag */}
+             <span className="text-sm font-bold text-orange-600 flex-shrink-0">
+               {formatCurrency(premiumStats.commissionPrice)}/mo
+             </span>
           </div>
           <p className="text-gray-600 text-sm mb-4 flex-grow">
             Reach sales milestones to automatically reduce your commission rates
@@ -174,20 +187,17 @@ const VendorsMemberHub = () => {
               <span className="font-medium text-gray-700">
                 Current Commission:
               </span>
-              <span className="font-bold text-gray-800">
+              <span className="font-bold text-gray-800 blur-[2px]">
                 {premiumStats.currentCommissionRate}
               </span>
             </div>
-            {/* --- MODIFIED Next Milestone Target --- */}
+            {/* MODIFIED: Added blur effect to stats */}
             <div className="flex justify-between text-sm p-2 bg-gray-50 rounded">
               <span className="font-medium text-gray-700">
-                Next Milestone Target (Revenue): {/* Changed Label */}
+                Next Milestone Target (Revenue):
               </span>
               <span className="font-bold text-gray-800 blur-[3px]">
-                {" "}
-                {/* Added blur */}
-                {formatCurrency(premiumStats.nextMilestoneTargetRevenue)}{" "}
-                {/* Changed to revenue and formatted */}
+                {formatCurrency(premiumStats.nextMilestoneTargetRevenue)}
               </span>
             </div>
             {/* --- END MODIFIED Next Milestone Target --- */}
@@ -197,7 +207,7 @@ const VendorsMemberHub = () => {
             onClick={handleViewMilestonesAndCommissions}
             className="w-full mt-auto py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium text-sm"
           >
-            Manage Milestones & Commissions
+            Buy Milestones & Commissions
           </button>
         </div>
         {/* --- END MODIFIED CARD --- */}
