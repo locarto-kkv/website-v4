@@ -34,7 +34,7 @@ const premiumStats = {
   // MODIFIED: Existing stats blurred or updated as placeholders
   featuredViews: 1250, // Example stat
   conversionBoost: "+3.5%", // Example stat
-  currentCommissionRate: "8%", // Placeholder
+  currentCommissionRate: "15%", // Placeholder
   nextMilestoneTargetRevenue: 750000, // Placeholder revenue target
 };
 

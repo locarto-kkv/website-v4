@@ -1,3 +1,5 @@
+// src/store/useAuthStore.jsx
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { axiosInstance } from "../lib/axios.js";
@@ -46,7 +48,12 @@ export const useAuthStore = create(
         set({ loginLoading: true });
         try {
           const res = await axiosInstance.post(`/${type}/auth/login`, data);
-          set({ currentUser: res.data, cooldown: 0, sentOtp: false });
+          // For login, preserve existing tosAccepted state, defaulting to true if none exists (for existing users)
+          const newCurrentUser = { 
+            ...res.data, 
+            tosAccepted: res.data.tosAccepted ?? true,
+          };
+          set({ currentUser: newCurrentUser, cooldown: 0, sentOtp: false });
           toast.success("Login Successful");
         } catch (error) {
           toast.error(error.response?.data?.message || "Login failed");
@@ -60,7 +67,14 @@ export const useAuthStore = create(
         set({ signupLoading: true });
         try {
           const res = await axiosInstance.post(`/${type}/auth/signup`, data);
-          set({ currentUser: res.data, cooldown: 0, sentOtp: false });
+          
+          // New vendor signups must explicitly set tosAccepted = false
+          const userWithTOS = 
+            type === 'vendor' 
+              ? { ...res.data, tosAccepted: false } 
+              : res.data;
+          
+          set({ currentUser: userWithTOS, cooldown: 0, sentOtp: false });
           toast.success("Signup Successful");
         } catch (error) {
           toast.error(error.response?.data?.message || "Signup failed");
@@ -108,6 +122,15 @@ export const useAuthStore = create(
         } finally {
           set({ authLoading: false });
         }
+      },
+
+      // --- NEW FUNCTION ---
+      acceptTOS: (type) => {
+        if (get().currentUser?.type !== type) return;
+        
+        set((state) => ({
+            currentUser: { ...state.currentUser, tosAccepted: true },
+        }));
       },
     }),
     {

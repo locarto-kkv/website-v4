@@ -1,4 +1,5 @@
 // src/pages/vendor/vendorRoutes.jsx
+
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useVendorDataStore } from "../../store/vendor/vendorDataStore";
@@ -17,6 +18,8 @@ import VendorLocationSetup from "./dashboard/VendorLocationSetup";
 import VendorOrders from "./dashboard/VendorOrders";
 import VendorMilestones from "./dashboard/VendorMilestones";
 import VendorEditProfile from "./dashboard/VendorEditProfile";
+// --- NEW IMPORT ---
+import VendorTOSAcceptance from "./VendorTOSAcceptance";
 
 const ProtectedRoute = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
@@ -27,10 +30,23 @@ const ProtectedRoute = () => {
     return <Navigate to="/vendor/login" replace />;
   }
 
+  // --- NEW TOS CHECK ---
+  const isTOSPage = location.pathname.includes("/vendor/tos-acceptance");
+  
+  // If TOS not accepted, redirect to TOS page, unless already on it
+  if (currentUser.tosAccepted === false) {
+    if (!isTOSPage) {
+        return <Navigate to="/vendor/tos-acceptance" replace />;
+    }
+    return <Outlet />; // Allow access to the TOS page
+  }
+  // --- END TOS CHECK ---
+
   const isProfileRoute = location.pathname.includes(
     "/vendor/dashboard/profile"
   );
 
+  // If TOS is accepted, proceed with existing profile/verification check
   if (profile?.status === "verified" || isProfileRoute) {
     return <Outlet />;
   }
@@ -47,13 +63,16 @@ const VendorRoutes = () => {
       <Route
         path="login"
         element={
-          currentUser?.type === "vendor" ? (
+          currentUser?.type === "vendor" && currentUser.tosAccepted ? (
             <Navigate to="/vendor/dashboard/overview" replace />
           ) : (
             <AuthVendor />
           )
         }
       />
+
+      {/* --- NEW TOS ACCEPTANCE ROUTE (outside dashboard layout) --- */}
+      <Route path="tos-acceptance" element={<VendorTOSAcceptance />} />
 
       <Route path="dashboard" element={<ProtectedRoute />}>
         <Route element={<VendorDashboardLayout />}>
@@ -62,11 +81,9 @@ const VendorRoutes = () => {
           <Route path="orders" element={<VendorOrders />} />
           <Route path="products" element={<VendorProducts />} />
           <Route path="milestones" element={<VendorMilestones />} />{" "}
-          {/* <-- ADD THIS ROUTE */}
           <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
           <Route path="profile/edit" element={<VendorEditProfile />} />{" "}
-          {/* <-- Add Edit Profile Route */}
           <Route path="analytics" element={<VendorAnalytics />} />
           <Route path="settings" element={<VendorSettings />} />
           <Route path="support" element={<VendorSupport />} />
@@ -75,7 +92,7 @@ const VendorRoutes = () => {
         </Route>
       </Route>
     </Routes>
-  ); //
+  ); 
 };
 
 export default VendorRoutes;
