@@ -1,20 +1,29 @@
 // src/pages/vendor/dashboard/VendorProfile.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react"; // Make sure to import useRef
 import { Link, useNavigate } from "react-router-dom";
 import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 import { useDataStore } from "../../../store/useDataStore";
 import { formatCurrency } from "../../../lib/utils"; // Import formatCurrency
+import { VendorProfileService } from "../../../services/vendor/vendorProfileService"; // Import service
+import toast from "react-hot-toast"; // Import toast
 
 const VendorProfile = () => {
   const blogs = useDataStore((s) => s.blogs);
   const vendor = useVendorDataStore((s) => s.vendor);
   const profile = useVendorDataStore((s) => s.profile);
+  const getProfile = useVendorDataStore((s) => s.getProfile); // Get getProfile action
   const dataLoading = useVendorDataStore((s) => s.dataLoading);
   const navigate = useNavigate();
 
   const [profileData, setProfileData] = useState(null);
   const [metrics, setMetrics] = useState({});
   const [documents, setDocuments] = useState([]);
+
+  // --- NEW: State for file management ---
+  const fileInputRef = useRef(null);
+  const [newFiles, setNewFiles] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  // --- END NEW STATE ---
 
   useEffect(() => {
     if (vendor && profile && blogs) {
@@ -63,6 +72,93 @@ const VendorProfile = () => {
   const openEditProfile = () => navigate("/vendor/dashboard/profile/edit");
   const goToSettings = () => navigate("/vendor/dashboard/settings");
   const goToSupport = () => navigate("/vendor/dashboard/support");
+
+  // --- *** MODIFIED: File handling functions *** ---
+  const handleFileSelect = (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      // This is the correct way to update state based on a previous state
+      // to ensure React sees the change.
+      setNewFiles((prevFiles) => {
+        const newFileArray = Array.from(files);
+        return [...prevFiles, ...newFileArray];
+      });
+    }
+    
+    // --- BUG FIX: This line was removed. ---
+    // e.target.value = null; 
+    // --- END BUG FIX ---
+  };
+
+
+  const handleRemoveNewFile = (indexToRemove) => {
+    setNewFiles((prevFiles) =>
+      prevFiles.filter((_, index) => index !== indexToRemove)
+    );
+    // After removing, we *can* clear the input to allow re-selection
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
+  };
+
+  const handleSaveDocuments = async () => {
+    if (newFiles.length === 0) {
+      toast.error("No new documents to save.");
+      return;
+    }
+
+    setIsSaving(true);
+    toast.loading("Uploading documents...");
+
+    // Construct a payload similar to EditProfile, but only with documents
+    // This ensures other profile data isn't accidentally wiped out
+    const existingAddress =
+      profile?.address?.find((addr) => addr.label === "Main") ||
+      profile?.address?.[0] ||
+      {};
+
+    const cleanAddress = {
+      label: existingAddress.label || "Main",
+      address_line_1: existingAddress.address_line_1,
+      address_line_2: existingAddress.address_line_2,
+      city: existingAddress.city,
+      state: existingAddress.state,
+      pincode: existingAddress.pincode,
+      country: existingAddress.country,
+      coordinates: existingAddress.coordinates,
+    };
+
+    const payload = {
+      profile: {
+        name: profile.name,
+      },
+      address: cleanAddress,
+      extra: {
+        primary_contact: {
+          phone_no: profile.primary_contact?.phone_no || profile.phone_no,
+          email: profile.email,
+        },
+      },
+      brand_logo_1: null, // Not updating logos here
+      brand_logo_2: null,
+      documents: newFiles, // Send only the new files
+    };
+
+    try {
+      await VendorProfileService.updateProfile(payload);
+      await getProfile(); // Refresh profile data
+      toast.dismiss();
+      toast.success("Documents uploaded successfully!");
+      setNewFiles([]); // Clear the new files list
+    } catch (error) {
+      console.error("Error uploading documents:", error);
+      toast.dismiss();
+      toast.error(error.response?.data?.message || "Failed to upload documents.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  // --- END NEW Functions ---
 
   // Unified document status handler
   const getDocumentStatus = (status) => {
@@ -213,7 +309,6 @@ const VendorProfile = () => {
                         <i
                           key={i}
                           className={`fas fa-star text-sm sm:text-base ${
-                            // --- FIX: Use Math.floor on metrics.averageRating ---
                             i < Math.floor(metrics.averageRating)
                               ? "text-yellow-300"
                               : "text-white/30"
@@ -222,7 +317,6 @@ const VendorProfile = () => {
                       ))}
                     </div>
                     <span className="ml-1 font-bold text-base sm:text-lg bg-white/20 px-2 py-0.5 rounded-lg backdrop-blur-sm">
-                      {/* --- FIX: Ensure metrics.averageRating is treated as a number --- */}
                       {Number(metrics.averageRating || 0).toFixed(1)}
                     </span>
                   </div>
@@ -316,61 +410,39 @@ const VendorProfile = () => {
                 </div>
               </div>
 
-              {/* Documents Section */}
-              {(accountStatus.label === "Account Verified" ||
-                documents.length > 0) && (
-                <div className="border-t pt-4 sm:pt-6">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <h3 className="font-bold text-gray-900 flex items-center gap-2 text-base sm:text-lg">
-                      <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i className="fas fa-folder text-amber-600 text-sm"></i>
-                      </div>
-                      Business Documents
-                    </h3>
-                    <button
-                      onClick={openSetup}
-                      className="flex items-center justify-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all font-bold shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-sm w-full sm:w-auto"
-                    >
-                      <i className="fas fa-upload text-xs"></i>
-                      <span>Upload / Manage</span>
-                    </button>
-                  </div>
-                  {documents.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                      {documents.map((doc, index) => {
-                        const statusInfo = getDocumentStatus(doc.status);
-                        return (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-orange-300 hover:shadow-sm transition-all"
-                          >
-                            <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
-                              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm border border-gray-200 flex-shrink-0">
-                                <i className="fas fa-file-alt text-gray-500 text-base sm:text-lg"></i>
-                              </div>
-                              <div className="overflow-hidden">
-                                <p className="font-bold text-gray-900 text-xs sm:text-sm truncate">
-                                  {doc.name || `Document ${index + 1}`}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {doc.type || "File"}
-                                </p>
-                              </div>
-                            </div>
-                            <span
-                              className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 whitespace-nowrap flex-shrink-0 ${statusInfo.color}`}
-                            >
-                              <i
-                                className={`${statusInfo.icon} text-[10px] sm:text-xs`}
-                              ></i>
-                              {statusInfo.label}
-                            </span>
-                          </div>
-                        );
-                      })}
+              {/* --- MODIFIED: Documents Section --- */}
+              <div className="border-t pt-4 sm:pt-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <h3 className="font-bold text-gray-900 flex items-center gap-2 text-base sm:text-lg">
+                    <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <i className="fas fa-folder text-amber-600 text-sm"></i>
                     </div>
-                  ) : (
-                    <div className="text-center py-8 sm:py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                    Business Documents
+                  </h3>
+                  {/* Hidden file input */}
+                  <input
+                    type="file"
+                    multiple
+                    hidden
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    accept="image/png, image/jpeg, application/pdf" // Example
+                  />
+                  <button
+                    type="button" // Set type to button
+                    onClick={() => fileInputRef.current.click()} // Click hidden input
+                    className="flex items-center justify-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all font-bold shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-sm w-full sm:w-auto"
+                  >
+                    <i className="fas fa-upload text-xs"></i>
+                    <span>Upload / Manage</span>
+                  </button>
+                </div>
+
+                {/* --- SIMPLIFIED DOCUMENT LIST LOGIC --- */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  {/* Empty State */}
+                  {documents.length === 0 && newFiles.length === 0 && (
+                    <div className="md:col-span-2 text-center py-8 sm:py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                         <i className="fas fa-folder-open text-gray-400 text-xl sm:text-2xl"></i>
                       </div>
@@ -378,12 +450,97 @@ const VendorProfile = () => {
                         No documents uploaded yet.
                       </p>
                       <p className="text-xs sm:text-sm text-gray-400 mt-1">
-                        Upload documents via the Setup page.
+                        Click "Upload / Manage" to add documents.
                       </p>
                     </div>
                   )}
+
+                  {/* Existing Documents */}
+                  {documents.map((doc, index) => {
+                    const statusInfo = getDocumentStatus(doc.status);
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-orange-300 hover:shadow-sm transition-all"
+                      >
+                        <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm border border-gray-200 flex-shrink-0">
+                            <i className="fas fa-file-alt text-gray-500 text-base sm:text-lg"></i>
+                          </div>
+                          <div className="overflow-hidden">
+                            <p className="font-bold text-gray-900 text-xs sm:text-sm truncate">
+                              {doc.name || `Document ${index + 1}`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {doc.type || "File"}
+                            </p>
+                          </div>
+                        </div>
+                        <span
+                          className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 whitespace-nowrap flex-shrink-0 ${statusInfo.color}`}
+                        >
+                          <i
+                            className={`${statusInfo.icon} text-[10px] sm:text-xs`}
+                          ></i>
+                          {statusInfo.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+
+                  {/* New Files to be Uploaded */}
+                  {newFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 sm:p-4 bg-blue-50 rounded-xl border-2 border-dashed border-blue-200"
+                    >
+                      <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-lg sm:rounded-xl flex items-center justify-center shadow-sm border border-gray-200 flex-shrink-0">
+                          <i className="fas fa-file-upload text-blue-500 text-base sm:text-lg"></i>
+                        </div>
+                        <div className="overflow-hidden">
+                          <p className="font-bold text-gray-900 text-xs sm:text-sm truncate">
+                            {file.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {(file.size / 1024).toFixed(1)} KB
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveNewFile(index)}
+                        className="text-red-500 hover:text-red-700 flex-shrink-0 ml-2"
+                        aria-label="Remove new file"
+                      >
+                        <i className="fas fa-times-circle"></i>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                {/* --- END SIMPLIFIED DOCUMENT LIST --- */}
+              </div>
+
+              {/* --- NEW SAVE BUTTON --- */}
+              {newFiles.length > 0 && (
+                <div className="flex justify-end pt-6">
+                  <button
+                    type="button"
+                    onClick={handleSaveDocuments}
+                    disabled={isSaving}
+                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-70"
+                  >
+                    {isSaving ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin mr-2"></i>Saving...
+                      </>
+                    ) : (
+                      "Save Documents"
+                    )}
+                  </button>
                 </div>
               )}
+              {/* --- END NEW SAVE BUTTON --- */}
             </div>
           </div>
         </div>
