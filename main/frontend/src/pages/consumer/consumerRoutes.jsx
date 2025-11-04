@@ -13,8 +13,8 @@ import AddReviewPage from "./dashboard/AddReviewPage.jsx";
 import CustomerSupport from "./dashboard/ConsumerSupport.jsx";
 import CustomerSettings from "./dashboard/ConsumerSettings.jsx";
 import RuleChatbot from "../Chatbot";
-import ShopProducts from "./ShopProducts";
 import CheckoutPage from "./CheckoutPage";
+import OrderPlacedPage from "./OrderPlacedPage.jsx";
 
 const ProtectedRoute = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
@@ -61,7 +61,8 @@ const ConsumerRoutes = () => {
         {/* Placing it outside layout for a more focused page feel */}
         <Route path="add-review/:orderId" element={<AddReviewPage />} />
         {/* Other protected consumer routes (outside the dashboard layout) */}
-        <Route path="checkout" element={<CheckoutPage />} />{" "}
+        <Route path="checkout" element={<CheckoutPage />} />
+        <Route path="order-placed" element={<OrderPlacedPage />} />
         {/* <-- Add Checkout Route */}
       </Route>
       {/* --- End Protected Routes --- */}

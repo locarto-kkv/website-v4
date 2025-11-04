@@ -6,6 +6,7 @@ import Footer from "../../components/Footer";
 import { useConsumerDataStore } from "../../store/consumer/consumerDataStore";
 import { formatCurrency } from "../../lib/utils";
 import { ConsumerListService } from "../../services/consumer/consumerListService"; // Import list service
+import { ConsumerOrderService } from "../../services/consumer/consumerOrderService"; // Import order service
 import toast from "react-hot-toast"; // Import toast for notifications
 
 // --- Mock Data for Saved Addresses (Keep as is) ---
@@ -72,6 +73,9 @@ const CheckoutPage = () => {
   const [promoMessage, setPromoMessage] = useState({ text: "", type: "" }); // type: 'success' or 'error'
   const [discountAmount, setDiscountAmount] = useState(0);
   // --- End State for Promo Code ---
+
+  // --- Add Loading State ---
+  const [loading, setLoading] = useState(false);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -215,24 +219,76 @@ const CheckoutPage = () => {
   };
   // --- End Promo Code Handler ---
 
-  const handleSubmitOrder = (e) => {
+  const handleSubmitOrder = async (e) => {
     e.preventDefault();
     if (!selectedAddressId && !showNewAddressForm) {
-      alert("Please select or add a delivery address.");
+      toast.error("Please select or add a delivery address.");
       return;
     }
     if (showNewAddressForm) {
-      alert("Please save the new address before placing the order.");
+      toast.error("Please save the new address before placing the order.");
       return;
     }
-    alert("Order placement functionality coming soon!");
-    console.log("Order Data:", {
-      addressId: selectedAddressId,
-      cartItems: cartItems,
-      total: total,
-      discount: discountAmount,
-      promoCode: discountAmount > 0 ? promoCode : "",
-    });
+
+    setLoading(true);
+    toast.loading("Placing your order...");
+
+    try {
+      // --- This is a MOCK order placement ---
+      // In a real app, you would call:
+      // const newOrder = await ConsumerOrderService.placeOrder(cartData, paymentInfo);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Create a mock order object to pass to the confirmation page
+      const mockOrder = {
+        id: Math.floor(Math.random() * 100000) + 90000, // Random order ID
+        created_at: new Date().toISOString(),
+        order_status: "pending", // Initial status
+        payment_mode: "Mock Payment", // Placeholder
+        payment_status: "paid", // Placeholder
+        amount: total,
+        // Pass cart items as 'products'
+        products: cartItems.map(item => ({
+          product_id: item.id || item.product_id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          product_images: item.product_images
+        })),
+        // Pass bill details for the summary
+        billDetails: {
+          subtotal,
+          deliveryFee,
+          platformFee,
+          gstAndRestaurantCharges,
+          discountAmount,
+          total
+        }
+      };
+      // --- End of Mock ---
+
+      // Simulate clearing the cart in Zustand
+      // In a real app, the backend might confirm this or you'd re-fetch lists
+      useConsumerDataStore.setState(state => ({
+        ...state,
+        lists: { ...state.lists, cart: [] }
+      }));
+      
+      setLoading(false);
+      toast.dismiss();
+      toast.success("Order placed successfully!");
+
+      // Navigate to the new order-placed page with the order data
+      navigate('/consumer/order-placed', { state: { order: mockOrder } });
+
+    } catch (error) {
+      setLoading(false);
+      toast.dismiss();
+      console.error("Order placement error:", error);
+      toast.error("Failed to place order. Please try again.");
+    }
   };
 
   const selectedAddress = savedAddresses.find(
@@ -263,40 +319,26 @@ const CheckoutPage = () => {
         {cartItems.length === 0 ? (
           // Empty Cart Message (Keep as is)
           <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 p-8 sm:p-12 text-center max-w-2xl mx-auto mt-10">
-            {/* ... empty cart content ... */}
             <div className="relative inline-block mb-6">
-              {" "}
-              {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
               <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mx-auto">
-                {" "}
-                {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
-                <i className="fas fa-shopping-cart text-4xl sm:text-5xl text-orange-500"></i>{" "}
-                {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
+                <i className="fas fa-shopping-cart text-4xl sm:text-5xl text-orange-500"></i>
               </div>
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                {" "}
-                {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
-                <i className="fas fa-exclamation text-white text-sm"></i>{" "}
-                {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
+                <i className="fas fa-exclamation text-white text-sm"></i>
               </div>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">
               Your Cart is Empty
-            </h2>{" "}
-            {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
+            </h2>
             <p className="text-base sm:text-lg text-gray-600 mb-8 max-w-md mx-auto">
-              {" "}
-              {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
-              Looks like you haven't added any items yet. Start shopping!{" "}
-              {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
+              Looks like you haven't added any items yet. Start shopping!
             </p>
             <Link
-              to="/map" // Link to map page or wherever shopping starts // [cite: src/pages/consumer/CheckoutPage.jsx]
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300" // [cite: src/pages/consumer/CheckoutPage.jsx]
+              to="/map" // Link to map page or wherever shopping starts
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
             >
-              <i className="fas fa-store"></i>{" "}
-              {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
-              Browse Stores {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
+              <i className="fas fa-store"></i>
+              Browse Stores
             </Link>
           </div>
         ) : (
@@ -742,15 +784,24 @@ const CheckoutPage = () => {
                 </div>
                 <button
                   onClick={handleSubmitOrder}
-                  disabled={!selectedAddressId && !showNewAddressForm}
+                  disabled={(!selectedAddressId && !showNewAddressForm) || loading}
                   className={`w-full mt-6 bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white py-3 sm:py-3 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 ${
-                    !selectedAddressId && !showNewAddressForm
+                    (!selectedAddressId && !showNewAddressForm) || loading
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:shadow-2xl hover:scale-105"
                   }`}
                 >
-                  <i className="fas fa-lock"></i>
-                  Place Order
+                  {loading ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      Placing Order...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-lock"></i>
+                      Place Order
+                    </>
+                  )}
                 </button>
               </div>
               {/* --- End Payment Section --- */}
@@ -760,7 +811,7 @@ const CheckoutPage = () => {
           // --- END NEW LAYOUT ---
         )}
       </main>
-      <Footer /> {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
+      <Footer />
       {/* Add CSS for input styling and scrollbar */}
       <style>{`
             .checkout-input {
@@ -783,9 +834,8 @@ const CheckoutPage = () => {
             .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; border: 1px solid #f8fafc; }
             .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
        `}</style>{" "}
-      {/* [cite: src/pages/consumer/CheckoutPage.jsx] */}
     </div>
   );
 };
 
-export default CheckoutPage; // [cite: src/pages/consumer/CheckoutPage.jsx]
+export default CheckoutPage;
