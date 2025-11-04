@@ -13,7 +13,7 @@ const currentPlan = {
   name: "Locarto Premium",
   status: "Active", // Could be 'Active', 'Expiring Soon', 'Cancelled'
   renewalDate: "2026-10-20", // Example date
-  // MODIFIED: Price is now set to 3199/mo (as per request for Main Plan)
+  // MODIFIED: Price is now set to 3199/mo (as per previous request for Main Plan)
   price: 3199, // Example price
   currency: "INR",
   keyBenefits: [
@@ -80,13 +80,18 @@ const VendorsMemberHub = () => {
                 : "Manage your subscription"}
             </p>
           </div>
-          {/* --- MODIFIED Price Display (Showing the new requested price) --- */}
+          {/* --- MODIFIED Price Display: Reverted to include strikethrough and 'Free !!' --- */}
           <div className="text-right flex-shrink-0 flex items-baseline gap-2">
-            <p className="text-4xl font-black text-white">
+            <p className="text-4xl font-black line-through text-white/50">
               {" "}
-              {/* Removed line-through and green text */}
+              {/* Added line-through and reduced opacity */}
               {formatCurrency(currentPlan.price)}
               <span className="text-xl font-medium">/mo</span>
+            </p>
+            <p className="text-3xl font-extrabold text-green-300 animate-pulse">
+              {" "}
+              {/* Added new 'Free !!' text */}
+              Free !!
             </p>
           </div>
           {/* --- END MODIFIED Price Display --- */}
@@ -115,7 +120,7 @@ const VendorsMemberHub = () => {
       </div>
       {/* Premium Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Enhanced Analytics Card (Added Price and Blurred Stats) */}
+        {/* Enhanced Analytics Card (Kept new price and blur) */}
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow flex flex-col">
           <div className="flex items-center justify-between gap-3 mb-4">
              <div className="flex items-center gap-3">
@@ -161,7 +166,7 @@ const VendorsMemberHub = () => {
           </button>
         </div>
 
-        {/* Milestone Commission Card (Added Price and Blurred Stats) */}
+        {/* Milestone Commission Card (Kept new price and blur) */}
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow flex flex-col">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-3">
@@ -207,7 +212,7 @@ const VendorsMemberHub = () => {
             onClick={handleViewMilestonesAndCommissions}
             className="w-full mt-auto py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium text-sm"
           >
-            Buy Milestones & Commissions
+            Buy Full Milestones & Commissions
           </button>
         </div>
         {/* --- END MODIFIED CARD --- */}
