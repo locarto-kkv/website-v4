@@ -35,7 +35,7 @@ const VendorLocationSetup = () => {
     coordinates: { lat: "", lng: "" },
   });
 
-  const { profile, getProfile } = useVendorDataStore();
+  const profile = useVendorDataStore((s) => s.profile);
 
   // ✅ Fetch approximate location from pincode (forward geocoding)
   const fetchLocationByPincode = async (pincode) => {
@@ -226,7 +226,7 @@ const VendorLocationSetup = () => {
   // ✅ Save
   const handleNextStep = async () => {
     const profileData = {
-      profile: { name: setupForm.businessName },
+      profile: { status: "complete" },
       address: {
         label: "Main",
         address_line_1: setupForm.addressLine1,
@@ -247,15 +247,19 @@ const VendorLocationSetup = () => {
       },
     };
 
-    localStorage.setItem("setupform", JSON.stringify(setupForm));
-    await VendorProfileService.updateProfile(profileData);
-    await getProfile();
+    const updatedProfile = await VendorProfileService.updateProfile(
+      profileData
+    );
+    useVendorDataStore.setState((state) => ({
+      ...state,
+      profile: updatedProfile,
+    }));
     navigate("/vendor/dashboard/profile");
   };
 
   const closeSetup = () => {
     localStorage.setItem("setupform", JSON.stringify(setupForm));
-    navigate("/vendor/dashboard/profile");
+    navigate("/vendor/dashboard/setup");
   };
 
   return (
@@ -287,7 +291,7 @@ const VendorLocationSetup = () => {
                 <input
                   type="text"
                   name="pincode"
-                  value={setupForm.pincode}
+                  value={newAddress.pincode}
                   onChange={(e) =>
                     setNewAddress((prev) => ({
                       ...prev,

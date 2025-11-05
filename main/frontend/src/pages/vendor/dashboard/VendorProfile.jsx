@@ -11,7 +11,6 @@ const VendorProfile = () => {
   const blogs = useDataStore((s) => s.blogs);
   const vendor = useVendorDataStore((s) => s.vendor);
   const profile = useVendorDataStore((s) => s.profile);
-  const getProfile = useVendorDataStore((s) => s.getProfile); // Get getProfile action
   const dataLoading = useVendorDataStore((s) => s.dataLoading);
   const navigate = useNavigate();
 
@@ -144,8 +143,11 @@ const VendorProfile = () => {
     };
 
     try {
-      await VendorProfileService.updateProfile(payload);
-      await getProfile(); // Refresh profile data
+      const newProfile = await VendorProfileService.updateProfile(payload);
+      useVendorDataStore((state) => {
+        console.log(state);
+        return;
+      }); // Refresh profile data
       toast.dismiss();
       toast.success("Documents uploaded successfully!");
       setNewFiles([]); // Clear the new files list

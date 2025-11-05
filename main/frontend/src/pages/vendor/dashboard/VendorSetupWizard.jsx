@@ -10,7 +10,6 @@ const VendorSetupWizard = () => {
     name: "",
     email: "",
     phone: "",
-    businessName: "",
     businessType: "",
     addressLine1: "",
     addressLine2: "",
@@ -46,11 +45,14 @@ const VendorSetupWizard = () => {
 
   // ✅ Retrieve setupForm from localStorage if it exists
   useEffect(() => {
-    if (profile.address.length > 0) {
+    console.log(profile);
+
+    if (profile?.address?.length > 0) {
       const mainAddress = profile.address.find((item) => item.label === "Main");
       console.log(mainAddress);
 
-      setSetupForm({
+      setSetupForm((prev) => ({
+        ...prev,
         addressLine1: mainAddress.address_line_1,
         addressLine2: mainAddress.address_line_2,
         pincode: mainAddress.pincode,
@@ -60,7 +62,7 @@ const VendorSetupWizard = () => {
           lat: mainAddress.coordinates[0],
           lng: mainAddress.coordinates[1],
         },
-      });
+      }));
       return;
     }
 
@@ -141,20 +143,6 @@ const VendorSetupWizard = () => {
 
           {/* Row 1: Business Name + Business Type */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700 mb-2">
-                Legal Business Name *
-              </label>
-              <input
-                type="text"
-                name="businessName"
-                value={setupForm.businessName}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="Enter legal business name"
-                required
-              />
-            </div>
             <div>
               <label className="block text-gray-700 mb-2">
                 Business Type *

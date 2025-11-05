@@ -28,9 +28,9 @@ const ProtectedRoute = () => {
     return <Navigate to="/vendor/login" replace />;
   }
 
-  const isProfileRoute = location.pathname.includes(
-    "/vendor/dashboard/profile"
-  );
+  const isProfileRoute =
+    location.pathname.includes("/vendor/dashboard/profile") ||
+    location.pathname.includes("/vendor/dashboard/setup");
 
   // If TOS is accepted, proceed with existing profile/verification check
   if (profile?.status === "verified" || isProfileRoute) {

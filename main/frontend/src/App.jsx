@@ -63,9 +63,10 @@ function App() {
   }, [currentUser]);
 
   if (authLoading || dataLoading || consumerLoading || vendorLoading) {
+    // console.log(authLoading, dataLoading, consumerLoading, vendorLoading);
+
     return (
       <div className="flex items-center justify-center min-h-screen pt-[70px]">
-        {" "}
         {/* Adjusted min-height */}
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
