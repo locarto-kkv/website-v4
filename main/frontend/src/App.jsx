@@ -56,12 +56,13 @@ function App() {
     } else if (currentUser?.type === "vendor") {
       clearConsumerData();
       loadVendorData();
+    } else {
+      clearConsumerData();
+      clearVendorData();
     }
   }, [currentUser]);
 
   if (authLoading || dataLoading || consumerLoading || vendorLoading) {
-    // console.log(authLoading, dataLoading, consumerLoading, vendorLoading);
-
     return (
       <div className="flex items-center justify-center min-h-screen pt-[70px]">
         {" "}

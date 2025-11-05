@@ -18,8 +18,6 @@ import VendorLocationSetup from "./dashboard/VendorLocationSetup";
 import VendorOrders from "./dashboard/VendorOrders";
 import VendorMilestones from "./dashboard/VendorMilestones";
 import VendorEditProfile from "./dashboard/VendorEditProfile";
-// --- NEW IMPORT ---
-import VendorTOSAcceptance from "./VendorTOSAcceptance";
 
 const ProtectedRoute = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
@@ -29,18 +27,6 @@ const ProtectedRoute = () => {
   if (currentUser?.type !== "vendor") {
     return <Navigate to="/vendor/login" replace />;
   }
-
-  // --- NEW TOS CHECK ---
-  const isTOSPage = location.pathname.includes("/vendor/tos-acceptance");
-  
-  // If TOS not accepted, redirect to TOS page, unless already on it
-  if (currentUser.tosAccepted === false) {
-    if (!isTOSPage) {
-        return <Navigate to="/vendor/tos-acceptance" replace />;
-    }
-    return <Outlet />; // Allow access to the TOS page
-  }
-  // --- END TOS CHECK ---
 
   const isProfileRoute = location.pathname.includes(
     "/vendor/dashboard/profile"
@@ -63,16 +49,13 @@ const VendorRoutes = () => {
       <Route
         path="login"
         element={
-          currentUser?.type === "vendor" && currentUser.tosAccepted ? (
+          currentUser?.type === "vendor" ? (
             <Navigate to="/vendor/dashboard/overview" replace />
           ) : (
             <AuthVendor />
           )
         }
       />
-
-      {/* --- NEW TOS ACCEPTANCE ROUTE (outside dashboard layout) --- */}
-      <Route path="tos-acceptance" element={<VendorTOSAcceptance />} />
 
       <Route path="dashboard" element={<ProtectedRoute />}>
         <Route element={<VendorDashboardLayout />}>
@@ -92,7 +75,7 @@ const VendorRoutes = () => {
         </Route>
       </Route>
     </Routes>
-  ); 
+  );
 };
 
 export default VendorRoutes;

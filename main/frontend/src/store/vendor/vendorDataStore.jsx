@@ -46,8 +46,10 @@ export const useVendorDataStore = create((set, get) => ({
         orders: [],
         products: [],
         vendor: [],
-        profile: null,
+        profile: [],
       });
+    } catch (error) {
+      console.error("ERROR in clearVendorData: ", error);
     } finally {
       set({ dataLoading: false });
     }

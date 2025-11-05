@@ -84,12 +84,11 @@ const VendorProfile = () => {
         return [...prevFiles, ...newFileArray];
       });
     }
-    
+
     // --- BUG FIX: This line was removed. ---
-    // e.target.value = null; 
+    // e.target.value = null;
     // --- END BUG FIX ---
   };
-
 
   const handleRemoveNewFile = (indexToRemove) => {
     setNewFiles((prevFiles) =>
@@ -153,7 +152,9 @@ const VendorProfile = () => {
     } catch (error) {
       console.error("Error uploading documents:", error);
       toast.dismiss();
-      toast.error(error.response?.data?.message || "Failed to upload documents.");
+      toast.error(
+        error.response?.data?.message || "Failed to upload documents."
+      );
     } finally {
       setIsSaving(false);
     }
