@@ -28,12 +28,13 @@ const ProtectedRoute = () => {
     return <Navigate to="/vendor/login" replace />;
   }
 
-  const isProfileRoute =
-    location.pathname.includes("/vendor/dashboard/profile") ||
-    location.pathname.includes("/vendor/dashboard/setup");
+  const isAccessibleRoute =
+    location.pathname.includes("profile") ||
+    location.pathname.includes("setup") ||
+    location.pathname.includes("support");
 
   // If TOS is accepted, proceed with existing profile/verification check
-  if (profile?.status === "verified" || isProfileRoute) {
+  if (!profile?.status || profile?.status === "verified" || isAccessibleRoute) {
     return <Outlet />;
   }
 

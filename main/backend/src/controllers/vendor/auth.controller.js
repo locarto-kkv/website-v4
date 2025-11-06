@@ -108,7 +108,7 @@ export const login = async (req, res) => {
       if (!isValid) return res.status(400).json({ message: "Invalid OTP" });
     } else if (password) {
       if (!user.password)
-        return res.status(400).json({ message: "Password Invalid, Use OTP" });
+        return res.status(400).json({ message: "Password not setup, Use OTP" });
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (!isPasswordCorrect)
         return res.status(400).json({ message: "Invalid Credentials" });
