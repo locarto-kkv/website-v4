@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -34,7 +40,6 @@ const MapView = () => {
   const dataLoading = useDataStore((s) => s.dataLoading);
 
   console.log(blogs);
-  
 
   // UI state
   const [showOverlay, setShowOverlay] = useState(true);
@@ -49,7 +54,8 @@ const MapView = () => {
     }
     return 0;
   })();
-  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(initialIndex);
+  const [currentCategoryIndex, setCurrentCategoryIndex] =
+    useState(initialIndex);
 
   // If a category param exists, hide overlay after mount (pure side-effect)
   useEffect(() => {
@@ -99,10 +105,11 @@ const MapView = () => {
   };
 
   // Function to create custom Leaflet marker icons
-  const createCustomIcon = useCallback((category) =>
-    L.divIcon({
-      className: "custom-marker",
-      html: `
+  const createCustomIcon = useCallback(
+    (category) =>
+      L.divIcon({
+        className: "custom-marker",
+        html: `
         <div style="
           background: linear-gradient(135deg, ${category.color}, ${category.color}dd);
           width: 36px;
@@ -118,10 +125,12 @@ const MapView = () => {
           <i class="${category.icon}" style="transform: rotate(45deg); color: white; font-size: 14px;"></i>
         </div>
       `,
-      iconSize: [36, 36],
-      iconAnchor: [18, 36],
-      popupAnchor: [0, -38],
-    }), []);
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -38],
+      }),
+    []
+  );
 
   // Initialize map effect (runs only once)
   useEffect(() => {
@@ -136,12 +145,15 @@ const MapView = () => {
       preferCanvas: true,
     }).setView([19.076, 72.8777], 12);
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      maxZoom: 19,
-      minZoom: 3,
-    }).addTo(mapInstance);
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 19,
+        minZoom: 3,
+      }
+    ).addTo(mapInstance);
 
     // create and add the marker layer AFTER map is available
     markerLayer.current = L.layerGroup().addTo(mapInstance);
@@ -190,7 +202,9 @@ const MapView = () => {
         Array.isArray(vendor.address[0].coordinates) &&
         vendor.address[0].coordinates.length === 2;
       const hasProductsInCategory =
-        vendor.products && Array.isArray(vendor.products) && vendor.products.length > 0;
+        vendor.products &&
+        Array.isArray(vendor.products) &&
+        vendor.products.length > 0;
       return hasValidPosition && hasProductsInCategory;
     });
   }, [blogs]);
@@ -272,8 +286,10 @@ const MapView = () => {
           );
           if (button) {
             button.onclick = () => {
-              const shopPath = `/shops/${vendor.id}/products/${encodeURIComponent(currentCategory.name)}`;
-              navigate(currentUser?.type === "consumer" ? `/consumer${shopPath}` : shopPath);
+              const shopPath = `/shops/${
+                vendor.id
+              }/products/${encodeURIComponent(currentCategory.name)}`;
+              navigate(shopPath);
             };
           }
         });
@@ -341,12 +357,17 @@ const MapView = () => {
       {/* Map and UI container */}
       <div className="h-screen relative">
         {/* Leaflet Map container */}
-        <div id="map-container" ref={mapContainerRef} className="w-full h-full bg-gray-800" style={{
-          position: 'relative',
-          touchAction: 'none',
-          WebkitTouchCallout: 'none',
-          WebkitUserSelect: 'none'
-        }}></div>
+        <div
+          id="map-container"
+          ref={mapContainerRef}
+          className="w-full h-full bg-gray-800"
+          style={{
+            position: "relative",
+            touchAction: "none",
+            WebkitTouchCallout: "none",
+            WebkitUserSelect: "none",
+          }}
+        ></div>
 
         {/* --- UI CONTROLS (Floating elements over the map) --- */}
         {!showOverlay && (
@@ -383,54 +404,60 @@ const MapView = () => {
           className={`
             fixed bottom-0 left-0 right-0 z-[9998] lg:hidden
             transition-all duration-500 ease-in-out
-            ${showOverlay ? "opacity-100 translate-y-0" : "opacity-0 translate-y-full pointer-events-none"}
+            ${
+              showOverlay
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-full pointer-events-none"
+            }
           `}
         >
           {/* Mobile Card Content */}
           <div className="bg-gray-900/80 backdrop-blur-xl border-t border-white/10 p-5 rounded-t-2xl">
             {/* Prev/Next Buttons and Icon */}
             <div className="flex justify-between items-center mb-4">
-               <button
-                 onClick={prevCategory}
-                 className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
-                 aria-label="Previous Category"
-               >
-                 <i className="fas fa-chevron-left"></i>
-               </button>
-               <div
-                 className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
-                 style={{
-                   background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
-                 }}
-               >
-                 <i className={`${currentCategory.icon} text-2xl text-white`}></i>
-               </div>
-               <button
-                 onClick={nextCategory}
-                 className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
-                 aria-label="Next Category"
-               >
-                 <i className="fas fa-chevron-right"></i>
-               </button>
-             </div>
-             {/* Category Name, Description, Explore Button */}
-             <div className="text-center">
-               <h2
-                 className="text-3xl font-bold mb-2"
-                 style={{ color: currentCategory.color }}
-               >
-                 {currentCategory.name}
-               </h2>
-               <p className="text-gray-300 text-sm mb-5 max-w-xs mx-auto">
-                 {currentCategory.description}
-               </p>
-               <button
-                 onClick={() => handleSelectCategory(currentCategoryIndex)}
-                 className="w-full bg-white/90 text-gray-900 font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-white transition-colors"
-               >
-                 Explore
-               </button>
-             </div>
+              <button
+                onClick={prevCategory}
+                className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
+                aria-label="Previous Category"
+              >
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
+                }}
+              >
+                <i
+                  className={`${currentCategory.icon} text-2xl text-white`}
+                ></i>
+              </div>
+              <button
+                onClick={nextCategory}
+                className="text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-white/10 rounded-full border border-white/20"
+                aria-label="Next Category"
+              >
+                <i className="fas fa-chevron-right"></i>
+              </button>
+            </div>
+            {/* Category Name, Description, Explore Button */}
+            <div className="text-center">
+              <h2
+                className="text-3xl font-bold mb-2"
+                style={{ color: currentCategory.color }}
+              >
+                {currentCategory.name}
+              </h2>
+              <p className="text-gray-300 text-sm mb-5 max-w-xs mx-auto">
+                {currentCategory.description}
+              </p>
+              <button
+                onClick={() => handleSelectCategory(currentCategoryIndex)}
+                className="w-full bg-white/90 text-gray-900 font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-white transition-colors"
+              >
+                Explore
+              </button>
+            </div>
           </div>
         </div>
 
@@ -443,53 +470,54 @@ const MapView = () => {
             ${showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"}
           `}
         >
-           {/* Desktop Overlay Content */}
-           <div className="relative w-full max-w-6xl mx-auto text-center px-6">
-             {/* Prev Button */}
-             <button
-               onClick={prevCategory}
-               className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
-               aria-label="Previous Category"
-             >
-               <i className="fas fa-chevron-left text-xl"></i>
-             </button>
-             {/* Next Button */}
-             <button
-               onClick={nextCategory}
-               className="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
-               aria-label="Next Category"
-             >
-               <i className="fas fa-chevron-right text-xl"></i>
-             </button>
-             {/* Category Icon, Name, Description */}
-             <div className="relative">
-               <div
-                 className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6 mx-auto"
-                 style={{
-                   background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
-                 }}
-               >
-                 <i className={`${currentCategory.icon} text-3xl text-white`}></i>
-               </div>
-               {/* Category Name (Clickable) */}
-               <button
-                 onClick={() => handleSelectCategory(currentCategoryIndex)}
-                 className="text-7xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-300 bg-transparent border-none"
-                 style={{
-                   color: currentCategory.color,
-                   textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20`,
-                 }}
-               >
-                 {currentCategory.name}
-               </button>
-               {/* Description */}
-               <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                 {currentCategory.description}
-               </p>
-             </div>
-           </div>
+          {/* Desktop Overlay Content */}
+          <div className="relative w-full max-w-6xl mx-auto text-center px-6">
+            {/* Prev Button */}
+            <button
+              onClick={prevCategory}
+              className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
+              aria-label="Previous Category"
+            >
+              <i className="fas fa-chevron-left text-xl"></i>
+            </button>
+            {/* Next Button */}
+            <button
+              onClick={nextCategory}
+              className="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
+              aria-label="Next Category"
+            >
+              <i className="fas fa-chevron-right text-xl"></i>
+            </button>
+            {/* Category Icon, Name, Description */}
+            <div className="relative">
+              <div
+                className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6 mx-auto"
+                style={{
+                  background: `linear-gradient(135deg, ${currentCategory.color}, ${currentCategory.color}cc)`,
+                }}
+              >
+                <i
+                  className={`${currentCategory.icon} text-3xl text-white`}
+                ></i>
+              </div>
+              {/* Category Name (Clickable) */}
+              <button
+                onClick={() => handleSelectCategory(currentCategoryIndex)}
+                className="text-7xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-300 bg-transparent border-none"
+                style={{
+                  color: currentCategory.color,
+                  textShadow: `0 4px 20px ${currentCategory.color}40, 0 0 40px ${currentCategory.color}20`,
+                }}
+              >
+                {currentCategory.name}
+              </button>
+              {/* Description */}
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                {currentCategory.description}
+              </p>
+            </div>
+          </div>
         </div>
-
       </div>
 
       {/* --- STYLES --- */}
