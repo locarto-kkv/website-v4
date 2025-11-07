@@ -1,7 +1,12 @@
+// src/pages/consumer/authConsumer.jsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import AuthLayout from "../../components/AuthLayout"; // Import the layout
+
+// --- START: MODIFIED IMPORT ---
+import GoogleLogo from "../../assets/Google_Favicon_2025.svg"; // Import the new Google logo
+// --- END: MODIFIED IMPORT ---
 
 // Inputs remain mostly the same, maybe adjust styling if needed
 const OtpInput = ({ value, onChange }) => (
@@ -165,7 +170,7 @@ const AuthConsumer = () => {
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">
             {isLogin ? "Customer Login" : "Customer Sign Up"}{" "}
-            {/* [cite: src/pages/consumer/authConsumer.jsx] */}
+            {/* */}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Explore local brands and products
@@ -323,31 +328,15 @@ const AuthConsumer = () => {
             onClick={handleGoogleSubmit}
             className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-300 transition-colors"
           >
-            <svg
+            {/* --- START: MODIFIED IMG TAG --- */}
+            <img
+              src={GoogleLogo}
+              alt="Google"
               className="w-5 h-5 mr-2"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 48 48"
-            >
-              <path
-                fill="#FFC107"
-                d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"
-              />
-              <path
-                fill="#FF3D00"
-                d="M6.306 14.691c-1.354 2.807-2.13 5.92-2.13 9.179s.776 6.372 2.13 9.179l-5.657 5.657C1.046 34.046 0 29.268 0 24s1.046-10.046 2.649-13.818l5.657 4.509z"
-              />
-              <path
-                fill="#4CAF50"
-                d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-5.657-5.657c-1.746 1.166-3.973 1.85-6.309 1.85-4.818 0-8.943-3.08-10.36-7.37H2.649v5.67C6.182 40.023 14.437 44 24 44z"
-              />
-              <path
-                fill="#1976D2"
-                d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l5.657 5.657C40.046 36.671 44 30.887 44 24c0-1.341-.138-2.65-.389-3.917z"
-              />
-            </svg>
+            />
+            {/* --- END: MODIFIED IMG TAG --- */}
             {isLogin ? "Login with Google" : "Sign up with Google"}{" "}
-            {/* [cite: src/pages/consumer/authConsumer.jsx] */}
+            {/* */}
           </button>
         </div>
 
