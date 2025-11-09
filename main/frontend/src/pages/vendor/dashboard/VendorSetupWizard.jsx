@@ -20,8 +20,6 @@ const VendorSetupWizard = () => {
     coordinates: {},
   });
 
-  const { profile } = useVendorDataStore();
-
   // ✅ Handle input changes dynamically
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,44 +31,13 @@ const VendorSetupWizard = () => {
 
   // ✅ Close setup wizard
   const closeSetup = () => {
-    localStorage.setItem("setupform", JSON.stringify(setupForm));
     navigate("/vendor/dashboard/profile");
   };
 
   // ✅ Save setupForm to localStorage & go to next step
   const handleNextStep = () => {
-    localStorage.setItem("setupform", JSON.stringify(setupForm));
-    navigate("/vendor/dashboard/setup/location");
+    navigate("/vendor/dashboard/setup/location", { state: setupForm });
   };
-
-  // ✅ Retrieve setupForm from localStorage if it exists
-  useEffect(() => {
-    console.log(profile);
-
-    if (profile?.address?.length > 0) {
-      const mainAddress = profile.address.find((item) => item.label === "Main");
-      console.log(mainAddress);
-
-      setSetupForm((prev) => ({
-        ...prev,
-        addressLine1: mainAddress.address_line_1,
-        addressLine2: mainAddress.address_line_2,
-        pincode: mainAddress.pincode,
-        state: mainAddress.state,
-        country: mainAddress.country,
-        coordinates: {
-          lat: mainAddress.coordinates[0],
-          lng: mainAddress.coordinates[1],
-        },
-      }));
-      return;
-    }
-
-    const storedForm = localStorage.getItem("setupform");
-    if (storedForm) {
-      setSetupForm(JSON.parse(storedForm));
-    }
-  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6">

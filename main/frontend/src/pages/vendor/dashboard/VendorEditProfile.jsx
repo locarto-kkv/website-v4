@@ -7,57 +7,53 @@ import toast from "react-hot-toast";
 
 const VendorEditProfile = () => {
   const navigate = useNavigate();
-  const { profile, getProfile, dataLoading } = useVendorDataStore();
+  const profile = useVendorDataStore((s) => s.profile);
+  const fetchProfile = useVendorDataStore((s) => s.fetchProfile);
+  const dataLoading = useVendorDataStore((s) => s.dataLoading);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone_no: "",
-    // Add other relevant profile fields here based on your data structure
-    // e.g., businessName, description, address details, brand_logo_1, brand_logo_2, documents etc.
+    website: "",
     address: {
-      // Example nested structure
       address_line_1: "",
       address_line_2: "",
-      city: "",
       state: "",
       pincode: "",
       country: "",
+      coordinates: [],
     },
-    brand_logo_1_file: null, // For file input
-    brand_logo_2_file: null, // For file input
-    documents_files: [], // For multiple document uploads
+    brand_logo_1: null,
+    brand_logo_2: null,
+    documents: [],
   });
   const [loading, setLoading] = useState(false);
   const [imagePreview1, setImagePreview1] = useState(null);
   const [imagePreview2, setImagePreview2] = useState(null);
 
-  // Populate form with existing profile data
+  // Populate form with profile data
   useEffect(() => {
-    if (profile) {
-      setFormData({
-        name: profile.name || "",
-        email: profile.email || "",
-        phone_no: profile.phone_no || "",
-        address: {
-          // Assuming the last address is the primary one
-          address_line_1:
-            profile.address?.[profile.address.length - 1]?.address_line_1 || "",
-          address_line_2:
-            profile.address?.[profile.address.length - 1]?.address_line_2 || "",
-          city: profile.address?.[profile.address.length - 1]?.city || "",
-          state: profile.address?.[profile.address.length - 1]?.state || "",
-          pincode: profile.address?.[profile.address.length - 1]?.pincode || "",
-          country: profile.address?.[profile.address.length - 1]?.country || "",
-        },
-        // Add other fields from profile
-        // Initialize file fields as null, set previews
-        brand_logo_1_file: null,
-        brand_logo_2_file: null,
-        documents_files: [],
-      });
-      setImagePreview1(profile.brand_logo_1 || null); // Set initial image preview
-      setImagePreview2(profile.brand_logo_2 || null); // Set initial image preview
-    }
+    setFormData({
+      name: profile.name || "",
+      email: profile.email || "",
+      phone_no: profile.phone_no || "",
+      website: profile.website || "",
+      address: {
+        // Assuming the last address is the primary one
+        address_line_1:
+          profile.address?.[profile.address.length - 1]?.address_line_1 || "",
+        address_line_2:
+          profile.address?.[profile.address.length - 1]?.address_line_2 || "",
+        state: profile.address?.[profile.address.length - 1]?.state || "",
+        pincode: profile.address?.[profile.address.length - 1]?.pincode || "",
+        country: profile.address?.[profile.address.length - 1]?.country || "",
+        coordinates:
+          profile.address?.[profile.address.length - 1]?.coordinates || [],
+      },
+    });
+    setImagePreview1(profile.brand_logo_1 || null);
+    setImagePreview2(profile.brand_logo_2 || null);
   }, [profile]);
 
   const handleChange = (e) => {
@@ -73,15 +69,15 @@ const VendorEditProfile = () => {
         },
       }));
     } else if (type === "file") {
-      if (name === "brand_logo_1_file") {
+      if (name === "brand_logo_1") {
         const file = files[0];
-        setFormData((prev) => ({ ...prev, brand_logo_1_file: file }));
+        setFormData((prev) => ({ ...prev, brand_logo_1: file }));
         setImagePreview1(
           file ? URL.createObjectURL(file) : profile.brand_logo_1 || null
         ); // Update preview
-      } else if (name === "brand_logo_2_file") {
+      } else if (name === "brand_logo_2") {
         const file = files[0];
-        setFormData((prev) => ({ ...prev, brand_logo_2_file: file }));
+        setFormData((prev) => ({ ...prev, brand_logo_2: file }));
         setImagePreview2(
           file ? URL.createObjectURL(file) : profile.brand_logo_2 || null
         ); // Update preview
@@ -99,11 +95,11 @@ const VendorEditProfile = () => {
 
   const handleRemoveImage = (logoNumber) => {
     if (logoNumber === 1) {
-      setFormData((prev) => ({ ...prev, brand_logo_1_file: null }));
+      setFormData((prev) => ({ ...prev, brand_logo_1: null }));
       setImagePreview1(null); // Clear preview
       // Here you might need to send a flag to the backend to remove the existing image
     } else if (logoNumber === 2) {
-      setFormData((prev) => ({ ...prev, brand_logo_2_file: null }));
+      setFormData((prev) => ({ ...prev, brand_logo_2: null }));
       setImagePreview2(null); // Clear preview
       // Similar backend flag logic might be needed
     }
@@ -114,32 +110,13 @@ const VendorEditProfile = () => {
     setLoading(true);
     toast.loading("Updating profile...");
 
-    // Construct the payload for the API
-    // Separate files from other data
-    const payload = {
-      profile: {
-        name: formData.name,
-        // Add any other direct profile fields
-      },
-      address: {
-        // Send only the address object
-        label: "Main", // Assuming this is the main address
-        ...formData.address,
-      },
-      extra: {
-        // Add fields from 'extra' object if needed, e.g., businessType, website
-      },
-      // Pass files directly if your service handles FormData or separate upload
-      brand_logo_1: formData.brand_logo_1_file,
-      brand_logo_2: formData.brand_logo_2_file,
-      documents: formData.documents_files, // Pass array of document files
-    };
+    const { address, ...profile } = formData;
+    console.log("SUBMIT");
+    console.log({ profile, address });
 
     try {
-      // Adjust the service call based on how it handles file uploads
-      // It might need FormData or separate upload logic after profile update
-      await VendorProfileService.updateProfile(payload);
-      await getProfile(); // Refresh profile data in context
+      // await VendorProfileService.updateProfile({ profile, address });
+      // await fetchProfile();
       toast.dismiss();
       toast.success("Profile updated successfully!");
       navigate("/vendor/dashboard/profile"); // Navigate back to profile view
@@ -228,6 +205,22 @@ const VendorEditProfile = () => {
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
             </div>
+            <div>
+              <label
+                htmlFor="phone_no"
+                className="block text-sm font-medium text-gray-600 mb-1"
+              >
+                Website
+              </label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                value={formData.website}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
             {/* Add other basic fields here */}
           </div>
         </section>
@@ -271,24 +264,7 @@ const VendorEditProfile = () => {
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label
-                  htmlFor="city"
-                  className="block text-sm font-medium text-gray-600 mb-1"
-                >
-                  City *
-                </label>
-                <input
-                  type="text"
-                  id="city"
-                  name="address.city"
-                  value={formData.address.city}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="state"
@@ -348,13 +324,13 @@ const VendorEditProfile = () => {
         {/* Branding & Documents */}
         <section>
           <h3 className="text-lg font-semibold text-gray-700 mb-4">
-            Branding & Documents
+            Brand Logos
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Brand Logo 1 */}
             <div>
               <label
-                htmlFor="brand_logo_1_file"
+                htmlFor="brand_logo_1"
                 className="block text-sm font-medium text-gray-600 mb-2"
               >
                 Brand Logo 1
@@ -378,8 +354,8 @@ const VendorEditProfile = () => {
                 )}
                 <input
                   type="file"
-                  id="brand_logo_1_file"
-                  name="brand_logo_1_file"
+                  id="brand_logo_1"
+                  name="brand_logo_1"
                   accept="image/*"
                   onChange={handleChange}
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
@@ -390,7 +366,7 @@ const VendorEditProfile = () => {
             {/* Brand Logo 2 */}
             <div>
               <label
-                htmlFor="brand_logo_2_file"
+                htmlFor="brand_logo_2"
                 className="block text-sm font-medium text-gray-600 mb-2"
               >
                 Brand Logo 2 (Optional)
@@ -414,8 +390,8 @@ const VendorEditProfile = () => {
                 )}
                 <input
                   type="file"
-                  id="brand_logo_2_file"
-                  name="brand_logo_2_file"
+                  id="brand_logo_2"
+                  name="brand_logo_2"
                   accept="image/*"
                   onChange={handleChange}
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
@@ -424,7 +400,7 @@ const VendorEditProfile = () => {
             </div>
 
             {/* Documents */}
-            <div className="md:col-span-2">
+            {/* <div className="md:col-span-2">
               <label
                 htmlFor="documents_files"
                 className="block text-sm font-medium text-gray-600 mb-2"
@@ -443,7 +419,6 @@ const VendorEditProfile = () => {
                 Upload relevant documents (e.g., GST, FSSAI). Hold Ctrl/Cmd to
                 select multiple.
               </p>
-              {/* Display current documents if needed */}
               {profile?.documents && profile.documents.length > 0 && (
                 <div className="mt-2 text-xs text-gray-600">
                   Current documents:{" "}
@@ -452,15 +427,26 @@ const VendorEditProfile = () => {
                     .join(", ")}
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
         </section>
 
         <div className="flex justify-end pt-6">
           <button
+            type="button"
+            onClick={() => {
+              navigate("/vendor/dashboard/profile/edit/location", {
+                state: formData,
+              });
+            }}
+            className="mx-2 px-8 py-3 bg-gradient-to-r from-blue-500 to-violet-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+          >
+            Update Location
+          </button>
+          <button
             type="submit"
             disabled={loading}
-            className="px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-70"
+            className="mx-2 px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-70"
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>

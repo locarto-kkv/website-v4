@@ -15,6 +15,7 @@ import CustomerSettings from "./dashboard/ConsumerSettings.jsx";
 import RuleChatbot from "../Chatbot";
 import CheckoutPage from "./CheckoutPage";
 import OrderPlacedPage from "./OrderPlacedPage.jsx";
+import NotFoundPage from "../NotFoundPage.jsx";
 
 const ProtectedRoute = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
@@ -67,8 +68,7 @@ const ConsumerRoutes = () => {
       </Route>
       {/* --- End Protected Routes --- */}
 
-      {/* Optional Catch-all */}
-      {/* <Route path="*" element={<Navigate to="/consumer/dashboard/overview" replace />} /> */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

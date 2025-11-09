@@ -7,7 +7,7 @@ import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx";
 import locartoImg from "../assets/locarto.png";
 import toast from "react-hot-toast";
 
-const Navbar = ({ pageType = "landing" }) => {
+const Navbar = ({ pageType = "homepage" }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -45,7 +45,7 @@ const Navbar = ({ pageType = "landing" }) => {
   const handleSectionNavigation = (sectionId) => {
     setMobileMenuOpen(false);
 
-    if (location.pathname === "/landing" || location.pathname === "/") {
+    if (location.pathname === "/home" || location.pathname === "/") {
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -53,7 +53,7 @@ const Navbar = ({ pageType = "landing" }) => {
         }
       }, 100);
     } else {
-      navigate(`/landing#${sectionId}`);
+      navigate(`/home#${sectionId}`);
     }
   };
 
@@ -106,10 +106,10 @@ const Navbar = ({ pageType = "landing" }) => {
         <div className="flex-1 flex justify-center items-center">
           <div className="flex items-center space-x-6 lg:space-x-8">
             <Link
-              to={pageType === "homepage" ? "/landing" : "/"}
+              to={pageType === "landing" ? "/home" : "/"}
               className="text-gray-700 hover:text-orange-500 font-medium transition-colors text-sm lg:text-base nav-link"
             >
-              {pageType === "homepage" ? "About Us" : "Home"}
+              {pageType === "landing" ? "About Us" : "Landing"}
             </Link>
             <Link
               to="/map"
@@ -310,7 +310,7 @@ const Navbar = ({ pageType = "landing" }) => {
               </div>
 
               <Link
-                to={pageType === "homepage" ? "/landing" : "/"}
+                to={pageType === "homepage" ? "/home" : "/"}
                 className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-orange-50 hover:text-orange-500 rounded-lg transition-colors font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >

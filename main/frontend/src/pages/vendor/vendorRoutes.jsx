@@ -18,6 +18,7 @@ import VendorLocationSetup from "./dashboard/VendorLocationSetup";
 import VendorOrders from "./dashboard/VendorOrders";
 import VendorMilestones from "./dashboard/VendorMilestones";
 import VendorEditProfile from "./dashboard/VendorEditProfile";
+import NotFoundPage from "../NotFoundPage";
 
 const ProtectedRoute = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
@@ -64,10 +65,14 @@ const VendorRoutes = () => {
           <Route path="overview" element={<VendorOverview />} />
           <Route path="orders" element={<VendorOrders />} />
           <Route path="products" element={<VendorProducts />} />
-          <Route path="milestones" element={<VendorMilestones />} />{" "}
+          <Route path="milestones" element={<VendorMilestones />} />
           <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
-          <Route path="profile/edit" element={<VendorEditProfile />} />{" "}
+          <Route path="profile/edit" element={<VendorEditProfile />} />
+          <Route
+            path="profile/edit/location"
+            element={<VendorLocationSetup />}
+          />
           <Route path="analytics" element={<VendorAnalytics />} />
           <Route path="settings" element={<VendorSettings />} />
           <Route path="support" element={<VendorSupport />} />
@@ -75,6 +80,7 @@ const VendorRoutes = () => {
           <Route path="setup/location" element={<VendorLocationSetup />} />
         </Route>
       </Route>
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

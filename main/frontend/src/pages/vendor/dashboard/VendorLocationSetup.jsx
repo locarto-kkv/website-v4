@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
@@ -7,24 +7,22 @@ import { VendorProfileService } from "../../../services/vendor/vendorProfileServ
 
 const VendorLocationSetup = () => {
   const navigate = useNavigate();
-  const [map, setMap] = useState(null);
-  const [marker, setMarker] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
+  const [map, setMap] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [newAddress, setNewAddress] = useState({
     addressLine1: "",
     addressLine2: "",
     pincode: "",
     state: "",
     country: "",
-    coordinates: { lat: "", lng: "" },
   });
 
   const [setupForm, setSetupForm] = useState({
     name: "",
     email: "",
     phone: "",
-    businessName: "",
     businessType: "",
     addressLine1: "",
     addressLine2: "",
@@ -35,9 +33,23 @@ const VendorLocationSetup = () => {
     coordinates: { lat: "", lng: "" },
   });
 
-  const profile = useVendorDataStore((s) => s.profile);
+  const isProfile = location.pathname.includes("profile");
 
-  // ✅ Fetch approximate location from pincode (forward geocoding)
+  const profile = useVendorDataStore((s) => s.profile);
+  const fetchProfile = useVendorDataStore((s) => s.fetchProfile);
+
+  let marker;
+
+  // Add new marker on map
+  const addMarker = (latlng) => {
+    if (marker) {
+      map.removeLayer(marker);
+    }
+
+    marker = L.marker(latlng).addTo(map);
+  };
+
+  //  Fetch approximate location from pincode (forward geocoding)
   const fetchLocationByPincode = async (pincode) => {
     if (!pincode) return;
     setLoading(true);
@@ -56,13 +68,6 @@ const VendorLocationSetup = () => {
 
         if (map) {
           map.setView(latlng, 14);
-          setMarker((prevMarker) => {
-            if (prevMarker) {
-              prevMarker.setLatLng(latlng);
-              return prevMarker;
-            }
-            return L.marker(latlng).addTo(map);
-          });
         }
 
         await fetchAddress(lat, lng);
@@ -75,7 +80,7 @@ const VendorLocationSetup = () => {
     setLoading(false);
   };
 
-  // ✅ Fetch address from coordinates (reverse geocode)
+  // Fetch address from coordinates (reverse geocode)
   const fetchAddress = async (lat, lng) => {
     setLoading(true);
     try {
@@ -102,8 +107,7 @@ const VendorLocationSetup = () => {
 
         // Center map and place marker
         map.setView(latlng, 14);
-        const newMarker = L.marker(latlng).addTo(map);
-        setMarker(newMarker);
+        addMarker(latlng);
 
         setNewAddress({
           addressLine1: addressLine1Parts.join(", "),
@@ -111,16 +115,8 @@ const VendorLocationSetup = () => {
           pincode: addr.postcode || "",
           state: addr.state || "",
           country: addr.country || "",
-          coordinates: { lat, lng },
         });
-        console.log("Fetched Address: ", {
-          addressLine1: addressLine1Parts.join(", "),
-          addressLine2: addressLine2Parts.join(", "),
-          pincode: addr.postcode || "",
-          state: addr.state || "",
-          country: addr.country || "",
-          coordinates: { lat, lng },
-        });
+        setSetupForm((prev) => ({ ...prev, coordinates: { lat, lng } }));
       }
     } catch (error) {
       console.error("Error fetching address:", error);
@@ -129,6 +125,7 @@ const VendorLocationSetup = () => {
     }
   };
 
+  // Fetch user current location
   const getUserLocation = () => {
     setLoading(true);
     if (!navigator.geolocation) {
@@ -148,23 +145,7 @@ const VendorLocationSetup = () => {
     setLoading(false);
   };
 
-  // ✅ Load setup form from localStorage
-  useEffect(() => {
-    const storedForm = localStorage.getItem("setupform");
-    if (storedForm) {
-      const parsedForm = JSON.parse(storedForm);
-      setSetupForm((prev) => ({ ...prev, ...parsedForm }));
-      setNewAddress({
-        addressLine1: parsedForm.addressLine1 || "",
-        addressLine2: parsedForm.addressLine2 || "",
-        pincode: parsedForm.pincode || "",
-        state: parsedForm.state || "",
-        country: parsedForm.country || "",
-      });
-    }
-  }, []);
-
-  // ✅ Initialize map
+  // Initialize map
   useEffect(() => {
     const mapInstance = L.map("map-container").setView([20.5937, 78.9629], 5);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -176,23 +157,23 @@ const VendorLocationSetup = () => {
     return () => mapInstance.remove();
   }, []);
 
-  // ✅ Set initial marker — from profile.coordinates or pincode
+  // Set initial marker — from profile or setupForm
   useEffect(() => {
     if (!map) return;
 
-    const storedCoords = setupForm.coordinates;
-    const storedPincode = setupForm.pincode;
+    console.log(location.state);
 
-    if (storedCoords.lat) {
-      const { lat, lng } = storedCoords;
+    setSetupForm(location.state);
+
+    if (isProfile) {
+      const [lat, lng] = location.state.coordinates;
       fetchAddress(lat, lng);
-    } else if (storedPincode) {
-      // Fallback to pincode-based location
-      fetchLocationByPincode(storedPincode);
+    } else {
+      fetchLocationByPincode(location.state.pincode);
     }
-  }, [map, profile, setupForm.pincode]);
+  }, [map]);
 
-  // ✅ Handle manual marker move — only update coordinates
+  // Handle manual marker move — only update coordinates
   useEffect(() => {
     if (!map) return;
 
@@ -200,21 +181,7 @@ const VendorLocationSetup = () => {
       const { lat, lng } = e.latlng;
       setLoading(true);
 
-      setMarker((prevMarker) => {
-        if (prevMarker) {
-          prevMarker.setLatLng(e.latlng);
-          return prevMarker;
-        }
-        return L.marker(e.latlng).addTo(map);
-      });
-
       await fetchAddress(lat, lng);
-
-      // Only update coordinates in setupForm
-      setSetupForm((prev) => ({
-        ...prev,
-        coordinates: { lat: lat.toFixed(6), lng: lng.toFixed(6) },
-      }));
 
       setLoading(false);
     };
@@ -223,43 +190,62 @@ const VendorLocationSetup = () => {
     return () => map.off("click", handleClick);
   }, [map]);
 
-  // ✅ Save
   const handleNextStep = async () => {
-    const profileData = {
-      profile: { status: "complete" },
-      address: {
-        label: "Main",
-        address_line_1: setupForm.addressLine1,
-        address_line_2: setupForm.addressLine2,
-        pincode: setupForm.pincode,
-        state: setupForm.state,
-        country: setupForm.country,
-        coordinates: [newAddress.coordinates.lat, newAddress.coordinates.lng],
-      },
-      extra: {
-        businessType: setupForm.businessType,
-        website: setupForm.website,
-        primary_contact: {
-          name: setupForm.name,
-          phone_no: setupForm.phone,
-          email: setupForm.email,
-        },
-      },
-    };
+    let profileData;
 
-    const updatedProfile = await VendorProfileService.updateProfile(
-      profileData
-    );
-    useVendorDataStore.setState((state) => ({
-      ...state,
-      profile: updatedProfile,
-    }));
+    if (isProfile) {
+      console.log(location.state);
+
+      profileData = {
+        profile: {
+          website: location.state.website,
+          name: location.state.name,
+          phone_no: location.state.phone_no,
+          email: location.state.email,
+        },
+        address: {
+          label: "Main",
+          address_line_1: location.state.address.address_line_1,
+          address_line_2: location.state.address.address_line_2,
+          pincode: location.state.address.pincode,
+          state: location.state.address.state,
+          country: location.state.address.country,
+          coordinates: [setupForm.coordinates.lat, setupForm.coordinates.lng],
+        },
+      };
+    } else {
+      profileData = {
+        profile: { status: "complete" },
+        address: {
+          label: "Main",
+          address_line_1: setupForm.addressLine1,
+          address_line_2: setupForm.addressLine2,
+          pincode: setupForm.pincode,
+          state: setupForm.state,
+          country: setupForm.country,
+          coordinates: [setupForm.coordinates.lat, setupForm.coordinates.lng],
+        },
+        extra: {
+          businessType: setupForm.businessType,
+          website: setupForm.website,
+          primary_contact: {
+            name: setupForm.name,
+            phone_no: setupForm.phone,
+            email: setupForm.email,
+          },
+        },
+      };
+    }
+
+    await VendorProfileService.updateProfile(profileData);
+    await fetchProfile();
     navigate("/vendor/dashboard/profile");
   };
 
   const closeSetup = () => {
-    localStorage.setItem("setupform", JSON.stringify(setupForm));
-    navigate("/vendor/dashboard/setup");
+    isProfile
+      ? navigate("/vendor/dashboard/profile/edit")
+      : navigate("/vendor/dashboard/setup");
   };
 
   return (
@@ -291,9 +277,9 @@ const VendorLocationSetup = () => {
                 <input
                   type="text"
                   name="pincode"
-                  value={newAddress.pincode}
+                  value={setupForm.pincode}
                   onChange={(e) =>
-                    setNewAddress((prev) => ({
+                    setSetupForm((prev) => ({
                       ...prev,
                       pincode: e.target.value,
                     }))
@@ -303,7 +289,7 @@ const VendorLocationSetup = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => fetchLocationByPincode(newAddress.pincode)}
+                  onClick={() => fetchLocationByPincode(setupForm.pincode)}
                   className="inline-flex items-center justify-center px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-r-lg transition-all"
                 >
                   <i className="fas fa-search"></i>
@@ -313,7 +299,8 @@ const VendorLocationSetup = () => {
 
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Current Pin At Location:
+                Current Pin At Location (This will only replace your pincode
+                from previous form):
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">
                 {newAddress.addressLine1 || "No address Found"}

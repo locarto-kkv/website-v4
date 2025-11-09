@@ -8,8 +8,8 @@ import { useConsumerDataStore } from "./store/consumer/consumerDataStore";
 import { useVendorDataStore } from "./store/vendor/vendorDataStore";
 
 // Public Pages
-import Homepage from "./pages/Homepage";
-import LandingPage from "./pages/Landingpage";
+import HomePage from "./pages/HomePage";
+import LandingPage from "./pages/LandingPage";
 import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";
@@ -80,9 +80,9 @@ function App() {
     <div className="min-h-screen flex flex-col">
       <Routes>
         {/* --- PUBLIC ROUTES --- */}
-        <Route path="/" element={<Homepage />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/map" element={<MapView />} />
-        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
         <Route
