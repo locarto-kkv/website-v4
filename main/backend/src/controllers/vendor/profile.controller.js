@@ -99,7 +99,6 @@ export const updateProfile = async (req, res) => {
           { ...newProfileData.address, vendor_id: userId },
           { onConflict: "id" }
         );
-      sendAuthEmail({ ...newProfileData, vendor_id: userId });
     }
 
     const { data: updatedUser, error } = await db
@@ -108,6 +107,12 @@ export const updateProfile = async (req, res) => {
       .eq("id", userId)
       .select()
       .single();
+
+    sendAuthEmail({
+      profile: updatedUser,
+      address: newProfileData.address,
+      extra: newProfileData.extra,
+    });
 
     if (error) throw error;
 

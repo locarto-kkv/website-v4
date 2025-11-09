@@ -1,6 +1,6 @@
 // src/pages/landingpage.jsx
 import React, { useRef, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useDataStore } from "../store/useDataStore.jsx";
 import { submitBeta } from "../services/betaService.js";
 
@@ -28,6 +28,18 @@ const LandingPage = () => {
   const { blogs } = useDataStore();
   const [showPopup, setShowPopup] = useState(false);
   const [betaForm, setBetaForm] = useState({ name: "", email: "" }); // Added email state for the new form
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      setTimeout(() => {
+        const element = document.querySelector(location.hash);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  }, [location]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

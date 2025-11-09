@@ -45,7 +45,7 @@ const Navbar = ({ pageType = "homepage" }) => {
   const handleSectionNavigation = (sectionId) => {
     setMobileMenuOpen(false);
 
-    if (location.pathname === "/home" || location.pathname === "/") {
+    if (location.pathname === "/home") {
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {

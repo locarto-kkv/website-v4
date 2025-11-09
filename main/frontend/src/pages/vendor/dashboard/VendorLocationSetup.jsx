@@ -12,8 +12,8 @@ const VendorLocationSetup = () => {
   const [map, setMap] = useState(null);
   const [loading, setLoading] = useState(false);
   const [newAddress, setNewAddress] = useState({
-    addressLine1: "",
-    addressLine2: "",
+    address_line_1: "",
+    address_line_2: "",
     pincode: "",
     state: "",
     country: "",
@@ -24,8 +24,8 @@ const VendorLocationSetup = () => {
     email: "",
     phone: "",
     businessType: "",
-    addressLine1: "",
-    addressLine2: "",
+    address_line_1: "",
+    address_line_2: "",
     pincode: "",
     state: "",
     country: "",
@@ -35,7 +35,6 @@ const VendorLocationSetup = () => {
 
   const isProfile = location.pathname.includes("profile");
 
-  const profile = useVendorDataStore((s) => s.profile);
   const fetchProfile = useVendorDataStore((s) => s.fetchProfile);
 
   let marker;
@@ -110,13 +109,17 @@ const VendorLocationSetup = () => {
         addMarker(latlng);
 
         setNewAddress({
-          addressLine1: addressLine1Parts.join(", "),
-          addressLine2: addressLine2Parts.join(", "),
+          address_line_1: addressLine1Parts.join(", "),
+          address_line_2: addressLine2Parts.join(", "),
           pincode: addr.postcode || "",
           state: addr.state || "",
           country: addr.country || "",
         });
-        setSetupForm((prev) => ({ ...prev, coordinates: { lat, lng } }));
+        setSetupForm((prev) => ({
+          ...prev,
+          coordinates: { lat, lng },
+          pincode: addr.postcode,
+        }));
       }
     } catch (error) {
       console.error("Error fetching address:", error);
@@ -161,15 +164,15 @@ const VendorLocationSetup = () => {
   useEffect(() => {
     if (!map) return;
 
-    console.log(location.state);
+    const { address, ...profile } = location.state;
 
-    setSetupForm(location.state);
+    setSetupForm({ ...address, ...profile });
 
     if (isProfile) {
-      const [lat, lng] = location.state.coordinates;
+      const [lat, lng] = location.state.address.coordinates;
       fetchAddress(lat, lng);
     } else {
-      fetchLocationByPincode(location.state.pincode);
+      fetchLocationByPincode(location.state.address.pincode);
     }
   }, [map]);
 
@@ -194,22 +197,21 @@ const VendorLocationSetup = () => {
     let profileData;
 
     if (isProfile) {
-      console.log(location.state);
-
       profileData = {
         profile: {
-          website: location.state.website,
-          name: location.state.name,
-          phone_no: location.state.phone_no,
-          email: location.state.email,
+          website: setupForm.website,
+          name: setupForm.name,
+          phone_no: setupForm.phone_no,
+          email: setupForm.email,
         },
         address: {
+          id: location.state.address.id,
           label: "Main",
-          address_line_1: location.state.address.address_line_1,
-          address_line_2: location.state.address.address_line_2,
-          pincode: location.state.address.pincode,
-          state: location.state.address.state,
-          country: location.state.address.country,
+          address_line_1: setupForm.address_line_1,
+          address_line_2: setupForm.address_line_2,
+          pincode: setupForm.pincode,
+          state: setupForm.state,
+          country: setupForm.country,
           coordinates: [setupForm.coordinates.lat, setupForm.coordinates.lng],
         },
       };
@@ -218,8 +220,8 @@ const VendorLocationSetup = () => {
         profile: { status: "complete" },
         address: {
           label: "Main",
-          address_line_1: setupForm.addressLine1,
-          address_line_2: setupForm.addressLine2,
+          address_line_1: setupForm.address_line_1,
+          address_line_2: setupForm.address_line_2,
           pincode: setupForm.pincode,
           state: setupForm.state,
           country: setupForm.country,
@@ -299,15 +301,15 @@ const VendorLocationSetup = () => {
 
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Current Pin At Location (This will only replace your pincode
+                Current Pin At Location (This will only override your pincode
                 from previous form):
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">
-                {newAddress.addressLine1 || "No address Found"}
-                {newAddress.addressLine2 && (
+                {newAddress.address_line_1 || "No address Found"}
+                {newAddress.address_line_2 && (
                   <>
                     <br />
-                    {newAddress.addressLine2}
+                    {newAddress.address_line_2}
                   </>
                 )}
               </p>

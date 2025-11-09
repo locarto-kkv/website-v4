@@ -562,26 +562,6 @@ const Homepage = () => {
               </div>
             </div>
           </section>
-
-          {/* Newsletter Section */}
-          {/*       <section className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl mb-12 sm:mb-16 mx-2 sm:mx-0">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
-              Stay Updated
-            </h3>
-            <p className="text-base sm:text-lg mb-6 sm:mb-8 opacity-90 max-w-2xl mx-auto px-2">
-              Subscribe for the latest updates and promotions.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 px-4 py-3 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 text-sm sm:text-base"
-              />
-              <button className="bg-white text-orange-600 px-6 sm:px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base">
-                Subscribe
-              </button>
-            </div>
-          </section> */}
         </div>
       </main>
       {/* Footer */}

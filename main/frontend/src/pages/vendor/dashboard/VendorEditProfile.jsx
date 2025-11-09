@@ -40,7 +40,7 @@ const VendorEditProfile = () => {
       phone_no: profile.phone_no || "",
       website: profile.website || "",
       address: {
-        // Assuming the last address is the primary one
+        id: profile.address?.[profile.address.length - 1]?.id || "",
         address_line_1:
           profile.address?.[profile.address.length - 1]?.address_line_1 || "",
         address_line_2:
@@ -111,12 +111,11 @@ const VendorEditProfile = () => {
     toast.loading("Updating profile...");
 
     const { address, ...profile } = formData;
-    console.log("SUBMIT");
-    console.log({ profile, address });
 
     try {
-      // await VendorProfileService.updateProfile({ profile, address });
-      // await fetchProfile();
+      await VendorProfileService.updateProfile({ profile, address });
+      await fetchProfile();
+
       toast.dismiss();
       toast.success("Profile updated successfully!");
       navigate("/vendor/dashboard/profile"); // Navigate back to profile view

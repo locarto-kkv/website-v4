@@ -40,10 +40,7 @@ const VendorProfile = () => {
         companyName: profile?.name || "N/A", // Use profile name first
         email: profile?.email || "N/A",
         phone: profile?.primary_contact?.phone_no || profile?.phone_no || "N/A", // Check extra data
-        address:
-          profile?.address?.find((addr) => addr.label === "Main") ||
-          profile?.address?.[0] ||
-          {}, // Prefer 'Main' address, fallback to first
+        address: profile?.address?.[profile.address.length - 1] || {}, // Prefer 'Main' address, fallback to first
         brandLogo: profile?.brand_logo_1 || "",
         established: profile?.created_at
           ? new Date(profile.created_at).getFullYear()
