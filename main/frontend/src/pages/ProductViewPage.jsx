@@ -330,33 +330,7 @@ const ProductViewPage = () => {
             )}
 
             {/* Product Features */}
-            <div className="grid grid-cols-3 gap-4 pt-4">
-              {[
-                {
-                  icon: "fas fa-shield-check",
-                  text: "Authentic",
-                  color: "from-green-500 to-emerald-500",
-                },
-                {
-                  icon: "fas fa-truck-fast",
-                  text: "Fast Delivery",
-                  color: "from-blue-500 to-cyan-500",
-                },
-                {
-                  icon: "fas fa-undo",
-                  text: "Easy Returns",
-                  color: "from-purple-500 to-pink-500",
-                },
-              ].map((feature, idx) => (
-                <div
-                  key={idx}
-                  className={`bg-gradient-to-br ${feature.color} rounded-2xl p-4 text-white text-center shadow-lg`}
-                >
-                  <i className={`${feature.icon} text-2xl mb-2`}></i>
-                  <p className="text-xs font-semibold">{feature.text}</p>
-                </div>
-              ))}
-            </div>
+            
           </div>
 
           {/* Product Details */}
