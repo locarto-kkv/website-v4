@@ -2,9 +2,10 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { ConsumerBlogService } from "../services/consumer/consumerBlogService.js";
 import { ConsumerProductService } from "../services/consumer/consumerProductService.js";
-
+import { ConsumerRecommendService } from "../services/consumer/consumerRecommendService.js";
 export const useDataStore = create((set, get) => ({
   blogs: [],
+  recommends: {},
   start: 0,
   dataLoading: false,
   productLoading: false,
@@ -82,13 +83,29 @@ export const useDataStore = create((set, get) => ({
     }
   },
 
-  loadBlogs: async () => {
+  fetchRecommends: async () => {
+    set({ dataLoading: true });
+    try {
+      const { vendors, products } = await ConsumerRecommendService.getRandom(
+        10
+      );
+      set({ recommends: { vendors, products } });
+    } catch (error) {
+      toast.error("Failed to fetch blogs");
+      console.error("Error fetching blogs:", error);
+    } finally {
+      set({ dataLoading: true });
+    }
+  },
+
+  loadData: async () => {
     set({ dataLoading: true });
     try {
       // const cachedBlogs = get().loadCache("blogs");
       // if (cachedBlogs) set({ blogs: cachedBlogs });
       // else
       await get().fetchBlogs();
+      await get().fetchRecommends();
     } catch (error) {
       console.error("Error loading cached blogs:", error);
       await get().fetchBlogs();

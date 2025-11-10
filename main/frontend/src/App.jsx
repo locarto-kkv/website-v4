@@ -31,7 +31,7 @@ function App() {
   const currentUser = useAuthStore((s) => s.currentUser);
 
   const dataLoading = useDataStore((s) => s.dataLoading);
-  const loadBlogs = useDataStore((s) => s.loadBlogs);
+  const loadData = useDataStore((s) => s.loadData);
 
   const consumerLoading = useConsumerDataStore((s) => s.dataLoading);
   const loadConsumerData = useConsumerDataStore((s) => s.loadConsumerData);
@@ -46,7 +46,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    loadBlogs();
+    loadData();
   }, []);
 
   useEffect(() => {

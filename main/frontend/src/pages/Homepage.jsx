@@ -1,4 +1,4 @@
-// src/pages/landingpage.jsx
+// src/pages/HomePage.jsx
 import React, { useRef, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useDataStore } from "../store/useDataStore.jsx";
@@ -24,7 +24,7 @@ const asset3 = "/assets/3.png";
 const asset4 = "/assets/4.png";
 const asset5 = "/assets/5.png";
 
-const LandingPage = () => {
+const HomePage = () => {
   const { blogs } = useDataStore();
   const [showPopup, setShowPopup] = useState(false);
   const [betaForm, setBetaForm] = useState({ name: "", email: "" }); // Added email state for the new form
@@ -382,4 +382,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default HomePage;

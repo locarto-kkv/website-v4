@@ -1,4 +1,4 @@
-// src/pages/Homepage.jsx
+// src/pages/LandingPage.jsx
 import React, { useEffect, useState } from "react";
 import SearchIcon from "../components/SearchIcon.jsx";
 import Navbar from "../components/Navbar.jsx";
@@ -8,9 +8,14 @@ import { getGreeting } from "../lib/utils.js";
 import { getRandomMsg } from "../services/welcomeMsgs.js";
 import { submitBeta } from "../services/betaService.js";
 
+import VendorsSlider from "../components/landing/VendorsSlider.jsx";
+import ProductsSlider from "../components/landing/ProductsSlider.jsx";
+
 import { useAuthStore } from "../store/useAuthStore.jsx";
+import { useDataStore } from "../store/useDataStore.jsx";
 import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx";
 import { useVendorDataStore } from "../store/vendor/vendorDataStore.jsx";
+import { ConsumerSearchService } from "../services/consumer/consumerSearchService.js";
 
 // Background Assets - Now using public folder paths
 const asset1 = "/assets/1.png";
@@ -19,18 +24,21 @@ const asset3 = "/assets/3.png";
 const asset4 = "/assets/4.png";
 const asset5 = "/assets/5.png";
 
-const Homepage = () => {
+const LandingPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showError, setShowError] = useState(false);
   const [suggestedCategory, setSuggestedCategory] = useState("");
   const [name, setName] = useState("");
   const [welcomeMessage, setWelcomeMessage] = useState("");
-  const [betaForm, setBetaForm] = useState({ name: "", email: "" }); // Added email state for the new form
+  const [betaForm, setBetaForm] = useState({ name: "", email: "" });
 
   const navigate = useNavigate();
+  const currentUser = useAuthStore((s) => s.currentUser);
+  const recommends = useDataStore((s) => s.recommends);
+  const consumerProfile = useConsumerDataStore((s) => s.profile);
+  const vendorProfile = useVendorDataStore((s) => s.profile);
 
   const availableCategories = ["personal care", "accessories"];
-  const popularProducts = [];
 
   // Function to handle email submission (copied from RegisterSocial)
   const handleSubmit = async (e) => {
@@ -66,25 +74,6 @@ const Homepage = () => {
     }
   };
 
-  const currentUser = useAuthStore((s) => s.currentUser);
-
-  const consumerProfile = useConsumerDataStore((s) => s.profile);
-  const vendorProfile = useVendorDataStore((s) => s.profile);
-
-  useEffect(() => {
-    if (currentUser?.type === "consumer") {
-      setName(consumerProfile.name);
-    } else if (currentUser?.type === "vendor") {
-      setName(vendorProfile.name);
-    } else {
-      setName("");
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    setWelcomeMessage(getRandomMsg());
-  }, []);
-
   const handleSearch = (e) => {
     e.preventDefault();
 
@@ -105,10 +94,24 @@ const Homepage = () => {
     }
   };
 
+  useEffect(() => {
+    if (currentUser?.type === "consumer") {
+      setName(consumerProfile.name);
+    } else if (currentUser?.type === "vendor") {
+      setName(vendorProfile.name);
+    } else {
+      setName("");
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    setWelcomeMessage(getRandomMsg());
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
       <Navbar pageType="landing" />
-
+      {console.log(recommends)}
       {/* Background Assets */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
         <img
@@ -372,7 +375,7 @@ const Homepage = () => {
                     type="text"
                     value={searchQuery}
                     onChange={handleInputChange}
-                    placeholder="Search for personal care, accessories..."
+                    placeholder="Search for a product, or brand...."
                     className="flex-grow px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 md:py-5 pr-2 rounded-l-full focus:outline-none text-gray-900 placeholder-gray-400 bg-transparent text-xs sm:text-base md:text-lg font-medium"
                   />
                   <Link
@@ -432,51 +435,9 @@ const Homepage = () => {
             }
           `}</style>
 
-          {/* Popular Products Section */}
-          <section className="mb-12 sm:mb-16 px-2 sm:px-0">
-            {/* ... (keep popular products section as is) ... */}
+          <VendorsSlider recommends={recommends} />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-              {popularProducts.map((product) => (
-                <div
-                  key={product.id}
-                  onClick={() => handleProductClick(product)}
-                  className="group relative bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2 overflow-hidden"
-                >
-                  <div
-                    className={`h-40 sm:h-48 bg-gradient-to-br ${product.bgColor} flex items-center justify-center text-5xl sm:text-6xl relative overflow-hidden`}
-                  >
-                    <div className="absolute inset-0 bg-black/10"></div>
-                    <span className="relative z-10 drop-shadow-lg">
-                      {product.image}
-                    </span>
-                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 sm:p-2">
-                        <i className="fas fa-heart text-white text-xs sm:text-sm opacity-70 hover:opacity-100 transition-opacity"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-5 sm:p-6">
-                    <h3 className="font-bold text-lg sm:text-xl text-gray-800 mb-1.5 sm:mb-2 group-hover:text-orange-600 transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-3 sm:mb-4 leading-relaxed">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xl sm:text-2xl font-bold text-orange-600">
-                        {product.price}
-                      </span>
-                      <button className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                </div>
-              ))}
-            </div>
-          </section>
+          <ProductsSlider recommends={recommends} />
 
           {/* Beta Signup Section */}
           <section className="bg-gradient-to-br from-[#353695] via-[#4a4db5] to-[#5b5fc7] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl mb-6 sm:mb-8 relative overflow-hidden mx-2 sm:mx-0">
@@ -613,4 +574,4 @@ const Homepage = () => {
   );
 };
 
-export default Homepage;
+export default LandingPage;
