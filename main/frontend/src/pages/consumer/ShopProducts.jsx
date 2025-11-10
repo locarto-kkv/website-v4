@@ -17,7 +17,7 @@ const ShopProducts = () => {
   let wishlist = [];
 
   if (currentUser?.type === "consumer") {
-    var { lists, fetchLists } = useConsumerDataStore();
+    const lists = useConsumerDataStore((s) => s.lists);
     cart = lists?.cart || [];
     wishlist = lists?.wishlist || [];
   }
@@ -71,11 +71,18 @@ const ShopProducts = () => {
     const isInWishlist = wishlist.some((item) => item.product_id === productId);
     try {
       if (isInWishlist) {
-        await removeFromList("wishlist", productId);
+        const newList = await removeFromList("wishlist", productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
       } else {
-        await updateList("wishlist", 1, productId);
+        const newList = await updateList("wishlist", 1, productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
       }
-      await fetchLists();
     } catch (err) {
       console.error("Error updating wishlist:", err);
     }
@@ -94,11 +101,18 @@ const ShopProducts = () => {
 
     try {
       if (newQty <= 0) {
-        await removeFromList("cart", productId);
+        const newList = await removeFromList("cart", productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
       } else {
-        await updateList("cart", newQty, productId);
+        const newList = await updateList("cart", newQty, productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
       }
-      await fetchLists();
     } catch (err) {
       console.error("Error updating cart:", err);
     }

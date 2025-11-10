@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 const CustomerLists = () => {
   const [listView, setListView] = useState("cart");
   const lists = useConsumerDataStore((s) => s.lists);
-  const fetchLists = useConsumerDataStore((s) => s.fetchLists);
   const { updateList, removeFromList } = ConsumerListService;
   const navigate = useNavigate();
 
@@ -21,11 +20,18 @@ const CustomerLists = () => {
 
     try {
       if (newQty <= 0) {
-        await removeFromList("cart", productId);
+        const newList = await removeFromList("cart", productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
       } else {
-        await updateList("cart", newQty, productId);
+        const newList = await updateList("cart", newQty, productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
       }
-      await fetchLists();
     } catch (err) {
       console.error("Error updating cart quantity:", err);
     }
@@ -33,8 +39,11 @@ const CustomerLists = () => {
 
   const removeFromCart = async (productId) => {
     try {
-      await removeFromList("cart", productId);
-      await fetchLists();
+      const newList = await removeFromList("cart", productId);
+      useConsumerDataStore.setState((state) => ({
+        ...state,
+        lists: { ...newList },
+      }));
     } catch (err) {
       console.error("Error removing from cart:", err);
     }
@@ -42,8 +51,11 @@ const CustomerLists = () => {
 
   const removeFromWishlist = async (productId) => {
     try {
-      await removeFromList("wishlist", productId);
-      await fetchLists();
+      const newList = await removeFromList("wishlist", productId);
+      useConsumerDataStore.setState((state) => ({
+        ...state,
+        lists: { ...newList },
+      }));
     } catch (err) {
       console.error("Error removing from wishlist:", err);
     }
@@ -55,9 +67,16 @@ const CustomerLists = () => {
       return;
     }
     try {
-      await updateList("cart", 1, item.id);
-      await removeFromList("wishlist", item.id);
-      await fetchLists();
+      const newList1 = await updateList("cart", 1, item.id);
+      useConsumerDataStore.setState((state) => ({
+        ...state,
+        lists: { ...newList1 },
+      }));
+      const newList2 = await removeFromList("wishlist", item.id);
+      useConsumerDataStore.setState((state) => ({
+        ...state,
+        lists: { ...newList2 },
+      }));
     } catch (err) {
       console.error("Error moving item to cart:", err);
     }

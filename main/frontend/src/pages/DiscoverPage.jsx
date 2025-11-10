@@ -130,7 +130,7 @@ const DiscoverPage = () => {
         <div className="mb-12 flex items-center justify-between animate-[fadeIn_1s_ease-in]">
           <div className="flex items-center space-x-4">
             <Link
-              to="/landing"
+              to="/"
               className="p-2 bg-white/80 backdrop-blur-sm rounded-full bg-gray-100 hover:bg-orange-400 transition-all duration-200 shadow-lg hover:scale-110"
               aria-label="Go back to home"
             >

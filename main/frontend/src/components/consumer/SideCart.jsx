@@ -26,9 +26,7 @@ const SideCart = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   // Assuming ConsumerListService provides these functions:
   const currentUser = useAuthStore((s) => s.currentUser);
-  const { removeFromList, updateList } = ConsumerListService;
-  const fetchLists = useConsumerDataStore((state) => state.fetchLists);
-
+  const { removeFromList } = ConsumerListService;
   const lists = useConsumerDataStore((state) => state.lists);
 
   // --- EFFECTS ---
