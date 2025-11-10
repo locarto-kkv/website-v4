@@ -52,10 +52,7 @@ const ProductSlider = ({ recommends }) => {
             >
               <div className="flex flex-col items-center text-center">
                 <img
-                  src={
-                    product.product_images?.[0]?.url ||
-                    "https://via.placeholder.com/200?text=No+Image"
-                  }
+                  src={product.product_images?.[0]?.url || "N/A"}
                   alt={product.name}
                   className="w-32 h-32 object-cover rounded-xl mb-4 border border-gray-200"
                 />

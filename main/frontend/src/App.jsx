@@ -86,7 +86,7 @@ function App() {
         <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
         <Route
-          path="/shops/:vendorId/products/:category"
+          path="/vendor/:vendorId/products/:category"
           element={<ShopProducts />}
         />
         <Route path="/product/:productId" element={<ProductViewPage />} />

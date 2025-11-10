@@ -286,7 +286,7 @@ const MapView = () => {
           );
           if (button) {
             button.onclick = () => {
-              const shopPath = `/shops/${
+              const shopPath = `/vendor/${
                 vendor.id
               }/products/${encodeURIComponent(currentCategory.name)}`;
               navigate(shopPath);

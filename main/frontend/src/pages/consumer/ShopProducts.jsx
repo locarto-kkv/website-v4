@@ -37,7 +37,9 @@ const ShopProducts = () => {
       if (!vendorId) return;
       setLoading(true);
       try {
-        await fetchProductsInBatch({ vendor_id: vendorId, category });
+        category === "all"
+          ? await fetchProductsInBatch({ vendor_id: vendorId })
+          : await fetchProductsInBatch({ vendor_id: vendorId, category });
       } catch (err) {
         console.error("Error fetching products:", err);
       } finally {

@@ -26,6 +26,11 @@ const asset5 = "/assets/5.png";
 
 const LandingPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState({
+    products: [],
+    vendors: [],
+  });
+  const [showDropdown, setShowDropdown] = useState(false);
   const [showError, setShowError] = useState(false);
   const [suggestedCategory, setSuggestedCategory] = useState("");
   const [name, setName] = useState("");
@@ -47,10 +52,33 @@ const LandingPage = () => {
     setBetaForm({ name: "", email: "" }); // Optionally clear email field after submission
   };
 
-  const handleInputChange = (e) => {
-    setSearchQuery(e.target.value);
-    if (showError) {
-      setShowError(false);
+  // 🟢 MODIFIED: handle live search input + API call
+  const handleInputChange = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    if (showError) setShowError(false);
+
+    if (query.trim().length === 0) {
+      setShowDropdown(false);
+      setSearchResults({ products: [], vendors: [] });
+      return;
+    }
+
+    try {
+      const results = await ConsumerSearchService.getSearchResults(query);
+      if (
+        results &&
+        (results.products.length > 0 || results.vendors.length > 0)
+      ) {
+        setSearchResults(results);
+        setShowDropdown(true);
+      } else {
+        setSearchResults({ products: [], vendors: [] });
+        setShowDropdown(false);
+      }
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+      setShowDropdown(false);
     }
   };
 
@@ -65,13 +93,13 @@ const LandingPage = () => {
   };
 
   const handleProductClick = (product) => {
-    if (availableCategories.includes(product.category.toLowerCase())) {
-      navigate(`/map?category=${product.category.replace(" ", "%20")}`);
-    } else {
-      console.log(
-        `Category "${product.category}" is not directly navigable via suggestions.`
-      );
-    }
+    navigate(`/product/${product.id}`);
+    setShowDropdown(false);
+  };
+
+  const handleVendorClick = (vendor) => {
+    navigate(`/vendor/${vendor.id}/products/all`);
+    setShowDropdown(false);
   };
 
   const handleSearch = (e) => {
@@ -111,7 +139,6 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
       <Navbar pageType="landing" />
-      {console.log(recommends)}
       {/* Background Assets */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
         <img
@@ -394,6 +421,50 @@ const LandingPage = () => {
                     </button>
                   </div>
                 </div>
+
+                {/* 🟢 Dropdown Results */}
+                {showDropdown && (
+                  <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-72 overflow-y-auto z-50 text-left">
+                    {searchResults.products.length === 0 &&
+                    searchResults.vendors.length === 0 ? (
+                      <div className="p-4 text-gray-500 text-sm">
+                        No results found.
+                      </div>
+                    ) : (
+                      <>
+                        {searchResults.products.map((product) => (
+                          <div
+                            key={`product-${product.id}`}
+                            onClick={() => handleProductClick(product)}
+                            className="flex justify-between items-center px-5 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-none transition"
+                          >
+                            <span className="font-medium text-gray-800">
+                              {product.name}
+                            </span>
+                            <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                              Product
+                            </span>
+                          </div>
+                        ))}
+
+                        {searchResults.vendors.map((vendor) => (
+                          <div
+                            key={`vendor-${vendor.id}`}
+                            onClick={() => handleVendorClick(vendor)}
+                            className="flex justify-between items-center px-5 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-none transition"
+                          >
+                            <span className="font-medium text-gray-800">
+                              {vendor.name}
+                            </span>
+                            <span className="text-xs font-semibold bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                              Vendor
+                            </span>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </form>
           </div>

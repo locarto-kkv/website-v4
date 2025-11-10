@@ -52,10 +52,7 @@ const BrandsSlider = ({ recommends }) => {
             >
               <div className="flex flex-col items-center text-center">
                 <img
-                  src={
-                    vendor.brand_logo_1 ||
-                    "https://via.placeholder.com/100?text=No+Logo"
-                  }
+                  src={vendor.brand_logo_1 || "N/A"}
                   alt={vendor.name}
                   className="w-20 h-20 rounded-full object-cover mb-4 border-2 border-[#f15b28] shadow-md"
                 />
