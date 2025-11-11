@@ -111,7 +111,6 @@ const VendorEditProfile = () => {
     toast.loading("Updating profile...");
 
     const { address, ...profile } = formData;
-
     try {
       await VendorProfileService.updateProfile({ profile, address });
       await fetchProfile();
@@ -166,7 +165,6 @@ const VendorEditProfile = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                required
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
             </div>
@@ -183,7 +181,6 @@ const VendorEditProfile = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
             </div>
@@ -200,7 +197,6 @@ const VendorEditProfile = () => {
                 name="phone_no"
                 value={formData.phone_no}
                 onChange={handleChange}
-                required
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
             </div>
@@ -243,7 +239,6 @@ const VendorEditProfile = () => {
                 name="address.address_line_1"
                 value={formData.address.address_line_1}
                 onChange={handleChange}
-                required
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
             </div>
@@ -277,7 +272,6 @@ const VendorEditProfile = () => {
                   name="address.state"
                   value={formData.address.state}
                   onChange={handleChange}
-                  required
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -294,7 +288,6 @@ const VendorEditProfile = () => {
                   name="address.pincode"
                   value={formData.address.pincode}
                   onChange={handleChange}
-                  required
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                 />
               </div>
@@ -313,7 +306,6 @@ const VendorEditProfile = () => {
                 name="address.country"
                 value={formData.address.country}
                 onChange={handleChange}
-                required
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
             </div>

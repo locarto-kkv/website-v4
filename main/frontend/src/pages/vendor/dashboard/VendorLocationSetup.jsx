@@ -163,15 +163,14 @@ const VendorLocationSetup = () => {
   // Set initial marker — from profile or setupForm
   useEffect(() => {
     if (!map) return;
-
     const { address, ...profile } = location.state;
     setSetupForm({ ...address, ...profile });
 
     if (isProfile) {
-      const [lat, lng] = location.state.coordinates;
+      const [lat, lng] = location.state.address.coordinates;
       fetchAddress(lat, lng);
     } else {
-      fetchLocationByPincode(location.state.pincode);
+      fetchLocationByPincode(location.state.address.pincode);
     }
   }, [map]);
 

@@ -7,7 +7,6 @@ const __filename = fileURLToPath(import.meta.url);
 export const getFileUploadUrl = async (id, name, file, bucket) => {
   try {
     const fileType = file.type;
-    const fileName = file.name;
     const fileSize = file.size;
 
     const formattedFileName = `${id}_${name}`;

@@ -45,29 +45,43 @@ export const updateProfile = async (req, res) => {
     }
 
     if (newProfileData.profile.brand_logo_1) {
+      await db.storage
+        .from("brand-logos")
+        .remove([`${userId}/${userId}_brand_logo_1`]);
+
       const imgUploadUrl = await getFileUploadUrl(
         userId,
+        "brand_logo_1",
         newProfileData.profile.brand_logo_1,
-        "brand_logos"
+        "brand-logos"
       );
 
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
 
       imgUploadUrls.brand_logo_1 = imgUploadUrl;
       newProfileData.profile.brand_logo_1 = imgPublicUrl;
+    } else {
+      imgUploadUrls.brand_logo_1 = null;
     }
 
     if (newProfileData.profile.brand_logo_2) {
+      await db.storage
+        .from("brand-logos")
+        .remove([`${userId}/${userId}_brand_logo_2`]);
+
       const imgUploadUrl = await getFileUploadUrl(
         userId,
+        "brand_logo_2",
         newProfileData.profile.brand_logo_2,
-        "brand_logos"
+        "brand-logos"
       );
 
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
 
       imgUploadUrls.brand_logo_2 = imgUploadUrl;
       newProfileData.profile.brand_logo_2 = imgPublicUrl;
+    } else {
+      imgUploadUrls.brand_logo_2 = null;
     }
 
     if (newProfileData.profile.documents) {
@@ -108,7 +122,7 @@ export const updateProfile = async (req, res) => {
       .select()
       .single();
 
-    sendAuthEmail({
+    await sendAuthEmail({
       profile: updatedUser,
       address: newProfileData.address,
       extra: newProfileData.extra,
