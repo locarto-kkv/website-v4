@@ -84,7 +84,6 @@ const ProductViewPage = () => {
         id: productId,
       });
       const revs = await ConsumerReviewService.getReviewsByProduct(productId);
-      console.log(revs);
 
       setProduct(prod[0]);
       setReviews(revs);
@@ -330,7 +329,6 @@ const ProductViewPage = () => {
             )}
 
             {/* Product Features */}
-            
           </div>
 
           {/* Product Details */}
