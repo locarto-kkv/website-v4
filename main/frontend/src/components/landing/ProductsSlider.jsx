@@ -89,7 +89,7 @@ const ProductsSlider = ({ recommends }) => {
         
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6">
           <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            RECOMMENDED PRODUCTS
+            Recommended Products
           </span>
         </h2>
         

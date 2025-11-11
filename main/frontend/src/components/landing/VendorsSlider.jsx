@@ -89,7 +89,7 @@ const VendorsSlider = ({ recommends }) => {
         
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6">
           <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent">
-            FEATURED VENDORS
+            Brands Handpicked for you
           </span>
         </h2>
         
