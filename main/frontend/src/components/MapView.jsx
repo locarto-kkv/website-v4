@@ -1,3 +1,5 @@
+// Add this to your MapView component - replace the existing component with this updated version
+
 import React, {
   useState,
   useEffect,
@@ -39,12 +41,16 @@ const MapView = () => {
   const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
   const dataLoading = useDataStore((s) => s.dataLoading);
 
-  console.log(blogs);
-
   // UI state
   const [showOverlay, setShowOverlay] = useState(true);
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState(null);
 
-  // Initialize currentCategoryIndex purely — no side-effects here
+  // Initialize currentCategoryIndex
   const initialIndex = (() => {
     if (categoryParam) {
       const idx = categories.findIndex(
@@ -57,7 +63,6 @@ const MapView = () => {
   const [currentCategoryIndex, setCurrentCategoryIndex] =
     useState(initialIndex);
 
-  // If a category param exists, hide overlay after mount (pure side-effect)
   useEffect(() => {
     if (categoryParam) {
       const idx = categories.findIndex(
@@ -68,18 +73,15 @@ const MapView = () => {
         setShowOverlay(false);
       }
     }
-    // only depends on categoryParam (derived from location.search)
   }, [categoryParam]);
 
   // Map & layers
   const [map, setMap] = useState(null);
-  // Create markerLayer only once AFTER leaflet is available (null initial)
   const markerLayer = useRef(null);
   const mapContainerRef = useRef(null);
   const invalidateSizeRequestRef = useRef(null);
-
-  // Keep track of last fetched category to avoid repeated fetches
   const lastFetchedCategoryRef = useRef(null);
+  const markersRef = useRef({});
 
   // Navigation functions
   const nextCategory = () =>
@@ -90,7 +92,6 @@ const MapView = () => {
       (prev) => (prev - 1 + categories.length) % categories.length
     );
 
-  // Select category and update URL
   const handleSelectCategory = (index) => {
     setCurrentCategoryIndex(index);
     setShowOverlay(false);
@@ -98,10 +99,54 @@ const MapView = () => {
     navigate(`/map?category=${encodeURIComponent(categoryName)}`);
   };
 
-  // Go back to category selection view
   const handleBackToCategories = () => {
     setShowOverlay(true);
+    setSearchQuery("");
+    setShowSearchResults(false);
     navigate("/map");
+  };
+
+  // Search functionality
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.trim().length === 0) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    // Filter vendors based on search query
+    const results = vendorsToDisplay.filter((vendor) =>
+      vendor.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    setSearchResults(results);
+    setShowSearchResults(true);
+  };
+
+  const handleSelectBrand = (vendor) => {
+    if (!map || !vendor.address?.[0]?.coordinates) return;
+
+    const coordinates = vendor.address[0].coordinates;
+    
+    // Zoom to the vendor location
+    map.setView(coordinates, 15, {
+      animate: true,
+      duration: 1,
+    });
+
+    // Open the marker popup
+    const marker = markersRef.current[vendor.id];
+    if (marker) {
+      marker.openPopup();
+      setSelectedMarker(vendor.id);
+    }
+
+    // Clear search
+    setSearchQuery("");
+    setShowSearchResults(false);
   };
 
   // Function to create custom Leaflet marker icons
@@ -132,7 +177,7 @@ const MapView = () => {
     []
   );
 
-  // Initialize map effect (runs only once)
+  // Initialize map effect
   useEffect(() => {
     if (map || !mapContainerRef.current) return;
 
@@ -155,7 +200,6 @@ const MapView = () => {
       }
     ).addTo(mapInstance);
 
-    // create and add the marker layer AFTER map is available
     markerLayer.current = L.layerGroup().addTo(mapInstance);
 
     setMap(mapInstance);
@@ -167,16 +211,13 @@ const MapView = () => {
       setMap(null);
       markerLayer.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // run once
+  }, []);
 
-  // Fetch products when category changes or overlay is hidden,
-  // but don't fetch repeatedly for the same category
+  // Fetch products when category changes
   useEffect(() => {
     const fetchCategoryProducts = async () => {
       if (!showOverlay) {
         const category = categories[currentCategoryIndex].name;
-        // If we already fetched this category and dataLoading is false, skip
         if (lastFetchedCategoryRef.current === category && !dataLoading) {
           return;
         }
@@ -190,10 +231,9 @@ const MapView = () => {
     };
 
     fetchCategoryProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showOverlay, currentCategoryIndex]);
 
-  // memoize vendors to display to avoid re-computing each render
+  // Memoize vendors to display
   const vendorsToDisplay = useMemo(() => {
     if (!blogs || !Array.isArray(blogs)) return [];
     return blogs.filter((vendor) => {
@@ -209,37 +249,32 @@ const MapView = () => {
     });
   }, [blogs]);
 
-  // Effect to update map markers when category or overlay or blogs change
+  // Update map markers
   useEffect(() => {
     if (!map || !markerLayer.current) return;
 
-    // Cancel any pending invalidateSize call
     if (invalidateSizeRequestRef.current) {
       cancelAnimationFrame(invalidateSizeRequestRef.current);
       invalidateSizeRequestRef.current = null;
     }
 
-    // Clear existing markers
     try {
       markerLayer.current.clearLayers();
+      markersRef.current = {};
     } catch (e) {
-      // ignore if layerGroup not ready
+      // ignore
     }
 
     if (!showOverlay) {
       const currentCategory = categories[currentCategoryIndex];
       const customIcon = createCustomIcon(currentCategory);
 
-      // Add markers for each vendor to display
       vendorsToDisplay.forEach((vendor) => {
         const coordinates = vendor.address?.[0]?.coordinates;
         if (!coordinates || coordinates.length !== 2) return;
 
-        // Leaflet expects [lat, lng]. If your stored coords are [lng, lat], flip them here.
-        // I'm assuming vendor.address[0].coordinates is [lat, lng] as per your previous usage.
         const marker = L.marker(coordinates, { icon: customIcon });
 
-        // Bind tooltip (hover text)
         marker.bindTooltip(vendor.name || "Unnamed Vendor", {
           permanent: false,
           direction: "top",
@@ -248,7 +283,6 @@ const MapView = () => {
           opacity: 0.9,
         });
 
-        // Prepare popup content
         const logo = vendor.brand_logo_1
           ? `<img src="${vendor.brand_logo_1}" alt="${vendor.name}" style="width:100%; max-height: 100px; object-fit: contain; border-radius:8px; margin-bottom:10px; background: #eee;" />`
           : "";
@@ -279,7 +313,6 @@ const MapView = () => {
           { maxWidth: 240, className: "modern-popup" }
         );
 
-        // When popup opens, attach button handler
         marker.on("popupopen", () => {
           const button = document.querySelector(
             `.view-products-btn[data-vendor-id="${vendor.id}"]`
@@ -295,9 +328,9 @@ const MapView = () => {
         });
 
         markerLayer.current.addLayer(marker);
+        markersRef.current[vendor.id] = marker;
       });
 
-      // Adjust map view to fit markers
       if (vendorsToDisplay.length > 0) {
         if (vendorsToDisplay.length === 1) {
           const coordinates = vendorsToDisplay[0].address?.[0]?.coordinates;
@@ -321,7 +354,6 @@ const MapView = () => {
         }
       });
     } else {
-      // overlay shown -> default center
       map.setView([19.076, 72.8777], 12);
       invalidateSizeRequestRef.current = requestAnimationFrame(() => {
         if (map) {
@@ -336,7 +368,6 @@ const MapView = () => {
         invalidateSizeRequestRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showOverlay, currentCategoryIndex, vendorsToDisplay, map]);
 
   const currentCategory = categories[currentCategoryIndex];
@@ -369,11 +400,70 @@ const MapView = () => {
           }}
         ></div>
 
-        {/* --- UI CONTROLS (Floating elements over the map) --- */}
+        {/* Search Bar - Shows when overlay is hidden */}
+        {!showOverlay && (
+          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-[9999] w-full max-w-md px-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-full blur-lg opacity-20" />
+              <div className="relative bg-white/95 backdrop-blur-md rounded-full shadow-2xl border border-white/20 flex items-center">
+                <div className="pl-5 pr-2">
+                  <i className="fas fa-search text-gray-400"></i>
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  placeholder="Search for a brand..."
+                  className="flex-grow py-3 pr-4 bg-transparent focus:outline-none text-gray-900 placeholder-gray-400 text-sm font-medium"
+                />
+              </div>
+
+              {/* Search Results Dropdown */}
+              {showSearchResults && (
+                <div className="absolute top-full mt-2 w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 max-h-64 overflow-y-auto">
+                  {searchResults.length === 0 ? (
+                    <div className="p-4 text-gray-500 text-sm text-center">
+                      No brands found
+                    </div>
+                  ) : (
+                    searchResults.map((vendor) => (
+                      <div
+                        key={vendor.id}
+                        onClick={() => handleSelectBrand(vendor)}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-none transition-colors"
+                      >
+                        {vendor.brand_logo_1 && (
+                          <img
+                            src={vendor.brand_logo_1}
+                            alt={vendor.name}
+                            className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                          />
+                        )}
+                        <div className="flex-grow">
+                          <div className="font-semibold text-gray-900 text-sm">
+                            {vendor.name}
+                          </div>
+                          {vendor.email && (
+                            <div className="text-xs text-gray-500 truncate">
+                              {vendor.email}
+                            </div>
+                          )}
+                        </div>
+                        <i className="fas fa-location-arrow text-orange-500"></i>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* UI CONTROLS */}
         {!showOverlay && (
           <>
-            {/* Desktop: Top Center "Back to Categories" Button */}
-            <div className="hidden lg:block absolute top-6 left-1/2 transform -translate-x-1/2 z-[9999]">
+            {/* Desktop: "Back to Categories" Button */}
+            <div className="hidden lg:block absolute top-24 left-1/2 transform -translate-x-1/2 z-[9999]">
               <button
                 onClick={handleBackToCategories}
                 className="group bg-black/40 backdrop-blur-lg hover:bg-black/60 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 border border-white/20 shadow-lg hover:shadow-xl flex items-center gap-2 text-sm"
@@ -397,9 +487,8 @@ const MapView = () => {
           </>
         )}
 
-        {/* --- CATEGORY SELECTION OVERLAYS --- */}
-
-        {/* Mobile Overlay Container (Slides up from bottom) */}
+        {/* CATEGORY SELECTION OVERLAYS */}
+        {/* Mobile Overlay */}
         <div
           className={`
             fixed bottom-0 left-0 right-0 z-[9998] lg:hidden
@@ -411,9 +500,7 @@ const MapView = () => {
             }
           `}
         >
-          {/* Mobile Card Content */}
           <div className="bg-gray-900/80 backdrop-blur-xl border-t border-white/10 p-5 rounded-t-2xl">
-            {/* Prev/Next Buttons and Icon */}
             <div className="flex justify-between items-center mb-4">
               <button
                 onClick={prevCategory}
@@ -440,7 +527,6 @@ const MapView = () => {
                 <i className="fas fa-chevron-right"></i>
               </button>
             </div>
-            {/* Category Name, Description, Explore Button */}
             <div className="text-center">
               <h2
                 className="text-3xl font-bold mb-2"
@@ -461,7 +547,7 @@ const MapView = () => {
           </div>
         </div>
 
-        {/* Desktop Overlay Container (Fades in/out, centered) */}
+        {/* Desktop Overlay */}
         <div
           className={`
             fixed inset-0 z-[9998] hidden lg:flex items-center justify-center
@@ -470,9 +556,7 @@ const MapView = () => {
             ${showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"}
           `}
         >
-          {/* Desktop Overlay Content */}
           <div className="relative w-full max-w-6xl mx-auto text-center px-6">
-            {/* Prev Button */}
             <button
               onClick={prevCategory}
               className="absolute left-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
@@ -480,7 +564,6 @@ const MapView = () => {
             >
               <i className="fas fa-chevron-left text-xl"></i>
             </button>
-            {/* Next Button */}
             <button
               onClick={nextCategory}
               className="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 hover:text-white hover:scale-110 transition-all bg-white/10 backdrop-blur-lg rounded-full w-14 h-14 flex items-center justify-center border border-white/20 z-10"
@@ -488,7 +571,6 @@ const MapView = () => {
             >
               <i className="fas fa-chevron-right text-xl"></i>
             </button>
-            {/* Category Icon, Name, Description */}
             <div className="relative">
               <div
                 className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl mb-6 mx-auto"
@@ -500,7 +582,6 @@ const MapView = () => {
                   className={`${currentCategory.icon} text-3xl text-white`}
                 ></i>
               </div>
-              {/* Category Name (Clickable) */}
               <button
                 onClick={() => handleSelectCategory(currentCategoryIndex)}
                 className="text-7xl font-bold mb-6 cursor-pointer hover:scale-105 transition-all duration-300 bg-transparent border-none"
@@ -511,7 +592,6 @@ const MapView = () => {
               >
                 {currentCategory.name}
               </button>
-              {/* Description */}
               <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
                 {currentCategory.description}
               </p>
@@ -520,7 +600,7 @@ const MapView = () => {
         </div>
       </div>
 
-      {/* --- STYLES --- */}
+      {/* STYLES */}
       <style>{`
         .leaflet-container {
           -webkit-tap-highlight-color: transparent;
