@@ -1,4 +1,5 @@
-// Add this to your MapView component - replace the existing component with this updated version
+// MapView.jsx - Complete fixed code
+// Replace your existing MapView component with this code
 
 import React, {
   useState,
@@ -275,12 +276,13 @@ const MapView = () => {
 
         const marker = L.marker(coordinates, { icon: customIcon });
 
+        // Brand names always visible
         marker.bindTooltip(vendor.name || "Unnamed Vendor", {
-          permanent: false,
+          permanent: true,
           direction: "top",
           offset: [0, -38],
           className: "custom-tooltip",
-          opacity: 0.9,
+          opacity: 1,
         });
 
         const logo = vendor.brand_logo_1
@@ -374,13 +376,13 @@ const MapView = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 relative">
-      {/* Logo */}
-      <div className="absolute top-4 left-4 z-[9999]">
+      {/* Logo - Fixed at top left with highest z-index */}
+      <div className="absolute top-4 left-4 z-[10000] pointer-events-auto">
         <Link to="/" className="group">
           <img
             src={locartoImg}
             alt="Locarto"
-            className="h-12 sm:h-14 w-auto object-contain"
+            className="h-12 sm:h-14 w-auto object-contain drop-shadow-lg"
           />
         </Link>
       </div>
@@ -402,7 +404,7 @@ const MapView = () => {
 
         {/* Search Bar - Shows when overlay is hidden */}
         {!showOverlay && (
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-[9999] w-full max-w-md px-4">
+          <div className="absolute top-20 lg:top-4 lg:left-1/2 lg:transform lg:-translate-x-1/2 left-1/2 transform -translate-x-1/2 z-[9999] w-full max-w-md px-4 lg:px-0">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-full blur-lg opacity-20" />
               <div className="relative bg-white/95 backdrop-blur-md rounded-full shadow-2xl border border-white/20 flex items-center">
@@ -463,7 +465,7 @@ const MapView = () => {
         {!showOverlay && (
           <>
             {/* Desktop: "Back to Categories" Button */}
-            <div className="hidden lg:block absolute top-24 left-1/2 transform -translate-x-1/2 z-[9999]">
+            <div className="hidden lg:flex absolute top-4 right-4 z-[9999]">
               <button
                 onClick={handleBackToCategories}
                 className="group bg-black/40 backdrop-blur-lg hover:bg-black/60 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 border border-white/20 shadow-lg hover:shadow-xl flex items-center gap-2 text-sm"
@@ -614,15 +616,22 @@ const MapView = () => {
           user-select: none;
         }
 
+        /* Brand name tooltip - always visible and positioned above popup */
         .custom-tooltip {
-          background: rgba(17, 24, 39, 0.9) !important;
-          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          background: rgba(17, 24, 39, 0.95) !important;
+          border: 1px solid rgba(255, 255, 255, 0.3) !important;
           border-radius: 8px !important;
           color: white !important;
           font-weight: 600 !important;
           padding: 6px 12px !important;
           font-size: 12px !important;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+          pointer-events: none !important;
+          z-index: 1000 !important;
+        }
+
+        .leaflet-tooltip-top:before {
+          border-top-color: rgba(17, 24, 39, 0.95) !important;
         }
 
         .leaflet-popup-content-wrapper {
