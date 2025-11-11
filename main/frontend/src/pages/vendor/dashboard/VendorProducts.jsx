@@ -24,8 +24,8 @@ const VendorProducts = () => {
     product_images: [], // Stores { file: File } or { name: string, url: string }
   });
 
-  const { products, getAnalytics } = useVendorDataStore(); // Assuming products is an array
-  console.log(products);
+  const products = useVendorDataStore((s) => s.products);
+  const fetchAnalytics = useVendorDataStore((s) => s.fetchAnalytics);
 
   // Example categories - adjust as needed or fetch dynamically
   const predefinedCategories = ["All", "Personal Care", "Accessories"]; // Make sure 'All' is first
@@ -81,7 +81,7 @@ const VendorProducts = () => {
       } else {
         await VendorProductService.addProduct(productData);
       }
-      await getAnalytics(); // Refresh data after add/edit
+      await fetchAnalytics(); // Refresh data after add/edit
       resetForm(); // Reset form state
       setShowModal(false); // Close modal
     } catch (error) {
@@ -114,7 +114,7 @@ const VendorProducts = () => {
       setLoading(true);
       try {
         await VendorProductService.deleteProduct(productIdToDelete);
-        await getAnalytics();
+        await fetchAnalytics();
         // Optionally add success feedback (e.g., toast)
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -693,7 +693,6 @@ const VendorProducts = () => {
                     </label>
                     {/* Image Preview Area */}
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
-                      {console.log(productData.product_images)}
                       {productData.product_images?.map((image, index) => (
                         <div
                           key={index}

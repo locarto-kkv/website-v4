@@ -165,14 +165,13 @@ const VendorLocationSetup = () => {
     if (!map) return;
 
     const { address, ...profile } = location.state;
-
     setSetupForm({ ...address, ...profile });
 
     if (isProfile) {
-      const [lat, lng] = location.state.address.coordinates;
+      const [lat, lng] = location.state.coordinates;
       fetchAddress(lat, lng);
     } else {
-      fetchLocationByPincode(location.state.address.pincode);
+      fetchLocationByPincode(location.state.pincode);
     }
   }, [map]);
 
