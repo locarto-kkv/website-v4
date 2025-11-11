@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 import { VendorProfileService } from "../../../services/vendor/vendorProfileService";
+import toast from "react-hot-toast";
 
 const VendorLocationSetup = () => {
   const navigate = useNavigate();
@@ -30,6 +31,10 @@ const VendorLocationSetup = () => {
     state: "",
     country: "",
     website: "",
+    ifsc_code: "",
+    account_number: "",
+    account_name: "",
+    bank_name: "",
     coordinates: { lat: "", lng: "" },
   });
 
@@ -163,8 +168,8 @@ const VendorLocationSetup = () => {
   // Set initial marker — from profile or setupForm
   useEffect(() => {
     if (!map) return;
-    const { address, ...profile } = location.state;
-    setSetupForm({ ...address, ...profile });
+    const { address, bank_detail, ...profile } = location.state;
+    setSetupForm({ ...address, ...profile, ...bank_detail });
 
     if (isProfile) {
       const [lat, lng] = location.state.address.coordinates;
@@ -192,6 +197,8 @@ const VendorLocationSetup = () => {
   }, [map]);
 
   const handleNextStep = async () => {
+    toast.loading("Submitting Data...");
+
     let profileData;
 
     if (isProfile) {
@@ -212,6 +219,12 @@ const VendorLocationSetup = () => {
           country: setupForm.country,
           coordinates: [setupForm.coordinates.lat, setupForm.coordinates.lng],
         },
+        bank_detail: {
+          ifsc_code: setupForm.ifsc_code,
+          account_number: setupForm.account_number,
+          account_name: setupForm.account_name,
+          bank_name: setupForm.bank_name,
+        },
       };
     } else {
       profileData = {
@@ -224,6 +237,12 @@ const VendorLocationSetup = () => {
           state: setupForm.state,
           country: setupForm.country,
           coordinates: [setupForm.coordinates.lat, setupForm.coordinates.lng],
+        },
+        bank_detail: {
+          ifsc_code: setupForm.ifsc_code,
+          account_number: setupForm.account_number,
+          account_name: setupForm.account_name,
+          bank_name: setupForm.bank_name,
         },
         extra: {
           businessType: setupForm.businessType,
@@ -239,6 +258,8 @@ const VendorLocationSetup = () => {
 
     await VendorProfileService.updateProfile(profileData);
     await fetchProfile();
+    toast.dismiss();
+    toast.success("Your data has been submitted successfully!");
     navigate("/vendor/dashboard/profile");
   };
 

@@ -141,10 +141,7 @@ const VendorProfile = () => {
 
     try {
       const newProfile = await VendorProfileService.updateProfile(payload);
-      useVendorDataStore((state) => {
-        console.log(state);
-        return;
-      }); // Refresh profile data
+
       toast.dismiss();
       toast.success("Documents uploaded successfully!");
       setNewFiles([]); // Clear the new files list
@@ -322,16 +319,18 @@ const VendorProfile = () => {
                   </div>
                 </div>
                 {/* Edit Button */}
-                <div className="absolute top-2 right-2 sm:relative sm:top-auto sm:right-auto sm:self-start">
-                  <button
-                    onClick={openEditProfile}
-                    className="flex items-center gap-1 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-white/50 text-black py-1.5 px-3 sm:py-2 sm:px-4 rounded-lg font-semibold transition-all hover:shadow-md text-xs sm:text-sm"
-                  >
-                    <i className="fas fa-edit text-xs"></i>
-                    <span className="hidden sm:inline">Edit Profile</span>
-                    <span className="sm:hidden">Edit</span>
-                  </button>
-                </div>
+                {profile?.status === "verified" && (
+                  <div className="absolute top-2 right-2 sm:relative sm:top-auto sm:right-auto sm:self-start">
+                    <button
+                      onClick={openEditProfile}
+                      className="flex items-center gap-1 bg-white/40 hover:bg-white/60 backdrop-blur-sm border border-white/50 text-black py-1.5 px-3 sm:py-2 sm:px-4 rounded-lg font-semibold transition-all hover:shadow-md text-xs sm:text-sm"
+                    >
+                      <i className="fas fa-edit text-xs"></i>
+                      <span className="hidden sm:inline">Edit Profile</span>
+                      <span className="sm:hidden">Edit</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

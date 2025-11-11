@@ -13,7 +13,9 @@ export const getProfile = async (req, res) => {
 
     const { data } = await db
       .from("vendors")
-      .select("*, address: addresses_vendor_id_fkey(*)")
+      .select(
+        "*, address: addresses_vendor_id_fkey(*), bank_detail: bank_details_vendor_id_fkey(*)"
+      )
       .eq("id", userId)
       .single();
 
@@ -115,6 +117,15 @@ export const updateProfile = async (req, res) => {
         );
     }
 
+    if (newProfileData.bank_detail) {
+      const { data, error } = await db
+        .from("bank_details")
+        .upsert(
+          { ...newProfileData.bank_detail, vendor_id: userId },
+          { onConflict: "id" }
+        );
+    }
+
     const { data: updatedUser, error } = await db
       .from("vendors")
       .update(newProfileData.profile)
@@ -126,6 +137,7 @@ export const updateProfile = async (req, res) => {
       profile: updatedUser,
       address: newProfileData.address,
       extra: newProfileData.extra,
+      bank_detail: newProfileData.bank_detail,
     });
 
     if (error) throw error;
@@ -150,6 +162,7 @@ export const deleteProfile = async (req, res) => {
 
     await db.from("vendors").delete().eq("id", userId);
     await db.from("addresses").delete().eq("vendor_id", userId);
+    await db.from("bank_details").delete().eq("vendor_id", userId);
     await deleteFolder(userId, "brand-logos");
     await deleteFolder(userId, "vendor-documents");
 

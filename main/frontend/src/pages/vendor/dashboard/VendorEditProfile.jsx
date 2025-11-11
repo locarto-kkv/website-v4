@@ -16,6 +16,9 @@ const VendorEditProfile = () => {
     email: "",
     phone_no: "",
     website: "",
+    brand_logo_1: null,
+    brand_logo_2: null,
+    documents: [],
     address: {
       address_line_1: "",
       address_line_2: "",
@@ -24,9 +27,12 @@ const VendorEditProfile = () => {
       country: "",
       coordinates: [],
     },
-    brand_logo_1: null,
-    brand_logo_2: null,
-    documents: [],
+    bank_detail: {
+      bank_name: "",
+      account_name: "",
+      account_number: "",
+      ifsc_code: "",
+    },
   });
   const [loading, setLoading] = useState(false);
   const [imagePreview1, setImagePreview1] = useState(null);
@@ -51,6 +57,21 @@ const VendorEditProfile = () => {
         coordinates:
           profile.address?.[profile.address.length - 1]?.coordinates || [],
       },
+      bank_detail: {
+        id: profile.bank_detail?.[profile.bank_detail.length - 1]?.id || "",
+        bank_name:
+          profile.bank_detail?.[profile.bank_detail.length - 1]?.bank_name ||
+          "",
+        account_name:
+          profile.bank_detail?.[profile.bank_detail.length - 1]?.account_name ||
+          "",
+        account_number:
+          profile.bank_detail?.[profile.bank_detail.length - 1]
+            ?.account_number || "",
+        ifsc_code:
+          profile.bank_detail?.[profile.bank_detail.length - 1]?.ifsc_code ||
+          "",
+      },
     });
     setImagePreview1(profile.brand_logo_1 || null);
     setImagePreview2(profile.brand_logo_2 || null);
@@ -66,6 +87,15 @@ const VendorEditProfile = () => {
         address: {
           ...prev.address,
           [addressField]: value,
+        },
+      }));
+    } else if (name.startsWith("bank_detail")) {
+      const bankField = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        bank_detail: {
+          ...prev.bank_detail,
+          [bankField]: value,
         },
       }));
     } else if (type === "file") {
@@ -110,9 +140,14 @@ const VendorEditProfile = () => {
     setLoading(true);
     toast.loading("Updating profile...");
 
-    const { address, ...profile } = formData;
+    const { address, bank_detail, ...profile } = formData;
+
     try {
-      await VendorProfileService.updateProfile({ profile, address });
+      await VendorProfileService.updateProfile({
+        profile,
+        address,
+        bank_detail,
+      });
       await fetchProfile();
 
       toast.dismiss();
@@ -157,7 +192,7 @@ const VendorEditProfile = () => {
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-600 mb-1"
               >
-                Business Name *
+                Business Name
               </label>
               <input
                 type="text"
@@ -173,7 +208,7 @@ const VendorEditProfile = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-600 mb-1"
               >
-                Contact Email *
+                Contact Email
               </label>
               <input
                 type="email"
@@ -189,7 +224,7 @@ const VendorEditProfile = () => {
                 htmlFor="phone_no"
                 className="block text-sm font-medium text-gray-600 mb-1"
               >
-                Contact Phone *
+                Contact Phone
               </label>
               <input
                 type="tel"
@@ -231,7 +266,7 @@ const VendorEditProfile = () => {
                 htmlFor="address_line_1"
                 className="block text-sm font-medium text-gray-600 mb-1"
               >
-                Address Line 1 *
+                Address Line 1
               </label>
               <input
                 type="text"
@@ -264,7 +299,7 @@ const VendorEditProfile = () => {
                   htmlFor="state"
                   className="block text-sm font-medium text-gray-600 mb-1"
                 >
-                  State *
+                  State
                 </label>
                 <input
                   type="text"
@@ -280,7 +315,7 @@ const VendorEditProfile = () => {
                   htmlFor="pincode"
                   className="block text-sm font-medium text-gray-600 mb-1"
                 >
-                  Pincode *
+                  Pincode
                 </label>
                 <input
                   type="text"
@@ -297,7 +332,7 @@ const VendorEditProfile = () => {
                 htmlFor="country"
                 className="block text-sm font-medium text-gray-600 mb-1"
               >
-                Country *
+                Country
               </label>
               {/* You might want a dropdown here */}
               <input
@@ -308,6 +343,81 @@ const VendorEditProfile = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               />
+            </div>
+          </div>
+        </section>
+
+        {/* Bank Details */}
+        <section className="border-b pb-6">
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">
+            Bank Details
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label
+                htmlFor="bank_name"
+                className="block text-sm font-medium text-gray-600 mb-1"
+              >
+                Bank Name
+              </label>
+              <input
+                type="text"
+                id="bank_name"
+                name="bank_detail.bank_name"
+                value={formData.bank_detail.bank_name}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="account_name"
+                className="block text-sm font-medium text-gray-600 mb-1"
+              >
+                Account Name
+              </label>
+              <input
+                type="text"
+                id="account_name"
+                name="bank_detail.account_name"
+                value={formData.bank_detail.account_name}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="account_number"
+                  className="block text-sm font-medium text-gray-600 mb-1"
+                >
+                  Account Number
+                </label>
+                <input
+                  type="text"
+                  id="account_number"
+                  name="bank_detail.account_number"
+                  value={formData.bank_detail.account_number}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="ifsc_code"
+                  className="block text-sm font-medium text-gray-600 mb-1"
+                >
+                  IFSC Code
+                </label>
+                <input
+                  type="text"
+                  id="ifsc_code"
+                  name="bank_detail.ifsc_code"
+                  value={formData.bank_detail.ifsc_code}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
             </div>
           </div>
         </section>
