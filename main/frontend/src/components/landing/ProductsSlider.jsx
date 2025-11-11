@@ -2,41 +2,55 @@ import React, { useState, useEffect, useRef } from "react";
 
 const ProductsSlider = ({ recommends }) => {
   const products = recommends?.products || [];
-  const [offset, setOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const containerRef = useRef(null);
-  const cardWidth = 320 + 32;
+  const scrollRef = useRef(null);
+  const animationRef = useRef(null);
 
   useEffect(() => {
-    if (isPaused || products.length === 0) return;
+    if (products.length === 0) return;
 
-    const interval = setInterval(() => {
-      setOffset((prev) => {
-        const newOffset = prev - 1;
-        if (Math.abs(newOffset) >= cardWidth * products.length) return 0;
-        return newOffset;
-      });
-    }, 30);
+    const scroll = scrollRef.current;
+    if (!scroll) return;
 
-    return () => clearInterval(interval);
-  }, [isPaused, products.length, cardWidth]);
+    let scrollPos = 0;
+    const scrollSpeed = 0.5; // Reduced speed for smoothness
+
+    const animate = () => {
+      if (!isPaused && scroll) {
+        scrollPos += scrollSpeed;
+        
+        // Reset when scrolled past first set
+        if (scrollPos >= scroll.scrollWidth / 3) {
+          scrollPos = 0;
+        }
+        
+        scroll.scrollLeft = scrollPos;
+      }
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPaused, products.length]);
 
   const handleNext = () => {
-    setOffset((prev) => {
-      const newOffset = prev - cardWidth;
-      if (Math.abs(newOffset) >= cardWidth * products.length) return 0;
-      return newOffset;
-    });
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 352, behavior: 'smooth' });
+    }
   };
 
   const handlePrev = () => {
-    setOffset((prev) => {
-      const newOffset = prev + cardWidth;
-      if (newOffset > 0) return -cardWidth * (products.length - 1);
-      return newOffset;
-    });
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -352, behavior: 'smooth' });
+    }
   };
 
+  // Triple the array for seamless loop
   const extendedProducts = products.length > 0 
     ? [...products, ...products, ...products] 
     : [];
@@ -79,7 +93,6 @@ const ProductsSlider = ({ recommends }) => {
 
       {/* Slider Container */}
       <div
-        ref={containerRef}
         className="relative"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -106,10 +119,9 @@ const ProductsSlider = ({ recommends }) => {
         </button>
 
         <div
-          className="flex gap-8 transition-transform duration-500"
-          style={{
-            transform: `translateX(${offset}px)`,
-          }}
+          ref={scrollRef}
+          className="flex gap-8 overflow-x-hidden"
+          style={{ scrollBehavior: 'auto' }}
         >
           {extendedProducts.map((product, index) => (
             <div
@@ -183,18 +195,8 @@ const ProductsSlider = ({ recommends }) => {
         </div>
       </div>
 
-      {/* Pause Indicator */}
-      {isPaused && (
-        <div className="text-center mt-8">
-          <span className="inline-flex items-center gap-2 bg-gray-100 px-5 py-2.5 rounded-full shadow-md">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-gray-600">
-              <rect x="6" y="4" width="4" height="16" rx="1" />
-              <rect x="14" y="4" width="4" height="16" rx="1" />
-            </svg>
-            <span className="text-sm font-semibold text-gray-600">Paused</span>
-          </span>
-        </div>
-      )}
+      
+     
     </div>
   );
 };
