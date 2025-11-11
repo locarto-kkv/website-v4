@@ -310,12 +310,12 @@ const Navbar = ({ pageType = "homepage" }) => {
               </div>
 
               <Link
-                to={pageType === "homepage" ? "/home" : "/"}
+                to={pageType === "landing" ? "/home" : "/"}
                 className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-orange-50 hover:text-orange-500 rounded-lg transition-colors font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <i className="fas fa-home w-5 text-center"></i>
-                {pageType === "homepage" ? "About Us" : "Home"}
+                {pageType === "landing" ? "About Us" : "Home"}
               </Link>
 
               <Link
