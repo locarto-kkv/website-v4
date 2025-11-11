@@ -6,6 +6,14 @@ const ProductsSlider = ({ recommends }) => {
   const scrollRef = useRef(null);
   const animationRef = useRef(null);
 
+  // Define scroll step: 290px on small screens (w-[280px] + gap/padding), 352px on desktop
+  const getScrollStep = () => {
+    if (window.innerWidth < 640) { // Assuming 'sm' is 640px
+      return 290; // Adjusted for new 280px tile width
+    }
+    return 352;
+  }
+
   useEffect(() => {
     if (products.length === 0) return;
 
@@ -43,9 +51,10 @@ const ProductsSlider = ({ recommends }) => {
 
   const handleNext = () => {
     if (scrollRef.current) {
+      const step = getScrollStep(); // Use responsive step
       const currentScroll = scrollRef.current.scrollLeft;
       scrollRef.current.scrollTo({ 
-        left: currentScroll + 352, 
+        left: currentScroll + step, 
         behavior: 'smooth' 
       });
     }
@@ -53,9 +62,10 @@ const ProductsSlider = ({ recommends }) => {
 
   const handlePrev = () => {
     if (scrollRef.current) {
+      const step = getScrollStep(); // Use responsive step
       const currentScroll = scrollRef.current.scrollLeft;
       scrollRef.current.scrollTo({ 
-        left: currentScroll - 352, 
+        left: currentScroll - step, 
         behavior: 'smooth' 
       });
     }
@@ -71,7 +81,7 @@ const ProductsSlider = ({ recommends }) => {
   }
 
   return (
-    <div className="w-full overflow-hidden relative py-16 sm:py-24 px-2 sm:px-4" id="products">
+    <div className="w-full overflow-hidden relative py-16 sm:py-24 px-0 sm:px-4" id="products">
       {/* Simplified Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 right-20 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl" />
@@ -79,7 +89,7 @@ const ProductsSlider = ({ recommends }) => {
       </div>
 
       {/* Section Header */}
-      <div className="text-center mb-16 sm:mb-20 relative z-10">
+      <div className="text-center mb-16 sm:mb-20 relative z-10 px-4 sm:px-0">
         <div className="relative inline-block mb-6">
           <div className="relative inline-flex items-center gap-3 bg-blue-100 px-6 sm:px-8 py-3 rounded-full text-xs sm:text-sm font-bold text-[#353695] shadow-lg">
             <span className="w-2 h-2 bg-[#353695] rounded-full" />
@@ -102,17 +112,17 @@ const ProductsSlider = ({ recommends }) => {
         </p>
       </div>
 
-      {/* Slider Container with padding for arrows */}
-      <div className="relative px-16 sm:px-20">
+      {/* Slider Container with responsive padding */}
+      <div className="relative px-0 sm:px-20">
         <div
           className="relative"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Navigation Arrows - Positioned outside */}
+          {/* Navigation Arrows - Adjusted for mobile */}
           <button
             onClick={handlePrev}
-            className="absolute -left-16 sm:-left-20 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-50 transition-all duration-300 hover:scale-110 border border-gray-100"
+            className="absolute -left-4 sm:-left-20 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/80 sm:bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-50 transition-all duration-300 hover:scale-110 border border-gray-100"
             aria-label="Previous"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[#353695]">
@@ -122,7 +132,7 @@ const ProductsSlider = ({ recommends }) => {
           
           <button
             onClick={handleNext}
-            className="absolute -right-16 sm:-right-20 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-50 transition-all duration-300 hover:scale-110 border border-gray-100"
+            className="absolute -right-4 sm:-right-20 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/80 sm:bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-50 transition-all duration-300 hover:scale-110 border border-gray-100"
             aria-label="Next"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[#353695]">
@@ -133,13 +143,13 @@ const ProductsSlider = ({ recommends }) => {
           {/* Scrollable container with padding to prevent border cut-off */}
           <div
             ref={scrollRef}
-            className="flex gap-8 overflow-x-hidden py-4"
+            className="flex gap-4 sm:gap-8 overflow-x-hidden py-4 px-4 sm:px-0"
             style={{ scrollBehavior: 'auto' }}
           >
             {extendedProducts.map((product, index) => (
               <div
                 key={`${product.id}-${index}`}
-                className="flex-shrink-0 w-[300px] sm:w-[320px] group"
+                className="flex-shrink-0 w-[280px] sm:w-[320px] group"
               >
                 {/* Main Card */}
                 <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 h-full hover:shadow-xl hover:-translate-y-2 hover:border-purple-200">
