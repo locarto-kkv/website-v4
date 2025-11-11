@@ -1,21 +1,19 @@
 // src/pages/LandingPage.jsx
-import React, { useEffect, useState } from "react";
-import SearchIcon from "../components/SearchIcon.jsx";
-import Navbar from "../components/Navbar.jsx";
-import Footer from "../components/Footer.jsx";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getGreeting } from "../lib/utils.js";
-import { getRandomMsg } from "../services/welcomeMsgs.js";
-import { submitBeta } from "../services/betaService.js";
-
-import VendorsSlider from "../components/landing/VendorsSlider.jsx";
-import ProductsSlider from "../components/landing/ProductsSlider.jsx";
-
 import { useAuthStore } from "../store/useAuthStore.jsx";
 import { useDataStore } from "../store/useDataStore.jsx";
 import { useConsumerDataStore } from "../store/consumer/consumerDataStore.jsx";
 import { useVendorDataStore } from "../store/vendor/vendorDataStore.jsx";
 import { ConsumerSearchService } from "../services/consumer/consumerSearchService.js";
+import { getGreeting } from "../lib/utils.js";
+import { getRandomMsg } from "../services/welcomeMsgs.js";
+import { submitBeta } from "../services/betaService.js";
+
+import SearchIcon from "../components/SearchIcon.jsx";
+import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
+import InteractiveGrid from "../components/landing/InteractiveGrid.jsx"; 
 
 // Background Assets - Now using public folder paths
 const asset1 = "/assets/1.png";
@@ -506,13 +504,28 @@ const LandingPage = () => {
             }
           `}</style>
 
-          <VendorsSlider recommends={recommends} />
+          {/* --- REPLACED VendorsSlider WITH InteractiveGrid --- */}
+          <InteractiveGrid
+            title="Brands Handpicked for you"
+            subtitle="Meet the innovative brands shaping tomorrow's marketplace"
+            data={recommends.vendors || []}
+            type="vendor"
+          />
+          {/* --- END REPLACEMENT --- */}
 
-          <ProductsSlider recommends={recommends} />
+          {/* --- REPLACED ProductsSlider WITH InteractiveGrid --- */}
+          <InteractiveGrid
+            title="Recommended Products"
+            subtitle="Curated collections from emerging brands you'll love"
+            data={recommends.products || []}
+            type="product"
+          />
+          {/* --- END REPLACEMENT --- */}
+
 
           {/* Beta Signup Section */}
           <section className="bg-gradient-to-br from-[#353695] via-[#4a4db5] to-[#5b5fc7] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl mb-6 sm:mb-8 relative overflow-hidden mx-2 sm:mx-0">
-            {/* ... (keep beta signup section as is) ... */}
+            {/* Background effects */}
             <div className="absolute inset-0">
               <div className="absolute top-10 left-10 w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
               <div
@@ -546,11 +559,11 @@ const LandingPage = () => {
                     type="text"
                     placeholder="Your full name"
                     name="name"
-                    value={betaForm.name} // Connect to state
+                    value={betaForm.name}
                     onChange={(e) =>
                       setBetaForm((prev) => ({ ...prev, name: e.target.value }))
-                    } // Connect to handler
-                    required // Keep required
+                    }
+                    required
                     className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 bg-white/95 backdrop-blur-sm font-medium shadow-lg transition-all duration-300 group-hover:bg-white text-sm sm:text-base"
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -560,14 +573,14 @@ const LandingPage = () => {
                     type="email"
                     name="email"
                     placeholder="Your email address"
-                    value={betaForm.email} // Connect to state
+                    value={betaForm.email}
                     onChange={(e) =>
                       setBetaForm((prev) => ({
                         ...prev,
                         email: e.target.value,
                       }))
-                    } // Connect to handler
-                    required // Keep required
+                    }
+                    required
                     className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white/30 bg-white/95 backdrop-blur-sm font-medium shadow-lg transition-all duration-300 group-hover:bg-white text-sm sm:text-base"
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -601,7 +614,6 @@ const LandingPage = () => {
       {/* Error Message Modal */}
       {showError && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          {/* ... (keep error modal content as is) ... */}
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 mx-4 transform animate-in">
             <div className="flex justify-between items-start mb-4 sm:mb-6">
               <div className="flex items-center gap-3">
