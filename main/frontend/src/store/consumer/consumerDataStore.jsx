@@ -8,6 +8,7 @@ export const useConsumerDataStore = create((set, get) => ({
   orders: [],
   lists: [],
   profile: [],
+  vendorInCart: null,
   dataLoading: false,
 
   loadCache: (name) => {
@@ -83,7 +84,11 @@ export const useConsumerDataStore = create((set, get) => ({
     set({ dataLoading: true });
     try {
       const response = await ConsumerListService.getLists();
-      set({ lists: response });
+
+      set({
+        lists: response,
+        vendorInCart: response.cart?.[0]?.vendor_id || null,
+      });
       // get().setCache("consumer_lists", response);
       return response;
     } catch (error) {

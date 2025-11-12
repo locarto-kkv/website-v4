@@ -56,6 +56,7 @@ const ProductViewPage = () => {
   const { updateList, removeFromList } = ConsumerListService;
 
   const lists = useConsumerDataStore((s) => s.lists);
+  const vendorInCart = useConsumerDataStore((s) => s.vendorInCart);
 
   const isConsumer = currentUser?.type === "consumer";
 
@@ -132,20 +133,38 @@ const ProductViewPage = () => {
       toast.error("Please log in as a customer to add items.");
       return;
     }
+
+    const vendorId = product.vendor_id;
+
     try {
       if (cartItem?.quantity === 1 && delta < 1) {
         const newList = await removeFromList("cart", product.id);
         useConsumerDataStore.setState((state) => ({
           ...state,
           lists: { ...newList },
+          vendorInCart: null,
         }));
       } else if (!cartItem?.quantity) {
+        if (vendorInCart && vendorId !== vendorInCart) {
+          toast.error(
+            "Only one brand is allowed in cart at a time. Please remove previous brand to add a different one"
+          );
+          return;
+        }
         const newList = await updateList("cart", "1", product.id);
         useConsumerDataStore.setState((state) => ({
           ...state,
           lists: { ...newList },
+          vendorInCart: vendorId,
         }));
       } else {
+        if (vendorInCart && vendorId !== vendorInCart) {
+          toast.error(
+            "Only one brand is allowed in cart at a time. Please remove previous brand to add a different one"
+          );
+          return;
+        }
+
         const newList = await updateList(
           "cart",
           cartItem.quantity + delta,
@@ -154,6 +173,7 @@ const ProductViewPage = () => {
         useConsumerDataStore.setState((state) => ({
           ...state,
           lists: { ...newList },
+          vendorInCart: vendorId,
         }));
       }
     } catch (error) {
@@ -166,8 +186,17 @@ const ProductViewPage = () => {
       toast.error("Please log in as a customer to buy.");
       return;
     }
+
+    const vendorId = product.vendor_id;
+
     try {
       if (!cartItem?.quantity) {
+        if (vendorInCart && vendorId !== vendorInCart) {
+          toast.error(
+            "Only one brand is allowed in cart at a time. Please remove previous brand to add a different one"
+          );
+          return;
+        }
         const newList = await updateList("cart", "1", product.id);
         useConsumerDataStore.setState((state) => ({
           ...state,

@@ -228,7 +228,10 @@ const SideCart = ({ isOpen, onClose }) => {
                     {/* Remove Button */}
                     <button
                       className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0"
-                      onClick={() => removeFromCart(item.product_id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFromCart(item.product_id);
+                      }}
                       title="Remove item"
                       aria-label={`Remove ${item.name} from cart`}
                     >

@@ -9,8 +9,12 @@ import toast from "react-hot-toast";
 
 const ShopProducts = () => {
   const { vendorId, category } = useParams();
-  const { currentUser } = useAuthStore();
-  const { blogs, fetchProductsInBatch } = useDataStore();
+  const currentUser = useAuthStore((s) => s.currentUser);
+  const blogs = useDataStore((s) => s.blogs);
+  const vendorInCart = useConsumerDataStore((s) => s.vendorInCart);
+  const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
+  console.log(vendorInCart);
+
   const { updateList, removeFromList } = ConsumerListService;
 
   let cart = [];
@@ -26,8 +30,80 @@ const ShopProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const toggleWishlist = async (e, productId) => {
+    e.preventDefault(); // Prevent navigation when clicking wishlist
+    e.stopPropagation();
+
+    if (currentUser?.type !== "consumer") {
+      toast.error("Please Login as Consumer");
+      return;
+    }
+    const isInWishlist = wishlist.some((item) => item.product_id === productId);
+    try {
+      if (isInWishlist) {
+        const newList = await removeFromList("wishlist", productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
+      } else {
+        const newList = await updateList("wishlist", 1, productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
+      }
+    } catch (err) {
+      console.error("Error updating wishlist:", err);
+    }
+  };
+
+  const handleCartChange = async (e, product, currentQty, delta) => {
+    e.preventDefault(); // Prevent navigation when clicking cart buttons
+    e.stopPropagation();
+
+    if (currentUser?.type !== "consumer") {
+      toast.error("Please Login as Consumer");
+      return;
+    }
+
+    const productId = product.id;
+    const vendorId = product.vendor_id;
+
+    if (vendorInCart && vendorId !== vendorInCart) {
+      toast.error(
+        "Only one brand is allowed in cart at a time. Please remove previous brand to add a different one"
+      );
+      return;
+    }
+
+    const newQty = currentQty + delta;
+
+    try {
+      if (newQty <= 0) {
+        const newList = await removeFromList("cart", productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+          vendorInCart: null,
+        }));
+      } else {
+        const newList = await updateList("cart", newQty, productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+          vendorInCart: vendorId,
+        }));
+      }
+    } catch (err) {
+      console.error("Error updating cart:", err);
+    }
+  };
+
   useEffect(() => {
     const foundVendor = blogs?.find((v) => String(v.id) === String(vendorId));
+    console.log(blogs);
+
     setVendor(foundVendor || null);
     setProducts(foundVendor?.products || []);
   }, [blogs, vendorId]);
@@ -61,64 +137,6 @@ const ShopProducts = () => {
         </Link>
       </div>
     );
-
-  const toggleWishlist = async (e, productId) => {
-    e.preventDefault(); // Prevent navigation when clicking wishlist
-    e.stopPropagation();
-
-    if (currentUser?.type !== "consumer") {
-      toast.error("Please Login as Consumer");
-      return;
-    }
-    const isInWishlist = wishlist.some((item) => item.product_id === productId);
-    try {
-      if (isInWishlist) {
-        const newList = await removeFromList("wishlist", productId);
-        useConsumerDataStore.setState((state) => ({
-          ...state,
-          lists: { ...newList },
-        }));
-      } else {
-        const newList = await updateList("wishlist", 1, productId);
-        useConsumerDataStore.setState((state) => ({
-          ...state,
-          lists: { ...newList },
-        }));
-      }
-    } catch (err) {
-      console.error("Error updating wishlist:", err);
-    }
-  };
-
-  const handleCartChange = async (e, productId, currentQty, delta) => {
-    e.preventDefault(); // Prevent navigation when clicking cart buttons
-    e.stopPropagation();
-
-    if (currentUser?.type !== "consumer") {
-      toast.error("Please Login as Consumer");
-      return;
-    }
-
-    const newQty = currentQty + delta;
-
-    try {
-      if (newQty <= 0) {
-        const newList = await removeFromList("cart", productId);
-        useConsumerDataStore.setState((state) => ({
-          ...state,
-          lists: { ...newList },
-        }));
-      } else {
-        const newList = await updateList("cart", newQty, productId);
-        useConsumerDataStore.setState((state) => ({
-          ...state,
-          lists: { ...newList },
-        }));
-      }
-    } catch (err) {
-      console.error("Error updating cart:", err);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 font-sans">
@@ -269,7 +287,7 @@ const ShopProducts = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={(e) =>
-                            handleCartChange(e, product.id, quantity, -1)
+                            handleCartChange(e, product, quantity, -1)
                           }
                           disabled={quantity <= 0}
                           className="rounded-full w-8 h-8 flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-all duration-200 border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -281,7 +299,7 @@ const ShopProducts = () => {
                         </span>
                         <button
                           onClick={(e) =>
-                            handleCartChange(e, product.id, quantity, +1)
+                            handleCartChange(e, product, quantity, +1)
                           }
                           className="rounded-full w-8 h-8 flex items-center justify-center bg-white/10 text-white hover:bg-white/20 transition-all duration-200 border border-white/20"
                         >
