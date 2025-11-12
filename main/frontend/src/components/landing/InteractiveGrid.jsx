@@ -236,22 +236,26 @@ const InteractiveGrid = ({ data, type }) => {
         </p>
       </div>
 
-      {/* Interactive Grid Container: Always 2 columns on mobile/tablet */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
-        {/* Limits to 2 items on mobile/tablet, 4 on desktop */}
-        {data.slice(0, displayLimit).map((item, index) => (
-          <div
-            key={item.id || index}
-            className="animate-fade-in-up-v2"
-            style={{ animationDelay: `${index * 0.15 + 0.1}s` }}
-          >
-            <CardComponent
-              {...(type === "vendor"
-                ? { vendor: item, isMobile }
-                : { product: item, isMobile })}
-            />
-          </div>
-        ))}
+      {/* Interactive Grid Container: Centered with flex wrapper */}
+      <div className="w-full flex justify-center px-4">
+        <div 
+          className="flex flex-wrap justify-center gap-4 sm:gap-6 max-w-[1400px] w-full"
+        >
+          {/* Limits to 2 items on mobile/tablet, 4 on desktop */}
+          {data.slice(0, displayLimit).map((item, index) => (
+            <div
+              key={item.id || index}
+              className="animate-fade-in-up-v2 w-[calc(50%-0.5rem)] sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] lg:max-w-[300px]"
+              style={{ animationDelay: `${index * 0.15 + 0.1}s` }}
+            >
+              <CardComponent
+                {...(type === "vendor"
+                  ? { vendor: item, isMobile }
+                  : { product: item, isMobile })}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* View All Button */}
