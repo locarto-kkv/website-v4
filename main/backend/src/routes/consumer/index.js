@@ -9,6 +9,7 @@ import listRoutes from "./consumer_list.routes.js";
 import blogRoutes from "./blog.routes.js";
 import recommendRoutes from "./recommend.routes.js";
 import searchRoutes from "./search.routes.js";
+import paymentRoutes from "./payment.routes.js";
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.use("/list", listRoutes);
 router.use("/blog", blogRoutes);
 router.use("/recommend", recommendRoutes);
 router.use("/search", searchRoutes);
+router.use("/payment", paymentRoutes);
 
 import { submitBeta } from "../../controllers/beta.controller.js";
 router.post("/submit-beta", submitBeta);

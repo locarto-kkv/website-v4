@@ -7,6 +7,7 @@ import { useConsumerDataStore } from "../../store/consumer/consumerDataStore";
 import { formatCurrency } from "../../lib/utils";
 import { ConsumerListService } from "../../services/consumer/consumerListService"; // Import list service
 import { ConsumerOrderService } from "../../services/consumer/consumerOrderService"; // Import order service
+import { ConsumerPaymentService } from "../../services/consumer/consumerPaymentService";
 import toast from "react-hot-toast"; // Import toast for notifications
 
 // --- Mock Data for Saved Addresses (Keep as is) ---
@@ -14,10 +15,10 @@ const mockSavedAddresses = [
   {
     id: "addr1",
     label: "Home",
-    fullName: "Jane Doe",
-    addressLine1: "123 Main St",
-    addressLine2: "Apt 4B",
-    city: "Mumbai",
+    name: "Jane Doe",
+    address_line_1: "123 Main St",
+    address_line_2: "Apt 4B",
+    country: "India",
     state: "Maharashtra",
     pincode: "400001",
     phone: "555-1234",
@@ -26,10 +27,10 @@ const mockSavedAddresses = [
   {
     id: "addr2",
     label: "Work",
-    fullName: "Jane Doe",
-    addressLine1: "456 Business Ave",
-    addressLine2: "Suite 100",
-    city: "Mumbai",
+    name: "Jane Doe",
+    address_line_1: "456 Business Ave",
+    address_line_2: "Suite 100",
+    country: "India",
     state: "Maharashtra",
     pincode: "400050",
     phone: "555-5678",
@@ -45,19 +46,24 @@ const CheckoutPage = () => {
 
   // State for form data (can be used for 'Add New Address' or editing)
   const [formData, setFormData] = useState({
-    fullName: "",
     email: "",
     phone: "",
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
+    address_line_1: "",
+    address_line_2: "",
     state: "",
+    country: "",
     pincode: "",
     label: "",
-    cardNumber: "",
-    cardName: "",
-    expiryDate: "",
-    cvv: "",
+  });
+
+  const [orderData, setOrderData] = useState({
+    payment_mode: "",
+    amount: "",
+    payment_status: "",
+    delivery_date: "",
+    order_status: "",
+    support_status: "",
+    payment_date: "",
   });
 
   const [savedAddresses] = useState(mockSavedAddresses);
@@ -91,12 +97,10 @@ const CheckoutPage = () => {
   );
   const deliveryFee = subtotal > 0 && subtotal < 500 ? 49 : 0;
   const platformFee = subtotal > 0 ? 5 : 0;
-  const gstAndRestaurantCharges = subtotal * 0.18;
-  // Apply discount *before* calculating the final total
-  const totalBeforeDiscount =
-    subtotal + deliveryFee + platformFee + gstAndRestaurantCharges;
-  const total = Math.max(0, totalBeforeDiscount - discountAmount); // Ensure total doesn't go below 0
-  // --- End Recalculate Totals ---
+
+  // const totalBeforeDiscount = subtotal + deliveryFee + platformFee;
+  // const total = Math.max(0, totalBeforeDiscount - discountAmount);
+  const total = subtotal;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -111,9 +115,11 @@ const CheckoutPage = () => {
   const handleAddNewAddress = () => {
     setFormData((prev) => ({
       ...prev,
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
+      email: "",
+      phone_no: "",
+      address_line_1: "",
+      address_line_2: "",
+      country: "",
       state: "",
       pincode: "",
       label: "",
@@ -126,16 +132,14 @@ const CheckoutPage = () => {
     e.preventDefault();
     console.log("Saving new address:", formData);
     const newAddress = {
-      id: `addr${Date.now()}`,
       label: formData.label || "Other",
-      fullName: formData.fullName,
-      addressLine1: formData.addressLine1,
-      addressLine2: formData.addressLine2,
-      city: formData.city,
+      name: formData.name,
+      address_line_1: formData.address_line_1,
+      address_line_2: formData.address_line_2,
+      country: formData.country,
       state: formData.state,
       pincode: formData.pincode,
-      phone: formData.phone,
-      isDefault: false,
+      phone_no: formData.phone_no,
     };
     mockSavedAddresses.push(newAddress);
     setSelectedAddressId(newAddress.id);
@@ -237,9 +241,9 @@ const CheckoutPage = () => {
       // --- This is a MOCK order placement ---
       // In a real app, you would call:
       // const newOrder = await ConsumerOrderService.placeOrder(cartData, paymentInfo);
-      
+
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Create a mock order object to pass to the confirmation page
       const mockOrder = {
@@ -250,39 +254,37 @@ const CheckoutPage = () => {
         payment_status: "paid", // Placeholder
         amount: total,
         // Pass cart items as 'products'
-        products: cartItems.map(item => ({
+        products: cartItems.map((item) => ({
           product_id: item.id || item.product_id,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
-          product_images: item.product_images
+          product_images: item.product_images,
         })),
         // Pass bill details for the summary
         billDetails: {
           subtotal,
           deliveryFee,
           platformFee,
-          gstAndRestaurantCharges,
           discountAmount,
-          total
-        }
+          total,
+        },
       };
       // --- End of Mock ---
 
       // Simulate clearing the cart in Zustand
       // In a real app, the backend might confirm this or you'd re-fetch lists
-      useConsumerDataStore.setState(state => ({
+      useConsumerDataStore.setState((state) => ({
         ...state,
-        lists: { ...state.lists, cart: [] }
+        lists: { ...state.lists, cart: [] },
       }));
-      
+
       setLoading(false);
       toast.dismiss();
       toast.success("Order placed successfully!");
 
       // Navigate to the new order-placed page with the order data
-      navigate('/consumer/order-placed', { state: { order: mockOrder } });
-
+      navigate("/consumer/order-placed", { state: { order: mockOrder } });
     } catch (error) {
       setLoading(false);
       toast.dismiss();
@@ -295,9 +297,11 @@ const CheckoutPage = () => {
     (addr) => addr.id === selectedAddressId
   );
   const displayAddressString = selectedAddress
-    ? `${selectedAddress.addressLine1}${
-        selectedAddress.addressLine2 ? ", " + selectedAddress.addressLine2 : ""
-      }, ${selectedAddress.city}, ${selectedAddress.state} - ${
+    ? `${selectedAddress.address_line_1}${
+        selectedAddress.address_line_2
+          ? ", " + selectedAddress.address_line_2
+          : ""
+      }, ${selectedAddress.state}, ${selectedAddress.country} - ${
         selectedAddress.pincode
       }`
     : "No address selected";
@@ -356,13 +360,13 @@ const CheckoutPage = () => {
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
                 {/* Items List (Interactive) */}
                 <div className="flex-shrink-0 md:max-w-md lg:max-w-lg w-full">
-                  {" "}
                   {/* Adjusted max-width */}
                   <h4 className="font-semibold text-gray-800 mb-3 text-base">
                     Items in Cart ({cartItems.length})
                   </h4>
                   {/* Make this section taller and scrollable */}
                   <div className="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2 border rounded-lg p-3 bg-gray-50/50">
+                    {console.log(cartItems)}
                     {cartItems.map((item) => {
                       const itemId = item.id || item.product_id; // Handle potential differences in ID field name
                       return (
@@ -461,10 +465,6 @@ const CheckoutPage = () => {
                       <span>Platform Fee</span>
                       <span>{formatCurrency(platformFee)}</span>
                     </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>GST & Restaurant Charges</span>
-                      <span>{formatCurrency(gstAndRestaurantCharges)}</span>
-                    </div>
 
                     {/* --- Promo Code Input --- */}
                     <div className="pt-3 border-t">
@@ -481,12 +481,14 @@ const CheckoutPage = () => {
                           value={promoCode}
                           onChange={(e) => setPromoCode(e.target.value)}
                           placeholder="Enter code"
-                          className="flex-1 checkout-input !py-1.5 !text-xs" // Smaller input
+                          className="flex-1 checkout-input !py-1.5 !text-xs hover:cursor-not-allowed"
+                          disabled
                         />
                         <button
                           type="button"
                           onClick={handleApplyPromo}
-                          className="px-3 py-1.5 bg-orange-500 text-white rounded-lg font-semibold text-xs hover:bg-orange-600 transition-colors"
+                          className="px-3 py-1.5 bg-orange-500 text-white rounded-lg font-semibold text-xs transition-colors hover:cursor-not-allowed"
+                          disabled
                         >
                           Apply
                         </button>
@@ -514,9 +516,9 @@ const CheckoutPage = () => {
                     )}
 
                     <div className="flex justify-between items-center text-base font-bold pt-3 border-t mt-3">
-                      <span className="text-gray-900">To Pay</span>
+                      <span className="text-gray-900">Total</span>
                       <span className="text-lg text-orange-600">
-                        {formatCurrency(total)}{" "}
+                        {formatCurrency(total)}
                         {/* Total now includes discount */}
                       </span>
                     </div>
@@ -528,11 +530,9 @@ const CheckoutPage = () => {
 
             {/* --- BOTTOM: Address and Payment Side-by-Side (Keep as is) --- */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-              {" "}
               {/* Grid for bottom sections */}
               {/* --- Address Section (Keep as is) --- */}
               <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 p-5 sm:p-6 h-fit">
-                {" "}
                 {/* Added h-fit */}
                 {/* ... Address content ... */}
                 <div className="flex items-center justify-between gap-3 mb-5">
@@ -581,17 +581,14 @@ const CheckoutPage = () => {
                             >
                               {addr.label || "Address"}
                             </label>
-                            {addr.isDefault && (
-                              <span className="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-medium">
-                                Default
-                              </span>
-                            )}
                           </div>
                           <p className="text-gray-600 text-xs">{`${
-                            addr.addressLine1
+                            addr.address_line_1
                           }${
-                            addr.addressLine2 ? ", " + addr.addressLine2 : ""
-                          }, ${addr.city}, ${addr.pincode}`}</p>
+                            addr.address_line_2
+                              ? ", " + addr.address_line_2
+                              : ""
+                          }, ${addr.country}, ${addr.pincode}`}</p>
                           <p className="text-gray-600 text-xs mt-1">
                             Contact: {addr.phone}
                           </p>
@@ -600,16 +597,7 @@ const CheckoutPage = () => {
                     ))}
                   </div>
                 )}
-                {!showNewAddressForm && selectedAddress && (
-                  <div className="p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm font-medium text-green-800">
-                      Delivering to:
-                    </p>
-                    <p className="text-xs text-gray-700 mt-1">
-                      {displayAddressString}
-                    </p>
-                  </div>
-                )}
+
                 {showNewAddressForm && (
                   <form
                     onSubmit={handleSaveNewAddress}
@@ -620,16 +608,16 @@ const CheckoutPage = () => {
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <input
-                        name="fullName"
-                        value={formData.fullName}
+                        name="email"
+                        value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="Full Name *"
-                        required
+                        placeholder="Email"
                         className="checkout-input"
+                        type="email"
                       />
                       <input
-                        name="phone"
-                        value={formData.phone}
+                        name="phone_no"
+                        value={formData.phone_no}
                         onChange={handleInputChange}
                         placeholder="Phone Number *"
                         required
@@ -638,34 +626,34 @@ const CheckoutPage = () => {
                       />
                     </div>
                     <input
-                      name="addressLine1"
-                      value={formData.addressLine1}
+                      name="address_line_1"
+                      value={formData.address_line_1}
                       onChange={handleInputChange}
                       placeholder="Address Line 1 (House No, Building, Street, Area) *"
                       required
                       className="checkout-input"
                     />
                     <input
-                      name="addressLine2"
-                      value={formData.addressLine2}
+                      name="address_line_2"
+                      value={formData.address_line_2}
                       onChange={handleInputChange}
                       placeholder="Address Line 2 (Landmark, etc.) (Optional)"
                       className="checkout-input"
                     />
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <input
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        placeholder="City *"
-                        required
-                        className="checkout-input"
-                      />
-                      <input
                         name="state"
                         value={formData.state}
                         onChange={handleInputChange}
                         placeholder="State *"
+                        required
+                        className="checkout-input"
+                      />
+                      <input
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        placeholder="Country *"
                         required
                         className="checkout-input"
                       />
@@ -682,7 +670,8 @@ const CheckoutPage = () => {
                       name="label"
                       value={formData.label || ""}
                       onChange={handleInputChange}
-                      placeholder="Save as (e.g., Home, Work) (Optional)"
+                      placeholder="Save as (e.g., Home, Work)"
+                      required
                       className="checkout-input"
                     />
 
@@ -707,7 +696,6 @@ const CheckoutPage = () => {
               {/* --- End Address Section --- */}
               {/* --- Payment Section --- */}
               <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 p-5 sm:p-6 h-fit">
-                {" "}
                 {/* Added h-fit */}
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -725,7 +713,12 @@ const CheckoutPage = () => {
                         type="radio"
                         name="paymentMethod"
                         id="pay-card"
-                        defaultChecked
+                        onClick={() =>
+                          setOrderData((prev) => ({
+                            ...prev,
+                            payment_mode: "prepaid",
+                          }))
+                        }
                         className="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500"
                       />
                       <label
@@ -746,6 +739,13 @@ const CheckoutPage = () => {
                         type="radio"
                         name="paymentMethod"
                         id="pay-upi"
+                        onClick={() =>
+                          setOrderData((prev) => ({
+                            ...prev,
+                            payment_mode: "prepaid",
+                          }))
+                        }
+                        defaultChecked
                         className="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500"
                       />
                       <label
@@ -762,6 +762,12 @@ const CheckoutPage = () => {
                         type="radio"
                         name="paymentMethod"
                         id="pay-cod"
+                        onClick={() =>
+                          setOrderData((prev) => ({
+                            ...prev,
+                            payment_mode: "cod",
+                          }))
+                        }
                         className="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500"
                       />
                       <label
@@ -773,18 +779,12 @@ const CheckoutPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="mt-5 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-orange-500 p-3 rounded-lg">
-                  <div className="flex items-start gap-2">
-                    <i className="fas fa-info-circle text-orange-500 mt-1 text-xs"></i>
-                    <p className="text-xs text-gray-700">
-                      Payment integration is currently a placeholder. No actual
-                      charges will be made.
-                    </p>
-                  </div>
-                </div>
+
                 <button
                   onClick={handleSubmitOrder}
-                  disabled={(!selectedAddressId && !showNewAddressForm) || loading}
+                  disabled={
+                    (!selectedAddressId && !showNewAddressForm) || loading
+                  }
                   className={`w-full mt-6 bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white py-3 sm:py-3 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 ${
                     (!selectedAddressId && !showNewAddressForm) || loading
                       ? "opacity-50 cursor-not-allowed"
@@ -796,10 +796,15 @@ const CheckoutPage = () => {
                       <i className="fas fa-spinner fa-spin"></i>
                       Placing Order...
                     </>
-                  ) : (
+                  ) : orderData.payment_mode === "cod" ? (
                     <>
                       <i className="fas fa-lock"></i>
                       Place Order
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-money-bill"></i>
+                      Proceed to Pay
                     </>
                   )}
                 </button>
@@ -833,7 +838,7 @@ const CheckoutPage = () => {
             .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 10px; }
             .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; border: 1px solid #f8fafc; }
             .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
-       `}</style>{" "}
+       `}</style>
     </div>
   );
 };

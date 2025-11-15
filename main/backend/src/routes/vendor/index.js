@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import authRoutes from "./auth.route.js";
+import authRoutes from "./auth.routes.js";
 import productRoutes from "./product.routes.js";
 import profileRoutes from "./profile.routes.js";
 import orderRoutes from "./order.routes.js";
