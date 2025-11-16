@@ -41,6 +41,7 @@ const mockSavedAddresses = [
 
 const CheckoutPage = () => {
   const lists = useConsumerDataStore((s) => s.lists);
+  const profile = useConsumerDataStore((s) => s.profile);
   const { updateList, removeFromList } = ConsumerListService;
   const navigate = useNavigate();
 
@@ -57,13 +58,20 @@ const CheckoutPage = () => {
   });
 
   const [orderData, setOrderData] = useState({
-    payment_mode: "",
+    payment_mode: "prepaid",
     amount: "",
     payment_status: "",
     delivery_date: "",
     order_status: "",
     support_status: "",
     payment_date: "",
+  });
+
+  const [bills, setBills] = useState({
+    total: "",
+    subtotal: "",
+    deliveryFee: "",
+    platformFee: "",
   });
 
   const [savedAddresses] = useState(mockSavedAddresses);
@@ -83,24 +91,27 @@ const CheckoutPage = () => {
   // --- Add Loading State ---
   const [loading, setLoading] = useState(false);
 
-  // Scroll to top when component mounts
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const subtotal = lists?.cart?.reduce(
+      (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
+      0
+    );
+    const deliveryFee = subtotal > 0 && subtotal < 500 ? 49 : 0;
+    const platformFee = subtotal > 0 ? 5 : 0;
+
+    // const totalBeforeDiscount = subtotal + bills.deliveryFee + platformFee;
+    // const total = Math.max(0, totalBeforeDiscount - discountAmount);
+    const total = subtotal;
+
+    setOrderData((prev) => ({ ...prev, amount: total }));
+    setBills((prev) => ({
+      ...prev,
+      total,
+      deliveryFee,
+      platformFee,
+      subtotal,
+    }));
   }, []);
-
-  const cartItems = lists?.cart || [];
-
-  // --- Recalculate Totals (including discount) ---
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
-    0
-  );
-  const deliveryFee = subtotal > 0 && subtotal < 500 ? 49 : 0;
-  const platformFee = subtotal > 0 ? 5 : 0;
-
-  // const totalBeforeDiscount = subtotal + deliveryFee + platformFee;
-  // const total = Math.max(0, totalBeforeDiscount - discountAmount);
-  const total = subtotal;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -147,9 +158,8 @@ const CheckoutPage = () => {
     alert("New address saved (mock)!");
   };
 
-  // --- Cart Item Interaction Handlers ---
   const handleQuantityChange = async (productId, delta) => {
-    const currentItem = cartItems.find(
+    const currentItem = lists?.cart.find(
       (item) => (item.id || item.product_id) === productId
     );
     if (!currentItem) return;
@@ -197,14 +207,12 @@ const CheckoutPage = () => {
       }
     }
   };
-  // --- End Cart Item Handlers ---
 
-  // --- Promo Code Handler ---
   const handleApplyPromo = () => {
     // --- Placeholder Promo Logic ---
     const code = promoCode.trim().toUpperCase();
     if (code === "LOCARTO10") {
-      const calculatedDiscount = subtotal * 0.1; // 10% discount
+      const calculatedDiscount = bills.subtotal * 0.1; // 10% discount
       setDiscountAmount(calculatedDiscount);
       setPromoMessage({
         text: `Applied! You saved ${formatCurrency(calculatedDiscount)}.`,
@@ -221,7 +229,6 @@ const CheckoutPage = () => {
     }
     // --- End Placeholder Promo Logic ---
   };
-  // --- End Promo Code Handler ---
 
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
@@ -234,17 +241,34 @@ const CheckoutPage = () => {
       return;
     }
 
+    try {
+      const options = await ConsumerPaymentService.initiatePayment(
+        profile,
+        orderData
+      );
+
+      console.log(options);
+
+      const rzp = new window.Razorpay(options);
+
+      rzp.on("payment.failed", (response) => {
+        console.error("Payment failed:", response.error);
+        toast.error("Payment failed. Please try again.");
+        setLoading(false);
+      });
+
+      rzp.open();
+    } catch (error) {
+      console.error("Order placement error:", error);
+      toast.error("Failed to place order. Please try again.");
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     toast.loading("Placing your order...");
-
+    setTimeout(() => {}, 3000);
     try {
-      // --- This is a MOCK order placement ---
-      // In a real app, you would call:
-      // const newOrder = await ConsumerOrderService.placeOrder(cartData, paymentInfo);
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
       // Create a mock order object to pass to the confirmation page
       const mockOrder = {
         id: Math.floor(Math.random() * 100000) + 90000, // Random order ID
@@ -252,9 +276,9 @@ const CheckoutPage = () => {
         order_status: "pending", // Initial status
         payment_mode: "Mock Payment", // Placeholder
         payment_status: "paid", // Placeholder
-        amount: total,
+        amount: bills.total,
         // Pass cart items as 'products'
-        products: cartItems.map((item) => ({
+        products: lists?.cart.map((item) => ({
           product_id: item.id || item.product_id,
           name: item.name,
           price: item.price,
@@ -262,29 +286,19 @@ const CheckoutPage = () => {
           product_images: item.product_images,
         })),
         // Pass bill details for the summary
-        billDetails: {
-          subtotal,
-          deliveryFee,
-          platformFee,
-          discountAmount,
-          total,
-        },
+        billDetails: bills,
       };
-      // --- End of Mock ---
 
-      // Simulate clearing the cart in Zustand
-      // In a real app, the backend might confirm this or you'd re-fetch lists
-      useConsumerDataStore.setState((state) => ({
-        ...state,
-        lists: { ...state.lists, cart: [] },
-      }));
+      // useConsumerDataStore.setState((state) => ({
+      //   ...state,
+      //   lists: { ...state.lists, cart: [] },
+      // }));
 
       setLoading(false);
       toast.dismiss();
       toast.success("Order placed successfully!");
 
-      // Navigate to the new order-placed page with the order data
-      navigate("/consumer/order-placed", { state: { order: mockOrder } });
+      // navigate("/consumer/order-placed", { state: { order: mockOrder } });
     } catch (error) {
       setLoading(false);
       toast.dismiss();
@@ -292,19 +306,6 @@ const CheckoutPage = () => {
       toast.error("Failed to place order. Please try again.");
     }
   };
-
-  const selectedAddress = savedAddresses.find(
-    (addr) => addr.id === selectedAddressId
-  );
-  const displayAddressString = selectedAddress
-    ? `${selectedAddress.address_line_1}${
-        selectedAddress.address_line_2
-          ? ", " + selectedAddress.address_line_2
-          : ""
-      }, ${selectedAddress.state}, ${selectedAddress.country} - ${
-        selectedAddress.pincode
-      }`
-    : "No address selected";
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -320,7 +321,7 @@ const CheckoutPage = () => {
           </button>
         </div>
 
-        {cartItems.length === 0 ? (
+        {lists?.cart?.length === 0 ? (
           // Empty Cart Message (Keep as is)
           <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 p-8 sm:p-12 text-center max-w-2xl mx-auto mt-10">
             <div className="relative inline-block mb-6">
@@ -362,12 +363,11 @@ const CheckoutPage = () => {
                 <div className="flex-shrink-0 md:max-w-md lg:max-w-lg w-full">
                   {/* Adjusted max-width */}
                   <h4 className="font-semibold text-gray-800 mb-3 text-base">
-                    Items in Cart ({cartItems.length})
+                    Items in Cart ({lists?.cart?.length})
                   </h4>
                   {/* Make this section taller and scrollable */}
                   <div className="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2 border rounded-lg p-3 bg-gray-50/50">
-                    {console.log(cartItems)}
-                    {cartItems.map((item) => {
+                    {lists?.cart?.map((item) => {
                       const itemId = item.id || item.product_id; // Handle potential differences in ID field name
                       return (
                         <div
@@ -447,13 +447,13 @@ const CheckoutPage = () => {
                     {/* ... existing bill details ... */}
                     <div className="flex justify-between text-gray-600">
                       <span>Item Total</span>
-                      <span>{formatCurrency(subtotal)}</span>
+                      <span>{formatCurrency(bills.subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>Delivery Fee</span>
                       <span>
-                        {deliveryFee > 0 ? (
-                          formatCurrency(deliveryFee)
+                        {bills.deliveryFee > 0 ? (
+                          formatCurrency(bills.deliveryFee)
                         ) : (
                           <span className="text-green-600 font-medium">
                             FREE
@@ -463,7 +463,7 @@ const CheckoutPage = () => {
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>Platform Fee</span>
-                      <span>{formatCurrency(platformFee)}</span>
+                      <span>{formatCurrency(bills.platformFee)}</span>
                     </div>
 
                     {/* --- Promo Code Input --- */}
@@ -518,7 +518,7 @@ const CheckoutPage = () => {
                     <div className="flex justify-between items-center text-base font-bold pt-3 border-t mt-3">
                       <span className="text-gray-900">Total</span>
                       <span className="text-lg text-orange-600">
-                        {formatCurrency(total)}
+                        {formatCurrency(bills.total)}
                         {/* Total now includes discount */}
                       </span>
                     </div>

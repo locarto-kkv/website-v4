@@ -1,13 +1,10 @@
 import logger from "../../lib/logger.js";
 import { env } from "../../lib/env.js";
 import Razorpay from "razorpay";
+import crypto from "crypto";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
-const FRONTEND_URL =
-  env.BACKEND_NODE_ENV === "development"
-    ? env.FRONTEND_URL
-    : env.PRODUCTION_URL;
 
 // import { validateWebhookSignature } from "razorpay/dist/utils/razorpay-utils";
 
@@ -19,17 +16,15 @@ const razorpay = new Razorpay({
 export const initiatePayment = async (req, res) => {
   try {
     const userId = req.user.id;
-    const product = req.body;
+    const { profile, data } = req.body;
     var date = new Date();
     date = date.toISOString();
 
     const options = {
-      amount: product.price * 100,
+      amount: data.amount * 100,
       currency: "INR",
-      receipt: `${userId}_${product.id}_${date}`,
+      receipt: `${userId}_${date}`,
     };
-
-    console.log(options);
 
     const order = await razorpay.orders.create(options);
 
@@ -38,20 +33,16 @@ export const initiatePayment = async (req, res) => {
       amount: order.amount,
       currency: order.currency,
       name: "Locarto",
-      description: "Test Transaction",
       order_id: order.id,
-      callback_url: `${FRONTEND_URL}/payment/success`, // Frontend success URL
       prefill: {
-        name: "Your Name",
-        email: "your.email@example.com",
-        contact: "9999999999",
+        name: profile.name,
+        email: profile.email,
+        contact: profile.phone_no,
       },
       theme: {
         color: "#F37254",
       },
     };
-
-    console.log(orderData);
 
     res.status(200).json(orderData);
   } catch (error) {
