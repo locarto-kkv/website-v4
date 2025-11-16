@@ -9,46 +9,21 @@ import { ConsumerListService } from "../../services/consumer/consumerListService
 import { ConsumerOrderService } from "../../services/consumer/consumerOrderService"; // Import order service
 import { ConsumerPaymentService } from "../../services/consumer/consumerPaymentService";
 import toast from "react-hot-toast"; // Import toast for notifications
-
-// --- Mock Data for Saved Addresses (Keep as is) ---
-const mockSavedAddresses = [
-  {
-    id: "addr1",
-    label: "Home",
-    name: "Jane Doe",
-    address_line_1: "123 Main St",
-    address_line_2: "Apt 4B",
-    country: "India",
-    state: "Maharashtra",
-    pincode: "400001",
-    phone: "555-1234",
-    isDefault: true,
-  },
-  {
-    id: "addr2",
-    label: "Work",
-    name: "Jane Doe",
-    address_line_1: "456 Business Ave",
-    address_line_2: "Suite 100",
-    country: "India",
-    state: "Maharashtra",
-    pincode: "400050",
-    phone: "555-5678",
-    isDefault: false,
-  },
-];
-// --- End Mock Data ---
+import { ConsumerProfileService } from "../../services/consumer/consumerProfileService";
 
 const CheckoutPage = () => {
   const lists = useConsumerDataStore((s) => s.lists);
   const profile = useConsumerDataStore((s) => s.profile);
+  const fetchProfile = useConsumerDataStore((s) => s.fetchProfile);
+  console.log(profile);
+
   const { updateList, removeFromList } = ConsumerListService;
   const navigate = useNavigate();
 
   // State for form data (can be used for 'Add New Address' or editing)
   const [formData, setFormData] = useState({
     email: "",
-    phone: "",
+    phone_no: "",
     address_line_1: "",
     address_line_2: "",
     state: "",
@@ -74,21 +49,19 @@ const CheckoutPage = () => {
     platformFee: "",
   });
 
-  const [savedAddresses] = useState(mockSavedAddresses);
+  const [savedAddresses] = useState(profile?.address ?? []);
   const [selectedAddressId, setSelectedAddressId] = useState(
-    mockSavedAddresses.find((addr) => addr.isDefault)?.id ||
-      mockSavedAddresses[0]?.id ||
+    profile?.address?.find((addr) => addr.isDefault)?.id ||
+      profile?.address?.[0]?.id ||
       null
   );
+
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
 
-  // --- State for Promo Code ---
   const [promoCode, setPromoCode] = useState("");
   const [promoMessage, setPromoMessage] = useState({ text: "", type: "" }); // type: 'success' or 'error'
   const [discountAmount, setDiscountAmount] = useState(0);
-  // --- End State for Promo Code ---
 
-  // --- Add Loading State ---
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -139,23 +112,23 @@ const CheckoutPage = () => {
     setShowNewAddressForm(true);
   };
 
-  const handleSaveNewAddress = (e) => {
+  const handleSaveNewAddress = async (e) => {
     e.preventDefault();
-    console.log("Saving new address:", formData);
-    const newAddress = {
-      label: formData.label || "Other",
-      name: formData.name,
-      address_line_1: formData.address_line_1,
-      address_line_2: formData.address_line_2,
-      country: formData.country,
-      state: formData.state,
-      pincode: formData.pincode,
-      phone_no: formData.phone_no,
-    };
-    mockSavedAddresses.push(newAddress);
-    setSelectedAddressId(newAddress.id);
+
+    const { address, ...profile2 } = profile;
+
+    toast.loading("Saving Address...");
+    const updatedProfile = await ConsumerProfileService.updateProfile({
+      profile: profile2,
+      address: formData,
+    });
+
+    await fetchProfile();
+
     setShowNewAddressForm(false);
-    alert("New address saved (mock)!");
+
+    toast.dismiss();
+    toast.success("Address Saved");
   };
 
   const handleQuantityChange = async (productId, delta) => {
@@ -191,20 +164,16 @@ const CheckoutPage = () => {
   };
 
   const handleRemoveItem = async (productId, productName) => {
-    if (
-      window.confirm(`Remove ${productName || "this item"} from your cart?`)
-    ) {
-      try {
-        const newList = await removeFromList("cart", productId);
-        useConsumerDataStore.setState((state) => ({
-          ...state,
-          lists: { ...newList },
-        }));
-        toast.success(`${productName || "Item"} removed from cart`);
-      } catch (err) {
-        console.error("Error removing item from cart:", err);
-        toast.error("Could not remove item from cart.");
-      }
+    try {
+      const newList = await removeFromList("cart", productId);
+      useConsumerDataStore.setState((state) => ({
+        ...state,
+        lists: { ...newList },
+      }));
+      toast.success(`${productName || "Item"} removed from cart`);
+    } catch (err) {
+      console.error("Error removing item from cart:", err);
+      toast.error("Could not remove item from cart.");
     }
   };
 
@@ -230,6 +199,28 @@ const CheckoutPage = () => {
     // --- End Placeholder Promo Logic ---
   };
 
+  const openRazorpay = (options) => {
+    return new Promise((resolve, reject) => {
+      const rzp = new window.Razorpay({
+        ...options,
+        handler: function (response) {
+          resolve({ status: "success", response });
+        },
+        modal: {
+          ondismiss: function () {
+            reject({ status: "closed" }); // User closed the popup
+          },
+        },
+      });
+
+      rzp.on("payment.failed", function (response) {
+        reject(response.error); // Payment failed
+      });
+
+      rzp.open();
+    });
+  };
+
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
     if (!selectedAddressId && !showNewAddressForm) {
@@ -242,34 +233,63 @@ const CheckoutPage = () => {
     }
 
     try {
+      toast.loading("Redirecting to payment...");
+
+      // 1️⃣ Get options from backend
       const options = await ConsumerPaymentService.initiatePayment(
         profile,
         orderData
       );
 
+      console.log("options");
+
       console.log(options);
 
-      const rzp = new window.Razorpay(options);
+      try {
+        var paymentResponse = await openRazorpay(options);
 
-      rzp.on("payment.failed", (response) => {
-        console.error("Payment failed:", response.error);
-        toast.error("Payment failed. Please try again.");
+        if (paymentResponse.status === "success") {
+          toast.dismiss();
+          setTimeout(() => {
+            toast.loading("Verifying Payment...");
+          }, 200);
+        }
+      } catch (err) {
         setLoading(false);
-      });
+        toast.dismiss();
 
-      rzp.open();
-    } catch (error) {
-      console.error("Order placement error:", error);
-      toast.error("Failed to place order. Please try again.");
-      setLoading(false);
-      return;
-    }
+        setTimeout(() => {
+          if (err.status === "closed") {
+            toast.error("Payment cancelled.");
+          } else if (err.status === "failed") {
+            toast.error("Payment failed. Try again.");
+          }
+        }, 200);
+        return;
+      }
 
-    setLoading(true);
-    toast.loading("Placing your order...");
-    setTimeout(() => {}, 3000);
-    try {
-      // Create a mock order object to pass to the confirmation page
+      console.log("paymentResponse");
+
+      console.log(paymentResponse);
+
+      const verify = await ConsumerPaymentService.validatePayment(
+        paymentResponse.response
+      );
+      toast.dismiss();
+
+      console.log("verify");
+
+      console.log(verify);
+
+      if (!verify.success) {
+        toast.error("Payment verification failed.");
+        return;
+      }
+
+      setTimeout(() => {
+        toast.success("Payment successful!");
+      }, 200);
+
       const mockOrder = {
         id: Math.floor(Math.random() * 100000) + 90000, // Random order ID
         created_at: new Date().toISOString(),
@@ -285,25 +305,27 @@ const CheckoutPage = () => {
           quantity: item.quantity,
           product_images: item.product_images,
         })),
-        // Pass bill details for the summary
         billDetails: bills,
       };
+
+      console.log("mockOrder");
+
+      console.log(mockOrder);
 
       // useConsumerDataStore.setState((state) => ({
       //   ...state,
       //   lists: { ...state.lists, cart: [] },
       // }));
 
-      setLoading(false);
-      toast.dismiss();
       toast.success("Order placed successfully!");
 
       // navigate("/consumer/order-placed", { state: { order: mockOrder } });
     } catch (error) {
-      setLoading(false);
-      toast.dismiss();
       console.error("Order placement error:", error);
       toast.error("Failed to place order. Please try again.");
+    } finally {
+      toast.dismiss();
+      setLoading(false);
     }
   };
 
@@ -590,7 +612,7 @@ const CheckoutPage = () => {
                               : ""
                           }, ${addr.country}, ${addr.pincode}`}</p>
                           <p className="text-gray-600 text-xs mt-1">
-                            Contact: {addr.phone}
+                            Contact: {addr.phone_no}
                           </p>
                         </div>
                       </div>

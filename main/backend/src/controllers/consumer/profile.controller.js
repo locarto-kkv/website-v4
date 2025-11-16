@@ -34,19 +34,22 @@ export const updateProfile = async (req, res) => {
     const userId = req.user.id;
     const newProfileData = req.body;
 
-    if (newProfileData.profile.password) {
+    if (newProfileData.profile?.password) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       newProfileData.profile.password = hashedPassword;
     }
 
     if (newProfileData.address) {
+      console.log(newProfileData.address);
+
       const { data, error } = await db
         .from("addresses")
         .upsert(
-          { ...newProfileData.address, vendor_id: userId },
+          { ...newProfileData.address, consumer_id: userId },
           { onConflict: "id" }
         );
+      if (error) throw error;
     }
 
     const { data: updatedUser, error } = await db

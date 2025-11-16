@@ -61,6 +61,8 @@ export const validatePayment = async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
 
+    console.log(razorpay_order_id, razorpay_payment_id, razorpay_signature);
+
     // Verify payment signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
