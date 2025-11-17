@@ -70,6 +70,34 @@ const ProductViewPage = () => {
   const [cartItem, setCartItem] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
 
+  // Helper to show the custom auth toast
+  const showAuthToast = () => {
+    toast((t) => (
+      <div className="flex flex-col gap-2 items-start">
+        <span className="font-medium text-gray-800">
+          Not signed in as customer
+        </span>
+        <button
+          onClick={() => {
+            toast.dismiss(t.id);
+            navigate("/consumer/login", { state: { isSignup: true } });
+          }}
+          className="px-3 py-1.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition-colors"
+        >
+          Sign Up as Customer
+        </button>
+      </div>
+    ), {
+        duration: 5000,
+        icon: '🔒',
+        style: {
+            background: '#fff',
+            color: '#333',
+            border: '1px solid #e5e7eb',
+        },
+    });
+  };
+
   const setLists = async () => {
     setIsInWishlist(
       lists.wishlist?.some((item) => item.product_id === product.id) || false
@@ -104,7 +132,7 @@ const ProductViewPage = () => {
 
   const handleWishlistToggle = async () => {
     if (!isConsumer) {
-      toast.error("Please log in as a customer to manage wishlist.");
+      showAuthToast();
       return;
     }
     try {
@@ -130,7 +158,7 @@ const ProductViewPage = () => {
 
   const handleQuantityChange = async (delta) => {
     if (!isConsumer) {
-      toast.error("Please log in as a customer to add items.");
+      showAuthToast();
       return;
     }
 
@@ -183,7 +211,7 @@ const ProductViewPage = () => {
 
   const handleBuyNow = async () => {
     if (!isConsumer) {
-      toast.error("Please log in as a customer to buy.");
+      showAuthToast();
       return;
     }
 

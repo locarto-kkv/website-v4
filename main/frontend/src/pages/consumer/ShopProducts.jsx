@@ -1,6 +1,6 @@
 // src/pages/consumer/ShopProducts.jsx
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom"; // Added useNavigate
 import { useDataStore } from "../../store/useDataStore";
 import { useConsumerDataStore } from "../../store/consumer/consumerDataStore";
 import { ConsumerListService } from "../../services/consumer/consumerListService";
@@ -9,11 +9,11 @@ import toast from "react-hot-toast";
 
 const ShopProducts = () => {
   const { vendorId, category } = useParams();
+  const navigate = useNavigate(); // Initialize navigate
   const currentUser = useAuthStore((s) => s.currentUser);
   const blogs = useDataStore((s) => s.blogs);
   const vendorInCart = useConsumerDataStore((s) => s.vendorInCart);
   const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
-  console.log(vendorInCart);
 
   const { updateList, removeFromList } = ConsumerListService;
 
@@ -30,12 +30,40 @@ const ShopProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper to show the custom auth toast
+  const showAuthToast = () => {
+    toast((t) => (
+      <div className="flex flex-col gap-2 items-start">
+        <span className="font-medium text-gray-800">
+          Not signed in as customer
+        </span>
+        <button
+          onClick={() => {
+            toast.dismiss(t.id);
+            navigate("/consumer/login", { state: { isSignup: true } });
+          }}
+          className="px-3 py-1.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition-colors"
+        >
+          Sign Up as Customer
+        </button>
+      </div>
+    ), {
+        duration: 5000,
+        icon: '🔒',
+        style: {
+            background: '#fff',
+            color: '#333',
+            border: '1px solid #e5e7eb',
+        },
+    });
+  };
+
   const toggleWishlist = async (e, productId) => {
-    e.preventDefault(); // Prevent navigation when clicking wishlist
+    e.preventDefault();
     e.stopPropagation();
 
     if (currentUser?.type !== "consumer") {
-      toast.error("Please Login as Consumer");
+      showAuthToast();
       return;
     }
     const isInWishlist = wishlist.some((item) => item.product_id === productId);
@@ -59,11 +87,11 @@ const ShopProducts = () => {
   };
 
   const handleCartChange = async (e, product, currentQty, delta) => {
-    e.preventDefault(); // Prevent navigation when clicking cart buttons
+    e.preventDefault();
     e.stopPropagation();
 
     if (currentUser?.type !== "consumer") {
-      toast.error("Please Login as Consumer");
+      showAuthToast();
       return;
     }
 
@@ -102,8 +130,6 @@ const ShopProducts = () => {
 
   useEffect(() => {
     const foundVendor = blogs?.find((v) => String(v.id) === String(vendorId));
-    console.log(blogs);
-
     setVendor(foundVendor || null);
     setProducts(foundVendor?.products || []);
   }, [blogs, vendorId]);
@@ -140,7 +166,6 @@ const ShopProducts = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 font-sans">
-      {/* Background Effect */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br opacity-10 rounded-full blur-3xl animate-pulse"
@@ -157,7 +182,6 @@ const ShopProducts = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6 max-w-7xl relative z-10">
-        {/* Back Button */}
         <div className="mb-6">
           <Link
             to="/map"
@@ -168,7 +192,6 @@ const ShopProducts = () => {
           </Link>
         </div>
 
-        {/* Vendor Header */}
         <div
           className="mb-8 rounded-3xl shadow-2xl p-8 text-white backdrop-blur-xl border border-white/10 relative overflow-hidden"
           style={{
@@ -214,7 +237,6 @@ const ShopProducts = () => {
           </div>
         </div>
 
-        {/* Product Grid */}
         {loading ? (
           <div className="text-center text-white/80 py-20">
             Loading products...
@@ -234,7 +256,6 @@ const ShopProducts = () => {
                   to={`/product/${product.id}`}
                   className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 flex flex-col group hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20 hover:-translate-y-2 hover:shadow-3xl cursor-pointer"
                 >
-                  {/* Product Image */}
                   <div className="relative mb-4">
                     <div className="overflow-hidden rounded-xl bg-white/5">
                       <img
@@ -247,7 +268,6 @@ const ShopProducts = () => {
                       />
                     </div>
 
-                    {/* Wishlist Button */}
                     <button
                       onClick={(e) => toggleWishlist(e, product.id)}
                       className="absolute top-3 right-3 bg-black/50 backdrop-blur-md rounded-full p-2.5 shadow-lg hover:scale-110 transition-all duration-200 border border-white/20 z-10"
@@ -262,7 +282,6 @@ const ShopProducts = () => {
                     </button>
                   </div>
 
-                  {/* Product Details */}
                   <div className="flex-1 mb-4">
                     <h3 className="font-bold text-white mb-1 text-lg">
                       {product.name}
@@ -278,7 +297,6 @@ const ShopProducts = () => {
                     </div>
                   </div>
 
-                  {/* Cart Controls */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between pt-3 border-t border-white/10">
                       <span className="text-2xl font-bold text-white drop-shadow-lg">

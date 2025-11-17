@@ -1,19 +1,16 @@
 // src/pages/consumer/authConsumer.jsx
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom"; // Added useLocation
 import { useAuthStore } from "../../store/useAuthStore";
-import AuthLayout from "../../components/AuthLayout"; // Import the layout
+import AuthLayout from "../../components/AuthLayout"; 
+import GoogleLogo from "../../assets/Google_Favicon_2025.svg"; 
 
-// --- START: MODIFIED IMPORT ---
-import GoogleLogo from "../../assets/Google_Favicon_2025.svg"; // Import the new Google logo
-// --- END: MODIFIED IMPORT ---
-
-// Inputs remain mostly the same, maybe adjust styling if needed
+// ... (OtpInput and PasswordInput components remain unchanged) ...
 const OtpInput = ({ value, onChange }) => (
   <div>
     <label
       htmlFor="otp"
-      className="block text-sm font-medium text-gray-700 sr-only" // Hide label visually but keep for accessibility
+      className="block text-sm font-medium text-gray-700 sr-only"
     >
       OTP
     </label>
@@ -27,7 +24,7 @@ const OtpInput = ({ value, onChange }) => (
         maxLength={4}
         placeholder="Enter 4-digit OTP"
         required
-        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
+        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
         value={value}
         onChange={onChange}
       />
@@ -49,7 +46,7 @@ const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => (
         name="password"
         type={showPassword ? "text" : "password"}
         required
-        className="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-10 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
+        className="block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-10 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
         value={value}
         onChange={onChange}
       />
@@ -71,7 +68,9 @@ const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => (
 );
 
 const AuthConsumer = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
+  // Initialize isLogin based on navigation state, default to true (Login)
+  const [isLogin, setIsLogin] = useState(location.state?.isSignup ? false : true);
   const [usePassword, setUsePassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -79,7 +78,7 @@ const AuthConsumer = () => {
     email: "",
     otp: "",
     password: "",
-    loginType: "", // Keep if used elsewhere, otherwise remove
+    loginType: "",
   });
 
   const {
@@ -105,14 +104,14 @@ const AuthConsumer = () => {
       if (sentOtp)
         return signupLoading || loginLoading
           ? "Verifying..."
-          : "Login / Sign Up with OTP"; // Combined state
+          : "Login / Sign Up with OTP";
     }
   };
 
   const handleAuthType = () => {
     setUsePassword((prev) => !prev);
-    setFormData((prev) => ({ ...prev, otp: "", password: "" })); // Clear other field on switch
-    setSentOtp(false); // Reset OTP state when switching
+    setFormData((prev) => ({ ...prev, otp: "", password: "" }));
+    setSentOtp(false);
   };
 
   const handleChange = (e) => {
@@ -134,9 +133,7 @@ const AuthConsumer = () => {
   };
 
   const handleGoogleSubmit = async () => {
-    // Removed 'e'
     googleLogin("consumer");
-    // Removed checkAuth(), as redirection should happen via backend flow
   };
 
   const resendOtp = async () => {
@@ -146,7 +143,6 @@ const AuthConsumer = () => {
     setFormData({ ...formData, otp: "" });
   };
 
-  // Cooldown timer remains the same
   useEffect(() => {
     if (cooldown === 0) {
       return;
@@ -154,7 +150,7 @@ const AuthConsumer = () => {
     const interval = setInterval(() => {
       useAuthStore.setState((state) => {
         if (state.cooldown <= 1) {
-          clearInterval(interval); // Clear interval when cooldown reaches 0
+          clearInterval(interval);
           return { cooldown: 0 };
         }
         return { cooldown: state.cooldown - 1 };
@@ -165,19 +161,16 @@ const AuthConsumer = () => {
 
   return (
     <AuthLayout pageTitle="Customer Portal">
-      {/* Removed redundant Locarto link */}
       <div className="bg-white py-8 px-6 shadow-xl rounded-lg sm:px-10 border border-gray-200">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">
-            {isLogin ? "Customer Login" : "Customer Sign Up"}{" "}
-            {/* */}
+            {isLogin ? "Customer Login" : "Customer Sign Up"}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Explore local brands and products
           </p>
         </div>
 
-        {/* New Login/Sign Up Toggle */}
         <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
           <button
             type="button"
@@ -186,7 +179,7 @@ const AuthConsumer = () => {
               setUsePassword(false);
               setSentOtp(false);
               setFormData((f) => ({ ...f, otp: "", password: "" }));
-            }} // Reset state
+            }}
             className={`flex-1 py-2.5 px-3 text-center font-semibold rounded-md transition-all duration-300 text-sm ${
               isLogin
                 ? "bg-white text-orange-600 shadow"
@@ -202,7 +195,7 @@ const AuthConsumer = () => {
               setUsePassword(false);
               setSentOtp(false);
               setFormData((f) => ({ ...f, otp: "", password: "" }));
-            }} // Reset state
+            }}
             className={`flex-1 py-2.5 px-3 text-center font-semibold rounded-md transition-all duration-300 text-sm ${
               !isLogin
                 ? "bg-white text-orange-600 shadow"
@@ -227,7 +220,7 @@ const AuthConsumer = () => {
                 name="name"
                 type="name"
                 required
-                className="mb-3 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
+                className="mb-3 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
                 value={formData.name}
                 onChange={handleChange}
               />
@@ -245,7 +238,7 @@ const AuthConsumer = () => {
               name="email"
               type="email"
               required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm" // Increased padding
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
               value={formData.email}
               onChange={handleChange}
             />
@@ -264,7 +257,6 @@ const AuthConsumer = () => {
             />
           )}
 
-          {/* Options: Use Password/OTP, Resend */}
           <div className="flex items-center justify-between text-sm flex-wrap gap-2">
             {isLogin && (
               <button
@@ -277,7 +269,6 @@ const AuthConsumer = () => {
                   : "Login with Password instead"}
               </button>
             )}
-            {/* Spacer for alignment when not showing Use Password */}
             {!isLogin && <div className="flex-1"></div>}
 
             {sentOtp && !usePassword && (
@@ -312,7 +303,6 @@ const AuthConsumer = () => {
           </div>
         </form>
 
-        {/* Divider */}
         <div className="my-6 flex items-center">
           <div className="flex-grow border-t border-gray-200"></div>
           <span className="flex-shrink mx-2 text-xs text-gray-400 uppercase">
@@ -321,26 +311,21 @@ const AuthConsumer = () => {
           <div className="flex-grow border-t border-gray-200"></div>
         </div>
 
-        {/* Google Login Button */}
         <div>
           <button
             type="button"
             onClick={handleGoogleSubmit}
             className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-300 transition-colors"
           >
-            {/* --- START: MODIFIED IMG TAG --- */}
             <img
               src={GoogleLogo}
               alt="Google"
               className="w-5 h-5 mr-2"
             />
-            {/* --- END: MODIFIED IMG TAG --- */}
-            {isLogin ? "Login with Google" : "Sign up with Google"}{" "}
-            {/* */}
+            {isLogin ? "Login with Google" : "Sign up with Google"}
           </button>
         </div>
 
-        {/* Toggle between Login/Sign up */}
         <div className="mt-6 text-center text-sm">
           {isLogin ? (
             <p className="text-gray-600">
@@ -352,7 +337,7 @@ const AuthConsumer = () => {
                   setUsePassword(false);
                   setSentOtp(false);
                   setFormData((f) => ({ ...f, otp: "", password: "" }));
-                }} // Reset state
+                }}
                 className="font-semibold text-orange-600 hover:text-orange-700 underline focus:outline-none"
               >
                 Sign up
@@ -368,7 +353,7 @@ const AuthConsumer = () => {
                   setUsePassword(false);
                   setSentOtp(false);
                   setFormData((f) => ({ ...f, otp: "", password: "" }));
-                }} // Reset state
+                }}
                 className="font-semibold text-orange-600 hover:text-orange-700 underline focus:outline-none"
               >
                 Log in
