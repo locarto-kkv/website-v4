@@ -6,7 +6,7 @@ import {
   getOrderStatusConfig,
 } from "../../../lib/utils";
 
-// ✅ Status badge component (unchanged)
+// Status badge
 const StatusBadge = ({ status }) => {
   const config = getOrderStatusConfig(status || "unknown");
   return (
@@ -20,7 +20,9 @@ const StatusBadge = ({ status }) => {
 };
 
 const VendorOrders = () => {
-  const { orders } = useVendorDataStore(); // ✅ Real order data from context
+  const orders = useVendorDataStore((s) => s.orders);
+  const safeOrders = Array.isArray(orders) ? orders : [];
+
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");
@@ -34,22 +36,28 @@ const VendorOrders = () => {
     "delivered",
     "cancelled",
     "refunded",
+    "confirmed",
   ];
 
-  // ✅ Safe default if context not loaded
-  const safeOrders = Array.isArray(orders) ? orders : [];
+  // Flatten all order items
+  const flattenedItems = useMemo(() => {
+    return safeOrders.flatMap((order) =>
+      order.items.map((item) => ({ order, item }))
+    );
+  }, [safeOrders]);
 
-  // ✅ Filter + Sort
-  const filteredAndSortedOrders = useMemo(() => {
-    let result = safeOrders.filter((order) => {
+  // Filter + sort items
+  const filteredAndSortedItems = useMemo(() => {
+    let result = flattenedItems.filter(({ order, item }) => {
+      const lowerSearch = searchQuery.toLowerCase();
+
       const matchesStatus =
         filterStatus === "all" ||
-        order.order_status?.toLowerCase() === filterStatus;
+        item.order_status?.toLowerCase() === filterStatus;
 
-      const lowerSearch = searchQuery.toLowerCase();
       const matchesSearch =
         `ORD${order.id}`.toLowerCase().includes(lowerSearch) ||
-        order.product?.name?.toLowerCase().includes(lowerSearch) ||
+        item.product?.name?.toLowerCase().includes(lowerSearch) ||
         order.payment_mode?.toLowerCase().includes(lowerSearch);
 
       return matchesStatus && matchesSearch;
@@ -58,43 +66,43 @@ const VendorOrders = () => {
     result.sort((a, b) => {
       switch (sortBy) {
         case "amount_high":
-          return (b.amount || 0) - (a.amount || 0);
+          return (b.order.amount || 0) - (a.order.amount || 0);
         case "amount_low":
-          return (a.amount || 0) - (b.amount || 0);
+          return (a.order.amount || 0) - (b.order.amount || 0);
         case "oldest":
-          return new Date(a.created_at) - new Date(b.created_at);
+          return new Date(a.order.created_at) - new Date(b.order.created_at);
         default:
-          return new Date(b.created_at) - new Date(a.created_at);
+          return new Date(b.order.created_at) - new Date(a.order.created_at);
       }
     });
 
     return result;
-  }, [filterStatus, searchQuery, sortBy, safeOrders]);
+  }, [flattenedItems, filterStatus, searchQuery, sortBy]);
 
-  // ✅ Order stats
-  const getOrderStats = () => {
-    const total = safeOrders.length;
-    const pending = safeOrders.filter(
-      (o) => o.order_status === "pending"
+  // Stats
+  const stats = useMemo(() => {
+    const allItems = flattenedItems;
+    const total = allItems.length;
+    const pending = allItems.filter(
+      (i) => i.item.order_status === "pending"
     ).length;
-    const cancelled = safeOrders.filter(
-      (o) => o.order_status === "cancelled"
+    const cancelled = allItems.filter(
+      (i) => i.item.order_status === "cancelled"
     ).length;
-    const delivered = safeOrders.filter(
-      (o) => o.order_status === "delivered"
+    const delivered = allItems.filter(
+      (i) => i.item.order_status === "delivered"
     ).length;
+
     return { total, pending, cancelled, delivered };
-  };
-
-  const stats = getOrderStats();
+  }, [flattenedItems]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* ✅ Stats Cards */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {[
           {
-            label: "Total Orders",
+            label: "Total Items",
             value: stats.total,
             icon: "fas fa-shopping-bag",
             color: "from-blue-500 to-cyan-500",
@@ -143,21 +151,21 @@ const VendorOrders = () => {
         ))}
       </div>
 
-      {/* ✅ Filters */}
+      {/* Filters */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div className="flex-1 relative order-2 sm:order-1">
             <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
             <input
               type="text"
-              placeholder="Search Orders..."
+              placeholder="Search Items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 text-sm"
             />
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg order-1 sm:order-2 self-start sm:self-center">
+          <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg order-1 sm:order-2">
             <button
               onClick={() => setViewMode("table")}
               className={`p-2 rounded-lg ${
@@ -219,16 +227,16 @@ const VendorOrders = () => {
         </div>
       </div>
 
-      {/* ✅ Orders Display */}
+      {/* Table View */}
       {viewMode === "table" ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            {filteredAndSortedOrders.length === 0 ? (
+            {filteredAndSortedItems.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                No orders found
+                No items found
               </div>
             ) : (
-              <table className="w-full min-w-[800px]">
+              <table className="w-full min-w-[900px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
@@ -238,7 +246,10 @@ const VendorOrders = () => {
                       Product
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                      Amount
+                      Qty
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                      Total
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                       Payment
@@ -249,48 +260,32 @@ const VendorOrders = () => {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                       Date
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                      Shipping Label
-                    </th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-gray-100">
-                  {filteredAndSortedOrders.map((order) => (
-                    <tr
-                      key={order.id}
-                      className="hover:bg-orange-50 transition"
-                    >
+                  {filteredAndSortedItems.map(({ order, item }) => (
+                    <tr key={item.id} className="hover:bg-orange-50 transition">
                       <td className="px-4 py-3 text-sm font-semibold text-gray-900">
                         ORD #{order.id}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
-                        {order.product?.name || "N/A"}
+                      <td className="px-4 py-3 text-sm">
+                        {item.product?.name}
                       </td>
+                      <td className="px-4 py-3 text-sm">{item.quantity}</td>
                       <td className="px-4 py-3 text-sm font-bold text-gray-900">
-                        {formatCurrency(order.amount)}
+                        {formatCurrency(
+                          item.quantity * (item.product?.price || 0)
+                        )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 capitalize">
-                        {order.payment_mode || "N/A"}
+                      <td className="px-4 py-3 text-sm capitalize">
+                        {order.payment_mode}
                       </td>
                       <td className="px-4 py-3">
-                        <StatusBadge status={order.order_status} />
+                        <StatusBadge status={item.order_status} />
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {formatDate(order.created_at)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {order.shipping_label ? (
-                          <a
-                            href={order.shipping_label}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:underline"
-                          >
-                            Download Shipping Label
-                          </a>
-                        ) : (
-                          "N/A"
-                        )}
                       </td>
                     </tr>
                   ))}
@@ -300,26 +295,35 @@ const VendorOrders = () => {
           </div>
         </div>
       ) : (
-        // ✅ Card view
+        // Card view
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredAndSortedOrders.map((order) => (
+          {filteredAndSortedItems.map(({ order, item }) => (
             <div
-              key={order.id}
+              key={item.id}
               className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition"
             >
               <div className="flex items-center justify-between mb-3">
                 <p className="font-semibold text-gray-900">ORD #{order.id}</p>
-                <StatusBadge status={order.order_status} />
+                <StatusBadge status={item.order_status} />
               </div>
+
               <p className="text-sm text-gray-700 mb-1">
-                <strong>Product:</strong> {order.product?.name}
+                <strong>Product:</strong> {item.product?.name}
               </p>
+
               <p className="text-sm text-gray-700 mb-1">
-                <strong>Amount:</strong> {formatCurrency(order.amount)}
+                <strong>Qty:</strong> {item.quantity}
               </p>
+
               <p className="text-sm text-gray-700 mb-1">
-                <strong>Payment:</strong> {order.payment_mode || "N/A"}
+                <strong>Total:</strong>{" "}
+                {formatCurrency(item.quantity * item.product?.price)}
               </p>
+
+              <p className="text-sm text-gray-700 mb-1">
+                <strong>Payment:</strong> {order.payment_mode}
+              </p>
+
               <p className="text-sm text-gray-700 mb-1">
                 <strong>Date:</strong> {formatDate(order.created_at)}
               </p>

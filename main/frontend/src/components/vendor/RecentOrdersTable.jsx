@@ -20,7 +20,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const RecentOrdersTable = () => {
-  const { orders } = useVendorDataStore();
+  const orders = useVendorDataStore((s) => s.orders);
 
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("desc");

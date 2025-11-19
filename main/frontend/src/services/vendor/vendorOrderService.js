@@ -15,11 +15,4 @@ export const VendorOrderService = {
     );
     return response.data;
   },
-
-  cancelOrder: async (orderId) => {
-    const response = await axiosInstance.put(
-      `${BASE_URL}/cancel-order/${orderId}`
-    );
-    return response.data;
-  },
 };

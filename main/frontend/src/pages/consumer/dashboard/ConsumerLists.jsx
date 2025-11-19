@@ -341,23 +341,6 @@ const CustomerLists = () => {
                       {formatCurrency(totalCartAmount)}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center text-sm sm:text-base">
-                    <span className="text-gray-600 font-medium flex items-center gap-2">
-                      <i className="fas fa-truck text-green-500"></i>
-                      Shipping
-                    </span>
-                    <span className="font-bold text-green-600">FREE</span>
-                  </div>
-                  <div className="border-t-2 border-orange-300 pt-3 md:pt-4 mt-3 md:mt-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
-                        Total Amount
-                      </span>
-                      <span className="text-xl sm:text-2xl md:text-4xl font-black bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                        {formatCurrency(totalCartAmount)}
-                      </span>
-                    </div>
-                  </div>
                 </div>
 
                 <button

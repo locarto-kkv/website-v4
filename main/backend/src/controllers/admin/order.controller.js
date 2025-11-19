@@ -10,13 +10,12 @@ export const getOrderById = async (req, res) => {
   try {
     const { orderId } = req.params;
 
-    const { data: order } = await db
-      .from("orders")
+    const { data: items } = await db
+      .from("order_items")
       .select()
-      .eq("id", orderId)
-      .single();
+      .eq("order_id", orderId);
 
-    res.status(200).json(order);
+    res.status(200).json(items);
   } catch (error) {
     logger({
       level: "error",

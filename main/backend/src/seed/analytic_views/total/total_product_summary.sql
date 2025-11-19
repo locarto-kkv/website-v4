@@ -1,4 +1,4 @@
-DROP VIEW total_product_summary;
+DROP VIEW IF EXISTS total_product_summary;
 
 CREATE VIEW public.total_product_summary AS
 SELECT
@@ -12,66 +12,103 @@ SELECT
     p.product_images AS product_images,
     p.status AS status,
     p.description AS description,
-    -- basic aggregations
-    COUNT(DISTINCT o.id) AS orders_count,
-    COUNT(DISTINCT o.consumer_id) AS consumers_count,
-    SUM(o.amount) AS total_amount,
-    AVG(o.amount) AS avg_amount,
 
-    -- dynamic order_status counts
+    /* --- ORDER COUNTS (prevent duplication) --- */
     (
-      SELECT 
-        COUNT(r.id)
-        FROM public.reviews r
-        LEFT JOIN public.orders o ON r.order_id = o.id
-        WHERE o.product_id = p.id
+      SELECT COUNT(DISTINCT o.id)
+      FROM public.order_items oi
+      JOIN public.orders o ON o.id = oi.order_id
+      WHERE oi.product_id = p.id
+    ) AS orders_count,
+
+    /* --- CONSUMERS WHO BOUGHT THIS PRODUCT --- */
+    (
+      SELECT COUNT(DISTINCT o.consumer_id)
+      FROM public.order_items oi
+      JOIN public.orders o ON o.id = oi.order_id
+      WHERE oi.product_id = p.id
+    ) AS consumers_count,
+
+    /* --- TOTAL AMOUNT (must SUM DISTINCT orders) --- */
+    (
+      SELECT SUM(amount)
+      FROM (
+        SELECT DISTINCT o.id, o.amount
+        FROM public.order_items oi 
+        JOIN public.orders o ON o.id = oi.order_id
+        WHERE oi.product_id = p.id
+      ) uniq_orders
+    ) AS total_amount,
+
+    (
+      SELECT AVG(amount)
+      FROM (
+        SELECT DISTINCT o.id, o.amount
+        FROM public.order_items oi 
+        JOIN public.orders o ON o.id = oi.order_id
+        WHERE oi.product_id = p.id
+      ) uniq_orders
+    ) AS avg_amount,
+
+    /* --- REVIEW COUNT (reviews reference order_items) --- */
+    (
+      SELECT COUNT(*)
+      FROM public.reviews r
+      JOIN public.order_items oi ON oi.id = r.order_item_id
+      WHERE oi.product_id = p.id
     ) AS count_reviews,
 
+    /* --- AVG REVIEW RATING --- */
     (
-      SELECT 
-        AVG(r.rating)
-        FROM public.reviews r
-        LEFT JOIN public.orders o ON r.order_id = o.id
-        WHERE o.product_id = p.id
-    ) AS avg_review,  
+      SELECT AVG(r.rating)
+      FROM public.reviews r
+      JOIN public.order_items oi ON oi.id = r.order_item_id
+      WHERE oi.product_id = p.id
+    ) AS avg_review,
 
+    /* --- ORDER STATUS COUNTS (FROM order_items) --- */
     (
       SELECT jsonb_object_agg(order_status, count_status)
       FROM (
-        SELECT COALESCE(o2.order_status, 'unknown') AS order_status, COUNT(*) AS count_status
-        FROM public.orders o2
-        WHERE o2.product_id = p.id
-        GROUP BY COALESCE(o2.order_status, 'unknown')
+        SELECT COALESCE(oi.order_status, 'unknown') AS order_status,
+               COUNT(*) AS count_status
+        FROM public.order_items oi
+        WHERE oi.product_id = p.id
+        GROUP BY COALESCE(oi.order_status, 'unknown')
       ) s
     ) AS order_status_counts,
 
-    -- dynamic payment_mode counts
+    /* --- PAYMENT MODE COUNTS (FROM orders) --- */
     (
       SELECT jsonb_object_agg(payment_mode, count_mode)
       FROM (
-        SELECT COALESCE(o3.payment_mode, 'unknown') AS payment_mode, COUNT(*) AS count_mode
-        FROM public.orders o3
-        WHERE o3.product_id = p.id
-        GROUP BY COALESCE(o3.payment_mode, 'unknown')
+        SELECT COALESCE(o.payment_mode, 'unknown') AS payment_mode,
+               COUNT(*) AS count_mode
+        FROM public.order_items oi
+        JOIN public.orders o ON o.id = oi.order_id
+        WHERE oi.product_id = p.id
+        GROUP BY COALESCE(o.payment_mode, 'unknown')
       ) s
     ) AS payment_mode_counts,
 
-    -- dynamic payment_status counts
+    /* --- PAYMENT STATUS COUNTS (FROM order_items) --- */
     (
       SELECT jsonb_object_agg(payment_status, count_status)
       FROM (
-        SELECT COALESCE(o4.payment_status, 'unknown') AS payment_status, COUNT(*) AS count_status
-        FROM public.orders o4
-        WHERE o4.product_id = p.id
-        GROUP BY COALESCE(o4.payment_status, 'unknown')
+        SELECT COALESCE(oi.payment_status, 'unknown') AS payment_status,
+               COUNT(*) AS count_status
+        FROM public.order_items oi
+        WHERE oi.product_id = p.id
+        GROUP BY COALESCE(oi.payment_status, 'unknown')
       ) s
     ) AS payment_status_counts,
 
-    -- consumer_list counts (list_type + quantity)
+    /* --- CONSUMER LIST COUNTS (wishlist / cart etc.) --- */
     (
       SELECT jsonb_object_agg(list_type, total_quantity)
       FROM (
-        SELECT COALESCE(cl.list_type, 'unknown') AS list_type, SUM(cl.quantity) AS total_quantity
+        SELECT COALESCE(cl.list_type, 'unknown') AS list_type,
+               SUM(cl.quantity) AS total_quantity
         FROM public.consumer_lists cl
         WHERE cl.product_id = p.id
         GROUP BY COALESCE(cl.list_type, 'unknown')
@@ -79,5 +116,6 @@ SELECT
     ) AS list_type_counts
 
 FROM public.products p
-LEFT JOIN public.orders o ON p.id = o.product_id
-GROUP BY p.vendor_id, p.id, p.name, p.quantity;
+GROUP BY p.id, p.vendor_id, p.name, p.quantity, p.price, p.weight,
+         p.category, p.product_images, p.status, p.description
+ORDER BY p.id;

@@ -1,5 +1,5 @@
 import db from "../../lib/db.js";
-import { cancelOrderService } from "../../services/order.service.js";
+// import { cancelOrderService } from "../../services/order.service.js";
 
 import logger from "../../lib/logger.js";
 import { fileURLToPath } from "url";
@@ -13,11 +13,14 @@ export const getOrders = async (req, res) => {
       .from("orders")
       .select(
         `*,
-        product: orders_product_id_fkey(*)
+        items: order_items_order_id_fkey(*,
+        product: order_items_product_id_fkey(*)
+        )
         `
       )
-      .eq("product.vendor_id", vendorId)
-      .not("product", "is", null);
+      .eq("items.product.vendor_id", vendorId)
+      .not("items.product", "is", null)
+      .not("items", "is", null);
 
     if (error) throw error;
 
@@ -35,13 +38,13 @@ export const getOrders = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { orderItemId } = req.params;
     const { order_status } = req.body;
 
     const { data: updatedOrder } = await db
-      .from("orders")
+      .from("order_items")
       .update({ order_status })
-      .eq("id", orderId)
+      .eq("id", orderItemId)
       .select()
       .single();
 
@@ -52,27 +55,6 @@ export const updateOrderStatus = async (req, res) => {
       message: error.message,
       location: __filename,
       func: "updateOrderStatus",
-    });
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const cancelOrder = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-
-    const updatedOrder = await cancelOrderService(orderId);
-
-    res.status(200).json({
-      message: "Order cancelled successfully",
-      order: updatedOrder,
-    });
-  } catch (error) {
-    logger({
-      level: "error",
-      message: error.message,
-      location: __filename,
-      func: "cancelOrder",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }

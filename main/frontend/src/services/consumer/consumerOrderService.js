@@ -8,9 +8,9 @@ export const ConsumerOrderService = {
     return response.data;
   },
 
-  placeOrder: async (productId, orderData) => {
+  placeOrder: async (orderData) => {
     const response = await axiosInstance.post(
-      `${BASE_URL}/place-order/${productId}`,
+      `${BASE_URL}/place-order/`,
       orderData
     );
     return response.data;

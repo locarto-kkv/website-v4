@@ -20,6 +20,8 @@ export const initiatePayment = async (req, res) => {
     var date = new Date();
     date = date.toISOString();
 
+    console.log(data);
+
     const options = {
       amount: data.amount * 100,
       currency: "INR",
@@ -38,6 +40,11 @@ export const initiatePayment = async (req, res) => {
         name: profile.name,
         email: profile.email,
         contact: profile.phone_no,
+      },
+      notes: {
+        product_id: data.product_id,
+        consumer_address_id: data.consumer_address_id,
+        vendor_address_id: data.vendor_address_id,
       },
       theme: {
         color: "#F37254",

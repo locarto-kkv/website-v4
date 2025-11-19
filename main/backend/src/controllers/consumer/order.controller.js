@@ -1,9 +1,8 @@
-import { cancelOrderService } from "../../services/order.service.js";
-
 import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
 
 import { fileURLToPath } from "url";
+import { log } from "console";
 const __filename = fileURLToPath(import.meta.url);
 
 export const getOrderHistory = async (req, res) => {
@@ -14,8 +13,10 @@ export const getOrderHistory = async (req, res) => {
       .from("orders")
       .select(
         `*,
-        product: orders_product_id_fkey(*),
-        review: reviews_order_id_fkey(*)
+        items: order_items_order_id_fkey(*,
+        product: order_items_product_id_fkey(*),          
+        review: reviews_order_item_id_fkey(*)
+        )
         `
       )
       .eq("consumer_id", userId);
@@ -37,22 +38,43 @@ export const getOrderHistory = async (req, res) => {
 export const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { productId } = req.params;
-    const { order } = req.body;
+    const { items, ...order } = req.body;
 
     const orderData = {
       ...order,
-      product_id: productId,
       consumer_id: userId,
     };
 
-    const { data: newOrder } = await db
+    const { data: newOrder, error } = await db
       .from("orders")
       .insert(orderData)
       .select()
       .single();
+    console.log(newOrder);
 
-    res.status(200).json({ order: newOrder });
+    const itemsData = [];
+
+    const status = {
+      payment_status: orderData.payment_date ? "paid" : "pending",
+      support_status: "open",
+      order_status: "confirmed",
+    };
+
+    items.map((item) => {
+      const itemData = {
+        ...item,
+        ...status,
+        order_id: newOrder.id,
+      };
+      itemsData.push(itemData);
+    });
+
+    const { data: newOrderItems } = await db
+      .from("order_items")
+      .insert(itemsData)
+      .select();
+
+    getOrderHistory(req, res);
   } catch (error) {
     logger({
       level: "error",
@@ -68,12 +90,29 @@ export const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
 
-    const updatedOrder = await cancelOrderService(orderId);
+    const { data: items } = await db
+      .from("order_items")
+      .select()
+      .eq("order_id", orderId);
 
-    res.status(200).json({
-      message: "Order cancelled successfully",
-      order: updatedOrder,
+    const itemsData = [];
+
+    items.map((item) => {
+      const itemData = {
+        ...item,
+        payment_status: item.payment_date ? "refunded" : "cancelled",
+        support_status: "open",
+        order_status: "cancelled",
+      };
+      itemsData.push(itemData);
     });
+
+    const { data: updatedOrderItems } = await db
+      .from("order_items")
+      .upsert(itemsData)
+      .select();
+
+    getOrderHistory(req, res);
   } catch (error) {
     logger({
       level: "error",

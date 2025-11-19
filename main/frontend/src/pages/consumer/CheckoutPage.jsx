@@ -15,7 +15,6 @@ const CheckoutPage = () => {
   const lists = useConsumerDataStore((s) => s.lists);
   const profile = useConsumerDataStore((s) => s.profile);
   const fetchProfile = useConsumerDataStore((s) => s.fetchProfile);
-  console.log(profile);
 
   const { updateList, removeFromList } = ConsumerListService;
   const navigate = useNavigate();
@@ -33,6 +32,7 @@ const CheckoutPage = () => {
   });
 
   const [orderData, setOrderData] = useState({
+    product_id: "",
     payment_mode: "prepaid",
     amount: "",
     payment_status: "",
@@ -40,6 +40,8 @@ const CheckoutPage = () => {
     order_status: "",
     support_status: "",
     payment_date: "",
+    consumer_address_id: "",
+    vendor_address_id: "",
   });
 
   const [bills, setBills] = useState({
@@ -69,14 +71,22 @@ const CheckoutPage = () => {
       (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
       0
     );
-    const deliveryFee = subtotal > 0 && subtotal < 500 ? 49 : 0;
-    const platformFee = subtotal > 0 ? 5 : 0;
+    // const deliveryFee = subtotal > 0 && subtotal < 500 ? 49 : 0;
+    // const platformFee = subtotal > 0 ? 5 : 0;
+    const deliveryFee = 0;
+    const platformFee = 0;
 
-    // const totalBeforeDiscount = subtotal + bills.deliveryFee + platformFee;
-    // const total = Math.max(0, totalBeforeDiscount - discountAmount);
-    const total = subtotal;
+    const totalBeforeDiscount = subtotal + deliveryFee + platformFee;
+    const total = Math.max(0, totalBeforeDiscount - discountAmount);
+    // const total = subtotal;
 
-    setOrderData((prev) => ({ ...prev, amount: total }));
+    const productIds = lists?.cart?.map((product) => product.id);
+
+    setOrderData((prev) => ({
+      ...prev,
+      amount: total,
+      product_id: productIds,
+    }));
     setBills((prev) => ({
       ...prev,
       total,
@@ -290,12 +300,13 @@ const CheckoutPage = () => {
         toast.success("Payment successful!");
       }, 200);
 
-      const mockOrder = {
-        id: Math.floor(Math.random() * 100000) + 90000, // Random order ID
-        created_at: new Date().toISOString(),
-        order_status: "pending", // Initial status
-        payment_mode: "Mock Payment", // Placeholder
-        payment_status: "paid", // Placeholder
+      console.log(orderData);
+
+      return;
+      const order = {
+        ...orderData,
+        order_status: "pending",
+        payment_status: "paid",
         amount: bills.total,
         // Pass cart items as 'products'
         products: lists?.cart.map((item) => ({

@@ -73,6 +73,7 @@ const SideCart = ({ isOpen, onClose }) => {
       useConsumerDataStore.setState((state) => ({
         ...state,
         lists: { ...newList },
+        vendorInCart: null,
       }));
       const updatedCartItems = newList?.cart || [];
       setCartItems(updatedCartItems);
