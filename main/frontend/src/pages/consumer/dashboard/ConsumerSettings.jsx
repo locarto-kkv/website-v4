@@ -41,10 +41,9 @@ const EditableInput = ({
 
 const CustomerSettings = () => {
   const navigate = useNavigate();
-  
+
   // Get data and methods from store
   const profile = useConsumerDataStore((s) => s.profile);
-  const fetchProfile = useConsumerDataStore((s) => s.fetchProfile);
   const orders = useConsumerDataStore((s) => s.orders);
 
   // Local state for form data
@@ -70,7 +69,7 @@ const CustomerSettings = () => {
     if (profile) {
       // Get the first address or default to empty
       const currentAddr = profile.address?.[0] || {};
-      
+
       setFormData({
         name: profile.name || "",
         email: profile.email || "",
@@ -115,13 +114,19 @@ const CustomerSettings = () => {
         },
       };
 
-      await ConsumerProfileService.updateProfile(payload);
-      
-      // Refresh store to reflect changes immediately and persist
-      await fetchProfile();
+      const updatedProfile = await ConsumerProfileService.updateProfile(
+        payload
+      );
+
+      useConsumerDataStore.setState((state) => ({
+        ...state,
+        profile: updatedProfile,
+      }));
 
       toast.dismiss();
-      toast.success(`${section === 'account' ? 'Account' : 'Address'} updated successfully!`);
+      toast.success(
+        `${section === "account" ? "Account" : "Address"} updated successfully!`
+      );
       setEditingSection(null);
     } catch (error) {
       console.error("Failed to save settings:", error);
@@ -135,19 +140,19 @@ const CustomerSettings = () => {
   const handleCancel = () => {
     // Revert to original profile data
     if (profile) {
-        const currentAddr = profile.address?.[0] || {};
-        setFormData({
-            name: profile.name || "",
-            email: profile.email || "",
-            phone_no: profile.phone_no || "",
-            address_line_1: currentAddr.address_line_1 || "",
-            address_line_2: currentAddr.address_line_2 || "",
-            city: currentAddr.city || "",
-            state: currentAddr.state || "",
-            pincode: currentAddr.pincode || "",
-            country: currentAddr.country || "India",
-            label: currentAddr.label || "Home",
-        });
+      const currentAddr = profile.address?.[0] || {};
+      setFormData({
+        name: profile.name || "",
+        email: profile.email || "",
+        phone_no: profile.phone_no || "",
+        address_line_1: currentAddr.address_line_1 || "",
+        address_line_2: currentAddr.address_line_2 || "",
+        city: currentAddr.city || "",
+        state: currentAddr.state || "",
+        pincode: currentAddr.pincode || "",
+        country: currentAddr.country || "India",
+        label: currentAddr.label || "Home",
+      });
     }
     setEditingSection(null);
   };
@@ -161,15 +166,15 @@ const CustomerSettings = () => {
     formData.address_line_2,
     formData.city,
     formData.state,
-    formData.pincode
-  ].filter(Boolean).join(", ");
+    formData.pincode,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
-      
       {/* --- MAIN CONTENT COLUMN --- */}
       <div className="xl:col-span-3 space-y-6">
-        
         {/* 1. ACCOUNT SETTINGS SECTION */}
         <div className="bg-white rounded-2xl shadow-lg p-3 md:p-4 lg:p-6 border border-gray-100">
           <div className="flex items-center justify-between gap-2 md:gap-3 mb-4 pb-4 border-b border-gray-100">
@@ -186,10 +191,10 @@ const CustomerSettings = () => {
                 </p>
               </div>
             </div>
-            {editingSection !== 'account' && (
+            {editingSection !== "account" && (
               <button
                 type="button"
-                onClick={() => setEditingSection('account')}
+                onClick={() => setEditingSection("account")}
                 className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-xs sm:text-sm font-semibold flex items-center gap-1.5"
               >
                 <i className="fas fa-pencil-alt"></i> Edit
@@ -205,7 +210,7 @@ const CustomerSettings = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                isEditing={editingSection === 'account'}
+                isEditing={editingSection === "account"}
               />
               <EditableInput
                 label="Email"
@@ -213,7 +218,7 @@ const CustomerSettings = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                isEditing={editingSection === 'account'}
+                isEditing={editingSection === "account"}
                 type="email"
               />
               <EditableInput
@@ -222,13 +227,13 @@ const CustomerSettings = () => {
                 name="phone_no"
                 value={formData.phone_no}
                 onChange={handleInputChange}
-                isEditing={editingSection === 'account'}
+                isEditing={editingSection === "account"}
                 type="tel"
               />
             </div>
 
             {/* Save Actions for Account */}
-            {editingSection === 'account' && (
+            {editingSection === "account" && (
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
@@ -239,11 +244,15 @@ const CustomerSettings = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleSave('account')}
+                  onClick={() => handleSave("account")}
                   disabled={loading}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium flex items-center gap-2 disabled:opacity-70"
                 >
-                  {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-save"></i>}
+                  {loading ? (
+                    <i className="fas fa-spinner fa-spin"></i>
+                  ) : (
+                    <i className="fas fa-save"></i>
+                  )}
                   Save Account Info
                 </button>
               </div>
@@ -267,10 +276,10 @@ const CustomerSettings = () => {
                 </p>
               </div>
             </div>
-            {editingSection !== 'address' && (
+            {editingSection !== "address" && (
               <button
                 type="button"
-                onClick={() => setEditingSection('address')}
+                onClick={() => setEditingSection("address")}
                 className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors text-xs sm:text-sm font-semibold flex items-center gap-1.5"
               >
                 <i className="fas fa-pencil-alt"></i> Edit
@@ -285,7 +294,7 @@ const CustomerSettings = () => {
               name="address_line_1"
               value={formData.address_line_1}
               onChange={handleInputChange}
-              isEditing={editingSection === 'address'}
+              isEditing={editingSection === "address"}
             />
             <EditableInput
               label="Address Line 2 (Optional)"
@@ -293,7 +302,7 @@ const CustomerSettings = () => {
               name="address_line_2"
               value={formData.address_line_2}
               onChange={handleInputChange}
-              isEditing={editingSection === 'address'}
+              isEditing={editingSection === "address"}
             />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               <EditableInput
@@ -302,7 +311,7 @@ const CustomerSettings = () => {
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
-                isEditing={editingSection === 'address'}
+                isEditing={editingSection === "address"}
               />
               <EditableInput
                 label="State"
@@ -310,7 +319,7 @@ const CustomerSettings = () => {
                 name="state"
                 value={formData.state}
                 onChange={handleInputChange}
-                isEditing={editingSection === 'address'}
+                isEditing={editingSection === "address"}
               />
               <EditableInput
                 label="Pincode"
@@ -318,12 +327,12 @@ const CustomerSettings = () => {
                 name="pincode"
                 value={formData.pincode}
                 onChange={handleInputChange}
-                isEditing={editingSection === 'address'}
+                isEditing={editingSection === "address"}
               />
             </div>
 
-             {/* Save Actions for Address */}
-             {editingSection === 'address' && (
+            {/* Save Actions for Address */}
+            {editingSection === "address" && (
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
@@ -334,12 +343,16 @@ const CustomerSettings = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleSave('address')}
+                  onClick={() => handleSave("address")}
                   disabled={loading}
                   className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition text-sm font-medium flex items-center gap-2 disabled:opacity-70"
                 >
-                   {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-save"></i>}
-                   Save Address
+                  {loading ? (
+                    <i className="fas fa-spinner fa-spin"></i>
+                  ) : (
+                    <i className="fas fa-save"></i>
+                  )}
+                  Save Address
                 </button>
               </div>
             )}
@@ -358,7 +371,10 @@ const CustomerSettings = () => {
               <h3 className="font-bold text-base md:text-lg text-gray-900 truncate">
                 {formData.name || "User"}
               </h3>
-              <p className="text-sm text-gray-500 truncate" title={formData.email}>
+              <p
+                className="text-sm text-gray-500 truncate"
+                title={formData.email}
+              >
                 {formData.email || "No email"}
               </p>
             </div>
@@ -400,7 +416,7 @@ const CustomerSettings = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-3 md:p-4 lg:p-6">
-           <h3 className="font-bold text-gray-900 mb-3 md:mb-4 flex items-center gap-2 text-base md:text-lg">
+          <h3 className="font-bold text-gray-900 mb-3 md:mb-4 flex items-center gap-2 text-base md:text-lg">
             <div className="w-7 h-7 md:w-8 md:h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center">
               <i className="fas fa-link text-orange-600 text-sm md:text-base"></i>
             </div>
@@ -411,19 +427,22 @@ const CustomerSettings = () => {
               onClick={() => navigate("/consumer/dashboard/orders")}
               className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
-              <i className="fas fa-box w-4 text-center text-gray-500"></i> My Orders
+              <i className="fas fa-box w-4 text-center text-gray-500"></i> My
+              Orders
             </button>
             <button
               onClick={() => navigate("/consumer/dashboard/lists")}
               className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
-              <i className="fas fa-list w-4 text-center text-gray-500"></i> My Lists
+              <i className="fas fa-list w-4 text-center text-gray-500"></i> My
+              Lists
             </button>
             <button
               onClick={() => navigate("/consumer/dashboard/support")}
               className="w-full text-left p-2.5 md:p-3 rounded-lg hover:bg-gray-100 text-gray-700 font-medium flex items-center gap-3 transition-colors text-sm"
             >
-              <i className="fas fa-headset w-4 text-center text-gray-500"></i> Support
+              <i className="fas fa-headset w-4 text-center text-gray-500"></i>{" "}
+              Support
             </button>
           </div>
         </div>

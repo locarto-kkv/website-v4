@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { protectRoute } from "../../middleware/auth.middleware.js";
 import {
+  clearList,
   getListItems,
   removeFromList,
   updateList,
@@ -11,5 +12,6 @@ const router = Router();
 router.get("/", protectRoute("consumer"), getListItems);
 router.put("/update/:productId", protectRoute("consumer"), updateList);
 router.delete("/delete/:productId", protectRoute("consumer"), removeFromList);
+router.delete("/clear/", protectRoute("consumer"), clearList);
 
 export default router;

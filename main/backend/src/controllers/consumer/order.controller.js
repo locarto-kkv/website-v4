@@ -2,7 +2,6 @@ import logger from "../../lib/logger.js";
 import db from "../../lib/db.js";
 
 import { fileURLToPath } from "url";
-import { log } from "console";
 const __filename = fileURLToPath(import.meta.url);
 
 export const getOrderHistory = async (req, res) => {
@@ -38,7 +37,7 @@ export const getOrderHistory = async (req, res) => {
 export const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { items, ...order } = req.body;
+    const { items, address, ...order } = req.body;
 
     const orderData = {
       ...order,
@@ -50,7 +49,8 @@ export const placeOrder = async (req, res) => {
       .insert(orderData)
       .select()
       .single();
-    console.log(newOrder);
+
+    if (error) throw error;
 
     const itemsData = [];
 
@@ -69,10 +69,12 @@ export const placeOrder = async (req, res) => {
       itemsData.push(itemData);
     });
 
-    const { data: newOrderItems } = await db
+    const { data: newOrderItems, error2 } = await db
       .from("order_items")
       .insert(itemsData)
       .select();
+
+    if (error2) throw error2;
 
     getOrderHistory(req, res);
   } catch (error) {

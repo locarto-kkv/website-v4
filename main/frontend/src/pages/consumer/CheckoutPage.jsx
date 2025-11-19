@@ -14,10 +14,10 @@ import { ConsumerProfileService } from "../../services/consumer/consumerProfileS
 const CheckoutPage = () => {
   const lists = useConsumerDataStore((s) => s.lists);
   const profile = useConsumerDataStore((s) => s.profile);
-  const fetchProfile = useConsumerDataStore((s) => s.fetchProfile);
-
-  const { updateList, removeFromList } = ConsumerListService;
+  const { updateList, removeFromList, clearList } = ConsumerListService;
   const navigate = useNavigate();
+
+  console.log(lists);
 
   // State for form data (can be used for 'Add New Address' or editing)
   const [formData, setFormData] = useState({
@@ -32,16 +32,14 @@ const CheckoutPage = () => {
   });
 
   const [orderData, setOrderData] = useState({
-    product_id: "",
+    items: "",
     payment_mode: "prepaid",
     amount: "",
-    payment_status: "",
-    delivery_date: "",
-    order_status: "",
-    support_status: "",
-    payment_date: "",
-    consumer_address_id: "",
-    vendor_address_id: "",
+    delivery_fee: "",
+    delivery_date: null,
+    payment_date: null,
+    consumer_address_id: null,
+    vendor_address_id: null,
   });
 
   const [bills, setBills] = useState({
@@ -51,11 +49,9 @@ const CheckoutPage = () => {
     platformFee: "",
   });
 
-  const [savedAddresses] = useState(profile?.address ?? []);
-  const [selectedAddressId, setSelectedAddressId] = useState(
-    profile?.address?.find((addr) => addr.isDefault)?.id ||
-      profile?.address?.[0]?.id ||
-      null
+  const [selectedAddress, setSelectedAddress] = useState(
+    // profile?.address?.find((addr) => addr.default)?.id ||
+    profile?.address?.[0] ?? null
   );
 
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
@@ -71,6 +67,7 @@ const CheckoutPage = () => {
       (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
       0
     );
+
     // const deliveryFee = subtotal > 0 && subtotal < 500 ? 49 : 0;
     // const platformFee = subtotal > 0 ? 5 : 0;
     const deliveryFee = 0;
@@ -80,12 +77,16 @@ const CheckoutPage = () => {
     const total = Math.max(0, totalBeforeDiscount - discountAmount);
     // const total = subtotal;
 
-    const productIds = lists?.cart?.map((product) => product.id);
+    const items = lists?.cart?.map((product) => ({
+      product_id: product.id,
+      quantity: product.quantity,
+    }));
 
     setOrderData((prev) => ({
       ...prev,
-      amount: total,
-      product_id: productIds,
+      amount: subtotal,
+      items,
+      delivery_fee: deliveryFee,
     }));
     setBills((prev) => ({
       ...prev,
@@ -101,8 +102,8 @@ const CheckoutPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddressSelect = (addressId) => {
-    setSelectedAddressId(addressId);
+  const handleAddressSelect = (address) => {
+    setSelectedAddress(address);
     setShowNewAddressForm(false);
   };
 
@@ -118,7 +119,7 @@ const CheckoutPage = () => {
       pincode: "",
       label: "",
     }));
-    setSelectedAddressId(null);
+    setSelectedAddress(null);
     setShowNewAddressForm(true);
   };
 
@@ -133,8 +134,10 @@ const CheckoutPage = () => {
       address: formData,
     });
 
-    await fetchProfile();
-
+    useConsumerDataStore.setState((state) => ({
+      ...state,
+      profile: updatedProfile,
+    }));
     setShowNewAddressForm(false);
 
     toast.dismiss();
@@ -233,7 +236,7 @@ const CheckoutPage = () => {
 
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
-    if (!selectedAddressId && !showNewAddressForm) {
+    if (!selectedAddress && !showNewAddressForm) {
       toast.error("Please select or add a delivery address.");
       return;
     }
@@ -242,102 +245,94 @@ const CheckoutPage = () => {
       return;
     }
 
-    try {
-      toast.loading("Redirecting to payment...");
-
-      // 1️⃣ Get options from backend
-      const options = await ConsumerPaymentService.initiatePayment(
-        profile,
-        orderData
-      );
-
-      console.log("options");
-
-      console.log(options);
-
+    if (orderData.payment_mode === "prepaid") {
       try {
-        var paymentResponse = await openRazorpay(options);
+        toast.loading("Redirecting to payment...");
 
-        if (paymentResponse.status === "success") {
+        const options = await ConsumerPaymentService.initiatePayment(
+          profile,
+          orderData
+        );
+
+        try {
+          var paymentResponse = await openRazorpay(options);
+
+          if (paymentResponse.status === "success") {
+            toast.dismiss();
+            setTimeout(() => {
+              toast.loading("Verifying Payment...");
+            }, 200);
+          }
+        } catch (err) {
+          setLoading(false);
           toast.dismiss();
+
           setTimeout(() => {
-            toast.loading("Verifying Payment...");
+            if (err.status === "closed") {
+              toast.error("Payment cancelled.");
+            } else if (err.status === "failed") {
+              toast.error("Payment failed. Try again.");
+            }
           }, 200);
+          return;
         }
-      } catch (err) {
-        setLoading(false);
+
+        const verify = await ConsumerPaymentService.validatePayment(
+          paymentResponse.response
+        );
+
         toast.dismiss();
 
+        if (!verify.success) {
+          setTimeout(() => {
+            toast.error("Payment verification failed.");
+          }, 200);
+          return;
+        }
+
         setTimeout(() => {
-          if (err.status === "closed") {
-            toast.error("Payment cancelled.");
-          } else if (err.status === "failed") {
-            toast.error("Payment failed. Try again.");
-          }
+          toast.success("Payment successful!");
         }, 200);
+
+        var date = new Date();
+
+        setOrderData((prev) => ({
+          ...prev,
+          payment_date: date.toISOString(),
+        }));
+      } catch (error) {
+        console.error("Order placement error:", error);
+        toast.error("Failed to place order. Please try again.");
         return;
+      } finally {
+        toast.dismiss();
+        setLoading(false);
       }
-
-      console.log("paymentResponse");
-
-      console.log(paymentResponse);
-
-      const verify = await ConsumerPaymentService.validatePayment(
-        paymentResponse.response
-      );
-      toast.dismiss();
-
-      console.log("verify");
-
-      console.log(verify);
-
-      if (!verify.success) {
-        toast.error("Payment verification failed.");
-        return;
-      }
-
-      setTimeout(() => {
-        toast.success("Payment successful!");
-      }, 200);
-
-      console.log(orderData);
-
-      return;
-      const order = {
-        ...orderData,
-        order_status: "pending",
-        payment_status: "paid",
-        amount: bills.total,
-        // Pass cart items as 'products'
-        products: lists?.cart.map((item) => ({
-          product_id: item.id || item.product_id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          product_images: item.product_images,
-        })),
-        billDetails: bills,
-      };
-
-      console.log("mockOrder");
-
-      console.log(mockOrder);
-
-      // useConsumerDataStore.setState((state) => ({
-      //   ...state,
-      //   lists: { ...state.lists, cart: [] },
-      // }));
-
-      toast.success("Order placed successfully!");
-
-      // navigate("/consumer/order-placed", { state: { order: mockOrder } });
-    } catch (error) {
-      console.error("Order placement error:", error);
-      toast.error("Failed to place order. Please try again.");
-    } finally {
-      toast.dismiss();
-      setLoading(false);
     }
+
+    const order = {
+      ...orderData,
+
+      consumer_address_id: selectedAddress.id,
+      address: selectedAddress,
+    };
+
+    console.log(order);
+
+    const updatedOrders = await ConsumerOrderService.placeOrder(order);
+    await clearList("cart");
+
+    useConsumerDataStore.setState((state) => ({
+      ...state,
+      lists: { wishlist: state.lists.wishlist },
+      orders: updatedOrders,
+    }));
+
+    toast.success("Order placed successfully!");
+
+    const currOrderId = updatedOrders[updatedOrders.length - 1].id;
+
+    navigate(`/consumer/track-order/${currOrderId}`);
   };
 
   return (
@@ -353,8 +348,7 @@ const CheckoutPage = () => {
             <span className="font-medium text-sm">Back</span>
           </button>
         </div>
-
-        {lists?.cart?.length === 0 ? (
+        {!lists?.cart ? (
           // Empty Cart Message (Keep as is)
           <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 p-8 sm:p-12 text-center max-w-2xl mx-auto mt-10">
             <div className="relative inline-block mb-6">
@@ -586,14 +580,14 @@ const CheckoutPage = () => {
                     </button>
                   )}
                 </div>
-                {!showNewAddressForm && savedAddresses.length > 0 && (
+                {!showNewAddressForm && profile.address?.length > 0 && (
                   <div className="space-y-3 mb-5">
-                    {savedAddresses.map((addr) => (
+                    {profile.address?.map((addr) => (
                       <div
                         key={addr.id}
-                        onClick={() => handleAddressSelect(addr.id)}
+                        onClick={() => handleAddressSelect(addr)}
                         className={`p-3 sm:p-4 border rounded-lg cursor-pointer transition-all duration-200 flex items-start gap-3 ${
-                          selectedAddressId === addr.id
+                          selectedAddress.id === addr.id
                             ? "border-orange-500 bg-orange-50 ring-2 ring-orange-200 shadow-md"
                             : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
                         }`}
@@ -602,8 +596,8 @@ const CheckoutPage = () => {
                           type="radio"
                           name="addressSelection"
                           id={`addr-radio-${addr.id}`}
-                          checked={selectedAddressId === addr.id}
-                          onChange={() => handleAddressSelect(addr.id)}
+                          checked={selectedAddress.id === addr.id}
+                          onChange={() => handleAddressSelect(addr)}
                           className="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500 mt-1 flex-shrink-0"
                         />
                         <div className="flex-1">
@@ -691,6 +685,7 @@ const CheckoutPage = () => {
                         className="checkout-input"
                       />
                       <input
+                        type="number"
                         name="pincode"
                         value={formData.pincode}
                         onChange={handleInputChange}
@@ -815,11 +810,9 @@ const CheckoutPage = () => {
 
                 <button
                   onClick={handleSubmitOrder}
-                  disabled={
-                    (!selectedAddressId && !showNewAddressForm) || loading
-                  }
+                  disabled={loading}
                   className={`w-full mt-6 bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white py-3 sm:py-3 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 ${
-                    (!selectedAddressId && !showNewAddressForm) || loading
+                    !selectedAddress || showNewAddressForm || loading
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:shadow-2xl hover:scale-105"
                   }`}

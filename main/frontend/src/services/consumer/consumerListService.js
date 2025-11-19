@@ -46,4 +46,13 @@ export const ConsumerListService = {
     );
     return response.data;
   },
+
+  clearList: async (type) => {
+    ensureConsumerAuth();
+
+    const response = await axiosInstance.delete(`${BASE_URL}/clear/`, {
+      data: { type },
+    });
+    return response.data;
+  },
 };

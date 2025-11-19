@@ -88,3 +88,27 @@ export const removeFromList = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const clearList = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { type: list_type } = req.body;
+
+    const { data } = await db
+      .from("consumer_lists")
+      .delete()
+      .eq("consumer_id", userId)
+      .eq("list_type", list_type)
+      .select();
+
+    res.status(200).json({ message: `${list_type} Cleared` });
+  } catch (error) {
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "clearList",
+    });
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

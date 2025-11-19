@@ -14,7 +14,7 @@ import CustomerSupport from "./dashboard/ConsumerSupport.jsx";
 import CustomerSettings from "./dashboard/ConsumerSettings.jsx";
 import RuleChatbot from "../Chatbot";
 import CheckoutPage from "./CheckoutPage";
-import OrderPlacedPage from "./OrderPlacedPage.jsx";
+import TrackOrderPage from "./TrackOrderPage.jsx";
 import NotFoundPage from "../NotFoundPage.jsx";
 
 const ProtectedRoute = () => {
@@ -63,7 +63,7 @@ const ConsumerRoutes = () => {
         <Route path="add-review/:orderId" element={<AddReviewPage />} />
         {/* Other protected consumer routes (outside the dashboard layout) */}
         <Route path="checkout" element={<CheckoutPage />} />
-        <Route path="order-placed" element={<OrderPlacedPage />} />
+        <Route path="track-order/:orderId" element={<TrackOrderPage />} />
         {/* <-- Add Checkout Route */}
       </Route>
       {/* --- End Protected Routes --- */}

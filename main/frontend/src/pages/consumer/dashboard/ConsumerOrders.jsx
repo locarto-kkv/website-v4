@@ -8,6 +8,8 @@ const CustomerOrders = () => {
   const orders = useConsumerDataStore((s) => s.orders);
   const navigate = useNavigate();
 
+  console.log(orders);
+
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");

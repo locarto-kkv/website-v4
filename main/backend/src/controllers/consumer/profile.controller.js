@@ -61,7 +61,7 @@ export const updateProfile = async (req, res) => {
 
     if (error) throw error;
 
-    res.status(200).json(updatedUser);
+    getProfile(req, res);
   } catch (error) {
     logger({
       level: "error",
