@@ -32,30 +32,33 @@ const ShopProducts = () => {
 
   // Helper to show the custom auth toast
   const showAuthToast = () => {
-    toast((t) => (
-      <div className="flex flex-col gap-2 items-start">
-        <span className="font-medium text-gray-800">
-          Not signed in as customer
-        </span>
-        <button
-          onClick={() => {
-            toast.dismiss(t.id);
-            navigate("/consumer/login", { state: { isSignup: true } });
-          }}
-          className="px-3 py-1.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition-colors"
-        >
-          Sign Up as Customer
-        </button>
-      </div>
-    ), {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-2 items-start">
+          <span className="font-medium text-gray-800">
+            Not signed in as customer
+          </span>
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              navigate("/consumer/login", { state: { isSignup: true } });
+            }}
+            className="px-3 py-1.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            Sign Up as Customer
+          </button>
+        </div>
+      ),
+      {
         duration: 5000,
-        icon: '🔒',
+        icon: "🔒",
         style: {
-            background: '#fff',
-            color: '#333',
-            border: '1px solid #e5e7eb',
+          background: "#fff",
+          color: "#333",
+          border: "1px solid #e5e7eb",
         },
-    });
+      }
+    );
   };
 
   const toggleWishlist = async (e, productId) => {
@@ -73,6 +76,7 @@ const ShopProducts = () => {
         useConsumerDataStore.setState((state) => ({
           ...state,
           lists: { ...newList },
+          vendorInCart: newList.cart ? state.vendorInCart : null,
         }));
       } else {
         const newList = await updateList("wishlist", 1, productId);
@@ -113,7 +117,7 @@ const ShopProducts = () => {
         useConsumerDataStore.setState((state) => ({
           ...state,
           lists: { ...newList },
-          vendorInCart: null,
+          vendorInCart: newList.cart ? state.vendorInCart : null,
         }));
       } else {
         const newList = await updateList("cart", newQty, productId);

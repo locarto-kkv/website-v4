@@ -70,10 +70,11 @@ const SideCart = ({ isOpen, onClose }) => {
   const removeFromCart = async (productId) => {
     try {
       const newList = await removeFromList("cart", productId);
+
       useConsumerDataStore.setState((state) => ({
         ...state,
         lists: { ...newList },
-        vendorInCart: null,
+        vendorInCart: newList.cart ? state.vendorInCart : null,
       }));
       const updatedCartItems = newList?.cart || [];
       setCartItems(updatedCartItems);

@@ -18,14 +18,21 @@ export const initiatePayment = async (req, res) => {
     const userId = req.user.id;
     const { profile, data } = req.body;
     var date = new Date();
-    date = date.toISOString();
-
-    console.log(data);
+    date = date.toISOString().split("T")[0];
 
     const options = {
       amount: data.amount * 100,
       currency: "INR",
       receipt: `${userId}_${date}`,
+      notes: {
+        consumer: JSON.stringify({
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          phone_no: profile.phone_no,
+        }),
+        items: JSON.stringify(data.items),
+      },
     };
 
     const order = await razorpay.orders.create(options);
@@ -42,9 +49,13 @@ export const initiatePayment = async (req, res) => {
         contact: profile.phone_no,
       },
       notes: {
-        product_id: data.product_id,
-        consumer_address_id: data.consumer_address_id,
-        vendor_address_id: data.vendor_address_id,
+        consumer: JSON.stringify({
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          phone_no: profile.phone_no,
+        }),
+        items: JSON.stringify(data.items),
       },
       theme: {
         color: "#F37254",
@@ -67,8 +78,6 @@ export const validatePayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
-
-    console.log(razorpay_order_id, razorpay_payment_id, razorpay_signature);
 
     // Verify payment signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;

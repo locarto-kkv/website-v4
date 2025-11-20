@@ -158,6 +158,7 @@ const CheckoutPage = () => {
         useConsumerDataStore.setState((state) => ({
           ...state,
           lists: { ...newList },
+          vendorInCart: newList.cart ? state.vendorInCart : null,
         }));
         toast.success(`${currentItem.name || "Item"} removed from cart`);
       } else {
@@ -180,6 +181,7 @@ const CheckoutPage = () => {
       useConsumerDataStore.setState((state) => ({
         ...state,
         lists: { ...newList },
+        vendorInCart: newList.cart ? state.vendorInCart : null,
       }));
       toast.success(`${productName || "Item"} removed from cart`);
     } catch (err) {
