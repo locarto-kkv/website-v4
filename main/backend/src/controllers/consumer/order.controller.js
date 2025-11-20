@@ -57,7 +57,7 @@ export const placeOrder = async (req, res) => {
     const status = {
       payment_status: orderData.payment_date ? "paid" : "pending",
       support_status: "open",
-      order_status: "confirmed",
+      order_status: "pending",
     };
 
     items.map((item) => {
@@ -88,30 +88,26 @@ export const placeOrder = async (req, res) => {
   }
 };
 
-export const cancelOrder = async (req, res) => {
+export const cancelOrderItem = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { itemId } = req.params;
 
-    const { data: items } = await db
+    const { data: item } = await db
       .from("order_items")
       .select()
-      .eq("order_id", orderId);
+      .eq("id", itemId)
+      .single();
 
-    const itemsData = [];
-
-    items.map((item) => {
-      const itemData = {
-        ...item,
-        payment_status: item.payment_date ? "refunded" : "cancelled",
-        support_status: "open",
-        order_status: "cancelled",
-      };
-      itemsData.push(itemData);
-    });
+    const itemData = {
+      ...item,
+      payment_status: item.payment_date ? "refunding" : "cancelled",
+      support_status: "open",
+      order_status: "cancelled",
+    };
 
     const { data: updatedOrderItems } = await db
       .from("order_items")
-      .upsert(itemsData)
+      .upsert(itemData)
       .select();
 
     getOrderHistory(req, res);
@@ -120,7 +116,7 @@ export const cancelOrder = async (req, res) => {
       level: "error",
       message: error.message,
       location: __filename,
-      func: "cancelOrder",
+      func: "cancelOrderItem",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }

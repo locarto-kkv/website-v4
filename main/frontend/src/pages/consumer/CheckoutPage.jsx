@@ -17,8 +17,6 @@ const CheckoutPage = () => {
   const { updateList, removeFromList, clearList } = ConsumerListService;
   const navigate = useNavigate();
 
-  console.log(lists);
-
   // State for form data (can be used for 'Add New Address' or editing)
   const [formData, setFormData] = useState({
     email: "",
@@ -259,9 +257,7 @@ const CheckoutPage = () => {
 
           if (paymentResponse.status === "success") {
             toast.dismiss();
-            setTimeout(() => {
-              toast.loading("Verifying Payment...");
-            }, 200);
+            toast.loading("Verifying Payment...");
           }
         } catch (err) {
           setLoading(false);
@@ -296,10 +292,7 @@ const CheckoutPage = () => {
 
         var date = new Date();
 
-        setOrderData((prev) => ({
-          ...prev,
-          payment_date: date.toISOString(),
-        }));
+        orderData.payment_date = date.toISOString();
       } catch (error) {
         console.error("Order placement error:", error);
         toast.error("Failed to place order. Please try again.");
@@ -312,7 +305,6 @@ const CheckoutPage = () => {
 
     const order = {
       ...orderData,
-
       consumer_address_id: selectedAddress.id,
       address: selectedAddress,
     };

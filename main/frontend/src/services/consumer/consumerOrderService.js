@@ -16,9 +16,9 @@ export const ConsumerOrderService = {
     return response.data;
   },
 
-  cancelOrder: async (orderId) => {
-    const response = await axiosInstance.patch(
-      `${BASE_URL}/cancel-order/${orderId}`
+  cancelOrderItem: async (itemId) => {
+    const response = await axiosInstance.put(
+      `${BASE_URL}/cancel-order/${itemId}`
     );
     return response.data;
   },

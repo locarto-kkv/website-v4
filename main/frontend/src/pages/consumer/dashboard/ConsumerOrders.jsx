@@ -8,8 +8,6 @@ const CustomerOrders = () => {
   const orders = useConsumerDataStore((s) => s.orders);
   const navigate = useNavigate();
 
-  console.log(orders);
-
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");
@@ -80,7 +78,10 @@ const CustomerOrders = () => {
 
     if (status !== "delivered") {
       return (
-        <button className="flex-1 px-3 py-2 md:px-4 bg-white hover:bg-gray-100 rounded-lg font-semibold text-sm transition-colors border border-gray-200 text-gray-700">
+        <button
+          onClick={() => navigate(`/consumer/track-order/${item.order_id}`)}
+          className="flex-1 px-3 py-2 md:px-4 bg-white hover:bg-gray-100 rounded-lg font-semibold text-sm transition-colors border border-gray-200 text-gray-700"
+        >
           Track Order
         </button>
       );
