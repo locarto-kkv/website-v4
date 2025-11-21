@@ -52,7 +52,7 @@ const ProductViewPage = () => {
   const navigate = useNavigate();
 
   const currentUser = useAuthStore((s) => s.currentUser);
-  const blogs = useDataStore((s) => s.blogs);
+  const brands = useDataStore((s) => s.brands);
   const { updateList, removeFromList } = ConsumerListService;
 
   const lists = useConsumerDataStore((s) => s.lists);
@@ -122,7 +122,7 @@ const ProductViewPage = () => {
       setLoading(false);
     };
     findProduct();
-  }, [productId, blogs]);
+  }, [productId, brands]);
 
   useEffect(() => {
     if (isConsumer && product) {
@@ -294,8 +294,8 @@ const ProductViewPage = () => {
 
   const images = product.product_images || [];
   const displayedImages = images.slice(0, 6);
-  const similarProducts = blogs
-    .flatMap((blog) => blog.products || [])
+  const similarProducts = brands
+    .flatMap((brand) => brand.products || [])
     .filter((p) => p.id !== product.id && p.category === product.category)
     .slice(0, 4);
 

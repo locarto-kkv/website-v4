@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useConsumerDataStore } from "../../store/consumer/consumerDataStore";
+import { useDataStore } from "../../store/useDataStore";
 import { formatCurrency } from "../../lib/utils";
 import { ConsumerListService } from "../../services/consumer/consumerListService"; // Import list service
 import { ConsumerOrderService } from "../../services/consumer/consumerOrderService"; // Import order service
@@ -13,7 +14,14 @@ import { ConsumerProfileService } from "../../services/consumer/consumerProfileS
 
 const CheckoutPage = () => {
   const lists = useConsumerDataStore((s) => s.lists);
+  const vendorInCart = useConsumerDataStore((s) => s.vendorInCart);
+
   const profile = useConsumerDataStore((s) => s.profile);
+
+  const brands = useDataStore((s) => s.brands);
+  const brand = brands.find((brand) => brand.id === vendorInCart);
+  console.log(brand?.address[0]?.id);
+
   const { updateList, removeFromList, clearList } = ConsumerListService;
   const navigate = useNavigate();
 
@@ -308,6 +316,7 @@ const CheckoutPage = () => {
     const order = {
       ...orderData,
       consumer_address_id: selectedAddress.id,
+      vendor_address_id: brand?.address[0]?.id,
       address: selectedAddress,
     };
 

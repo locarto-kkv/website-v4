@@ -20,8 +20,8 @@ const DiscoverPage = () => {
   const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
   const [logoAnimationKey, setLogoAnimationKey] = useState(0);
 
-  const { blogs } = useDataStore();
-  const brandData = blogs.filter((b) => b.blog.length > 0);
+  const brands = useDataStore((s) => s.brands);
+  const brandData = brands.filter((b) => b.blog.length > 0);
 
   // Scroll to top when component mounts
   useEffect(() => {

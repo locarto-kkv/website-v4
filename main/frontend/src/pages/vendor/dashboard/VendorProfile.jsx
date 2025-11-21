@@ -8,7 +8,7 @@ import { VendorProfileService } from "../../../services/vendor/vendorProfileServ
 import toast from "react-hot-toast"; // Import toast
 
 const VendorProfile = () => {
-  const blogs = useDataStore((s) => s.blogs);
+  const brands = useDataStore((s) => s.brands);
   const vendor = useVendorDataStore((s) => s.vendor);
   const profile = useVendorDataStore((s) => s.profile);
   const dataLoading = useVendorDataStore((s) => s.dataLoading);
@@ -25,16 +25,18 @@ const VendorProfile = () => {
   // --- END NEW STATE ---
 
   useEffect(() => {
-    if (vendor && profile && blogs) {
-      // Ensure blogs is also loaded
-      // Find the blog entry associated with the vendor profile
+    if (vendor && profile && brands) {
+      // Ensure brands is also loaded
+      // Find the brand entry associated with the vendor profile
       // Using String comparison for robustness in case IDs are numbers in one place and strings elsewhere
-      const vendorBlog = blogs.find((b) => String(b.id) === String(profile.id)); // Assuming profile ID matches blog/vendor ID
+      const vendorBrand = brands.find(
+        (b) => String(b.id) === String(profile.id)
+      ); // Assuming profile ID matches brand/vendor ID
 
       // Ensure rating is treated as a number
-      const blogRating = vendorBlog?.blog?.[0]?.rating;
+      const brandRating = vendorBrand?.blog?.[0]?.rating;
       const profileRating = profile?.average_rating;
-      const averageRatingValue = Number(blogRating ?? profileRating ?? 0); // Convert potential rating to number, default to 0
+      const averageRatingValue = Number(brandRating ?? profileRating ?? 0); // Convert potential rating to number, default to 0
 
       setProfileData({
         companyName: profile?.name || "N/A", // Use profile name first
@@ -45,13 +47,13 @@ const VendorProfile = () => {
         established: profile?.created_at
           ? new Date(profile.created_at).getFullYear()
           : "N/A",
-        // Get description from the matched blog entry
+        // Get description from the matched brand entry
         description:
-          vendorBlog?.blog?.[0]?.description || "No description available.",
+          vendorBrand?.blog?.[0]?.description || "No description available.",
       });
 
       setMetrics({
-        // Use data primarily from vendor context if available, fallback to profile/blog
+        // Use data primarily from vendor context if available, fallback to profile/brand
         totalOrders: vendor?.orders_count ?? profile?.orders_count ?? 0,
         totalRevenue: vendor?.total_amount ?? profile?.total_amount ?? 0,
         averageRating: averageRatingValue, // Use the calculated numeric rating
@@ -62,7 +64,7 @@ const VendorProfile = () => {
       // Ensure profile.documents is treated as an array
       setDocuments(Array.isArray(profile?.documents) ? profile.documents : []);
     }
-  }, [vendor, profile, blogs]); // Added blogs dependency
+  }, [vendor, profile, brands]); // Added brands dependency
 
   const openSetup = () => navigate("/vendor/dashboard/setup");
   const openEditProfile = () => navigate("/vendor/dashboard/profile/edit");

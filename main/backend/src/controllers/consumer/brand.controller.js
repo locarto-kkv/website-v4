@@ -4,12 +4,12 @@ import logger from "../../lib/logger.js";
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
-export const getBlogs = async (req, res) => {
+export const getBrands = async (req, res) => {
   try {
     const { start } = req.query;
     const start_index = parseInt(start, 10);
 
-    const { data: blogs, error } = await db
+    const { data: brands, error } = await db
       .from("vendors")
       .select(
         `id, name, email, phone_no, brand_logo_1, brand_logo_2, status, website,
@@ -18,13 +18,13 @@ export const getBlogs = async (req, res) => {
       )
       .order("id", { ascending: true });
 
-    res.status(200).json(blogs);
+    res.status(200).json(brands);
   } catch (error) {
     logger({
       level: "error",
       message: error.message,
       location: __filename,
-      func: "getBlogs",
+      func: "getBrands",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }

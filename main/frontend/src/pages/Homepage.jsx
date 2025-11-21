@@ -25,7 +25,7 @@ const asset4 = "/assets/4.png";
 const asset5 = "/assets/5.png";
 
 const HomePage = () => {
-  const { blogs } = useDataStore();
+  const brands = useDataStore((s) => s.brands);
   const [showPopup, setShowPopup] = useState(false);
   const [betaForm, setBetaForm] = useState({ name: "", email: "" }); // Added email state for the new form
   const location = useLocation();
@@ -206,8 +206,8 @@ const HomePage = () => {
                 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]
               "
                 >
-                  {blogs &&
-                    blogs
+                  {brands &&
+                    brands
                       .filter((b) => b.blog?.length > 0)
                       .slice(0, 3)
                       .map((brand, idx) => (

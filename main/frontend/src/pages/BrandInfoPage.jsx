@@ -18,8 +18,8 @@ const asset5 = "/assets/5.png";
 const BrandInfoPage = () => {
   const { brandTitle } = useParams();
   const [brand, setBrand] = useState();
-  const { blogs } = useDataStore();
-  const brandData = blogs.filter((b) => b.blog.length > 0);
+  const { brands } = useDataStore();
+  const brandData = brands.filter((b) => b.blog.length > 0);
 
   // Scroll to top whenever brandId changes
   useEffect(() => {

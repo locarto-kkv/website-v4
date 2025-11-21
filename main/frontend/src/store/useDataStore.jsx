@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { ConsumerBlogService } from "../services/consumer/consumerBlogService.js";
+import { ConsumerBrandService } from "../services/consumer/consumerBrandService.js";
 import { ConsumerProductService } from "../services/consumer/consumerProductService.js";
 import { ConsumerRecommendService } from "../services/consumer/consumerRecommendService.js";
 export const useDataStore = create((set, get) => ({
-  blogs: [],
+  brands: [],
   recommends: {},
   start: 0,
   dataLoading: false,
@@ -33,11 +33,11 @@ export const useDataStore = create((set, get) => ({
     }
   },
 
-  clearBlogs: () => {
+  clearBrands: () => {
     set({ dataLoading: true });
     try {
-      localStorage.removeItem("blogs");
-      set({ blogs: [] });
+      localStorage.removeItem("brands");
+      set({ brands: [] });
     } finally {
       set({ dataLoading: false });
     }
@@ -46,21 +46,21 @@ export const useDataStore = create((set, get) => ({
   fetchProductsInBatch: async (query = {}) => {
     set({ productLoading: true });
     try {
-      const { start, blogs } = get();
+      const { start, brands } = get();
 
       const response = await ConsumerProductService.getProductsByFilter(
         query,
         start
       );
 
-      const updatedBlogs = blogs.map((blog) => {
+      const updatedBrands = brands.map((brand) => {
         const vendorProducts = response.filter(
-          (product) => product.vendor_id === blog.id
+          (product) => product.vendor_id === brand.id
         );
-        return { ...blog, products: vendorProducts };
+        return { ...brand, products: vendorProducts };
       });
 
-      set({ blogs: updatedBlogs });
+      set({ brands: updatedBrands });
     } catch (error) {
       toast.error("Failed to fetch products");
       console.error("Error fetching products:", error);
@@ -69,15 +69,15 @@ export const useDataStore = create((set, get) => ({
     }
   },
 
-  fetchBlogs: async () => {
+  fetchBrands: async () => {
     set({ dataLoading: true });
     try {
-      const data = await ConsumerBlogService.getBlogs(0);
-      set({ blogs: data });
-      // get().setCache("blogs", data);
+      const data = await ConsumerBrandService.getBrands(0);
+      set({ brands: data });
+      // get().setCache("brands", data);
     } catch (error) {
-      toast.error("Failed to fetch blogs");
-      console.error("Error fetching blogs:", error);
+      toast.error("Failed to fetch brands");
+      console.error("Error fetching brands:", error);
     } finally {
       set({ dataLoading: false });
     }
@@ -91,8 +91,8 @@ export const useDataStore = create((set, get) => ({
       );
       set({ recommends: { vendors, products } });
     } catch (error) {
-      toast.error("Failed to fetch blogs");
-      console.error("Error fetching blogs:", error);
+      toast.error("Failed to fetch brands");
+      console.error("Error fetching brands:", error);
     } finally {
       set({ dataLoading: true });
     }
@@ -101,14 +101,14 @@ export const useDataStore = create((set, get) => ({
   loadData: async () => {
     set({ dataLoading: true });
     try {
-      // const cachedBlogs = get().loadCache("blogs");
-      // if (cachedBlogs) set({ blogs: cachedBlogs });
+      // const cachedBrands = get().loadCache("brands");
+      // if (cachedBrands) set({ brands: cachedBrands });
       // else
-      await get().fetchBlogs();
+      await get().fetchBrands();
       await get().fetchRecommends();
     } catch (error) {
-      console.error("Error loading cached blogs:", error);
-      await get().fetchBlogs();
+      console.error("Error loading cached brands:", error);
+      await get().fetchBrands();
     } finally {
       set({ dataLoading: false });
     }
