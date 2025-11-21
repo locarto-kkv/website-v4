@@ -4,32 +4,60 @@ import { env } from "../lib/env.js";
 const DELHIVERY_BASE_URL = "https://track.delhivery.com";
 const DELHIVERY_TOKEN = env.DELHIVERY_API_KEY;
 
-const headers = {
-  Authorization: `Token ${DELHIVERY_TOKEN}`,
-  "Content-Type": "application/json",
-};
+/**
+ * Generic Delhivery Request Helper
+ * - Automatically selects correct Content-Type (json | form)
+ */
+async function delhiveryRequest({
+  url,
+  method = "GET",
+  params,
+  data,
+  contentType = "json",
+}) {
+  const headers =
+    contentType === "form"
+      ? {
+          Authorization: `Token ${DELHIVERY_TOKEN}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        }
+      : {
+          Authorization: `Token ${DELHIVERY_TOKEN}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        };
 
-// console.log(headers);
-
-// 1️⃣ Check Serviceability
-export async function checkServiceability(pincode) {
-  return axios.get(`${DELHIVERY_BASE_URL}/c/api/pin-codes/json/`, {
-    params: { filter_codes: pincode },
+  return axios({
+    url: `${DELHIVERY_BASE_URL}${url}`,
+    method,
     headers,
+    params,
+    data,
   });
 }
-// const { data } = await checkServiceability("400701");
-// const { cod, pre_paid, cash, pickup, repl, sun_tat, is_oda } =
-//   data.delivery_codes[0].postal_code;
-// console.log(cod, pre_paid, cash, pickup, repl, sun_tat, is_oda);
 
-// 2️⃣ Get Expected TAT (delivery time)
+/* --------------------------------------
+ * 1️⃣ Check Serviceability
+ * ------------------------------------*/
+export async function checkServiceability(pincode) {
+  return delhiveryRequest({
+    url: "/c/api/pin-codes/json/",
+    params: { filter_codes: pincode },
+    contentType: "json",
+  });
+}
+
+/* --------------------------------------
+ * 2️⃣ Get Expected TAT
+ * ------------------------------------*/
 export async function getExpectedTAT(
   originPin,
   destinationPin,
   expectedPickupDate
 ) {
-  return axios.get(`${DELHIVERY_BASE_URL}/api/dc/expected_tat`, {
+  return delhiveryRequest({
+    url: "/api/dc/expected_tat",
     params: {
       origin_pin: originPin,
       destination_pin: destinationPin,
@@ -37,32 +65,32 @@ export async function getExpectedTAT(
       pdt: "B2C",
       expected_pickup_date: expectedPickupDate,
     },
-    headers,
+    contentType: "json",
   });
 }
 
-// const { data } = await getExpectedTAT("400701", "400001");
-// console.log(data.data.tat, data.success);
-
-// 3️⃣ Fetch Waybill numbers
+/* --------------------------------------
+ * 3️⃣ Fetch Waybill Numbers
+ * ------------------------------------*/
 export async function fetchWaybill(count = 5) {
-  return axios.get(`${DELHIVERY_BASE_URL}/waybill/api/bulk/json/`, {
+  return delhiveryRequest({
+    url: "/waybill/api/bulk/json/",
     params: { token: DELHIVERY_TOKEN, count },
-    headers,
+    contentType: "json",
   });
 }
 
-// const response = await fetchWaybill(1);
-// console.log(response.data);
-
-// 9️⃣ Calculate Shipping Cost
-export async function calculateShippingCost({
+/* --------------------------------------
+ * 4️⃣ Calculate Shipping Cost
+ * ------------------------------------*/
+export async function calculateShippingCost(
   originPin,
   destinationPin,
   weight,
-  paymentType = "Pre-paid",
-}) {
-  return axios.get(`${DELHIVERY_BASE_URL}/api/kinko/v1/invoice/charges/.json`, {
+  paymentType = "Pre-paid"
+) {
+  return delhiveryRequest({
+    url: "/api/kinko/v1/invoice/charges/.json",
     params: {
       md: "E",
       ss: "Delivered",
@@ -71,95 +99,120 @@ export async function calculateShippingCost({
       cgm: weight,
       pt: paymentType,
     },
-    headers,
+    contentType: "json",
   });
 }
 
-// const response = await calculateShippingCost("400701", "400001", "1000");
-// console.log(response.data[0].total_amount);
+/* --------------------------------------
+ * 5️⃣ Create Warehouse
+ * ------------------------------------*/
+export async function createWarehouse(data) {
+  return delhiveryRequest({
+    url: "/api/backend/clientwarehouse/create/",
+    method: "POST",
+    data,
+    contentType: "json",
+  });
+}
 
-// 4️⃣ Create Shipment
+/* --------------------------------------
+ * 6️⃣ Update Warehouse
+ * ------------------------------------*/
+export async function updateWarehouse(data) {
+  return delhiveryRequest({
+    url: "/api/backend/clientwarehouse/edit/",
+    method: "POST",
+    data,
+    contentType: "json",
+  });
+}
+
+/* --------------------------------------
+ * 7️⃣ Create Shipment  (FORM REQUIRED)
+ * ------------------------------------*/
 export async function createShipment(payload) {
-  const formattedData = `format=json&data=${JSON.stringify(payload)}`;
-  return axios.post(
-    `${DELHIVERY_BASE_URL}/api/cmu/create.json`,
-    formattedData,
-    { headers }
-  );
+  const { pickup_location, ...shipment } = payload;
+
+  const body = `format=json&data=${encodeURIComponent(
+    JSON.stringify({
+      shipments: [shipment],
+      pickup_location: { name: pickup_location },
+    })
+  )}`;
+
+  const res = await delhiveryRequest({
+    url: "/api/cmu/create.json",
+    method: "POST",
+    data: body,
+    contentType: "form",
+  });
+
+  return res.data;
 }
 
-// const response = await createShipment({
-//   name: consumer.name,
-//   add: consumer.address,
-//   phone: consumer.phone_no,
-//   pin: consumer.pincode,
-//   payment_mode: order.payment_mode,
-//   order: order.id,
-// });
-
-// 5️⃣ Edit Shipment
-export async function updateShipment(data) {
-  return axios.post(`${DELHIVERY_BASE_URL}/api/p/edit`, data, { headers });
-}
-
-// 6️⃣ Cancel Shipment
-export async function cancelShipment(waybill) {
-  return axios.post(
-    `${DELHIVERY_BASE_URL}/api/p/edit`,
-    { waybill, cancellation: "true" },
-    { headers }
-  );
-}
-
-// 8️⃣ Track Shipment
+/* --------------------------------------
+ * 8️⃣ Track Shipment
+ * ------------------------------------*/
 export async function trackShipment(waybill) {
-  return axios.get(`${DELHIVERY_BASE_URL}/api/v1/packages/json/`, {
+  return delhiveryRequest({
+    url: "/api/v1/packages/json/",
     params: { waybill },
-    headers,
+    contentType: "json",
+  });
+}
+/* --------------------------------------
+ * 9️⃣ Edit Shipment
+ * ------------------------------------*/
+export async function updateShipment(data) {
+  return delhiveryRequest({
+    url: "/api/p/edit",
+    method: "POST",
+    data,
+    contentType: "json",
   });
 }
 
-// 🔟 Generate Shipping Label
+/* --------------------------------------
+ * 🔟 Cancel Shipment
+ * ------------------------------------*/
+export async function cancelShipment(waybill) {
+  return delhiveryRequest({
+    url: "/api/p/edit",
+    method: "POST",
+    data: { waybill, cancellation: "true" },
+    contentType: "json",
+  });
+}
+
+/* --------------------------------------
+ * 1️⃣1️⃣ Generate Shipping Label (PDF)
+ * ------------------------------------*/
 export async function generateShippingLabel(waybill, pdfSize = "4R") {
-  return axios.get(`${DELHIVERY_BASE_URL}/api/p/packing_slip`, {
+  return delhiveryRequest({
+    url: "/api/p/packing_slip",
     params: { wbns: waybill, pdf: "true", pdf_size: pdfSize },
-    headers,
+    contentType: "json",
   });
 }
 
-// 1️⃣1️⃣ Pickup Request
+/* --------------------------------------
+ * 1️⃣2️⃣ Create Pickup Request
+ * ------------------------------------*/
 export async function createPickupRequest({
   pickup_date,
   pickup_time,
   pickup_location,
   expected_package_count = 1,
 }) {
-  return axios.post(
-    `${DELHIVERY_BASE_URL}/fm/request/new/`,
-    {
+  return delhiveryRequest({
+    url: "/fm/request/new/",
+    method: "POST",
+    data: {
       pickup_date,
       pickup_time,
       pickup_location,
       expected_package_count,
     },
-    { headers }
-  );
-}
-
-// 1️⃣2️⃣ Create Warehouse
-export async function createWarehouse(data) {
-  return axios.put(
-    `${DELHIVERY_BASE_URL}/api/backend/clientwarehouse/create/`,
-    data,
-    { headers }
-  );
-}
-
-// 1️⃣3️⃣ Update Warehouse
-export async function updateWarehouse(data) {
-  return axios.post(
-    `${DELHIVERY_BASE_URL}/api/backend/clientwarehouse/edit/`,
-    data,
-    { headers }
-  );
+    contentType: "json",
+  });
 }
