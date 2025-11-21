@@ -9,7 +9,25 @@ export const useConsumerDataStore = create((set, get) => ({
   lists: [],
   profile: [],
   vendorInCart: null,
+
+  // Loading system
+  pending: 0,
   dataLoading: false,
+
+  startLoading: () =>
+    set((state) => ({
+      pending: state.pending + 1,
+      dataLoading: true,
+    })),
+
+  stopLoading: () =>
+    set((state) => {
+      const pending = Math.max(0, state.pending - 1);
+      return {
+        pending,
+        dataLoading: pending > 0,
+      };
+    }),
 
   loadCache: (name) => {
     try {
@@ -35,7 +53,7 @@ export const useConsumerDataStore = create((set, get) => ({
   },
 
   clearConsumerData: () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       ["consumer_profile", "consumer_orders", "consumer_lists"].forEach((key) =>
         localStorage.removeItem(key)
@@ -44,63 +62,60 @@ export const useConsumerDataStore = create((set, get) => ({
         orders: [],
         lists: [],
         profile: [],
+        vendorInCart: null,
       });
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   fetchProfile: async () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       const response = await ConsumerProfileService.getProfile();
       set({ profile: response });
-      // get().setCache("consumer_profile", response);
       return response;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch profile");
       console.error("Error fetching consumer profile:", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   fetchOrders: async () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       const response = await ConsumerOrderService.getOrders();
       set({ orders: response });
-      // get().setCache("consumer_orders", response);
       return response;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch orders");
       console.error("Error fetching consumer orders:", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   fetchLists: async () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       const response = await ConsumerListService.getLists();
-
       set({
         lists: response,
         vendorInCart: response.cart?.[0]?.vendor_id || null,
       });
-      // get().setCache("consumer_lists", response);
       return response;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch lists");
       console.error("Error fetching consumer lists:", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   loadConsumerData: async () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       // const cachedProfile = get().loadCache("consumer_profile");
       // if (cachedProfile) set({ profile: cachedProfile });
@@ -119,7 +134,7 @@ export const useConsumerDataStore = create((set, get) => ({
     } catch (error) {
       console.error("Error loading consumer data:", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 }));

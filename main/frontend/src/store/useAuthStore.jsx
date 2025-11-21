@@ -15,7 +15,7 @@ export const useAuthStore = create(
     currentUser: null,
     sentOtp: false,
     // Loading states
-    authLoading: false,
+    authLoading: true,
     loginLoading: false,
     signupLoading: false,
     logoutLoading: false,

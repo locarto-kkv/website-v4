@@ -10,7 +10,25 @@ export const useVendorDataStore = create((set, get) => ({
   vendor: [],
   orders: [],
   profile: [],
+
+  // Loading Manager
+  pending: 0,
   dataLoading: false,
+
+  startLoading: () =>
+    set((state) => ({
+      pending: state.pending + 1,
+      dataLoading: true,
+    })),
+
+  stopLoading: () =>
+    set((state) => {
+      const pending = Math.max(0, state.pending - 1);
+      return {
+        pending,
+        dataLoading: pending > 0,
+      };
+    }),
 
   loadCache: (name) => {
     try {
@@ -36,7 +54,7 @@ export const useVendorDataStore = create((set, get) => ({
   },
 
   clearVendorData: () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       ["vendor_profile", "vendor_analytics", "vendor_orders"].forEach((key) =>
         localStorage.removeItem(key)
@@ -51,17 +69,18 @@ export const useVendorDataStore = create((set, get) => ({
     } catch (error) {
       console.error("ERROR in clearVendorData: ", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   changeDataRange: (range) => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       const { analyticData } = get();
       if (!analyticData) return;
 
       let newProducts, newVendor;
+
       if (range === "total") {
         newProducts = analyticData.products?.total;
         newVendor = analyticData.vendor?.total;
@@ -75,30 +94,28 @@ export const useVendorDataStore = create((set, get) => ({
 
       set({ products: newProducts, vendor: newVendor });
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   fetchProfile: async () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       const response = await VendorProfileService.getProfile();
-      // get().setCache("vendor_profile", response);
       set({ profile: response });
       return response;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch profile");
       console.error("Error fetching profile:", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   fetchAnalytics: async () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       const response = await VendorAnalyticService.getAnalytics();
-      // get().setCache("vendor_analytics", response);
       set({
         analyticData: response,
         products: response.products?.total,
@@ -109,27 +126,27 @@ export const useVendorDataStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Failed to fetch analytics");
       console.error("Error fetching analytics:", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   fetchOrders: async () => {
-    set({ dataLoading: true });
+    get().startLoading();
     try {
       const response = await VendorOrderService.getOrders();
-      // get().setCache("vendor_orders", response);
       set({ orders: response });
       return response;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch orders");
       console.error("Error fetching orders:", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 
   loadVendorData: async () => {
-    set({ dataLoading: true });
+    // Batch loading: total pending decrements only when all are done
+    get().startLoading();
     try {
       // const cachedProfile = get().loadCache("vendor_profile");
       // if (cachedProfile) set({ profile: cachedProfile });
@@ -143,9 +160,8 @@ export const useVendorDataStore = create((set, get) => ({
       //     products: cachedAnalytics.products?.total,
       //     vendor: cachedAnalytics.vendor?.total,
       //   });
-      // } else {
+      // } else
       await get().fetchAnalytics();
-      // }
 
       // const cachedOrders = get().loadCache("vendor_orders");
       // if (cachedOrders) set({ orders: cachedOrders });
@@ -154,7 +170,7 @@ export const useVendorDataStore = create((set, get) => ({
     } catch (error) {
       console.error("Error loading vendor data:", error);
     } finally {
-      set({ dataLoading: false });
+      get().stopLoading();
     }
   },
 }));

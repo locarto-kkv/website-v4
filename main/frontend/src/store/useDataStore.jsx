@@ -7,7 +7,7 @@ export const useDataStore = create((set, get) => ({
   brands: [],
   recommends: {},
   start: 0,
-  dataLoading: false,
+  dataLoading: true,
   productLoading: false,
 
   loadCache: (name) => {
@@ -75,7 +75,6 @@ export const useDataStore = create((set, get) => ({
   },
 
   fetchBrands: async () => {
-    set({ dataLoading: true });
     try {
       const data = await ConsumerBrandService.getBrands(0);
       set({ brands: data });
@@ -83,13 +82,10 @@ export const useDataStore = create((set, get) => ({
     } catch (error) {
       toast.error("Failed to fetch brands");
       console.error("Error fetching brands:", error);
-    } finally {
-      set({ dataLoading: false });
     }
   },
 
   fetchRecommends: async () => {
-    set({ dataLoading: true });
     try {
       const { vendors, products } = await ConsumerRecommendService.getRandom(
         10
@@ -98,8 +94,6 @@ export const useDataStore = create((set, get) => ({
     } catch (error) {
       toast.error("Failed to fetch brands");
       console.error("Error fetching brands:", error);
-    } finally {
-      set({ dataLoading: false });
     }
   },
 
@@ -113,7 +107,6 @@ export const useDataStore = create((set, get) => ({
       await get().fetchRecommends();
     } catch (error) {
       console.error("Error loading cached brands:", error);
-      await get().fetchBrands();
     } finally {
       set({ dataLoading: false });
     }
