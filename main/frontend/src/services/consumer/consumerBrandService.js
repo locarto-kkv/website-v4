@@ -1,6 +1,6 @@
 import { axiosInstance } from "../../lib/axios.js";
 
-const BASE_URL = "/consumer/blog";
+const BASE_URL = "/consumer/brand";
 
 export const ConsumerBrandService = {
   getBrands: async (start_index) => {

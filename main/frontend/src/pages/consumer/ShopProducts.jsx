@@ -11,7 +11,7 @@ const ShopProducts = () => {
   const { vendorId, category } = useParams();
   const navigate = useNavigate(); // Initialize navigate
   const currentUser = useAuthStore((s) => s.currentUser);
-  const blogs = useDataStore((s) => s.blogs);
+  const brands = useDataStore((s) => s.brands);
   const vendorInCart = useConsumerDataStore((s) => s.vendorInCart);
   const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
 
@@ -133,10 +133,10 @@ const ShopProducts = () => {
   };
 
   useEffect(() => {
-    const foundVendor = blogs?.find((v) => String(v.id) === String(vendorId));
+    const foundVendor = brands?.find((v) => String(v.id) === String(vendorId));
     setVendor(foundVendor || null);
     setProducts(foundVendor?.products || []);
-  }, [blogs, vendorId]);
+  }, [brands, vendorId]);
 
   useEffect(() => {
     const fetchProducts = async () => {

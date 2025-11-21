@@ -44,6 +44,11 @@ export const useDataStore = create((set, get) => ({
   },
 
   fetchProductsInBatch: async (query = {}) => {
+    const { brands } = get();
+    if (!brands || brands.length === 0) {
+      console.warn("Brands not loaded yet.");
+      return;
+    }
     set({ productLoading: true });
     try {
       const { start, brands } = get();
@@ -94,7 +99,7 @@ export const useDataStore = create((set, get) => ({
       toast.error("Failed to fetch brands");
       console.error("Error fetching brands:", error);
     } finally {
-      set({ dataLoading: true });
+      set({ dataLoading: false });
     }
   },
 

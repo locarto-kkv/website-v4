@@ -38,13 +38,13 @@ const MapView = () => {
   const categoryParam = queryParams.get("category");
   const navigate = useNavigate();
   const currentUser = useAuthStore((s) => s.currentUser);
-  const blogs = useDataStore((s) => s.blogs);
+  const brands = useDataStore((s) => s.brands);
   const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
   const dataLoading = useDataStore((s) => s.dataLoading);
 
   // UI state
   const [showOverlay, setShowOverlay] = useState(true);
-  
+
   // Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -131,7 +131,7 @@ const MapView = () => {
     if (!map || !vendor.address?.[0]?.coordinates) return;
 
     const coordinates = vendor.address[0].coordinates;
-    
+
     // Zoom to the vendor location
     map.setView(coordinates, 15, {
       animate: true,
@@ -236,8 +236,8 @@ const MapView = () => {
 
   // Memoize vendors to display
   const vendorsToDisplay = useMemo(() => {
-    if (!blogs || !Array.isArray(blogs)) return [];
-    return blogs.filter((vendor) => {
+    if (!brands || !Array.isArray(brands)) return [];
+    return brands.filter((vendor) => {
       const hasValidPosition =
         vendor.address?.[0]?.coordinates &&
         Array.isArray(vendor.address[0].coordinates) &&
@@ -248,7 +248,7 @@ const MapView = () => {
         vendor.products.length > 0;
       return hasValidPosition && hasProductsInCategory;
     });
-  }, [blogs]);
+  }, [brands]);
 
   // Update map markers
   useEffect(() => {
