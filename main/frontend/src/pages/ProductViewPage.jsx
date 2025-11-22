@@ -53,6 +53,7 @@ const ProductViewPage = () => {
 
   const currentUser = useAuthStore((s) => s.currentUser);
   const brands = useDataStore((s) => s.brands);
+  const fetchProductsInBatch = useDataStore((s) => s.fetchProductsInBatch);
   const { updateList, removeFromList } = ConsumerListService;
 
   const lists = useConsumerDataStore((s) => s.lists);
@@ -116,13 +117,17 @@ const ProductViewPage = () => {
         id: productId,
       });
       const revs = await ConsumerReviewService.getReviewsByProduct(productId);
+      await fetchProductsInBatch({
+        vendor_id: prod[0]?.vendor_id,
+        category: prod[0]?.category,
+      });
 
       setProduct(prod[0]);
       setReviews(revs);
       setLoading(false);
     };
     findProduct();
-  }, [productId, brands]);
+  }, [productId]);
 
   useEffect(() => {
     if (isConsumer && product) {
@@ -296,7 +301,12 @@ const ProductViewPage = () => {
   const displayedImages = images.slice(0, 6);
   const similarProducts = brands
     .flatMap((brand) => brand.products || [])
-    .filter((p) => p.id !== product.id && p.category === product.category)
+    .filter(
+      (p) =>
+        p.id !== product.id &&
+        p.category === product.category &&
+        p.vendor_id === product.vendor_id
+    )
     .slice(0, 4);
 
   return (
