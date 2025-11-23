@@ -81,7 +81,7 @@ const ProductCard = ({ product, isMobile }) => {
           {product.category || "Product"}
         </span>
 
-        <h3 className="font-black text-sm sm:text-lg mb-1 sm:mb-3 line-clamp-2 transition-colors duration-300 flex-grow">
+        <h3 className="font-black text-sm sm:text-lg mb-1 sm:mb-3 transition-colors duration-300 flex-grow">
           <span className="text-gray-900 group-hover:text-purple-700 transition-colors">
             {product.name}
           </span>

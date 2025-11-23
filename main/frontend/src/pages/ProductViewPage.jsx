@@ -71,6 +71,9 @@ const ProductViewPage = () => {
   const [cartItem, setCartItem] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
 
+  // Find the vendor associated with the product
+  const vendor = product ? brands.find((b) => b.id === product.vendor_id) : null;
+
   // Helper to show the custom auth toast
   const showAuthToast = () => {
     toast(
@@ -333,6 +336,38 @@ const ProductViewPage = () => {
           <span className="text-gray-800 font-semibold">{product.name}</span>
         </nav>
 
+        {/* Brand Header */}
+        {vendor && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-xl border border-gray-200 overflow-hidden flex-shrink-0 bg-white flex items-center justify-center">
+                {vendor.brand_logo_1 ? (
+                  <img
+                    src={vendor.brand_logo_1}
+                    alt={vendor.name}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <i className="fas fa-store text-2xl text-gray-400"></i>
+                )}
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 leading-tight">
+                  {vendor.name}
+                </h2>
+                <p className="text-sm text-gray-500">Official Brand Store</p>
+              </div>
+            </div>
+            <Link
+              to={`/vendor/${vendor.id}/products/all`}
+              className="hidden sm:inline-flex items-center gap-2 text-orange-600 bg-orange-50 hover:bg-orange-100 px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+            >
+              <span>View Store</span>
+              <i className="fas fa-arrow-right"></i>
+            </Link>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mb-16">
           {/* Image Gallery */}
           <div className="space-y-4">
@@ -578,6 +613,17 @@ const ProductViewPage = () => {
                   Share
                 </button>
               </div>
+
+              {/* View All Products Button */}
+              {vendor && (
+                <Link
+                  to={`/vendor/${vendor.id}/products/all`}
+                  className="w-full flex items-center justify-center gap-2 text-gray-600 hover:text-orange-600 font-semibold py-3 rounded-xl border-2 border-dashed border-gray-300 hover:border-orange-300 hover:bg-orange-50 transition-all"
+                >
+                  <i className="fas fa-store"></i>
+                  View all products from {vendor.name}
+                </Link>
+              )}
             </div>
           </div>
         </div>
