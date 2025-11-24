@@ -19,6 +19,7 @@ import VendorOrders from "./dashboard/VendorOrders";
 import VendorMilestones from "./dashboard/VendorMilestones";
 import VendorEditProfile from "./dashboard/VendorEditProfile";
 import NotFoundPage from "../NotFoundPage";
+import VendorProductForm from "./dashboard/VendorProductForm";
 
 const ProtectedRoute = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
@@ -65,6 +66,8 @@ const VendorRoutes = () => {
           <Route path="overview" element={<VendorOverview />} />
           <Route path="orders" element={<VendorOrders />} />
           <Route path="products" element={<VendorProducts />} />
+          <Route path="product/form" element={<VendorProductForm />} />
+
           <Route path="milestones" element={<VendorMilestones />} />
           <Route path="members-hub" element={<VendorsMemberHub />} />
           <Route path="profile" element={<VendorProfile />} />
