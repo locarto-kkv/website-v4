@@ -257,7 +257,7 @@ const ShopProducts = () => {
               return (
                 <Link
                   key={product.id}
-                  to={`/product/${product.id}`}
+                  to={`/product/${product.product_uuid}`}
                   className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 flex flex-col group hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20 hover:-translate-y-2 hover:shadow-3xl cursor-pointer"
                 >
                   <div className="relative mb-4">

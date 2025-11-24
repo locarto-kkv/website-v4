@@ -10,11 +10,12 @@ export const getProductsByFilter = async (req, res) => {
     const start_index = parseInt(start, 10) || 0;
 
     // Parse filters if it's a JSON string
+
     let parsedFilters = filters;
     if (typeof filters === "string") {
       try {
         parsedFilters = JSON.parse(filters);
-      } catch {
+      } catch (error) {
         return res
           .status(400)
           .json({ message: "Invalid filters format. Must be valid JSON." });
@@ -27,6 +28,7 @@ export const getProductsByFilter = async (req, res) => {
       .select()
       .range(start_index, start_index + batchSize)
       .eq("status", "available")
+      .eq("base", true)
       .order("id", { ascending: true });
 
     // Dynamically apply filters
@@ -43,7 +45,7 @@ export const getProductsByFilter = async (req, res) => {
     if (productError) throw productError;
     if (!products || products.length === 0) return res.status(200).json([]);
 
-    // Fetch summaries
+    // // Fetch summaries
     const productIds = products.map((p) => p.id);
     const { data: summary, error: summaryError } = await db
       .from("total_product_summary")
@@ -65,6 +67,134 @@ export const getProductsByFilter = async (req, res) => {
       message: error.message,
       location: __filename,
       func: "getProductsByFilter",
+    });
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getProductVariants = async (req, res) => {
+  try {
+    const { product_uuid } = req.params;
+
+    const { data, error } = await db
+      .from("products")
+      .select(
+        `*, items: order_items_product_id_fkey(id, 
+          review: reviews_order_item_id_fkey(*)
+        )`
+      )
+      .eq("product_uuid", product_uuid);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0)
+      return res.status(404).json({ message: "Product not found" });
+
+    const base = data[0];
+    const allReviews = [];
+
+    // -----------------------------------------
+    // 1) COLLECT REVIEWS
+    // -----------------------------------------
+    for (const product of data) {
+      if (product.items?.length) {
+        for (const item of product.items) {
+          if (item.review) {
+            allReviews.push(item.review);
+          }
+        }
+      }
+    }
+
+    // Review stats
+    const count_reviews = allReviews.length;
+    const avg_review =
+      count_reviews > 0
+        ? allReviews.reduce((sum, r) => sum + r.rating, 0) / count_reviews
+        : 0;
+
+    // -----------------------------------------
+    // 2) CHECK IF ATTRIBUTE_TYPE EXISTS
+    // -----------------------------------------
+    const firstType = base.attribute_type;
+
+    // ❌ No variants → return base product only
+    if (!firstType) {
+      const singleItem = {
+        id: base.id,
+        price: base.price,
+        quantity: base.quantity,
+        weight: base.weight,
+        attribute_name: base.attribute_name,
+        base: base.base,
+        product_images: base.product_images,
+      };
+
+      const response = {
+        product_uuid: base.product_uuid,
+        vendor_id: base.vendor_id,
+        category: base.category,
+        variants: {}, // important: empty
+        base: singleItem, // only product
+        reviews: allReviews,
+        avg_review,
+        count_reviews,
+        count_variants: 1,
+      };
+
+      return res.status(200).json(response);
+    }
+
+    // -----------------------------------------
+    // 3) GROUP VARIANTS (attribute_type exists)
+    // -----------------------------------------
+    const variants = {};
+
+    for (const product of data) {
+      const {
+        id,
+        price,
+        quantity,
+        weight,
+        attribute_name,
+        attribute_type,
+        base,
+        product_images,
+      } = product;
+
+      if (!variants[attribute_type]) variants[attribute_type] = [];
+      variants[attribute_type].push({
+        id,
+        price,
+        quantity,
+        weight,
+        attribute_name,
+        base,
+        product_images,
+      });
+    }
+
+    const count_variants = data.length;
+
+    const response = {
+      product_uuid: base.product_uuid,
+      vendor_id: base.vendor_id,
+      category: base.category,
+      variants,
+      reviews: allReviews,
+      avg_review,
+      count_reviews,
+      count_variants,
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getProductVariants",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }

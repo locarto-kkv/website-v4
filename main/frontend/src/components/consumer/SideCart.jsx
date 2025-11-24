@@ -225,7 +225,7 @@ const SideCart = ({ isOpen, onClose }) => {
                     style={{
                       animation: `slideIn 0.3s ease-out ${index * 0.05}s both`, // Staggered animation
                     }}
-                    onClick={() => navigate(`/product/${item.product_id}`)}
+                    onClick={() => navigate(`/product/${item.product_uuid}`)}
                   >
                     {/* Image */}
                     <div className="relative flex-shrink-0">

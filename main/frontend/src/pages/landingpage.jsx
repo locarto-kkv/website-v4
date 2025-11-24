@@ -13,7 +13,7 @@ import { submitBeta } from "../services/betaService.js";
 import SearchIcon from "../components/SearchIcon.jsx";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
-import InteractiveGrid from "../components/landing/InteractiveGrid.jsx"; 
+import InteractiveGrid from "../components/landing/InteractiveGrid.jsx";
 
 // Background Assets - Now using public folder paths
 const asset1 = "/assets/1.png";
@@ -91,7 +91,7 @@ const LandingPage = () => {
   };
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product.product_uuid}`);
     setShowDropdown(false);
   };
 
@@ -521,7 +521,6 @@ const LandingPage = () => {
             type="product"
           />
           {/* --- END REPLACEMENT --- */}
-
 
           {/* Beta Signup Section */}
           <section className="bg-gradient-to-br from-[#353695] via-[#4a4db5] to-[#5b5fc7] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-center text-white shadow-2xl mb-6 sm:mb-8 relative overflow-hidden mx-2 sm:mx-0">

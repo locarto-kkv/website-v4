@@ -19,4 +19,14 @@ export const ConsumerProductService = {
       throw error;
     }
   },
+  getProductVariants: async (product_uuid) => {
+    try {
+      const response = await axiosInstance.get(`${BASE_URL}/${product_uuid}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("Failed to fetch products. Please try again.");
+      throw error;
+    }
+  },
 };

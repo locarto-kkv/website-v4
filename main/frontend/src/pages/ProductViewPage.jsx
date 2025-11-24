@@ -4,7 +4,6 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDataStore } from "../store/useDataStore";
 import { ConsumerListService } from "../services/consumer/consumerListService";
 import { ConsumerProductService } from "../services/consumer/consumerProductService";
-import { ConsumerReviewService } from "../services/consumer/consumerReviewService";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatCurrency } from "../lib/utils";
 import Navbar from "../components/Navbar";
@@ -14,7 +13,7 @@ import { useConsumerDataStore } from "../store/consumer/consumerDataStore";
 
 const SimilarProductCard = ({ product }) => (
   <Link
-    to={`/product/${product.id}`}
+    to={`/product/${product.product_uuid}`}
     className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-2 border border-gray-100"
   >
     <div className="relative overflow-hidden aspect-square bg-gray-100">
@@ -48,7 +47,7 @@ const SimilarProductCard = ({ product }) => (
 );
 
 const ProductViewPage = () => {
-  const { productId } = useParams();
+  const { product_uuid } = useParams();
   const navigate = useNavigate();
 
   const currentUser = useAuthStore((s) => s.currentUser);
@@ -61,18 +60,23 @@ const ProductViewPage = () => {
 
   const isConsumer = currentUser?.type === "consumer";
 
-  const [product, setProduct] = useState(null);
+  // State
+  const [product, setProduct] = useState(null); // The currently selected variant or base product
+  const [globalData, setGlobalData] = useState(null); // The raw API response wrapper
+  const [variantList, setVariantList] = useState([]); // Array of variants (if any)
+  const [variantKey, setVariantKey] = useState(""); // "size", "color", etc.
+
   const [reviews, setReviews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedColor, setSelectedColor] = useState(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [cartItem, setCartItem] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
 
-  // Find the vendor associated with the product
-  const vendor = product ? brands.find((b) => b.id === product.vendor_id) : null;
+  // Find the vendor associated with the product (using global data if available)
+  const vendor = globalData
+    ? brands.find((b) => b.id === globalData.vendor_id)
+    : null;
 
   // Helper to show the custom auth toast
   const showAuthToast = () => {
@@ -106,6 +110,7 @@ const ProductViewPage = () => {
   };
 
   const setLists = async () => {
+    if (!product) return;
     setIsInWishlist(
       lists.wishlist?.some((item) => item.product_id === product.id) || false
     );
@@ -116,21 +121,93 @@ const ProductViewPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     const findProduct = async () => {
-      const prod = await ConsumerProductService.getProductsByFilter({
-        id: productId,
-      });
-      const revs = await ConsumerReviewService.getReviewsByProduct(productId);
-      await fetchProductsInBatch({
-        vendor_id: prod[0]?.vendor_id,
-        category: prod[0]?.category,
-      });
+      setLoading(true);
+      try {
+        const data = await ConsumerProductService.getProductVariants(
+          product_uuid
+        );
 
-      setProduct(prod[0]);
-      setReviews(revs);
-      setLoading(false);
+        // 1. Store Global Data
+        setGlobalData(data);
+        setReviews(data.reviews || []);
+
+        let vList = [];
+        let vKey = "";
+        let initialVariant = null;
+
+        // 2. Identify the Product Base/Initial State
+        // Strategy: Check if there is a direct 'base' object first (Single SKU).
+        if (data.base) {
+          initialVariant = data.base;
+        }
+
+        // 3. Parse Variants (if they exist)
+        if (data.variants && typeof data.variants === "object") {
+          const keys = Object.keys(data.variants);
+          if (keys.length > 0) {
+            vKey = keys[0]; // e.g., "size"
+            vList = data.variants[vKey];
+
+            // If we didn't find a direct base object earlier, find the base variant
+            // or default to the first one in the list.
+            if (!initialVariant) {
+              initialVariant = vList.find((v) => v.base) || vList[0];
+            }
+          }
+        }
+
+        setVariantList(vList);
+        setVariantKey(vKey);
+
+        // 4. Merge Data
+        if (initialVariant) {
+          const mergedProduct = {
+            ...initialVariant,
+            name: data.name || initialVariant.name || "Product Name",
+            vendor_id: data.vendor_id,
+            category: data.category,
+            avg_review: data.avg_review || 0,
+            count_reviews: data.count_reviews || 0,
+            description: data.description,
+          };
+          setProduct(mergedProduct);
+        }
+
+        // 5. Background fetch for similar products
+        if (data.vendor_id) {
+          fetchProductsInBatch({
+            vendor_id: data.vendor_id,
+            category: data.category,
+          });
+        }
+      } catch (error) {
+        console.error("Error loading product", error);
+        toast.error("Failed to load product details");
+      } finally {
+        setLoading(false);
+      }
     };
+
     findProduct();
-  }, [productId]);
+  }, [product_uuid]);
+
+  // Handle Variant Switching
+  const handleVariantChange = (variant) => {
+    if (!globalData) return;
+
+    const mergedProduct = {
+      ...variant,
+      name: globalData.name || variant.name || product.name,
+      vendor_id: globalData.vendor_id,
+      category: globalData.category,
+      avg_review: globalData.avg_review || 0,
+      count_reviews: globalData.count_reviews || 0,
+      description: globalData.description || product.description,
+    };
+
+    setProduct(mergedProduct);
+    setSelectedImageIndex(0);
+  };
 
   useEffect(() => {
     if (isConsumer && product) {
@@ -173,9 +250,7 @@ const ProductViewPage = () => {
       showAuthToast();
       return;
     }
-
     const vendorId = product.vendor_id;
-
     try {
       if (cartItem?.quantity === 1 && delta < 1) {
         const newList = await removeFromList("cart", product.id);
@@ -204,7 +279,6 @@ const ProductViewPage = () => {
           );
           return;
         }
-
         const newList = await updateList(
           "cart",
           cartItem.quantity + delta,
@@ -226,9 +300,7 @@ const ProductViewPage = () => {
       showAuthToast();
       return;
     }
-
     const vendorId = product.vendor_id;
-
     try {
       if (!cartItem?.quantity) {
         if (vendorInCart && vendorId !== vendorInCart) {
@@ -433,8 +505,6 @@ const ProductViewPage = () => {
                 ))}
               </div>
             )}
-
-            {/* Product Features */}
           </div>
 
           {/* Product Details */}
@@ -449,7 +519,7 @@ const ProductViewPage = () => {
               )}
 
               <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
-                {product.name}
+                {globalData?.name || product.name}
               </h1>
 
               {/* Ratings */}
@@ -499,58 +569,38 @@ const ProductViewPage = () => {
                 <p className="text-sm text-gray-500 mt-2">
                   Inclusive of all taxes
                 </p>
+                {/* Only show "Selected Variant" if there is an attribute name (i.e. not a single product) */}
+                {product.attribute_name && (
+                  <p className="text-orange-600 font-semibold mt-1">
+                    Selected Variant: {product.attribute_name}
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Size Selection */}
-            {product.sizes && product.sizes.length > 0 && (
+            {/* --- Variant Selector (Conditional) --- */}
+            {variantList.length > 0 && (
               <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <i className="fas fa-ruler text-orange-500"></i>
-                  Select Size:{" "}
-                  <span className="text-orange-600">{selectedSize}</span>
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 capitalize">
+                  <i className="fas fa-layer-group text-orange-500"></i>
+                  Select {variantKey}:{" "}
+                  <span className="text-orange-600">
+                    {product.attribute_name}
+                  </span>
                 </h3>
                 <div className="flex flex-wrap gap-3">
-                  {product.sizes.map((size) => (
+                  {variantList.map((variant) => (
                     <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`px-6 py-3 border-2 rounded-xl font-bold transition-all duration-300 hover:scale-105 ${
-                        selectedSize === size
-                          ? "bg-gradient-to-r from-orange-500 to-red-500 text-white border-orange-500 shadow-lg"
+                      key={variant.id}
+                      onClick={() => handleVariantChange(variant)}
+                      className={`min-w-[4rem] px-4 py-3 border-2 rounded-xl font-bold transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center ${
+                        product.id === variant.id
+                          ? "bg-gradient-to-r from-orange-500 to-red-500 text-white border-orange-500 shadow-lg scale-105"
                           : "bg-white hover:bg-gray-50 border-gray-300 text-gray-700"
                       }`}
                     >
-                      {size}
+                      <span>{variant.attribute_name}</span>
                     </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Color Selection */}
-            {product.colors && product.colors.length > 0 && (
-              <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <i className="fas fa-palette text-orange-500"></i>
-                  Select Color:{" "}
-                  <span className="text-orange-600 capitalize">
-                    {selectedColor}
-                  </span>
-                </h3>
-                <div className="flex flex-wrap gap-4">
-                  {product.colors.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      style={{ backgroundColor: color.toLowerCase() }}
-                      className={`w-12 h-12 rounded-full border-4 transition-all duration-300 hover:scale-110 ${
-                        selectedColor === color
-                          ? "ring-4 ring-orange-500 border-white shadow-2xl scale-110"
-                          : "border-gray-300 hover:border-gray-400 shadow-lg"
-                      }`}
-                      title={color}
-                    />
                   ))}
                 </div>
               </div>
@@ -613,17 +663,6 @@ const ProductViewPage = () => {
                   Share
                 </button>
               </div>
-
-              {/* View All Products Button */}
-              {vendor && (
-                <Link
-                  to={`/vendor/${vendor.id}/products/all`}
-                  className="w-full flex items-center justify-center gap-2 text-gray-600 hover:text-orange-600 font-semibold py-3 rounded-xl border-2 border-dashed border-gray-300 hover:border-orange-300 hover:bg-orange-50 transition-all"
-                >
-                  <i className="fas fa-store"></i>
-                  View all products from {vendor.name}
-                </Link>
-              )}
             </div>
           </div>
         </div>
@@ -638,7 +677,7 @@ const ProductViewPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {reviews.map((r) => {
-                const review = r.review;
+                const review = r.review || r;
                 const hasImages =
                   review.review_images && review.review_images.length > 0;
 

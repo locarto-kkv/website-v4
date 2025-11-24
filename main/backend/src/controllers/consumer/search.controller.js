@@ -12,7 +12,8 @@ export const getSearchResults = async (req, res) => {
     if (type === "product") {
       const { data: products, error: productError } = await db
         .from("products")
-        .select("id, name")
+        .select("id, name, product_uuid")
+        .eq("base", true)
         .ilike("name", `${query}%`)
         .order("name", { ascending: true })
         .limit(limit);
@@ -33,7 +34,8 @@ export const getSearchResults = async (req, res) => {
     } else if (type === "all") {
       const { data: products, error: productError } = await db
         .from("products")
-        .select("id, name")
+        .select("id, name, product_uuid")
+        .eq("base", true)
         .ilike("name", `${query}%`)
         .order("name", { ascending: true })
         .limit(limit);

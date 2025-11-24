@@ -89,7 +89,7 @@ function App() {
           path="/vendor/:vendorId/products/:category"
           element={<ShopProducts />}
         />
-        <Route path="/product/:productId" element={<ProductViewPage />} />
+        <Route path="/product/:product_uuid" element={<ProductViewPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         {/* --- MAKE SURE THIS LINE IS CORRECT --- */}
         <Route

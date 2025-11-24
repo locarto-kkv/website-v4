@@ -53,7 +53,7 @@ const ProductCard = ({ product, isMobile }) => {
   return (
     <Link
       ref={tiltRef}
-      to={`/product/${product.id}`}
+      to={`/product/${product.product_uuid}`}
       className="product-card-v2 group bg-white shadow-xl lg:bg-white/80 lg:backdrop-blur-md rounded-2xl lg:shadow-xl overflow-hidden border border-gray-200 lg:border-white/40 transition-all duration-500 h-full flex flex-col cursor-pointer lg:hover:shadow-2xl lg:hover:border-white"
     >
       {/* Image Container with Price */}
@@ -95,7 +95,7 @@ const ProductCard = ({ product, isMobile }) => {
         {/* Action Button */}
         <div className="mt-auto pt-2 sm:pt-4 border-t border-gray-200 flex-shrink-0">
           <button
-            onClick={() => navigate(`/product/${product.id}`)}
+            onClick={() => navigate(`/product/${product.product_uuid}`)}
             className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
           >
             <i className="fas fa-eye"></i>
@@ -123,7 +123,7 @@ const VendorCard = ({ vendor, isMobile }) => {
         <div className="relative mb-4 sm:mb-6">
           {/* Background Shimmer Effect (Desktop Only) */}
           <div className="absolute inset-[-10px] rounded-full opacity-10 blur-md bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 lg:animate-shimmer hidden lg:block" />
-  
+
           <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white shadow-xl transition-all duration-300 group-hover:border-orange-500 group-hover:scale-105 bg-gradient-to-br from-orange-50 to-pink-50 relative z-10">
             <img
               src={vendor.brand_logo_1 || "/api/placeholder/112/112"}
@@ -132,20 +132,20 @@ const VendorCard = ({ vendor, isMobile }) => {
             />
           </div>
         </div>
-  
+
         {/* Vendor Name */}
         <h3 className="font-black text-lg sm:text-2xl mb-2 sm:mb-3 transition-colors duration-300 text-center">
           <span className="text-gray-900 group-hover:text-orange-700 transition-colors">
             {vendor.name}
           </span>
         </h3>
-  
+
         {/* Email / Contact */}
         <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 px-3 py-1.5 bg-gray-100 rounded-full group-hover:bg-orange-100 transition-colors duration-300 flex-shrink-0">
           <i className="fas fa-envelope text-orange-500"></i>
           <span className="break-all font-medium text-[10px] sm:text-xs">
-          {vendor.email}
-        </span>
+            {vendor.email}
+          </span>
         </div>
       </div>
       {/* END WRAPPER */}
@@ -238,9 +238,7 @@ const InteractiveGrid = ({ data, type }) => {
 
       {/* Interactive Grid Container: Centered with flex wrapper */}
       <div className="w-full flex justify-center px-4">
-        <div 
-          className="flex flex-wrap justify-center gap-4 sm:gap-6 max-w-[1400px] w-full"
-        >
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 max-w-[1400px] w-full">
           {/* Limits to 2 items on mobile/tablet, 4 on desktop */}
           {data.slice(0, displayLimit).map((item, index) => (
             <div
