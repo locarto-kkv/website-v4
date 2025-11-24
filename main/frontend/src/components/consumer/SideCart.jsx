@@ -7,6 +7,7 @@ import { useConsumerDataStore } from "../../store/consumer/consumerDataStore";
 import { useNavigate } from "react-router-dom";
 // Corrected import path
 import { formatCurrency } from "../../lib/utils"; // Import formatCurrency
+import toast from "react-hot-toast";
 
 const SideCart = ({ isOpen, onClose }) => {
   // --- STATE ---
@@ -26,7 +27,7 @@ const SideCart = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   // Assuming ConsumerListService provides these functions:
   const currentUser = useAuthStore((s) => s.currentUser);
-  const { removeFromList } = ConsumerListService;
+  const { removeFromList, updateList } = ConsumerListService;
   const lists = useConsumerDataStore((state) => state.lists);
 
   // --- EFFECTS ---
@@ -82,6 +83,39 @@ const SideCart = ({ isOpen, onClose }) => {
     } catch (err) {
       console.error("Error removing from cart:", err);
       // Optionally show error feedback
+    }
+  };
+
+  const handleQuantityChange = async (productId, delta) => {
+    const currentItem = lists?.cart.find(
+      (item) => (item.id || item.product_id) === productId
+    );
+    if (!currentItem) return;
+
+    const currentQty = Number(currentItem.quantity) || 0;
+    const newQty = Math.max(0, currentQty + delta); // Ensure quantity doesn't go below 0
+
+    try {
+      if (newQty === 0) {
+        // If new quantity is 0, remove the item
+        const newList = await removeFromList("cart", productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+          vendorInCart: newList.cart ? state.vendorInCart : null,
+        }));
+        toast.success(`${currentItem.name || "Item"} removed from cart`);
+      } else {
+        // Otherwise, update the quantity
+        const newList = await updateList("cart", newQty, productId);
+        useConsumerDataStore.setState((state) => ({
+          ...state,
+          lists: { ...newList },
+        }));
+      }
+    } catch (err) {
+      console.error("Error updating cart quantity:", err);
+      toast.error("Could not update cart quantity.");
     }
   };
 
@@ -218,14 +252,40 @@ const SideCart = ({ isOpen, onClose }) => {
                         {formatCurrency(item.price)}
                       </p>
                       {/* Quantity Controls */}
-                      <div className="flex items-center gap-2 mt-2">
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuantityChange(item.id, -1);
+                          }}
+                          className="w-5 h-5 flex items-center justify-center text-xs bg-gray-200 text-gray-700 rounded hover:bg-red-500 hover:text-white transition-colors disabled:opacity-50"
+                          disabled={item.quantity <= 0} // Disable if 0, logic handles removal
+                          aria-label={`Decrease quantity of ${item.name}`}
+                        >
+                          <i className="fas fa-minus"></i>
+                        </button>
+                        <span className="w-5 text-center font-semibold text-gray-800 text-sm">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuantityChange(item.id, 1);
+                          }}
+                          className="w-5 h-5 flex items-center justify-center text-xs bg-gray-200 text-gray-700 rounded hover:bg-green-500 hover:text-white transition-colors"
+                          aria-label={`Increase quantity of ${item.name}`}
+                        >
+                          <i className="fas fa-plus"></i>
+                        </button>
+                      </div>
+                      {/* <div className="flex items-center gap-2 mt-2">
                         <span className="font-medium text-gray-800 text-sm">
                           Quantity:
                         </span>
                         <span className="text-gray-800 text-sm font-semibold">
                           {item.quantity}
                         </span>
-                      </div>
+                      </div> */}
                     </div>
                     {/* Remove Button */}
                     <button
