@@ -1,5 +1,5 @@
 // src/pages/vendor/dashboard/VendorProducts.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react"; // Added useRef, useEffect
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../../lib/utils.js";
 import { VendorProductService } from "../../../services/vendor/vendorProductService.js";
@@ -13,10 +13,25 @@ const VendorProducts = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [loading, setLoading] = useState(false);
 
+  // --- NEW: State to track which dropdown is open ---
+  const [activeMenuId, setActiveMenuId] = useState(null);
+  const menuRef = useRef(null);
+
   const products = useVendorDataStore((s) => s.products);
   const fetchAnalytics = useVendorDataStore((s) => s.fetchAnalytics);
 
   const predefinedCategories = ["All", "Personal Care", "Accessories"];
+
+  // --- NEW: Handle clicking outside to close menu ---
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setActiveMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Navigate to Form Page
   const handleAddProduct = () => {
@@ -27,11 +42,27 @@ const VendorProducts = () => {
     navigate("/vendor/dashboard/product/form", {
       state: { mode: "edit", product },
     });
+    setActiveMenuId(null);
+  };
+
+  // --- NEW: Handle Add Variant (Navigates to edit with intent) ---
+  const handleAddVariant = (product) => {
+    navigate("/vendor/dashboard/product/form", {
+      state: { mode: "edit", product, focusVariants: true },
+    });
+    setActiveMenuId(null);
+  };
+
+  // --- NEW: Handle View Product ---
+  const handleViewProduct = (product) => {
+    navigate(`/product/${product.product_uuid}`);
+    setActiveMenuId(null);
   };
 
   const handleDeleteProduct = async (productIdToDelete) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       setLoading(true);
+      setActiveMenuId(null);
       try {
         await VendorProductService.deleteProduct(productIdToDelete);
         await fetchAnalytics();
@@ -223,13 +254,14 @@ const VendorProducts = () => {
           {filteredProducts.map((product) => {
             const stockStatus = getStockStatus(product.quantity);
 
-            // --- List View Item ---
+            // --- List View Item (Simplified for brevity, can apply similar menu logic if needed) ---
             if (viewMode === "list") {
               return (
                 <div
                   key={product.product_id}
                   className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-300"
                 >
+                  {/* ... List view content (you can add the menu here too if desired) ... */}
                   <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       {product.product_images &&
@@ -273,16 +305,8 @@ const VendorProducts = () => {
                           <span className="text-xs sm:text-sm text-gray-500">
                             Stock: {product.quantity}
                           </span>
-                          {product.avg_review && (
-                            <div className="flex items-center gap-1">
-                              <i className="fas fa-star text-yellow-400 text-xs sm:text-sm"></i>
-                              <span className="text-xs sm:text-sm font-medium">
-                                {product.avg_review}
-                              </span>
-                            </div>
-                          )}
                         </div>
-
+                        {/* List view actions can remain buttons or switch to menu */}
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleEditProduct(product)}
@@ -306,7 +330,7 @@ const VendorProducts = () => {
               );
             }
 
-            // --- Grid View Item ---
+            // --- Grid View Item (MODIFIED SECTION) ---
             return (
               <div
                 key={product.product_id}
@@ -370,24 +394,63 @@ const VendorProducts = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-auto">
+
+                  {/* --- REPLACED: Action Buttons with Menu --- */}
+                  <div className="relative mt-auto flex justify-end">
                     <button
-                      onClick={() => handleEditProduct(product)}
-                      disabled={loading}
-                      className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2 sm:px-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium text-xs sm:text-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveMenuId(
+                          activeMenuId === product.product_id
+                            ? null
+                            : product.product_id
+                        );
+                      }}
+                      className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors focus:outline-none"
                     >
-                      <i className="fas fa-edit text-[10px] sm:text-xs"></i>{" "}
-                      Edit
+                      <i className="fas fa-ellipsis-v text-lg"></i>
                     </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product.product_id)}
-                      disabled={loading}
-                      className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2 sm:px-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium text-xs sm:text-sm"
-                    >
-                      <i className="fas fa-trash text-[10px] sm:text-xs"></i>{" "}
-                      Delete
-                    </button>
+
+                    {/* Dropdown Menu */}
+                    {activeMenuId === product.product_id && (
+                      <div
+                        ref={menuRef}
+                        className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-100 z-20 overflow-hidden animate-fade-in-up"
+                      >
+                        <div className="py-1">
+                          <button
+                            onClick={() => handleViewProduct(product)}
+                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center gap-3"
+                          >
+                            <i className="fas fa-eye w-4"></i> View Product
+                          </button>
+                          <button
+                            onClick={() => handleEditProduct(product)}
+                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center gap-3"
+                          >
+                            <i className="fas fa-edit w-4"></i> Edit Details
+                          </button>
+                          <button
+                            onClick={() => handleAddVariant(product)}
+                            className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors flex items-center gap-3"
+                          >
+                            <i className="fas fa-plus-circle w-4"></i> Add
+                            Variant
+                          </button>
+                          <div className="border-t border-gray-100 my-1"></div>
+                          <button
+                            onClick={() =>
+                              handleDeleteProduct(product.product_id)
+                            }
+                            className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3"
+                          >
+                            <i className="fas fa-trash-alt w-4"></i> Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
+                  {/* --- END REPLACEMENT --- */}
                 </div>
               </div>
             );
