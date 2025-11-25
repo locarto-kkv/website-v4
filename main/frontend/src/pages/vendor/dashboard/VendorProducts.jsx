@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../../lib/utils.js";
 import { VendorProductService } from "../../../services/vendor/vendorProductService.js";
 import { useVendorDataStore } from "../../../store/vendor/vendorDataStore.jsx";
+import { ConsumerProductService } from "../../../services/consumer/consumerProductService.js";
+import { useAuthStore } from "../../../store/useAuthStore.jsx";
 
 const VendorProducts = () => {
   const navigate = useNavigate();
@@ -12,16 +14,27 @@ const VendorProducts = () => {
   const [sortBy, setSortBy] = useState("name");
   const [viewMode, setViewMode] = useState("grid");
   const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
 
   // --- NEW: State to track which dropdown is open ---
   const [activeMenuId, setActiveMenuId] = useState(null);
   const menuRef = useRef(null);
 
-  const products = useVendorDataStore((s) => s.products);
+  const currentUser = useAuthStore((s) => s.currentUser);
   const fetchAnalytics = useVendorDataStore((s) => s.fetchAnalytics);
 
   const predefinedCategories = ["All", "Personal Care", "Accessories"];
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const products = await ConsumerProductService.getProductsByFilter({
+        vendor_id: currentUser.id,
+      });
+      setProducts(products);
+    };
+
+    fetchProducts();
+  }, []);
   // --- NEW: Handle clicking outside to close menu ---
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -94,6 +107,8 @@ const VendorProducts = () => {
     };
     return icons[category] || icons["Default"];
   };
+
+  console.log(products);
 
   // Filter and sort products
   const filteredProducts = (products || [])

@@ -122,12 +122,14 @@ export const getProductVariants = async (req, res) => {
     if (!firstType) {
       const singleItem = {
         id: base.id,
+        name: base.name,
+        description: base.description,
         price: base.price,
         quantity: base.quantity,
         weight: base.weight,
-        attribute_name: base.attribute_name,
-        base: base.base,
         product_images: base.product_images,
+        status: base.status,
+        created_at: base.created_at,
       };
 
       const response = {
@@ -153,6 +155,8 @@ export const getProductVariants = async (req, res) => {
     for (const product of data) {
       const {
         id,
+        name,
+        description,
         price,
         quantity,
         weight,
@@ -160,17 +164,21 @@ export const getProductVariants = async (req, res) => {
         attribute_type,
         base,
         product_images,
+        status,
       } = product;
 
       if (!variants[attribute_type]) variants[attribute_type] = [];
       variants[attribute_type].push({
         id,
+        name,
+        description,
         price,
         quantity,
         weight,
         attribute_name,
         base,
         product_images,
+        status,
       });
     }
 

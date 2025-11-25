@@ -164,11 +164,11 @@ const ProductViewPage = () => {
           const mergedProduct = {
             ...initialVariant,
             name: data.name || initialVariant.name || "Product Name",
+            description: data.description || initialVariant.description,
             vendor_id: data.vendor_id,
             category: data.category,
             avg_review: data.avg_review || 0,
             count_reviews: data.count_reviews || 0,
-            description: data.description,
           };
           setProduct(mergedProduct);
         }

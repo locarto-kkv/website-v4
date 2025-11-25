@@ -2,18 +2,35 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { VendorProductService } from "../../../services/vendor/vendorProductService";
 import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
+import { ConsumerProductService } from "../../../services/consumer/consumerProductService.js";
+import { useAuthStore } from "../../../store/useAuthStore.jsx";
 
 const VendorProductForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const fetchAnalytics = useVendorDataStore((s) => s.fetchAnalytics);
 
+  const fetchAnalytics = useVendorDataStore((s) => s.fetchAnalytics);
   // Determine mode and initial data from navigation state
-  const { mode, product } = location.state || { mode: "add", product: null };
+  const { mode, product: data } = location.state || {
+    mode: "add",
+    product: null,
+  };
   const isEditMode = mode === "edit";
 
   const [loading, setLoading] = useState(false);
   const [imagesUpdated, setImagesUpdated] = useState(false);
+  const [product, setProduct] = useState([]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const product = await ConsumerProductService.getProductVariants(
+        data.product_uuid
+      );
+      setProduct(product);
+    };
+
+    fetchProduct();
+  }, []);
 
   // Form State
   const [productData, setProductData] = useState({
@@ -39,15 +56,21 @@ const VendorProductForm = () => {
   // Initialize form if in edit mode
   useEffect(() => {
     if (isEditMode && product) {
-      setProductData({
-        name: product.name || "",
-        description: product.description || "",
-        price: product.price || "",
-        quantity: product.quantity || "",
-        weight: product.weight || "",
-        category: product.category || "",
-        product_images: product.product_images || [],
-      });
+      if (product.count_variants < 2) {
+        console.log(product);
+
+        setProductData({
+          name: product.base.name || "",
+          description: product.base.description || "",
+          price: product.base.price || "",
+          quantity: product.base.quantity || "",
+          weight: product.base.weight || "",
+          category: product.category || "",
+          product_images: product.base.product_images || [],
+        });
+      }
+      // If you have variants in the incoming product object, initialize them here
+      // if (product.variants) setVariantsData(product.variants);
     }
   }, [isEditMode, product]);
 
@@ -83,28 +106,51 @@ const VendorProductForm = () => {
   const handleProductVariant = {
     handleInputChange: (e, variant_idx) => {
       const { name, value } = e.target;
-      setVariantsData((prev) => ({ ...prev, [name]: value }));
+      setVariantsData((prev) =>
+        prev.map((item, i) =>
+          i === variant_idx ? { ...item, [name]: value } : item
+        )
+      );
     },
 
     handleImageChange: (e, variant_idx) => {
       if (e.target.files && e.target.files[0]) {
         const file = e.target.files[0];
-        setVariantsData((prev) => ({
-          ...prev,
-          product_images: [...prev.product_images, { file }],
-        }));
+        setVariantsData((prev) =>
+          prev.map((item, i) =>
+            i === variant_idx
+              ? {
+                  ...item,
+                  product_images: [...item.product_images, { file }],
+                }
+              : item
+          )
+        );
         setImagesUpdated(true);
       }
       e.target.value = null;
     },
 
-    handleDeleteImage: (index, variant_idx) => {
-      if (window.confirm("Remove this image?")) {
-        const updatedImages = productData.product_images.filter(
-          (_, i) => i !== index
+    handleDeleteImage: (imageIndex, variant_idx) => {
+      if (window.confirm("Remove this variant image?")) {
+        setVariantsData((prev) =>
+          prev.map((item, i) => {
+            if (i === variant_idx) {
+              const updatedImages = item.product_images.filter(
+                (_, imgI) => imgI !== imageIndex
+              );
+              return { ...item, product_images: updatedImages };
+            }
+            return item;
+          })
         );
-        setVariantsData({ ...productData, product_images: updatedImages });
         if (isEditMode) setImagesUpdated(true);
+      }
+    },
+
+    handleRemoveVariant: (variant_idx) => {
+      if (window.confirm("Remove this variant?")) {
+        setVariantsData((prev) => prev.filter((_, i) => i !== variant_idx));
       }
     },
   };
@@ -113,15 +159,20 @@ const VendorProductForm = () => {
     e.preventDefault();
     setLoading(true);
 
+    const finalPayload = {
+      ...productData,
+      variants: variantsData, // Include variants in submission
+    };
+
     try {
       if (isEditMode) {
         await VendorProductService.editProduct(
           product.product_id,
-          productData,
+          finalPayload,
           imagesUpdated
         );
       } else {
-        await VendorProductService.addProduct(productData);
+        await VendorProductService.addProduct(finalPayload);
       }
 
       // Refresh global store data
@@ -137,8 +188,7 @@ const VendorProductForm = () => {
     }
   };
 
-  const ProductForm = (formData) => {
-    const { data, handler } = formData;
+  const ProductForm = ({ data, handler }) => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Product Name */}
@@ -326,26 +376,65 @@ const VendorProductForm = () => {
         {/* Form Body */}
         <div className="p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Main Product Form */}
             <ProductForm data={productData} handler={handleProduct} />
 
-            <button
-              type="button"
-              onClick={() => setVariantsData((prev) => [...prev, productData])}
-              className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-bold transition-all"
-            >
-              <span className="flex items-center gap-2">
-                <i className="fas fa-plus"></i>
-                Add Variant
-              </span>
-            </button>
-            {variantsData.length > 0 &&
-              variantsData.map((variant, idx) => (
-                <ProductForm
-                  key={idx}
-                  data={variant}
-                  handler={handleProductVariant}
-                />
-              ))}
+            <div className="border-t border-gray-200 pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-800">Variants</h3>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVariantsData((prev) => [...prev, { ...productData }])
+                  }
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-bold transition-all"
+                >
+                  <span className="flex items-center gap-2">
+                    <i className="fas fa-plus"></i>
+                    Add Variant
+                  </span>
+                </button>
+              </div>
+
+              <div className="space-y-8">
+                {variantsData.length > 0 &&
+                  variantsData.map((variant, idx) => {
+                    // Create a wrapper handler for this specific index
+                    // This ensures the Generic ProductForm triggers the correct index updates
+                    const variantHandler = {
+                      handleInputChange: (e) =>
+                        handleProductVariant.handleInputChange(e, idx),
+                      handleImageChange: (e) =>
+                        handleProductVariant.handleImageChange(e, idx),
+                      handleDeleteImage: (imgIdx) =>
+                        handleProductVariant.handleDeleteImage(imgIdx, idx),
+                    };
+
+                    return (
+                      <div
+                        key={idx}
+                        className="bg-gray-50 p-4 rounded-xl border border-gray-200 relative"
+                      >
+                        <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                          <h4 className="font-bold text-gray-600">
+                            Variant #{idx + 1}
+                          </h4>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleProductVariant.handleRemoveVariant(idx)
+                            }
+                            className="text-red-500 hover:text-red-700 text-sm font-semibold"
+                          >
+                            <i className="fas fa-trash mr-1"></i> Remove Variant
+                          </button>
+                        </div>
+                        <ProductForm data={variant} handler={variantHandler} />
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
 
             {/* Footer Actions */}
             <div className="flex items-center justify-end gap-4 pt-6 mt-6 border-t border-gray-200">
