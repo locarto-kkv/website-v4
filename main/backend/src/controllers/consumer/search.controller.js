@@ -9,12 +9,14 @@ export const getSearchResults = async (req, res) => {
     const { query, type } = req.query;
     const limit = 5;
 
+    const searchPattern = `%${query}%`;
+
     if (type === "product") {
       const { data: products, error: productError } = await db
         .from("products")
         .select("id, name, product_uuid")
         .eq("base", true)
-        .ilike("name", `${query}%`)
+        .ilike("name", searchPattern)
         .order("name", { ascending: true })
         .limit(limit);
 
@@ -25,7 +27,7 @@ export const getSearchResults = async (req, res) => {
         .from("vendors")
         .select("id, name")
         .eq("status", "verified")
-        .ilike("name", `${query}%`)
+        .ilike("name", searchPattern)
         .order("name", { ascending: true })
         .limit(limit);
 
@@ -36,7 +38,7 @@ export const getSearchResults = async (req, res) => {
         .from("products")
         .select("id, name, product_uuid")
         .eq("base", true)
-        .ilike("name", `${query}%`)
+        .ilike("name", searchPattern)
         .order("name", { ascending: true })
         .limit(limit);
 
@@ -46,7 +48,7 @@ export const getSearchResults = async (req, res) => {
         .from("vendors")
         .select("id, name")
         .eq("status", "verified")
-        .ilike("name", `${query}%`)
+        .ilike("name", searchPattern)
         .order("name", { ascending: true })
         .limit(limit);
 
@@ -60,7 +62,7 @@ export const getSearchResults = async (req, res) => {
       level: "error",
       message: error.message,
       location: __filename,
-      func: "getRandom",
+      func: "getSearchResults",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }
