@@ -69,6 +69,9 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Scroll to top when the component mounts
+    window.scrollTo(0, 0);
+
     const subtotal = lists?.cart?.reduce(
       (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
       0
