@@ -62,6 +62,50 @@ export const VendorProductService = {
     }
   },
 
+  addProductVariant: async (variantsData) => {
+    try {
+      let product_images_files = [];
+
+      const images_metadata = productData.product_images.map((image, index) => {
+        if (image.file) {
+          product_images_files.push(image.file);
+          return {
+            name: `product_image_${index + 1}`,
+            type: image.file.type,
+            size: image.file.size,
+          };
+        } else if (image.url) {
+          return {
+            name: `product_image_${index + 1}`,
+            url: image.url,
+          };
+        }
+      });
+
+      const payload = {
+        ...productData,
+        product_images: images_metadata,
+      };
+
+      const { data: response } = await axiosInstance.post(
+        `${BASE_URL}/add`,
+        payload
+      );
+
+      if (response.imgUploadUrls && product_images_files.length > 0) {
+        await VendorProductService.uploadImages(
+          product_images_files,
+          response.imgUploadUrls
+        );
+      }
+      toast.success("Product Added");
+      return response.product;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Add Product failed");
+      console.error("Error in addProduct:", error.response?.data?.message);
+    }
+  },
+
   editProduct: async (productId, productData, imagesUpdated) => {
     try {
       console.log(productData);

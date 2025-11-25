@@ -2,6 +2,7 @@ import db from "../../lib/db.js";
 import logger from "../../lib/logger.js";
 import { getFileUploadUrl, deleteFolder } from "../../services/file.service.js";
 import { env } from "../../lib/env.js";
+import { v4 as uuidv4 } from "uuid";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
@@ -16,9 +17,12 @@ export const addProduct = async (req, res) => {
       weight,
       category,
       product_images = null,
+      attribute_type = null,
+      attribute_name = null,
     } = req.body;
 
     const userId = req.user.id;
+    const product_uuid = uuidv4();
 
     const imgUploadUrls = [];
     const imgPublicUrls = [];
@@ -31,6 +35,10 @@ export const addProduct = async (req, res) => {
       description,
       vendor_id: userId,
       category,
+      product_uuid,
+      base: true,
+      attribute_type,
+      attribute_name,
     };
 
     const { data: newProduct, error } = await db
@@ -83,6 +91,87 @@ export const addProduct = async (req, res) => {
       message: error.message,
       location: __filename,
       func: "addProduct",
+    });
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const addProductVariant = async (req, res) => {
+  try {
+    const {
+      name,
+      quantity,
+      description,
+      price,
+      weight,
+      category,
+      product_images = null,
+      attribute_type,
+      attribute_name,
+      product_uuid,
+    } = req.body;
+
+    const userId = req.user.id;
+
+    const imgUploadUrls = [];
+    const imgPublicUrls = [];
+
+    const productData = {
+      name,
+      quantity,
+      price,
+      weight,
+      description,
+      category,
+      vendor_id: userId,
+      product_uuid,
+      attribute_type,
+      attribute_name,
+      base: false,
+    };
+
+    const { data: newProductVariant, error } = await db
+      .from("products")
+      .insert(productData)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    if (product_images) {
+      for (const image of product_images) {
+        const imgUploadUrl = await getFileUploadUrl(
+          newProduct.id,
+          image.name,
+          image,
+          "product-images"
+        );
+        imgPublicUrls.push({
+          name: image.name,
+          url: `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/product-images/${imgUploadUrl.filePath}`,
+        });
+        imgUploadUrls.push(imgUploadUrl);
+      }
+
+      const { data: updatedProductVariant, error } = await db
+        .from("products")
+        .update({ product_images: imgPublicUrls })
+        .eq("id", newProduct.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      res.status(201).json({ product: updatedProductVariant, imgUploadUrls });
+    } else {
+      res.status(201).json({ product: newProductVariant });
+    }
+  } catch (error) {
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "addProductVariant",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }

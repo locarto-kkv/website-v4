@@ -134,8 +134,8 @@ export const getProductVariants = async (req, res) => {
         product_uuid: base.product_uuid,
         vendor_id: base.vendor_id,
         category: base.category,
-        variants: {}, // important: empty
-        base: singleItem, // only product
+        variants: {},
+        base: singleItem,
         reviews: allReviews,
         avg_review,
         count_reviews,
