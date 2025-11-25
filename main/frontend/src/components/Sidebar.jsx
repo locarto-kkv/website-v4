@@ -87,9 +87,6 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
         icon: "fas fa-user-circle",
         path: "/vendor/dashboard/profile",
       },
-      // REMOVED Settings and Support from here
-      // { id: "settings", label: "Settings", icon: "fas fa-cog", path: "/vendor/settings" },
-      // { id: "support", label: "Support", icon: "fas fa-headset", path: "/vendor/support" },
     ];
   } else if (isConsumer) {
     headerDetails = {
@@ -192,22 +189,20 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
       {/* Sidebar Container */}
       <div
         className={`
-          fixed lg:sticky
-          top-0 left-0 bottom-0
+          fixed
+          top-0 lg:top-[70px] left-0 bottom-0
           w-64
           bg-white shadow-lg lg:shadow-none border-r border-gray-200
           flex flex-col
           h-screen lg:h-[calc(100vh-70px)]
           lg:pt-0
-          flex-shrink-0 z-50
+          flex-shrink-0 z-50 lg:z-40
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
         role="navigation"
         aria-label="Main navigation"
       >
-        {/* Mobile Close Button - Moved inside the header for better layout */}
-
         {/* Header */}
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -222,7 +217,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
               </h2>
             </div>
           </div>
-          {/* Mobile Close Button - Now positioned within the flex container */}
+          {/* Mobile Close Button */}
           <button
             onClick={onClose}
             className="lg:hidden p-2 -mr-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -293,9 +288,6 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
             ))}
           </ul>
         </nav>
-
-        {/* Optional Footer */}
-        {/* <div className="p-4 mt-auto border-t border-gray-100"> ... </div> */}
       </div>
     </>
   );

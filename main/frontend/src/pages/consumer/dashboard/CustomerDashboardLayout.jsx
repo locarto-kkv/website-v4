@@ -115,8 +115,8 @@ const CustomerDashboardLayout = () => {
         />
 
         {/* Main content area */}
-        {/* Removed fixed height calculation h-[calc(100vh-70px)] */}
-        <main className="flex-1 overflow-y-auto">
+        {/* Added lg:ml-64 margin to accommodate the fixed sidebar on desktop */}
+        <main className="flex-1 overflow-y-auto lg:ml-64">
           <div className="p-6 md:p-8">
             {/* Dynamic Page Header */}
             <div className="flex items-center gap-4 mb-8">
