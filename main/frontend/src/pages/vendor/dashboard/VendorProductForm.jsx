@@ -285,6 +285,7 @@ const VendorProductForm = () => {
   const [loading, setLoading] = useState(false);
   const [imagesUpdated, setImagesUpdated] = useState(false);
   const [product, setProduct] = useState(null);
+  const [deletedVariants, setDeletedVariants] = useState([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -432,6 +433,9 @@ const VendorProductForm = () => {
 
     handleRemoveVariant: (variant_idx) => {
       if (window.confirm("Remove this variant?")) {
+        if (variantsData[variant_idx].id) {
+          setDeletedVariants((prev) => [...prev, variantsData[variant_idx].id]);
+        }
         setVariantsData((prev) => prev.filter((_, i) => i !== variant_idx));
       }
     },
@@ -463,19 +467,27 @@ const VendorProductForm = () => {
                 imagesUpdated
               )
           );
-        } else {
-          await VendorProductService.addProduct(productData);
-          if (variantsData.length > 0) {
-            variantsData.map(
-              async (variant) =>
-                await VendorProductService.addProductVariant({
-                  ...variant,
-                  product_uuid: product.product_uuid,
-                })
-            );
-          }
+        }
+
+        if (deletedVariants.length > 0) {
+          deletedVariants.map(
+            async (variant_id) =>
+              await VendorProductService.deleteProduct(variant_id)
+          );
+        }
+      } else {
+        await VendorProductService.addProduct(productData);
+        if (variantsData.length > 0) {
+          variantsData.map(
+            async (variant) =>
+              await VendorProductService.addProductVariant({
+                ...variant,
+                product_uuid: product.product_uuid,
+              })
+          );
         }
       }
+
       // Refresh global store data
       await fetchAnalytics();
 
@@ -528,12 +540,15 @@ const VendorProductForm = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setVariantsData((prev) => [
-                      ...prev,
-                      {
-                        ...productData,
-                      },
-                    ]);
+                    setVariantsData((prev) => {
+                      const { id, ...product } = productData;
+                      return [
+                        ...prev,
+                        {
+                          ...product,
+                        },
+                      ];
+                    });
                   }}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-bold transition-all"
                 >

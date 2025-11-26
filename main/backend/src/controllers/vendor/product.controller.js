@@ -298,13 +298,30 @@ export const deleteProduct = async (req, res) => {
   try {
     const { productId } = req.params;
 
-    const { data, error } = await db
+    const { data: product } = await db
       .from("products")
-      .delete()
-      .eq("id", productId);
+      .select()
+      .eq("id", productId)
+      .single();
 
-    await deleteFolder(productId, "product-images");
+    if (product.base) {
+      const { data: variants, error } = await db
+        .from("products")
+        .delete()
+        .eq("product_uuid", product.product_uuid)
+        .select();
 
+      variants.map(
+        async (variant) => await deleteFolder(variant.id, "product-images")
+      );
+    } else {
+      const { data, error } = await db
+        .from("products")
+        .delete()
+        .eq("id", productId);
+
+      await deleteFolder(productId, "product-images");
+    }
     res.status(200).json({ message: "Product Removed Successfully" });
   } catch (error) {
     logger({
