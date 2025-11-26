@@ -207,7 +207,10 @@ const SideCart = ({ isOpen, onClose }) => {
                 Start adding items to see them here
               </p>
               <button
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  navigate("/map"); // MODIFIED: Navigate to /map
+                }}
                 className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all"
               >
                 Continue Shopping
@@ -412,7 +415,10 @@ const SideCart = ({ isOpen, onClose }) => {
             <i className="fas fa-arrow-right text-sm"></i>
           </button>
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              navigate("/map"); // MODIFIED: Navigate to /map
+            }}
             className="w-full text-center text-gray-500 hover:text-gray-700 mt-3 text-sm font-medium"
           >
             or Continue Shopping
