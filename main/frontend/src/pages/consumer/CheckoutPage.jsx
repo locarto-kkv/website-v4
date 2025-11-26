@@ -20,7 +20,6 @@ const CheckoutPage = () => {
 
   const brands = useDataStore((s) => s.brands);
   const brand = brands.find((brand) => brand.id === vendorInCart);
-  console.log(brand?.address[0]?.id);
 
   const { updateList, removeFromList, clearList } = ConsumerListService;
   const navigate = useNavigate();
@@ -147,6 +146,9 @@ const CheckoutPage = () => {
       ...state,
       profile: updatedProfile,
     }));
+    setSelectedAddress(
+      updatedProfile.address[updatedProfile.address.length - 1]
+    );
     setShowNewAddressForm(false);
 
     toast.dismiss();
@@ -588,46 +590,48 @@ const CheckoutPage = () => {
                 </div>
                 {!showNewAddressForm && profile.address?.length > 0 && (
                   <div className="space-y-3 mb-5">
-                    {profile.address?.map((addr) => (
-                      <div
-                        key={addr.id}
-                        onClick={() => handleAddressSelect(addr)}
-                        className={`p-3 sm:p-4 border rounded-lg cursor-pointer transition-all duration-200 flex items-start gap-3 ${
-                          selectedAddress.id === addr.id
-                            ? "border-orange-500 bg-orange-50 ring-2 ring-orange-200 shadow-md"
-                            : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="addressSelection"
-                          id={`addr-radio-${addr.id}`}
-                          checked={selectedAddress.id === addr.id}
-                          onChange={() => handleAddressSelect(addr)}
-                          className="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500 mt-1 flex-shrink-0"
-                        />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center mb-1">
-                            <label
-                              htmlFor={`addr-radio-${addr.id}`}
-                              className="font-semibold text-gray-800 text-sm cursor-pointer"
-                            >
-                              {addr.label || "Address"}
-                            </label>
+                    {profile.address?.map((addr) => {
+                      return (
+                        <div
+                          key={addr.id}
+                          onClick={() => handleAddressSelect(addr)}
+                          className={`p-3 sm:p-4 border rounded-lg cursor-pointer transition-all duration-200 flex items-start gap-3 ${
+                            selectedAddress.id === addr.id
+                              ? "border-orange-500 bg-orange-50 ring-2 ring-orange-200 shadow-md"
+                              : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="addressSelection"
+                            id={`addr-radio-${addr.id}`}
+                            checked={selectedAddress.id === addr.id}
+                            onChange={() => handleAddressSelect(addr)}
+                            className="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500 mt-1 flex-shrink-0"
+                          />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center mb-1">
+                              <label
+                                htmlFor={`addr-radio-${addr.id}`}
+                                className="font-semibold text-gray-800 text-sm cursor-pointer"
+                              >
+                                {addr.label || "Address"}
+                              </label>
+                            </div>
+                            <p className="text-gray-600 text-xs">{`${
+                              addr.address_line_1
+                            }${
+                              addr.address_line_2
+                                ? ", " + addr.address_line_2
+                                : ""
+                            }, ${addr.country}, ${addr.pincode}`}</p>
+                            <p className="text-gray-600 text-xs mt-1">
+                              Contact: {addr.phone_no}
+                            </p>
                           </div>
-                          <p className="text-gray-600 text-xs">{`${
-                            addr.address_line_1
-                          }${
-                            addr.address_line_2
-                              ? ", " + addr.address_line_2
-                              : ""
-                          }, ${addr.country}, ${addr.pincode}`}</p>
-                          <p className="text-gray-600 text-xs mt-1">
-                            Contact: {addr.phone_no}
-                          </p>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
 
