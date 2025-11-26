@@ -14,13 +14,8 @@ const SideCart = ({ isOpen, onClose }) => {
   const [cartItems, setCartItems] = useState([]);
   const [prices, setPrices] = useState({
     subtotal: 0,
-    shipping: 0, // Example fixed shipping
-    tax: 0, // Example tax rate
-    total: 0,
   });
-  const [couponCode, setCouponCode] = useState("");
-  const [couponMessage, setCouponMessage] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false); // Example state
+
   const [loading, setLoading] = useState(true); // Added loading state
 
   // --- HOOKS ---
@@ -52,7 +47,7 @@ const SideCart = ({ isOpen, onClose }) => {
       }
       setLoading(false);
     }
-  }, [isOpen]);
+  }, [isOpen, lists]);
 
   // Update prices based on cart items
   const updatePrices = (items) => {
@@ -60,11 +55,7 @@ const SideCart = ({ isOpen, onClose }) => {
       (sum, item) => sum + (item.price || 0) * (item.quantity || 0), // Use safe defaults
       0
     );
-    const shipping = subtotal > 0 ? 5.99 : 0; // Only add shipping if there are items
-    const tax = subtotal * 0.08; // 8% tax example
-    const total = subtotal + shipping + tax;
-
-    setPrices({ subtotal, shipping, tax, total });
+    setPrices({ subtotal });
   };
 
   // Remove item from cart
@@ -116,21 +107,6 @@ const SideCart = ({ isOpen, onClose }) => {
     } catch (err) {
       console.error("Error updating cart quantity:", err);
       toast.error("Could not update cart quantity.");
-    }
-  };
-
-  // Apply coupon code (Placeholder logic)
-  const applyCoupon = () => {
-    if (couponCode.trim().toUpperCase() === "LOCARTO10") {
-      setCouponMessage("Coupon 'LOCARTO10' applied successfully!");
-      setCouponApplied(true);
-      // Add logic here to actually adjust the price if needed
-    } else if (couponCode.trim()) {
-      setCouponMessage("Invalid coupon code.");
-      setCouponApplied(false);
-    } else {
-      setCouponMessage("");
-      setCouponApplied(false);
     }
   };
 
@@ -281,14 +257,6 @@ const SideCart = ({ isOpen, onClose }) => {
                           <i className="fas fa-plus"></i>
                         </button>
                       </div>
-                      {/* <div className="flex items-center gap-2 mt-2">
-                        <span className="font-medium text-gray-800 text-sm">
-                          Quantity:
-                        </span>
-                        <span className="text-gray-800 text-sm font-semibold">
-                          {item.quantity}
-                        </span>
-                      </div> */}
                     </div>
                     {/* Remove Button */}
                     <button
@@ -306,50 +274,6 @@ const SideCart = ({ isOpen, onClose }) => {
                 ))}
               </div>
 
-              {/* Enhanced Coupon Section */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <i className="fas fa-tag text-orange-500"></i>
-                    <span className="text-sm font-medium text-gray-700">
-                      Have a coupon?
-                    </span>
-                  </div>
-                  {/* Remove coupon button - Add logic later */}
-                  {/* {couponApplied && (
-                    <button className="text-xs text-red-500 hover:text-red-600 transition-colors duration-200">
-                      Remove
-                    </button>
-                  )} */}
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="Enter coupon code"
-                    value={couponCode}
-                    disabled
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-sm"
-                  />
-                  <button
-                    onClick={applyCoupon}
-                    className="bg-orange-500 text-white px-4 sm:px-5 py-2 sm:py-3 rounded-lg hover:bg-orange-600 transition-colors duration-200 font-semibold text-sm"
-                  >
-                    Apply
-                  </button>
-                </div>
-                {/* Coupon Message Area */}
-                {couponMessage && (
-                  <p
-                    className={`mt-2 text-xs font-medium ${
-                      couponApplied ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {couponMessage}
-                  </p>
-                )}
-              </div>
-
               {/* Enhanced Order Summary */}
               <div className="mt-6 p-5 bg-gray-50 rounded-xl border border-gray-200">
                 <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -357,38 +281,21 @@ const SideCart = ({ isOpen, onClose }) => {
                   Order Summary
                 </h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Subtotal</span>
-                    <span className="font-medium text-gray-800">
-                      {formatCurrency(prices.subtotal)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Shipping</span>
-                    <span className="font-medium text-gray-800">
-                      {formatCurrency(prices.shipping)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Tax (Est.)</span>
-                    <span className="font-medium text-gray-800">
-                      {formatCurrency(prices.tax)}
-                    </span>
-                  </div>
-                  {/* Example Discount - Add logic later */}
-                  {/* {couponApplied && (
-                    <div className="flex justify-between text-green-600">
-                      <span>Discount</span>
-                      <span className="font-medium">
-                        -{formatCurrency(prices.subtotal * 0.10)}
+                  {cartItems.map((item) => (
+                    <div className="flex justify-between text-gray-600">
+                      <span className="font-semibold">{item.name} </span>
+                      <span className="font-extrabold">{item.quantity} x</span>
+                      <span className="font-medium text-gray-800">
+                        {formatCurrency(item.price)}
                       </span>
                     </div>
-                  )} */}
+                  ))}
+
                   <div className="border-t border-gray-200 pt-3 mt-2">
                     <div className="flex justify-between font-bold text-base text-gray-900">
-                      <span>Total</span>
+                      <span>Subtotal</span>
                       <span className="text-orange-600">
-                        {formatCurrency(prices.total)}{" "}
+                        {formatCurrency(prices.subtotal)}
                         {/* Adjust if discount applied */}
                       </span>
                     </div>

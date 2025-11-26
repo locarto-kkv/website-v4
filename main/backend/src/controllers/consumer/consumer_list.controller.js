@@ -10,7 +10,8 @@ export const getListItems = async (req, res) => {
     const { data: listItems } = await db
       .from("consumer_lists")
       .select("list_type, quantity, product_id, product: products(*)")
-      .eq("consumer_id", userId);
+      .eq("consumer_id", userId)
+      .order("id");
 
     const groupedList = listItems.reduce((acc, item) => {
       const { list_type, quantity, product_id, product } = item;

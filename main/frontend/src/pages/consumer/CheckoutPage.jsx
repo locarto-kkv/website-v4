@@ -103,7 +103,7 @@ const CheckoutPage = () => {
       platformFee,
       subtotal,
     }));
-  }, []);
+  }, [lists]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
