@@ -228,7 +228,11 @@ const VendorLocationSetup = () => {
       };
     } else {
       profileData = {
-        profile: { status: "complete" },
+        profile: {
+          status: "complete",
+          website: setupForm.website,
+          phone_no: setupForm.phone,
+        },
         address: {
           label: "Main",
           address_line_1: setupForm.address_line_1,
