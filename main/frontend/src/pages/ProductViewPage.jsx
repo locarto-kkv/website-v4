@@ -432,7 +432,7 @@ const ProductViewPage = () => {
             </div>
             <Link
               to={`/vendor/${vendor.id}/products/all`}
-              className="hidden sm:inline-flex items-center gap-2 text-orange-600 bg-orange-50 hover:bg-orange-100 px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
+              className="inline-flex items-center gap-2 text-orange-600 bg-orange-50 hover:bg-orange-100 px-4 py-2 rounded-lg font-semibold transition-colors text-sm"
             >
               <span>View Store</span>
               <i className="fas fa-arrow-right"></i>
