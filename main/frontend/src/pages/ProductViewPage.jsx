@@ -80,6 +80,9 @@ const ProductViewPage = () => {
 
   // Helper to show the custom auth toast
   const showAuthToast = () => {
+    // Dismiss any existing toasts first
+    toast.dismiss();
+    
     toast(
       (t) => (
         <div className="flex flex-col gap-2 items-start">
@@ -98,6 +101,7 @@ const ProductViewPage = () => {
         </div>
       ),
       {
+        id: "auth-toast", // Unique ID prevents stacking
         duration: 5000,
         icon: "🔒",
         style: {
