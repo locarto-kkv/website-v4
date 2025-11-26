@@ -282,6 +282,8 @@ export const editProduct = async (req, res) => {
     if (error) throw error;
     res.status(200).json({ product: updatedProduct, imgUploadUrls });
   } catch (error) {
+    console.log(error);
+
     logger({
       level: "error",
       message: error.message,

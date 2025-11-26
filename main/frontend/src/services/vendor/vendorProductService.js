@@ -62,7 +62,7 @@ export const VendorProductService = {
     }
   },
 
-  addProductVariant: async (variantsData) => {
+  addProductVariant: async (productData) => {
     try {
       let product_images_files = [];
 
@@ -108,8 +108,6 @@ export const VendorProductService = {
 
   editProduct: async (productId, productData, imagesUpdated) => {
     try {
-      console.log(productData);
-
       let product_images_files = [];
 
       if (imagesUpdated) {
@@ -134,14 +132,10 @@ export const VendorProductService = {
         productData.product_images = images_metadata;
       }
 
-      console.log(productData, imagesUpdated);
-
       const { data: response } = await axiosInstance.put(
         `${BASE_URL}/edit/${productId}`,
         { productData, imagesUpdated }
       );
-
-      console.log(response);
 
       if (response.imgUploadUrls && product_images_files.length > 0) {
         await VendorProductService.uploadImages(

@@ -3,7 +3,272 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { VendorProductService } from "../../../services/vendor/vendorProductService";
 import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 import { ConsumerProductService } from "../../../services/consumer/consumerProductService.js";
-import { useAuthStore } from "../../../store/useAuthStore.jsx";
+
+const ProductForm = ({ data, handler, variant, base = true }) => {
+  const categories = ["Personal Care", "Accessories"];
+  const [enabled, setEnabled] = useState(false);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Product Name */}
+      <div className="md:col-span-2">
+        <label className="block text-sm font-bold text-gray-700 mb-2">
+          Product Name *
+        </label>
+        <input
+          type="text"
+          name="name"
+          value={data.name}
+          onChange={handler.handleInputChange}
+          required
+          className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+          placeholder="Enter product name"
+        />
+      </div>
+
+      {/* Description */}
+      <div className="md:col-span-2">
+        <label className="block text-sm font-bold text-gray-700 mb-2">
+          Description *
+        </label>
+        <textarea
+          name="description"
+          value={data.description}
+          onChange={handler.handleInputChange}
+          required
+          rows="4"
+          className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all resize-none"
+          placeholder="Describe the product features and benefits..."
+        ></textarea>
+      </div>
+
+      {/* Price */}
+      <div>
+        <label className="block text-sm font-bold text-gray-700 mb-2">
+          Price (₹) *
+        </label>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
+            ₹
+          </span>
+          <input
+            type="number"
+            name="price"
+            value={data.price}
+            onChange={handler.handleInputChange}
+            required
+            min="0"
+            step="0.01"
+            className="w-full pl-8 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      {/* Weight */}
+      <div>
+        <label className="block text-sm font-bold text-gray-700 mb-2">
+          Weight (grams) *
+        </label>
+        <input
+          type="number"
+          name="weight"
+          value={data.weight}
+          onChange={handler.handleInputChange}
+          required
+          min="1"
+          className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+          placeholder="e.g. 500"
+        />
+      </div>
+
+      {/* Quantity */}
+      <div>
+        <label className="block text-sm font-bold text-gray-700 mb-2">
+          Stock Quantity *
+        </label>
+        <input
+          type="number"
+          name="quantity"
+          value={data.quantity}
+          onChange={handler.handleInputChange}
+          required
+          min="0"
+          className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+          placeholder="Available units"
+        />
+      </div>
+
+      {/* Category */}
+      <div>
+        <label className="block text-sm font-bold text-gray-700 mb-2">
+          Category *
+        </label>
+        <select
+          name="category"
+          value={data.category}
+          onChange={handler.handleInputChange}
+          required
+          disabled={!base}
+          className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all bg-white"
+        >
+          <option value="">Select Category</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {variant && (
+        <>
+          {/* Attribute Type */}
+
+          <div className="md:col-span-1">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+              Attribute Type *
+            </label>
+            <input
+              type="text"
+              name="attribute_type"
+              value={data.attribute_type}
+              onChange={handler.handleInputChange}
+              required
+              disabled={!base}
+              className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+              placeholder="Enter Variant type (Size/Quantity/etc.)"
+            />
+          </div>
+
+          {/* Attribute Name */}
+          <div className="md:col-span-1">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+              Attribute Name *
+            </label>
+            <input
+              type="text"
+              name="attribute_name"
+              value={data.attribute_name}
+              onChange={handler.handleInputChange}
+              required
+              className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+              placeholder="Enter Variant name (Large/100ml/etc.)"
+            />
+          </div>
+        </>
+      )}
+
+      {base && (
+        <div>
+          <button
+            type="button"
+            onClick={() => setEnabled(!enabled)}
+            className={`
+        relative w-14 h-7 flex items-center rounded-full transition-colors duration-300
+        ${
+          enabled
+            ? "bg-gradient-to-r from-[#f8693b] to-[#f83600]"
+            : "bg-gray-300"
+        }
+      `}
+          >
+            <span
+              className={`
+          absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300
+          ${enabled ? "translate-x-7" : "translate-x-1"}
+        `}
+            ></span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setEnabled(!enabled)}
+            className={`
+        relative w-14 h-7 flex items-center rounded-full transition-colors duration-300
+        ${
+          enabled
+            ? "bg-gradient-to-r from-[#f8693b] to-[#f83600]"
+            : "bg-gray-300"
+        }
+      `}
+          >
+            <span
+              className={`
+          absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300
+          ${enabled ? "translate-x-7" : "translate-x-1"}
+        `}
+            ></span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setEnabled(!enabled)}
+            className={`
+        relative w-14 h-7 flex items-center rounded-full transition-colors duration-300
+        ${
+          enabled
+            ? "bg-gradient-to-r from-[#f8693b] to-[#f83600]"
+            : "bg-gray-300"
+        }
+      `}
+          >
+            <span
+              className={`
+          absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300
+          ${enabled ? "translate-x-7" : "translate-x-1"}
+        `}
+            ></span>
+          </button>
+        </div>
+      )}
+      {/* Image Upload Section */}
+      <div className="md:col-span-2 bg-gray-50 p-4 rounded-xl border border-gray-200">
+        <label className="block text-sm font-bold text-gray-700 mb-3">
+          Product Images
+        </label>
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
+          {data.product_images?.map((image, index) => (
+            <div
+              key={index}
+              className="relative aspect-square border rounded-lg overflow-hidden group bg-white shadow-sm"
+            >
+              <img
+                src={
+                  image.url ||
+                  (image.file
+                    ? URL.createObjectURL(image.file)
+                    : "placeholder.png")
+                }
+                alt={`Preview ${index}`}
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => handler.handleDeleteImage(index)}
+                className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-700"
+                title="Remove"
+              >
+                <i className="fas fa-times text-xs"></i>
+              </button>
+            </div>
+          ))}
+
+          {/* Upload Button */}
+          <label className="aspect-square border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-white hover:border-orange-500 transition-all flex flex-col items-center justify-center text-gray-400 hover:text-orange-500 group">
+            <i className="fas fa-camera text-2xl mb-2 group-hover:scale-110 transition-transform"></i>
+            <span className="text-xs font-semibold">Add Photo</span>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={handler.handleImageChange}
+            />
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const VendorProductForm = () => {
   const navigate = useNavigate();
@@ -19,7 +284,7 @@ const VendorProductForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [imagesUpdated, setImagesUpdated] = useState(false);
-  const [product, setProduct] = useState([]);
+  const [product, setProduct] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -50,15 +315,10 @@ const VendorProductForm = () => {
 
   const [variantsData, setVariantsData] = useState([]);
 
-  // Example categories
-  const categories = ["Personal Care", "Accessories"];
-
   // Initialize form if in edit mode
   useEffect(() => {
     if (isEditMode && product) {
       if (product.count_variants < 2) {
-        console.log(product);
-
         setProductData({
           name: product.base.name || "",
           description: product.base.description || "",
@@ -68,9 +328,31 @@ const VendorProductForm = () => {
           category: product.category || "",
           product_images: product.base.product_images || [],
         });
+      } else {
+        const attribute_type = Object.keys(product.variants)[0];
+        const base = product.variants[attribute_type].find(
+          (variant) => variant.base
+        );
+        const variants = product.variants[attribute_type].filter(
+          (variant) => variant !== base
+        );
+
+        setProductData({
+          id: base.id,
+          product_uuid: product.product_uuid,
+          vendor_id: product.vendor_id,
+          category: product.category || "",
+          attribute_name: base.attribute_name || "",
+          name: base.name || "",
+          description: base.description || "",
+          price: base.price || "",
+          quantity: base.quantity || "",
+          weight: base.weight || "",
+          product_images: base.product_images || [],
+          attribute_type,
+        });
+        setVariantsData(variants);
       }
-      // If you have variants in the incoming product object, initialize them here
-      // if (product.variants) setVariantsData(product.variants);
     }
   }, [isEditMode, product]);
 
@@ -159,22 +441,41 @@ const VendorProductForm = () => {
     e.preventDefault();
     setLoading(true);
 
-    const finalPayload = {
-      ...productData,
-      variants: variantsData, // Include variants in submission
-    };
+    // console.log(productData);
+    // console.log(variantsData);
 
     try {
       if (isEditMode) {
         await VendorProductService.editProduct(
-          product.product_id,
-          finalPayload,
+          productData.id,
+          productData,
           imagesUpdated
         );
-      } else {
-        await VendorProductService.addProduct(finalPayload);
+        if (variantsData.length > 0) {
+          variantsData.map(
+            async (variant) =>
+              await VendorProductService.editProduct(
+                variant.id,
+                {
+                  ...variant,
+                  product_uuid: product.product_uuid,
+                },
+                imagesUpdated
+              )
+          );
+        } else {
+          await VendorProductService.addProduct(productData);
+          if (variantsData.length > 0) {
+            variantsData.map(
+              async (variant) =>
+                await VendorProductService.addProductVariant({
+                  ...variant,
+                  product_uuid: product.product_uuid,
+                })
+            );
+          }
+        }
       }
-
       // Refresh global store data
       await fetchAnalytics();
 
@@ -186,168 +487,6 @@ const VendorProductForm = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const ProductForm = ({ data, handler }) => {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Product Name */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            Product Name *
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={data.name}
-            onChange={handler.handleInputChange}
-            required
-            className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
-            placeholder="Enter product name"
-          />
-        </div>
-
-        {/* Description */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            Description *
-          </label>
-          <textarea
-            name="description"
-            value={data.description}
-            onChange={handler.handleInputChange}
-            required
-            rows="4"
-            className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all resize-none"
-            placeholder="Describe the product features and benefits..."
-          ></textarea>
-        </div>
-
-        {/* Price */}
-        <div>
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            Price (₹) *
-          </label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">
-              ₹
-            </span>
-            <input
-              type="number"
-              name="price"
-              value={data.price}
-              onChange={handler.handleInputChange}
-              required
-              min="0"
-              step="0.01"
-              className="w-full pl-8 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
-              placeholder="0.00"
-            />
-          </div>
-        </div>
-
-        {/* Weight */}
-        <div>
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            Weight (grams) *
-          </label>
-          <input
-            type="number"
-            name="weight"
-            value={data.weight}
-            onChange={handler.handleInputChange}
-            required
-            min="1"
-            className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
-            placeholder="e.g. 500"
-          />
-        </div>
-
-        {/* Quantity */}
-        <div>
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            Stock Quantity *
-          </label>
-          <input
-            type="number"
-            name="quantity"
-            value={data.quantity}
-            onChange={handler.handleInputChange}
-            required
-            min="0"
-            className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
-            placeholder="Available units"
-          />
-        </div>
-
-        {/* Category */}
-        <div>
-          <label className="block text-sm font-bold text-gray-700 mb-2">
-            Category *
-          </label>
-          <select
-            name="category"
-            value={data.category}
-            onChange={handler.handleInputChange}
-            required
-            className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all bg-white"
-          >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Image Upload Section */}
-        <div className="md:col-span-2 bg-gray-50 p-4 rounded-xl border border-gray-200">
-          <label className="block text-sm font-bold text-gray-700 mb-3">
-            Product Images
-          </label>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
-            {data.product_images?.map((image, index) => (
-              <div
-                key={index}
-                className="relative aspect-square border rounded-lg overflow-hidden group bg-white shadow-sm"
-              >
-                <img
-                  src={
-                    image.url ||
-                    (image.file
-                      ? URL.createObjectURL(image.file)
-                      : "placeholder.png")
-                  }
-                  alt={`Preview ${index}`}
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => handler.handleDeleteImage(index)}
-                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-700"
-                  title="Remove"
-                >
-                  <i className="fas fa-times text-xs"></i>
-                </button>
-              </div>
-            ))}
-
-            {/* Upload Button */}
-            <label className="aspect-square border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-white hover:border-orange-500 transition-all flex flex-col items-center justify-center text-gray-400 hover:text-orange-500 group">
-              <i className="fas fa-camera text-2xl mb-2 group-hover:scale-110 transition-transform"></i>
-              <span className="text-xs font-semibold">Add Photo</span>
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handler.handleImageChange}
-              />
-            </label>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -377,16 +516,25 @@ const VendorProductForm = () => {
         <div className="p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Main Product Form */}
-            <ProductForm data={productData} handler={handleProduct} />
+            <ProductForm
+              data={productData}
+              handler={handleProduct}
+              variant={variantsData.length > 0}
+            />
 
             <div className="border-t border-gray-200 pt-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-bold text-gray-800">Variants</h3>
                 <button
                   type="button"
-                  onClick={() =>
-                    setVariantsData((prev) => [...prev, { ...productData }])
-                  }
+                  onClick={() => {
+                    setVariantsData((prev) => [
+                      ...prev,
+                      {
+                        ...productData,
+                      },
+                    ]);
+                  }}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-bold transition-all"
                 >
                   <span className="flex items-center gap-2">
@@ -429,7 +577,16 @@ const VendorProductForm = () => {
                             <i className="fas fa-trash mr-1"></i> Remove Variant
                           </button>
                         </div>
-                        <ProductForm data={variant} handler={variantHandler} />
+                        <ProductForm
+                          data={{
+                            ...variant,
+                            category: productData.category,
+                            attribute_type: productData.attribute_type,
+                          }}
+                          handler={variantHandler}
+                          variant={true}
+                          base={false}
+                        />
                       </div>
                     );
                   })}

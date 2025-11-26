@@ -108,8 +108,6 @@ const VendorProducts = () => {
     return icons[category] || icons["Default"];
   };
 
-  console.log(products);
-
   // Filter and sort products
   const filteredProducts = (products || [])
     .filter((product) => {
