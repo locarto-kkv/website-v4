@@ -80,8 +80,7 @@ const ProductViewPage = () => {
 
   // Helper to show the custom auth toast
   const showAuthToast = () => {
-    // Dismiss any existing toasts first
-    toast.dismiss();
+    toast.dismiss(); // Clear previous toasts to prevent stacking
     
     toast(
       (t) => (
@@ -101,7 +100,7 @@ const ProductViewPage = () => {
         </div>
       ),
       {
-        id: "auth-toast", // Unique ID prevents stacking
+        id: "auth-toast",
         duration: 5000,
         icon: "🔒",
         style: {
@@ -140,7 +139,6 @@ const ProductViewPage = () => {
         let initialVariant = null;
 
         // 2. Identify the Product Base/Initial State
-        // Strategy: Check if there is a direct 'base' object first (Single SKU).
         if (data.base) {
           initialVariant = data.base;
         }
@@ -152,8 +150,6 @@ const ProductViewPage = () => {
             vKey = keys[0]; // e.g., "size"
             vList = data.variants[vKey];
 
-            // If we didn't find a direct base object earlier, find the base variant
-            // or default to the first one in the list.
             if (!initialVariant) {
               initialVariant = vList.find((v) => v.base) || vList[0];
             }
@@ -474,7 +470,8 @@ const ProductViewPage = () => {
                 }`}
               >
                 <i
-                  className={`fas fa-heart text-2xl ${
+                  /* MODIFIED: Switch between solid (fas) and regular (far) based on state */
+                  className={`${isInWishlist ? "fas" : "far"} fa-heart text-2xl ${
                     isInWishlist ? "animate-pulse" : ""
                   }`}
                 ></i>

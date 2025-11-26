@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom"; // Ensure Navigate is imported if used
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 import { useDataStore } from "./store/useDataStore";
@@ -63,11 +63,8 @@ function App() {
   }, [currentUser]);
 
   if (authLoading || dataLoading || consumerLoading || vendorLoading) {
-    // console.log(authLoading, dataLoading, consumerLoading, vendorLoading);
-
     return (
       <div className="flex items-center justify-center min-h-screen pt-[70px]">
-        {/* Adjusted min-height */}
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading data...</p>
@@ -91,12 +88,10 @@ function App() {
         />
         <Route path="/product/:product_uuid" element={<ProductViewPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        {/* --- MAKE SURE THIS LINE IS CORRECT --- */}
         <Route
           path="/terms-and-conditions"
           element={<TermsAndConditionsPage />}
         />
-        {/* -------------------------------------- */}
         <Route path="/alerts" element={<AlertsPage />} />
 
         {/* --- ADMIN ROUTES --- */}
@@ -110,7 +105,16 @@ function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
-      <Toaster />
+      {/* CHANGED: Added toastOptions to set global duration to 2000ms */}
+      <Toaster
+        toastOptions={{
+          duration: 2000,
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        }}
+      />
     </div>
   );
 }
