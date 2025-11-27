@@ -35,6 +35,7 @@ const VendorProducts = () => {
 
     fetchProducts();
   }, []);
+
   // --- NEW: Handle clicking outside to close menu ---
   useEffect(() => {
     const handleClickOutside = (event) => {

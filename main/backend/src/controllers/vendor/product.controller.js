@@ -141,7 +141,7 @@ export const addProductVariant = async (req, res) => {
     if (product_images) {
       for (const image of product_images) {
         const imgUploadUrl = await getFileUploadUrl(
-          newProduct.id,
+          newProductVariant.id,
           image.name,
           image,
           "product-images"
@@ -156,7 +156,7 @@ export const addProductVariant = async (req, res) => {
       const { data: updatedProductVariant, error } = await db
         .from("products")
         .update({ product_images: imgPublicUrls })
-        .eq("id", newProduct.id)
+        .eq("id", newProductVariant.id)
         .select()
         .single();
 

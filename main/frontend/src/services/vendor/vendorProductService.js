@@ -88,7 +88,7 @@ export const VendorProductService = {
       };
 
       const { data: response } = await axiosInstance.post(
-        `${BASE_URL}/add`,
+        `${BASE_URL}/add-variant`,
         payload
       );
 

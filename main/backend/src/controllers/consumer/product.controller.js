@@ -116,10 +116,9 @@ export const getProductVariants = async (req, res) => {
     // -----------------------------------------
     // 2) CHECK IF ATTRIBUTE_TYPE EXISTS
     // -----------------------------------------
-    const firstType = base.attribute_type;
 
     // ❌ No variants → return base product only
-    if (!firstType) {
+    if (data.length === 1) {
       const singleItem = {
         id: base.id,
         name: base.name,
@@ -130,6 +129,9 @@ export const getProductVariants = async (req, res) => {
         product_images: base.product_images,
         status: base.status,
         created_at: base.created_at,
+        cod: base.cod,
+        replace: base.replace,
+        return_refund: base.return_refund,
       };
 
       const response = {
@@ -148,7 +150,7 @@ export const getProductVariants = async (req, res) => {
     }
 
     // -----------------------------------------
-    // 3) GROUP VARIANTS (attribute_type exists)
+    // 3) GROUP VARIANTS (variants exists)
     // -----------------------------------------
     const variants = {};
 
@@ -165,21 +167,41 @@ export const getProductVariants = async (req, res) => {
         base,
         product_images,
         status,
+        cod,
+        replace,
+        return_refund,
       } = product;
 
       if (!variants[attribute_type]) variants[attribute_type] = [];
-      variants[attribute_type].push({
-        id,
-        name,
-        description,
-        price,
-        quantity,
-        weight,
-        attribute_name,
-        base,
-        product_images,
-        status,
-      });
+      const variantData = base
+        ? {
+            id,
+            name,
+            description,
+            price,
+            quantity,
+            weight,
+            attribute_name,
+            base,
+            product_images,
+            status,
+            cod,
+            replace,
+            return_refund,
+          }
+        : {
+            id,
+            name,
+            description,
+            price,
+            quantity,
+            weight,
+            attribute_name,
+            base,
+            product_images,
+            status,
+          };
+      variants[attribute_type].push(variantData);
     }
 
     const count_variants = data.length;

@@ -4,9 +4,47 @@ import { VendorProductService } from "../../../services/vendor/vendorProductServ
 import { useVendorDataStore } from "../../../store/vendor/vendorDataStore";
 import { ConsumerProductService } from "../../../services/consumer/consumerProductService.js";
 
+const Toggle = ({ name, label, value, onChange }) => {
+  // Function to simulate an event object for the handler
+  const handleToggleClick = () => {
+    // Manually construct an event-like object for handler.handleInputChange
+    const simulatedEvent = {
+      target: {
+        name: name,
+        value: !value,
+      },
+    };
+    onChange(simulatedEvent);
+  };
+
+  return (
+    <div className="flex items-center justify-between">
+      <label className="text-sm font-bold text-gray-700">{label}</label>
+      <button
+        type="button"
+        onClick={handleToggleClick}
+        className={`
+          relative w-14 h-7 flex items-center rounded-full transition-colors duration-300
+          ${
+            value
+              ? "bg-gradient-to-r from-[#f8693b] to-[#f83600]"
+              : "bg-gray-300"
+          }
+        `}
+      >
+        <span
+          className={`
+            absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300
+            ${value ? "translate-x-7" : "translate-x-1"}
+          `}
+        ></span>
+      </button>
+    </div>
+  );
+};
+
 const ProductForm = ({ data, handler, variant, base = true }) => {
   const categories = ["Personal Care", "Accessories"];
-  const [enabled, setEnabled] = useState(false);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -25,7 +63,6 @@ const ProductForm = ({ data, handler, variant, base = true }) => {
           placeholder="Enter product name"
         />
       </div>
-
       {/* Description */}
       <div className="md:col-span-2">
         <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -41,7 +78,6 @@ const ProductForm = ({ data, handler, variant, base = true }) => {
           placeholder="Describe the product features and benefits..."
         ></textarea>
       </div>
-
       {/* Price */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -64,7 +100,6 @@ const ProductForm = ({ data, handler, variant, base = true }) => {
           />
         </div>
       </div>
-
       {/* Weight */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -81,7 +116,6 @@ const ProductForm = ({ data, handler, variant, base = true }) => {
           placeholder="e.g. 500"
         />
       </div>
-
       {/* Quantity */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -98,7 +132,6 @@ const ProductForm = ({ data, handler, variant, base = true }) => {
           placeholder="Available units"
         />
       </div>
-
       {/* Category */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -120,12 +153,11 @@ const ProductForm = ({ data, handler, variant, base = true }) => {
           ))}
         </select>
       </div>
-
+      {/* Variant Specific Fields */}{" "}
       {variant && (
         <>
           {/* Attribute Type */}
-
-          <div className="md:col-span-1">
+          <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Attribute Type *
             </label>
@@ -136,13 +168,15 @@ const ProductForm = ({ data, handler, variant, base = true }) => {
               onChange={handler.handleInputChange}
               required
               disabled={!base}
-              className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+              className="w-full p-3 border-2 border-gray-300 rounded-xl 
+                   focus:ring-2 focus:ring-orange-500/50 
+                   focus:border-orange-500 transition-all"
               placeholder="Enter Variant type (Size/Quantity/etc.)"
             />
           </div>
 
           {/* Attribute Name */}
-          <div className="md:col-span-1">
+          <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Attribute Name *
             </label>
@@ -152,74 +186,47 @@ const ProductForm = ({ data, handler, variant, base = true }) => {
               value={data.attribute_name}
               onChange={handler.handleInputChange}
               required
-              className="w-full p-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+              className="w-full p-3 border-2 border-gray-300 rounded-xl 
+                   focus:ring-2 focus:ring-orange-500/50 
+                   focus:border-orange-500 transition-all"
               placeholder="Enter Variant name (Large/100ml/etc.)"
             />
           </div>
         </>
       )}
-
+      {/* Base Product Toggles (COD, Replace, Return/Refund) */}
       {base && (
-        <div>
-          <button
-            type="button"
-            onClick={() => setEnabled(!enabled)}
-            className={`
-        relative w-14 h-7 flex items-center rounded-full transition-colors duration-300
-        ${
-          enabled
-            ? "bg-gradient-to-r from-[#f8693b] to-[#f83600]"
-            : "bg-gray-300"
-        }
-      `}
-          >
-            <span
-              className={`
-          absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300
-          ${enabled ? "translate-x-7" : "translate-x-1"}
-        `}
-            ></span>
-          </button>
+        <>
+          {/* Cash on Delivery Toggle */}
+          <div>
+            <Toggle
+              name="cod"
+              label="Cash on Delivery (COD)"
+              value={data.cod}
+              onChange={handler.handleInputChange}
+            />
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setEnabled(!enabled)}
-            className={`
-        relative w-14 h-7 flex items-center rounded-full transition-colors duration-300
-        ${
-          enabled
-            ? "bg-gradient-to-r from-[#f8693b] to-[#f83600]"
-            : "bg-gray-300"
-        }
-      `}
-          >
-            <span
-              className={`
-          absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300
-          ${enabled ? "translate-x-7" : "translate-x-1"}
-        `}
-            ></span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setEnabled(!enabled)}
-            className={`
-        relative w-14 h-7 flex items-center rounded-full transition-colors duration-300
-        ${
-          enabled
-            ? "bg-gradient-to-r from-[#f8693b] to-[#f83600]"
-            : "bg-gray-300"
-        }
-      `}
-          >
-            <span
-              className={`
-          absolute w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300
-          ${enabled ? "translate-x-7" : "translate-x-1"}
-        `}
-            ></span>
-          </button>
-        </div>
+          {/* Replacement Allowed Toggle */}
+          <div>
+            <Toggle
+              name="replace"
+              label="Replacement Allowed"
+              value={data.replace}
+              onChange={handler.handleInputChange}
+            />
+          </div>
+
+          {/* Return/Refund Allowed Toggle */}
+          <div>
+            <Toggle
+              name="return_refund"
+              label="Return/Refund Allowed"
+              value={data.return_refund}
+              onChange={handler.handleInputChange}
+            />
+          </div>
+        </>
       )}
       {/* Image Upload Section */}
       <div className="md:col-span-2 bg-gray-50 p-4 rounded-xl border border-gray-200">
@@ -309,9 +316,9 @@ const VendorProductForm = () => {
     product_images: [],
     attribute_type: "",
     attribute_name: "",
-    cod: "",
-    replace: "",
-    refund_return: "",
+    cod: true,
+    replace: true,
+    return_refund: true,
   });
 
   const [variantsData, setVariantsData] = useState([]);
@@ -320,7 +327,9 @@ const VendorProductForm = () => {
   useEffect(() => {
     if (isEditMode && product) {
       if (product.count_variants < 2) {
-        setProductData({
+        setProductData((prev) => ({
+          ...prev,
+          id: product.base.id,
           name: product.base.name || "",
           description: product.base.description || "",
           price: product.base.price || "",
@@ -328,7 +337,10 @@ const VendorProductForm = () => {
           weight: product.base.weight || "",
           category: product.category || "",
           product_images: product.base.product_images || [],
-        });
+          cod: product.base.cod,
+          replace: product.base.replace,
+          return_refund: product.base.return_refund,
+        }));
       } else {
         const attribute_type = Object.keys(product.variants)[0];
         const base = product.variants[attribute_type].find(
@@ -351,6 +363,9 @@ const VendorProductForm = () => {
           weight: base.weight || "",
           product_images: base.product_images || [],
           attribute_type,
+          cod: base.cod,
+          replace: base.replace,
+          return_refund: base.return_refund,
         });
         setVariantsData(variants);
       }
@@ -450,30 +465,39 @@ const VendorProductForm = () => {
 
     try {
       if (isEditMode) {
+        if (deletedVariants.length > 0) {
+          deletedVariants.map(
+            async (variant_id) =>
+              await VendorProductService.deleteProduct(variant_id)
+          );
+        }
+        if (deletedVariants.length === variantsData.length) {
+          (productData.attribute_type = null),
+            (productData.attribute_name = null);
+        }
+
         await VendorProductService.editProduct(
           productData.id,
           productData,
           imagesUpdated
         );
         if (variantsData.length > 0) {
-          variantsData.map(
-            async (variant) =>
-              await VendorProductService.editProduct(
-                variant.id,
-                {
+          variantsData.map(async (variant) => {
+            variant.id
+              ? await VendorProductService.editProduct(
+                  variant.id,
+                  {
+                    ...variant,
+                    product_uuid: product.product_uuid,
+                  },
+                  imagesUpdated
+                )
+              : await VendorProductService.addProductVariant({
                   ...variant,
                   product_uuid: product.product_uuid,
-                },
-                imagesUpdated
-              )
-          );
-        }
-
-        if (deletedVariants.length > 0) {
-          deletedVariants.map(
-            async (variant_id) =>
-              await VendorProductService.deleteProduct(variant_id)
-          );
+                  attribute_type: productData.attribute_type,
+                });
+          });
         }
       } else {
         await VendorProductService.addProduct(productData);
@@ -546,6 +570,7 @@ const VendorProductForm = () => {
                         ...prev,
                         {
                           ...product,
+                          product_images: [],
                         },
                       ];
                     });
@@ -595,8 +620,10 @@ const VendorProductForm = () => {
                         <ProductForm
                           data={{
                             ...variant,
-                            category: productData.category,
-                            attribute_type: productData.attribute_type,
+                            category: variant.category || productData.category,
+                            attribute_type:
+                              variant.attribute_type ||
+                              productData.attribute_type,
                           }}
                           handler={variantHandler}
                           variant={true}
