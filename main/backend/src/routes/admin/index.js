@@ -5,6 +5,7 @@ import productRoutes from "./product.routes.js";
 import blogRoutes from "./blog.routes.js";
 import orderRoutes from "./order.routes.js";
 import vendorRoutes from "./vendor.routes.js";
+import searchRoutes from "./search.routes.js";
 
 const router = Router();
 
@@ -13,5 +14,6 @@ router.use("/blog", blogRoutes);
 router.use("/product", productRoutes);
 router.use("/order", orderRoutes);
 router.use("/vendor", vendorRoutes);
+router.use("/search", searchRoutes);
 
 export default router;

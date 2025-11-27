@@ -21,7 +21,7 @@ export const protectRoute = (requiredRole) => {
           .json({ message: "Unauthorized - Invalid Token" });
       }
 
-      if (requiredRole !== "admin") {
+      if (decoded.userType !== "admin") {
         if (!requiredRole) {
           exit;
         } else if (decoded.userType !== requiredRole) {

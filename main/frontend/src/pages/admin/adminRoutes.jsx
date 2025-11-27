@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 
 import AuthAdmin from "./authAdmin";
@@ -15,17 +15,22 @@ import AdminDashboard from "./adminDashboard";
 
 const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
+  const location = useLocation();
 
+  console.log(location.pathname);
+
+  if (location.pathname === "/admin")
+    return <Navigate to="/admin/login" replace />;
   return currentUser?.type === "admin" ? (
     <Outlet />
   ) : (
-    <Navigate to="/admin/login" replace />
+    <Navigate to="/" replace />
   );
 };
 
 const AdminRoutes = () => {
   const { currentUser } = useAuthStore();
-  // console.log(currentUser);
+  console.log(currentUser);
 
   return (
     <Routes>

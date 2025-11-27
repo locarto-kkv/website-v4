@@ -9,7 +9,27 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const addBlog = async (req, res) => {
   try {
-    const blogData = req.body;
+    const { vendor_name, ...blogData } = req.body;
+
+    const { data: vendorId, vendorError } = await db
+      .from("vendors")
+      .select("id")
+      .eq("name", vendor_name)
+      .single();
+
+    if (vendorError) {
+      logger({
+        level: "error",
+        message: error.message,
+        location: __filename,
+        func: "addBlog",
+      });
+      res.status(500).json({ message: "Vendor Not Found" });
+    }
+
+    blogData.vendor_id = vendorId;
+
+    console.log(blogData);
 
     const { data: newBlog, error } = await db
       .from("blogs")

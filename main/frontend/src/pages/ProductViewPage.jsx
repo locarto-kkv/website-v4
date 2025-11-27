@@ -81,7 +81,7 @@ const ProductViewPage = () => {
   // Helper to show the custom auth toast
   const showAuthToast = () => {
     toast.dismiss(); // Clear previous toasts to prevent stacking
-    
+
     toast(
       (t) => (
         <div className="flex flex-col gap-2 items-start">
@@ -471,9 +471,9 @@ const ProductViewPage = () => {
               >
                 <i
                   /* MODIFIED: Switch between solid (fas) and regular (far) based on state */
-                  className={`${isInWishlist ? "fas" : "far"} fa-heart text-2xl ${
-                    isInWishlist ? "animate-pulse" : ""
-                  }`}
+                  className={`${
+                    isInWishlist ? "fas" : "far"
+                  } fa-heart text-2xl ${isInWishlist ? "animate-pulse" : ""}`}
                 ></i>
               </button>
 

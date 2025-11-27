@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { AdminBlogService } from "../../../services/admin/adminBlogService";
+import { AdminBlogService } from "../../../services/admin/adminBlogService.js";
 import { useDataStore } from "../../../store/useDataStore";
 import BrandIdentityCard from "../../../components/landing/card";
 
-function BlogPage() {
+function BrandPage() {
   const [formData, setFormData] = useState({
-    vendor_id: "",
+    vendor_name: "",
     title: "",
     subtitle: "",
     description: "",
@@ -13,18 +13,18 @@ function BlogPage() {
     rating: "",
     sections: [{ title: "", icon: "", content: "" }],
   });
-  const [showBlogForm, setShowBlogForm] = useState(false);
-  const [editingBlog, setEditingBlog] = useState(false);
+  const [showBrandForm, setShowBrandForm] = useState(false);
+  const [editingBrand, setEditingBrand] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { blogs, fetchBlogs } = useDataStore();
+  const { brands, fetchBrands } = useDataStore();
   const { editBlog, addBlog, deleteBlog } = AdminBlogService;
 
   const handleEdit = async (brand) => {
-    setEditingBlog(true);
-    setShowBlogForm(true);
+    setEditingBrand(true);
+    setShowBrandForm(true);
 
-    setFormData({ ...brand.blog, vendor_id: brand.id, brand_logo: null });
+    setFormData({ ...brand.blog, vendor_name: brand.id, brand_logo: null });
   };
 
   const handleDelete = async (brand) => {
@@ -33,7 +33,7 @@ function BlogPage() {
     ) {
       setLoading(true);
       await deleteBlog(brand.blog.id, brand.id);
-      await fetchBlogs();
+      await fetchBrands();
       setLoading(false);
     }
   };
@@ -65,19 +65,19 @@ function BlogPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingBlog) {
+    if (editingBrand) {
       setLoading(true);
       await editBlog(formData.id, formData);
-      await fetchBlogs();
-      setEditingBlog(false);
+      await fetchBrands();
+      setEditingBrand(false);
     } else {
       setLoading(true);
       await addBlog(formData);
-      await fetchBlogs();
+      await fetchBrands();
     }
 
     setFormData({
-      vendor_id: "",
+      vendor_name: "",
       title: "",
       subtitle: "",
       description: "",
@@ -85,7 +85,7 @@ function BlogPage() {
       rating: "",
       sections: [{ title: "", icon: "", content: "" }],
     });
-    setShowBlogForm(false);
+    setShowBrandForm(false);
     setLoading(false);
   };
 
@@ -98,17 +98,20 @@ function BlogPage() {
               Manage Your Blogs
             </h1>
             <p className="text-gray-600 mt-2">
-              {blogs.filter((b) => b.blog).length} blog
-              {blogs.filter((b) => b.blog).length !== 1 ? "s" : ""} available
+              {brands.filter((b) => b.blog.length > 0).length} blog
+              {brands.filter((b) => b.blog.length > 0).length !== 1
+                ? "s"
+                : ""}{" "}
+              available
             </p>
           </div>
 
           <button
             onClick={() => {
-              setShowBlogForm((prev) => !prev);
-              setEditingBlog(false);
+              setShowBrandForm((prev) => !prev);
+              setEditingBrand(false);
               setFormData({
-                vendor_id: "",
+                vendor_name: "",
                 title: "",
                 subtitle: "",
                 description: "",
@@ -119,7 +122,7 @@ function BlogPage() {
             }}
             className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
-            {showBlogForm ? (
+            {showBrandForm ? (
               <>
                 <i className="fas fa-times"></i> Close Form
               </>
@@ -133,10 +136,10 @@ function BlogPage() {
 
         {/* Grid for cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogs &&
-            !showBlogForm &&
-            blogs.map((brand) => {
-              if (brand.blog) {
+          {brands &&
+            !showBrandForm &&
+            brands.map((brand) => {
+              if (brand.blog.length > 0) {
                 return (
                   <div key={brand.id} className="flex justify-center">
                     <BrandIdentityCard
@@ -152,16 +155,16 @@ function BlogPage() {
         </div>
 
         {/* Blog Form */}
-        {showBlogForm && (
+        {showBrandForm && (
           <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-200">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
-                {editingBlog ? "Edit Blog" : "Create New Blog"}
+                {editingBrand ? "Edit Blog" : "Create New Blog"}
               </h2>
               <button
                 onClick={() => {
-                  setShowBlogForm(false);
-                  setEditingBlog(false);
+                  setShowBrandForm(false);
+                  setEditingBrand(false);
                 }}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -173,13 +176,16 @@ function BlogPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-gray-700 mb-2 font-medium">
-                    Vendor id
+                    Vendor Name
                   </label>
+                  <span className="text-gray-400">
+                    (must match exactly as displayed)
+                  </span>
                   <input
-                    name="vendor_id"
-                    value={formData.vendor_id}
+                    name="vendor_name"
+                    value={formData.vendor_name}
                     onChange={handleChange}
-                    placeholder="Vendor Id"
+                    placeholder="Vendor Name"
                     className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
                     required
                   />
@@ -341,7 +347,7 @@ function BlogPage() {
                   type="submit"
                   className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg"
                 >
-                  {editingBlog
+                  {editingBrand
                     ? loading
                       ? "Loading..."
                       : "Update Blog"
@@ -354,7 +360,7 @@ function BlogPage() {
           </div>
         )}
 
-        {blogs?.length === 0 && !showBlogForm && (
+        {brands?.length === 0 && !showBrandForm && (
           <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200 max-w-2xl mx-auto">
             <div className="text-6xl mb-6 text-gray-300">📝</div>
             <h3 className="text-2xl font-bold text-gray-800 mb-2">
@@ -365,9 +371,9 @@ function BlogPage() {
             </p>
             <button
               onClick={() => {
-                setShowBlogForm(true);
+                setShowBrandForm(true);
                 setFormData({
-                  vendor_id: "",
+                  vendor_name: "",
                   title: "",
                   subtitle: "",
                   description: "",
@@ -387,4 +393,4 @@ function BlogPage() {
   );
 }
 
-export default BlogPage;
+export default BrandPage;
