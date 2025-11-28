@@ -51,6 +51,7 @@ const AdminRoutes = () => {
           {/* Redirect index route of admin to dashboard */}
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="orders" element={<AdminOrders />} /> {/* Add Route */}
           {/* <Route path="products" element={<AdminProducts />} />
           <Route path="members-hub" element={<AdminsMemberHub />} />
           <Route path="profile" element={<AdminProfile />} />

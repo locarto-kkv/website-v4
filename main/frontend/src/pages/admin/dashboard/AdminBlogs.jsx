@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+// src/pages/admin/dashboard/AdminBlogs.jsx
+import React, { useEffect, useState, useRef } from "react"; // Added useRef
 import { AdminBlogService } from "../../../services/admin/adminBlogService.js";
+import { ConsumerSearchService } from "../../../services/consumer/consumerSearchService.js"; // Import Search Service
 import { useDataStore } from "../../../store/useDataStore";
 import BrandIdentityCard from "../../../components/landing/card";
 
@@ -17,6 +19,13 @@ function BrandPage() {
   const [editingBrand, setEditingBrand] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // --- Search State ---
+  const [vendorSearchQuery, setVendorSearchQuery] = useState("");
+  const [vendorSearchResults, setVendorSearchResults] = useState([]);
+  const [showVendorDropdown, setShowVendorDropdown] = useState(false);
+  const searchTimeoutRef = useRef(null);
+  // --------------------
+
   const { brands, fetchBrands } = useDataStore();
   const { editBlog, addBlog, deleteBlog } = AdminBlogService;
 
@@ -24,7 +33,10 @@ function BrandPage() {
     setEditingBrand(true);
     setShowBrandForm(true);
 
+    // Set form data with ID
     setFormData({ ...brand.blog, vendor_name: brand.id, brand_logo: null });
+    // Set search query with Name for display
+    setVendorSearchQuery(brand.name);
   };
 
   const handleDelete = async (brand) => {
@@ -42,6 +54,45 @@ function BrandPage() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  // --- Vendor Search Handler ---
+  const handleVendorSearch = async (e) => {
+    const query = e.target.value;
+    setVendorSearchQuery(query);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (query.trim().length === 0) {
+      setVendorSearchResults([]);
+      setShowVendorDropdown(false);
+      // Optional: Clear selected vendor ID if query is cleared? 
+      // setFormData(prev => ({ ...prev, vendor_name: "" }));
+      return;
+    }
+
+    // Debounce search
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const results = await ConsumerSearchService.getSearchResults(query, "vendor"); // Assuming 'vendor' type filters
+        // The API returns { products: [], vendors: [] } or similar structure
+        // Based on LandingPage logic, it returns an object with vendors array
+        setVendorSearchResults(results.vendors || []); 
+        setShowVendorDropdown(true);
+      } catch (error) {
+        console.error("Error searching vendors:", error);
+      }
+    }, 300);
+  };
+
+  const handleVendorSelect = (vendor) => {
+    setVendorSearchQuery(vendor.name);
+    setFormData(prev => ({ ...prev, vendor_name: vendor.id }));
+    setShowVendorDropdown(false);
+  };
+  // ---------------------------
 
   const handleSectionChange = (index, e) => {
     const { name, value } = e.target;
@@ -76,6 +127,7 @@ function BrandPage() {
       await fetchBrands();
     }
 
+    // Reset Form
     setFormData({
       vendor_name: "",
       title: "",
@@ -85,6 +137,7 @@ function BrandPage() {
       rating: "",
       sections: [{ title: "", icon: "", content: "" }],
     });
+    setVendorSearchQuery(""); // Reset search query
     setShowBrandForm(false);
     setLoading(false);
   };
@@ -119,6 +172,7 @@ function BrandPage() {
                 rating: "",
                 sections: [{ title: "", icon: "", content: "" }],
               });
+              setVendorSearchQuery(""); // Reset search on close/open
             }}
             className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
@@ -174,22 +228,53 @@ function BrandPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+                
+                {/* --- Modified Vendor Name Search Input --- */}
+                <div className="relative">
                   <label className="block text-gray-700 mb-2 font-medium">
                     Vendor Name
                   </label>
-                  <span className="text-gray-400">
-                    (must match exactly as displayed)
+                  <span className="text-gray-400 text-xs block mb-1">
+                    (Search and select a vendor)
                   </span>
-                  <input
-                    name="vendor_name"
-                    value={formData.vendor_name}
-                    onChange={handleChange}
-                    placeholder="Vendor Name"
-                    className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={vendorSearchQuery}
+                      onChange={handleVendorSearch}
+                      onFocus={() => {
+                        if (vendorSearchResults.length > 0) setShowVendorDropdown(true);
+                      }}
+                      placeholder="Search Vendor..."
+                      className="w-full border rounded-lg px-4 py-3 pl-10 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                      required // Ensure user types something
+                    />
+                    <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                  </div>
+
+                  {/* Dropdown Results */}
+                  {showVendorDropdown && vendorSearchResults.length > 0 && (
+                    <div className="absolute z-50 w-full bg-white mt-1 rounded-lg shadow-xl border border-gray-200 max-h-60 overflow-y-auto">
+                      {vendorSearchResults.map((vendor) => (
+                        <div
+                          key={vendor.id}
+                          onClick={() => handleVendorSelect(vendor)}
+                          className="px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-none transition-colors flex items-center justify-between"
+                        >
+                          <span className="font-medium text-gray-800">{vendor.name}</span>
+                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">ID: {vendor.id}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {showVendorDropdown && vendorSearchQuery && vendorSearchResults.length === 0 && (
+                     <div className="absolute z-50 w-full bg-white mt-1 rounded-lg shadow-xl border border-gray-200 p-4 text-center text-gray-500">
+                        No vendors found.
+                     </div>
+                  )}
                 </div>
+                {/* --------------------------------------- */}
+
                 <div>
                   <label className="block text-gray-700 mb-2 font-medium">
                     Title *
@@ -381,6 +466,7 @@ function BrandPage() {
                   rating: "",
                   sections: [{ title: "", icon: "", content: "" }],
                 });
+                setVendorSearchQuery("");
               }}
               className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 mx-auto"
             >
