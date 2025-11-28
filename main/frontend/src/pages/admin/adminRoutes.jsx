@@ -5,7 +5,7 @@ import AuthAdmin from "./authAdmin";
 import AdminDashboardLayout from "./dashboard/adminDashboardLayout";
 import AdminDashboard from "./adminDashboard";
 import AdminOrders from "./dashboard/AdminOrders"; // Import the new component
-
+import NotFoundPage from "../NotFoundPage";
 // ... commented out imports kept for reference
 // import AdminProfile from "./dashboard/AdminProfile";
 // import AdminAnalytics from "./dashboard/AdminAnalytics";
@@ -20,8 +20,6 @@ const ProtectedRoute = () => {
   const { currentUser } = useAuthStore();
   const location = useLocation();
 
-  console.log(location.pathname);
-
   if (location.pathname === "/admin")
     return <Navigate to="/admin/login" replace />;
   return currentUser?.type === "admin" ? (
@@ -33,7 +31,6 @@ const ProtectedRoute = () => {
 
 const AdminRoutes = () => {
   const { currentUser } = useAuthStore();
-  console.log(currentUser);
 
   return (
     <Routes>
@@ -54,8 +51,8 @@ const AdminRoutes = () => {
           {/* Redirect index route of admin to dashboard */}
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="orders" element={<AdminOrders />} /> {/* Added Orders Route */}
-          
+          <Route path="orders" element={<AdminOrders />} />{" "}
+          {/* Added Orders Route */}
           {/* Commented out routes for future implementation */}
           {/* <Route path="products" element={<AdminProducts />} />
           <Route path="members-hub" element={<AdminsMemberHub />} />
@@ -66,6 +63,7 @@ const AdminRoutes = () => {
           <Route path="setup" element={<AdminSetup />} /> */}
         </Route>
       </Route>
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

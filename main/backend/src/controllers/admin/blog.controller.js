@@ -9,27 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const addBlog = async (req, res) => {
   try {
-    const { vendor_name, ...blogData } = req.body;
-
-    const { data: vendorId, vendorError } = await db
-      .from("vendors")
-      .select("id")
-      .eq("name", vendor_name)
-      .single();
-
-    if (vendorError) {
-      logger({
-        level: "error",
-        message: error.message,
-        location: __filename,
-        func: "addBlog",
-      });
-      res.status(500).json({ message: "Vendor Not Found" });
-    }
-
-    blogData.vendor_id = vendorId;
-
-    console.log(blogData);
+    const blogData = req.body;
 
     const { data: newBlog, error } = await db
       .from("blogs")
@@ -75,7 +55,7 @@ export const addBlog = async (req, res) => {
 export const editBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const { vendor_id, ...blogData } = req.body;
+    const blogData = req.body;
 
     let imgUploadUrl = null;
 
@@ -98,8 +78,6 @@ export const editBlog = async (req, res) => {
       .eq("id", blogId)
       .select()
       .single();
-
-    console.log(error);
 
     res.status(200).json({ blog: updatedBlog, imgUploadUrl });
   } catch (error) {

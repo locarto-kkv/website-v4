@@ -7,7 +7,7 @@ import BrandIdentityCard from "../../../components/landing/card";
 
 function BrandPage() {
   const [formData, setFormData] = useState({
-    vendor_name: "",
+    vendor_id: "",
     title: "",
     subtitle: "",
     description: "",
@@ -34,17 +34,19 @@ function BrandPage() {
     setShowBrandForm(true);
 
     // Set form data with ID
-    setFormData({ ...brand.blog, vendor_name: brand.id, brand_logo: null });
+    setFormData({ ...brand.blog[0], vendor_id: brand.id, brand_logo: null });
     // Set search query with Name for display
     setVendorSearchQuery(brand.name);
   };
 
   const handleDelete = async (brand) => {
     if (
-      window.confirm(`Are you sure you want to delete "${brand.blog.title}"?`)
+      window.confirm(
+        `Are you sure you want to delete "${brand.blog[0].title}"?`
+      )
     ) {
       setLoading(true);
-      await deleteBlog(brand.blog.id, brand.id);
+      await deleteBlog(brand.blog[0].id);
       await fetchBrands();
       setLoading(false);
     }
@@ -59,7 +61,7 @@ function BrandPage() {
   const handleVendorSearch = async (e) => {
     const query = e.target.value;
     setVendorSearchQuery(query);
-    
+
     // Clear previous timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
@@ -68,18 +70,21 @@ function BrandPage() {
     if (query.trim().length === 0) {
       setVendorSearchResults([]);
       setShowVendorDropdown(false);
-      // Optional: Clear selected vendor ID if query is cleared? 
-      // setFormData(prev => ({ ...prev, vendor_name: "" }));
+      // Optional: Clear selected vendor ID if query is cleared?
+      // setFormData(prev => ({ ...prev, vendor_id: "" }));
       return;
     }
 
     // Debounce search
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const results = await ConsumerSearchService.getSearchResults(query, "vendor"); // Assuming 'vendor' type filters
+        const results = await ConsumerSearchService.getSearchResults(
+          query,
+          "vendor"
+        ); // Assuming 'vendor' type filters
         // The API returns { products: [], vendors: [] } or similar structure
         // Based on LandingPage logic, it returns an object with vendors array
-        setVendorSearchResults(results.vendors || []); 
+        setVendorSearchResults(results.vendors || []);
         setShowVendorDropdown(true);
       } catch (error) {
         console.error("Error searching vendors:", error);
@@ -89,7 +94,7 @@ function BrandPage() {
 
   const handleVendorSelect = (vendor) => {
     setVendorSearchQuery(vendor.name);
-    setFormData(prev => ({ ...prev, vendor_name: vendor.id }));
+    setFormData((prev) => ({ ...prev, vendor_id: vendor.id }));
     setShowVendorDropdown(false);
   };
   // ---------------------------
@@ -118,6 +123,7 @@ function BrandPage() {
 
     if (editingBrand) {
       setLoading(true);
+
       await editBlog(formData.id, formData);
       await fetchBrands();
       setEditingBrand(false);
@@ -129,7 +135,7 @@ function BrandPage() {
 
     // Reset Form
     setFormData({
-      vendor_name: "",
+      vendor_id: "",
       title: "",
       subtitle: "",
       description: "",
@@ -164,7 +170,7 @@ function BrandPage() {
               setShowBrandForm((prev) => !prev);
               setEditingBrand(false);
               setFormData({
-                vendor_name: "",
+                vendor_id: "",
                 title: "",
                 subtitle: "",
                 description: "",
@@ -228,7 +234,6 @@ function BrandPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
                 {/* --- Modified Vendor Name Search Input --- */}
                 <div className="relative">
                   <label className="block text-gray-700 mb-2 font-medium">
@@ -243,7 +248,8 @@ function BrandPage() {
                       value={vendorSearchQuery}
                       onChange={handleVendorSearch}
                       onFocus={() => {
-                        if (vendorSearchResults.length > 0) setShowVendorDropdown(true);
+                        if (vendorSearchResults.length > 0)
+                          setShowVendorDropdown(true);
                       }}
                       placeholder="Search Vendor..."
                       className="w-full border rounded-lg px-4 py-3 pl-10 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
@@ -261,17 +267,23 @@ function BrandPage() {
                           onClick={() => handleVendorSelect(vendor)}
                           className="px-4 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-none transition-colors flex items-center justify-between"
                         >
-                          <span className="font-medium text-gray-800">{vendor.name}</span>
-                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">ID: {vendor.id}</span>
+                          <span className="font-medium text-gray-800">
+                            {vendor.name}
+                          </span>
+                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                            ID: {vendor.id}
+                          </span>
                         </div>
                       ))}
                     </div>
                   )}
-                  {showVendorDropdown && vendorSearchQuery && vendorSearchResults.length === 0 && (
-                     <div className="absolute z-50 w-full bg-white mt-1 rounded-lg shadow-xl border border-gray-200 p-4 text-center text-gray-500">
+                  {showVendorDropdown &&
+                    vendorSearchQuery &&
+                    vendorSearchResults.length === 0 && (
+                      <div className="absolute z-50 w-full bg-white mt-1 rounded-lg shadow-xl border border-gray-200 p-4 text-center text-gray-500">
                         No vendors found.
-                     </div>
-                  )}
+                      </div>
+                    )}
                 </div>
                 {/* --------------------------------------- */}
 
@@ -458,7 +470,7 @@ function BrandPage() {
               onClick={() => {
                 setShowBrandForm(true);
                 setFormData({
-                  vendor_name: "",
+                  vendor_id: "",
                   title: "",
                   subtitle: "",
                   description: "",
