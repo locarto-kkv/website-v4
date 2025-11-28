@@ -21,9 +21,9 @@ export const sendAuthEmail = async (payload) => {
     const to = "team@locarto.in";
 
     await transporter.sendMail({
-      from: "it@locarto.in",
+      from: "Locarto <it@locarto.in>",
       to,
-      subject: `Profile Verification Email From ${payload.profile.name}`,
+      subject: `Profile Verification From ${payload.profile.name}`,
       text: JSON.stringify(payload, null, "\t"),
     });
   } catch (error) {
