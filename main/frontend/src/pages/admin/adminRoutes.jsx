@@ -4,13 +4,16 @@ import { useAuthStore } from "../../store/useAuthStore";
 import AuthAdmin from "./authAdmin";
 import AdminDashboardLayout from "./dashboard/adminDashboardLayout";
 import AdminDashboard from "./adminDashboard";
+import AdminOrders from "./dashboard/AdminOrders"; // Import the new component
+
+// ... commented out imports kept for reference
 // import AdminProfile from "./dashboard/AdminProfile";
 // import AdminAnalytics from "./dashboard/AdminAnalytics";
 // import AdminSettings from "./dashboard/AdminSettings";
 // import AdminProducts from "./dashboard/AdminProducts";
 // import AdminSupport from "./dashboard/AdminSupport";
 // import AdminSetup from "./dashboard/AdminSetupWizard";
-// import AdminsMemberHub from "./dashboard/AdminsMemberHub"; // Add this import
+// import AdminsMemberHub from "./dashboard/AdminsMemberHub";
 // import { AnalyticProvider } from "../../context/AdminAnalyticContext";
 
 const ProtectedRoute = () => {
@@ -51,7 +54,9 @@ const AdminRoutes = () => {
           {/* Redirect index route of admin to dashboard */}
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="orders" element={<AdminOrders />} /> {/* Add Route */}
+          <Route path="orders" element={<AdminOrders />} /> {/* Added Orders Route */}
+          
+          {/* Commented out routes for future implementation */}
           {/* <Route path="products" element={<AdminProducts />} />
           <Route path="members-hub" element={<AdminsMemberHub />} />
           <Route path="profile" element={<AdminProfile />} />
