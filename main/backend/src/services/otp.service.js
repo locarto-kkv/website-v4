@@ -48,9 +48,9 @@ async function sendEmail(to, otp) {
   console.log("Reciever: " + to + " OTP : " + otp);
 
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from: "Locarto <it@locarto.in>",
     to,
-    subject: "Your OTP Code",
+    subject: "OTP for Locarto",
     text: `Your OTP is ${otp}. It will expire in 2 minutes.`,
   });
   console.log(`Email OTP sent to ${to}`);
