@@ -44,11 +44,9 @@ export const placeOrder = async (req, res) => {
       consumer_id: userId,
     };
 
-    const { data: newOrder, error } = await db
-      .from("orders")
-      .insert(orderData)
-      .select()
-      .single();
+    const { data: newOrder, error } = await db.rpc("create_order", {
+      payload: orderData,
+    });
 
     if (error) throw error;
 
@@ -69,10 +67,9 @@ export const placeOrder = async (req, res) => {
       itemsData.push(itemData);
     });
 
-    const { data: newOrderItems, error2 } = await db
-      .from("order_items")
-      .insert(itemsData)
-      .select();
+    const { data: newOrderItems, error2 } = await db.rpc("create_order_items", {
+      itemsdata: itemsData,
+    });
 
     if (error2) throw error2;
 
