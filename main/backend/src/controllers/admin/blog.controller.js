@@ -19,18 +19,20 @@ export const addBlog = async (req, res) => {
 
     if (error) throw error;
 
-    if (blogData.brand_logo) {
+    console.log(blogData);
+
+    if (blogData.blog_image) {
       const imgUploadUrl = await getFileUploadUrl(
-        newBlog.id,
-        "brand_logo",
-        blogData.brand_logo,
+        blogData.vendor_id,
+        "blog_image",
+        blogData.blog_image,
         "brand-logos"
       );
       const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
 
       const { data: updatedBlog, error } = await db
         .from("blogs")
-        .update({ brand_logo: imgPublicUrl })
+        .update({ blog_image: imgPublicUrl })
         .eq("id", newBlog.id)
         .select()
         .single();
@@ -55,21 +57,41 @@ export const addBlog = async (req, res) => {
 export const editBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const blogData = req.body;
+    const { blogData, imageUpdated } = req.body;
 
     let imgUploadUrl = null;
 
-    if (blogData.brand_logo) {
-      imgUploadUrl = await getFileUploadUrl(
-        blogId,
-        "brand_logo",
-        blogData.brand_logo,
-        "brand-logos"
-      );
+    if (imageUpdated) {
+      const image = blogData.blog_image;
 
-      const imgPublicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${imgUploadUrl.filePath}`;
+      if (image && typeof image === "object" && image.name) {
+        console.log("CASE 1: New image uploaded:", image);
 
-      blogData.brand_logo = imgPublicUrl;
+        const fileName = `${blogData.vendor_id}_${image.name}`;
+        const filePath = `${blogData.vendor_id}/${fileName}`;
+
+        const removeResp = await db.storage
+          .from("brand-logos")
+          .remove([filePath]);
+
+        console.log("Old image removed:", removeResp.data, removeResp.error);
+
+        const uploadResponse = await getFileUploadUrl(
+          blogData.vendor_id,
+          image.name,
+          image,
+          "brand-logos"
+        );
+
+        imgUploadUrl = uploadResponse;
+
+        const publicUrl = `${env.SUPABASE_PROJECT_URL}/storage/v1/object/public/brand-logos/${uploadResponse.filePath}`;
+
+        blogData.blog_image = publicUrl;
+      } else if (!image) {
+        console.log("CASE 2: Blog image removed by user");
+        blogData.blog_image = null;
+      }
     }
 
     const { data: updatedBlog, error } = await db
@@ -79,14 +101,18 @@ export const editBlog = async (req, res) => {
       .select()
       .single();
 
-    res.status(200).json({ blog: updatedBlog, imgUploadUrl });
-  } catch (error) {
-    logger({
-      level: "error",
-      message: error.message,
-      location: __filename,
-      func: "editBlog",
+    if (error) {
+      console.error("DB update error:", error);
+      return res.status(500).json({ message: "Database update failed" });
+    }
+
+    return res.status(200).json({
+      blog: updatedBlog,
+      imgUploadUrl,
     });
+  } catch (error) {
+    console.error("editBlog Error:", error);
+
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -94,7 +120,17 @@ export const editBlog = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const { data, error } = await db.from("blogs").delete().eq("id", blogId);
+    const { data, error } = await db
+      .from("blogs")
+      .delete()
+      .eq("id", blogId)
+      .select()
+      .single();
+
+    const fileName = `${data.vendor_id}_blog_image`;
+    const filePath = `${data.vendor_id}/${fileName}`;
+
+    await db.storage.from("brand-logos").remove([filePath]);
 
     res.status(200).json({ message: "Blog Deleted Successfully" });
   } catch (error) {

@@ -117,7 +117,7 @@ const DiscoverPage = () => {
             return (
               <img
                 key={`${brand.name}-${logoAnimationKey}`} // Include animation key to trigger re-render
-                src={brand.blog[0].brand_logo}
+                src={brand.blog[0].blog_image}
                 alt={brand.title}
                 className="absolute inset-0 w-full h-full object-contain transition-opacity duration-1000 ease-in-out"
                 style={{ opacity, zIndex }}

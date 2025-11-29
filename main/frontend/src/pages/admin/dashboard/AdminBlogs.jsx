@@ -11,14 +11,14 @@ function BrandPage() {
     title: "",
     subtitle: "",
     description: "",
-    brand_logo: "",
+    blog_image: "",
     rating: "",
     sections: [{ title: "", icon: "", content: "" }],
   });
-  const [showBrandForm, setShowBrandForm] = useState(false);
+  const [showBlogForm, setShowBlogForm] = useState(false);
   const [editingBrand, setEditingBrand] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [imageUpdated, setImageUpdated] = useState(false);
   // --- Search State ---
   const [vendorSearchQuery, setVendorSearchQuery] = useState("");
   const [vendorSearchResults, setVendorSearchResults] = useState([]);
@@ -26,15 +26,16 @@ function BrandPage() {
   const searchTimeoutRef = useRef(null);
   // --------------------
 
-  const { brands, fetchBrands } = useDataStore();
+  const brands = useDataStore((s) => s.brands);
+  const fetchBrands = useDataStore((s) => s.fetchBrands);
   const { editBlog, addBlog, deleteBlog } = AdminBlogService;
 
   const handleEdit = async (brand) => {
     setEditingBrand(true);
-    setShowBrandForm(true);
+    setShowBlogForm(true);
 
     // Set form data with ID
-    setFormData({ ...brand.blog[0], vendor_id: brand.id, brand_logo: null });
+    setFormData({ ...brand.blog[0], vendor_id: brand.id });
     // Set search query with Name for display
     setVendorSearchQuery(brand.name);
   };
@@ -52,9 +53,35 @@ function BrandPage() {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleBlog = {
+    handleInputChange: (e) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    },
+
+    handleImageChange: (e) => {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+
+        setFormData((prev) => ({
+          ...prev,
+          blog_image: { file }, // <— matches product { file }
+        }));
+
+        setImageUpdated(true);
+      }
+      e.target.value = null;
+    },
+
+    handleDeleteImage: () => {
+      if (window.confirm("Remove this image?")) {
+        setFormData((prev) => ({
+          ...prev,
+          blog_image: null,
+        }));
+        if (editingBrand) setImageUpdated(true);
+      }
+    },
   };
 
   // --- Vendor Search Handler ---
@@ -70,8 +97,7 @@ function BrandPage() {
     if (query.trim().length === 0) {
       setVendorSearchResults([]);
       setShowVendorDropdown(false);
-      // Optional: Clear selected vendor ID if query is cleared?
-      // setFormData(prev => ({ ...prev, vendor_id: "" }));
+      setFormData((prev) => ({ ...prev, vendor_id: "" }));
       return;
     }
 
@@ -81,9 +107,7 @@ function BrandPage() {
         const results = await ConsumerSearchService.getSearchResults(
           query,
           "vendor"
-        ); // Assuming 'vendor' type filters
-        // The API returns { products: [], vendors: [] } or similar structure
-        // Based on LandingPage logic, it returns an object with vendors array
+        );
         setVendorSearchResults(results.vendors || []);
         setShowVendorDropdown(true);
       } catch (error) {
@@ -114,7 +138,10 @@ function BrandPage() {
   };
 
   const removeSection = (index) => {
+    console.log(index);
+
     const updatedSections = formData.sections.filter((_, i) => i !== index);
+
     setFormData({ ...formData, sections: updatedSections });
   };
 
@@ -124,7 +151,7 @@ function BrandPage() {
     if (editingBrand) {
       setLoading(true);
 
-      await editBlog(formData.id, formData);
+      await editBlog(formData.id, formData, imageUpdated);
       await fetchBrands();
       setEditingBrand(false);
     } else {
@@ -139,12 +166,12 @@ function BrandPage() {
       title: "",
       subtitle: "",
       description: "",
-      brand_logo: "",
+      blog_image: "",
       rating: "",
       sections: [{ title: "", icon: "", content: "" }],
     });
     setVendorSearchQuery(""); // Reset search query
-    setShowBrandForm(false);
+    setShowBlogForm(false);
     setLoading(false);
   };
 
@@ -167,14 +194,14 @@ function BrandPage() {
 
           <button
             onClick={() => {
-              setShowBrandForm((prev) => !prev);
+              setShowBlogForm((prev) => !prev);
               setEditingBrand(false);
               setFormData({
                 vendor_id: "",
                 title: "",
                 subtitle: "",
                 description: "",
-                brand_logo: "",
+                blog_image: "",
                 rating: "",
                 sections: [{ title: "", icon: "", content: "" }],
               });
@@ -182,7 +209,7 @@ function BrandPage() {
             }}
             className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
-            {showBrandForm ? (
+            {showBlogForm ? (
               <>
                 <i className="fas fa-times"></i> Close Form
               </>
@@ -197,7 +224,7 @@ function BrandPage() {
         {/* Grid for cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {brands &&
-            !showBrandForm &&
+            !showBlogForm &&
             brands.map((brand) => {
               if (brand.blog.length > 0) {
                 return (
@@ -215,7 +242,7 @@ function BrandPage() {
         </div>
 
         {/* Blog Form */}
-        {showBrandForm && (
+        {showBlogForm && (
           <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-200">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
@@ -223,7 +250,7 @@ function BrandPage() {
               </h2>
               <button
                 onClick={() => {
-                  setShowBrandForm(false);
+                  setShowBlogForm(false);
                   setEditingBrand(false);
                 }}
                 className="text-gray-500 hover:text-gray-700"
@@ -294,7 +321,7 @@ function BrandPage() {
                   <input
                     name="title"
                     value={formData.title}
-                    onChange={handleChange}
+                    onChange={handleBlog.handleInputChange}
                     placeholder="Blog Title"
                     className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
                     required
@@ -308,7 +335,7 @@ function BrandPage() {
                   <input
                     name="subtitle"
                     value={formData.subtitle}
-                    onChange={handleChange}
+                    onChange={handleBlog.handleInputChange}
                     placeholder="Blog Subtitle"
                     className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
                     required
@@ -323,7 +350,7 @@ function BrandPage() {
                 <textarea
                   name="description"
                   value={formData.description}
-                  onChange={handleChange}
+                  onChange={handleBlog.handleInputChange}
                   placeholder="Blog Description"
                   rows={4}
                   className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all`}
@@ -339,7 +366,7 @@ function BrandPage() {
                   <input
                     name="rating"
                     value={formData.rating}
-                    onChange={handleChange}
+                    onChange={handleBlog.handleInputChange}
                     placeholder="Rating (0-5)"
                     type="number"
                     min="0"
@@ -350,22 +377,58 @@ function BrandPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-gray-700 mb-2 font-medium">
-                    Logo/Image
+                {/* Blog Image Upload Section */}
+                <div className="md:col-span-2 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                  <label className="block text-sm font-bold text-gray-700 mb-3">
+                    Blog Image
                   </label>
-                  <input
-                    type="file"
-                    name="image"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        setFormData({ ...formData, brand_logo: file });
-                      }
-                    }}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  />
+
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
+                    {/* If image exists — show preview card */}
+                    {formData.blog_image && (
+                      <div className="relative aspect-square border rounded-lg overflow-hidden group bg-white shadow-sm">
+                        <img
+                          src={
+                            formData.blog_image.file
+                              ? URL.createObjectURL(formData.blog_image.file)
+                              : formData.blog_image || "placeholder.png"
+                          }
+                          alt="Blog Preview"
+                          className="w-full h-full object-cover"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={handleBlog.handleDeleteImage}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full 
+                     w-6 h-6 flex items-center justify-center opacity-0 
+                     group-hover:opacity-100 transition-all hover:bg-red-700"
+                          title="Remove"
+                        >
+                          <i className="fas fa-times text-xs"></i>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Upload Button (Only show if no image is selected) */}
+                    {!formData.blog_image && (
+                      <label
+                        className="aspect-square border-2 border-dashed border-gray-300 
+                        rounded-lg cursor-pointer hover:bg-white hover:border-orange-500 
+                        transition-all flex flex-col items-center justify-center 
+                        text-gray-400 hover:text-orange-500 group"
+                      >
+                        <i className="fas fa-camera text-2xl mb-2 group-hover:scale-110 transition-transform"></i>
+                        <span className="text-xs font-semibold">Add Photo</span>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={handleBlog.handleImageChange}
+                        />
+                      </label>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -457,7 +520,7 @@ function BrandPage() {
           </div>
         )}
 
-        {brands?.length === 0 && !showBrandForm && (
+        {brands?.length === 0 && !showBlogForm && (
           <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200 max-w-2xl mx-auto">
             <div className="text-6xl mb-6 text-gray-300">📝</div>
             <h3 className="text-2xl font-bold text-gray-800 mb-2">
@@ -468,7 +531,7 @@ function BrandPage() {
             </p>
             <button
               onClick={() => {
-                setShowBrandForm(true);
+                setShowBlogForm(true);
                 setFormData({
                   vendor_id: "",
                   title: "",
