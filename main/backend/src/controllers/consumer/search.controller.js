@@ -1,9 +1,11 @@
 import db from "../../lib/db.js";
 import logger from "../../lib/logger.js";
+import { getEmbedding } from "../../services/consumer/gpt.service.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
+// only for search bar autocomplete
 export const getSearchResults = async (req, res) => {
   try {
     const { query, type } = req.query;
@@ -63,6 +65,36 @@ export const getSearchResults = async (req, res) => {
       message: error.message,
       location: __filename,
       func: "getSearchResults",
+    });
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// get similar products based on current user query
+export const getSimilarResults = async (req, res) => {
+  try {
+    const query = req.query;
+    const limit = 6;
+
+    const searchPattern = `%${query}%`;
+    // const embedding = await getEmbedding(query);
+
+    const { data: queryProducts, error: queryError } = await db
+      .from("products")
+      .select("id, name, product_uuid")
+      .eq("base", true)
+      .ilike("name", searchPattern)
+      .order("name", { ascending: true })
+      .limit(limit);
+
+    // const {data: similarProducts, error: similarError} = db.rpc("", {embedding, limit})
+    // return res.status(200).json(queryProducts, similarProducts);
+  } catch (error) {
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "getSimilarResults",
     });
     res.status(500).json({ message: "Internal Server Error" });
   }
