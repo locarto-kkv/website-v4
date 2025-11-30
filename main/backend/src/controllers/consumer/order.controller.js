@@ -36,12 +36,7 @@ export const getOrderHistory = async (req, res) => {
 export const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { items, address, ...order } = req.body;
-
-    const orderData = {
-      ...order,
-      consumer_id: userId,
-    };
+    const { items, address, ...orderData } = req.body;
 
     const { data: newOrder, error } = await db.rpc("create_order", {
       payload: orderData,

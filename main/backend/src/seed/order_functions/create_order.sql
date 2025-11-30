@@ -62,6 +62,7 @@ begin
   -- Insert order row with snapshots
   insert into orders (
     consumer_id,
+    vendor_id,
     delivery_date,
     payment_mode,
     amount,
@@ -74,6 +75,7 @@ begin
   )
   values (
     (consumer_addr_json->>'consumer_id')::bigint,
+    (vendor_addr_json->>'vendor_id')::bigint,
     delivery_date,
     payment_mode,
     amount,
