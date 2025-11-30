@@ -313,7 +313,9 @@ const ProductViewPage = () => {
         useConsumerDataStore.setState((state) => ({
           ...state,
           lists: { ...newList },
+          vendorInCart: product.vendor_id,
         }));
+
         navigate("/consumer/checkout");
       } else {
         navigate("/consumer/checkout");
