@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom"; // Added useLocation
 import { useAuthStore } from "../../store/useAuthStore";
-import AuthLayout from "../../components/AuthLayout"; 
-import GoogleLogo from "../../assets/Google_Favicon_2025.svg"; 
+import AuthLayout from "../../components/AuthLayout";
+import GoogleLogo from "../../assets/Google_Favicon_2025.svg";
 
 // ... (OtpInput and PasswordInput components remain unchanged) ...
 const OtpInput = ({ value, onChange }) => (
@@ -70,7 +70,9 @@ const PasswordInput = ({ value, onChange, showPassword, setShowPassword }) => (
 const AuthConsumer = () => {
   const location = useLocation();
   // Initialize isLogin based on navigation state, default to true (Login)
-  const [isLogin, setIsLogin] = useState(location.state?.isSignup ? false : true);
+  const [isLogin, setIsLogin] = useState(
+    location.state?.isSignup ? false : true
+  );
   const [usePassword, setUsePassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -317,11 +319,7 @@ const AuthConsumer = () => {
             onClick={handleGoogleSubmit}
             className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-300 transition-colors"
           >
-            <img
-              src={GoogleLogo}
-              alt="Google"
-              className="w-5 h-5 mr-2"
-            />
+            <img src={GoogleLogo} alt="Google" className="w-5 h-5 mr-2" />
             {isLogin ? "Login with Google" : "Sign up with Google"}
           </button>
         </div>

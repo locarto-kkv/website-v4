@@ -1,5 +1,5 @@
 // src/pages/consumer/consumerRoutes.jsx
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 
 import CustomerDashboardLayout from "./dashboard/CustomerDashboardLayout";
@@ -21,7 +21,13 @@ const ProtectedRoute = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
 
   if (currentUser?.type !== "consumer") {
-    return <Navigate to="/consumer/login" replace />;
+    return (
+      <Navigate
+        to="/consumer/login"
+        replace
+        state={{ from: location.pathname }}
+      />
+    );
   } else {
     return <Outlet />;
   }
@@ -29,6 +35,7 @@ const ProtectedRoute = () => {
 
 const ConsumerRoutes = () => {
   const currentUser = useAuthStore((s) => s.currentUser);
+  const location = useLocation();
 
   return (
     <Routes>
@@ -37,7 +44,10 @@ const ConsumerRoutes = () => {
         path="login"
         element={
           currentUser?.type === "consumer" ? (
-            <Navigate to="/" replace />
+            <Navigate
+              to={location.state?.from ? location.state.from : "/"}
+              replace
+            />
           ) : (
             <AuthConsumer />
           )

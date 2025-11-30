@@ -91,7 +91,9 @@ const ProductViewPage = () => {
           <button
             onClick={() => {
               toast.dismiss(t.id);
-              navigate("/consumer/login", { state: { isSignup: true } });
+              navigate("/consumer/login", {
+                state: { isSignup: true, from: location.pathname },
+              });
             }}
             className="px-3 py-1.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition-colors"
           >

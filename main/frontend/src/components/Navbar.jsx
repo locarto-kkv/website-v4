@@ -208,6 +208,7 @@ const Navbar = ({ pageType = "homepage" }) => {
                       className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-100 transition-colors flex items-center gap-2"
                       onClick={() => setDropdownOpen(false)}
                       role="menuitem"
+                      state={{ from: location.pathname }}
                     >
                       <i className="fas fa-user w-4 text-center text-gray-500"></i>{" "}
                       Login as Customer
@@ -394,6 +395,7 @@ const Navbar = ({ pageType = "homepage" }) => {
                     to="/consumer/login"
                     className="flex items-center gap-3 py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
                     onClick={() => setDropdownOpen(false)}
+                    state={{ from: location.pathname }}
                   >
                     <i className="fas fa-user w-5 text-center text-gray-500"></i>
                     Login as Customer
