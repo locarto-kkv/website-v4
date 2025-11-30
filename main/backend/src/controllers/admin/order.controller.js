@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const getOrderByFilter = async (req, res) => {
   try {
-    const { filters = {}, start = 0, limit = 10 } = req.query;
+    const { filters = {}, start = 0, limit = 100 } = req.query;
 
     const parsedFilters =
       typeof filters === "string" ? JSON.parse(filters) : filters || {};

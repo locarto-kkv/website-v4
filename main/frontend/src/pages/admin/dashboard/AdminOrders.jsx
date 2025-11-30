@@ -51,7 +51,7 @@ const SearchDropdown = ({
   const handleSearch = async (e) => {
     const val = e.target.value;
     setQuery(val);
-    
+
     if (val.trim().length < 2) {
       setResults([]);
       setShowDropdown(false);
@@ -87,7 +87,9 @@ const SearchDropdown = ({
         {label}
       </label>
       <div className="relative">
-        <i className={`fas ${icon} absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm`}></i>
+        <i
+          className={`fas ${icon} absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm`}
+        ></i>
         <input
           type="text"
           value={query}
@@ -112,7 +114,9 @@ const SearchDropdown = ({
       {showDropdown && (
         <div className="absolute z-50 w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto">
           {loading ? (
-            <div className="p-3 text-center text-xs text-gray-500">Loading...</div>
+            <div className="p-3 text-center text-xs text-gray-500">
+              Loading...
+            </div>
           ) : results.length > 0 ? (
             results.map((item, idx) => (
               <div
@@ -129,7 +133,9 @@ const SearchDropdown = ({
               </div>
             ))
           ) : (
-            <div className="p-3 text-center text-xs text-gray-500">No results found</div>
+            <div className="p-3 text-center text-xs text-gray-500">
+              No results found
+            </div>
           )}
         </div>
       )}
@@ -141,7 +147,9 @@ const SearchDropdown = ({
 
 const OrderEditForm = ({ orderData, onClose }) => {
   // Deep clone initial data for local state editing
-  const [formData, setFormData] = useState(JSON.parse(JSON.stringify(orderData)));
+  const [formData, setFormData] = useState(
+    JSON.parse(JSON.stringify(orderData))
+  );
 
   const handleUpdate = () => {
     console.log("Updated Order Data:", formData);
@@ -162,21 +170,24 @@ const OrderEditForm = ({ orderData, onClose }) => {
         return { ...prev, order: { ...prev.order, [field]: value } };
       }
       if (section === "consumer_address") {
-        return { 
-          ...prev, 
-          order: { 
-            ...prev.order, 
-            consumer_address: { ...prev.order.consumer_address, [field]: value } 
-          } 
+        return {
+          ...prev,
+          order: {
+            ...prev.order,
+            consumer_address: {
+              ...prev.order.consumer_address,
+              [field]: value,
+            },
+          },
         };
       }
       if (section === "vendor_address") {
-        return { 
-          ...prev, 
-          order: { 
-            ...prev.order, 
-            vendor_address: { ...prev.order.vendor_address, [field]: value } 
-          } 
+        return {
+          ...prev,
+          order: {
+            ...prev.order,
+            vendor_address: { ...prev.order.vendor_address, [field]: value },
+          },
         };
       }
       return prev;
@@ -193,9 +204,14 @@ const OrderEditForm = ({ orderData, onClose }) => {
               <i className="fas fa-edit text-orange-500"></i>
               Edit Order Details
             </h2>
-            <p className="text-gray-400 text-xs mt-1">ID: #{formData.id} • Order ID: #{formData.order_id}</p>
+            <p className="text-gray-400 text-xs mt-1">
+              ID: #{formData.id} • Order ID: #{formData.order_id}
+            </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
             <i className="fas fa-times text-xl"></i>
           </button>
         </div>
@@ -203,54 +219,73 @@ const OrderEditForm = ({ orderData, onClose }) => {
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50 custom-scrollbar">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
             {/* 1. Item Details */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <i className="fas fa-box text-blue-500"></i> Item & Product Details
+                <i className="fas fa-box text-blue-500"></i> Item & Product
+                Details
               </h3>
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="w-32 h-32 bg-gray-100 rounded-lg shrink-0 overflow-hidden border">
-                  <img 
-                    src={formData.product?.product_images?.[0]?.url || "https://placehold.co/150"} 
-                    alt="Product" 
+                  <img
+                    src={
+                      formData.product?.product_images?.[0]?.url ||
+                      "https://placehold.co/150"
+                    }
+                    alt="Product"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">Product Name</label>
-                    <input 
-                      type="text" 
-                      value={formData.product?.name || ""} 
-                      onChange={(e) => handleChange("product", "name", e.target.value)}
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Product Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.product?.name || ""}
+                      onChange={(e) =>
+                        handleChange("product", "name", e.target.value)
+                      }
                       className="w-full p-2 border rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">Category</label>
-                    <input 
-                      type="text" 
-                      value={formData.product?.category || ""} 
-                      onChange={(e) => handleChange("product", "category", e.target.value)}
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Category
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.product?.category || ""}
+                      onChange={(e) =>
+                        handleChange("product", "category", e.target.value)
+                      }
                       className="w-full p-2 border rounded-lg text-sm bg-gray-50 focus:bg-white"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">Unit Price</label>
-                    <input 
-                      type="number" 
-                      value={formData.product?.price || 0} 
-                      onChange={(e) => handleChange("product", "price", e.target.value)}
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Unit Price
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.product?.price || 0}
+                      onChange={(e) =>
+                        handleChange("product", "price", e.target.value)
+                      }
                       className="w-full p-2 border rounded-lg text-sm bg-gray-50 focus:bg-white"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">Quantity</label>
-                    <input 
-                      type="number" 
-                      value={formData.quantity || 0} 
-                      onChange={(e) => handleChange("root", "quantity", e.target.value)}
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Quantity
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.quantity || 0}
+                      onChange={(e) =>
+                        handleChange("root", "quantity", e.target.value)
+                      }
                       className="w-full p-2 border rounded-lg text-sm bg-gray-50 focus:bg-white"
                     />
                   </div>
@@ -261,15 +296,20 @@ const OrderEditForm = ({ orderData, onClose }) => {
             {/* 2. Order Details */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <i className="fas fa-file-invoice-dollar text-green-500"></i> Order Summary
+                <i className="fas fa-file-invoice-dollar text-green-500"></i>{" "}
+                Order Summary
               </h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">Order Status</label>
-                    <select 
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Order Status
+                    </label>
+                    <select
                       value={formData.order_status}
-                      onChange={(e) => handleChange("root", "order_status", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("root", "order_status", e.target.value)
+                      }
                       className="w-full p-2 border rounded-lg text-sm bg-white"
                     >
                       <option value="pending">Pending</option>
@@ -280,10 +320,14 @@ const OrderEditForm = ({ orderData, onClose }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">Payment Status</label>
-                    <select 
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Payment Status
+                    </label>
+                    <select
                       value={formData.payment_status}
-                      onChange={(e) => handleChange("root", "payment_status", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("root", "payment_status", e.target.value)
+                      }
                       className="w-full p-2 border rounded-lg text-sm bg-white"
                     >
                       <option value="pending">Pending</option>
@@ -294,20 +338,28 @@ const OrderEditForm = ({ orderData, onClose }) => {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">Payment Mode</label>
-                  <input 
-                    type="text" 
-                    value={formData.order?.payment_mode || ""} 
-                    onChange={(e) => handleChange("order", "payment_mode", e.target.value)}
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Payment Mode
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.order?.payment_mode || ""}
+                    onChange={(e) =>
+                      handleChange("order", "payment_mode", e.target.value)
+                    }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">Total Amount (Order Level)</label>
-                  <input 
-                    type="number" 
-                    value={formData.order?.amount || 0} 
-                    onChange={(e) => handleChange("order", "amount", e.target.value)}
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Total Amount (Order Level)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.order?.amount || 0}
+                    onChange={(e) =>
+                      handleChange("order", "amount", e.target.value)
+                    }
                     className="w-full p-2 border rounded-lg text-sm font-bold text-gray-800"
                   />
                 </div>
@@ -320,36 +372,58 @@ const OrderEditForm = ({ orderData, onClose }) => {
                 <i className="fas fa-user text-purple-500"></i> Consumer Details
               </h3>
               <div className="space-y-3">
-                <input 
+                <input
                   placeholder="Address Line 1"
-                  value={formData.order?.consumer_address?.address_line_1 || ""} 
-                  onChange={(e) => handleChange("consumer_address", "address_line_1", e.target.value)}
+                  value={formData.order?.consumer_address?.address_line_1 || ""}
+                  onChange={(e) =>
+                    handleChange(
+                      "consumer_address",
+                      "address_line_1",
+                      e.target.value
+                    )
+                  }
                   className="w-full p-2 border rounded-lg text-sm"
                 />
-                <input 
+                <input
                   placeholder="Address Line 2"
-                  value={formData.order?.consumer_address?.address_line_2 || ""} 
-                  onChange={(e) => handleChange("consumer_address", "address_line_2", e.target.value)}
+                  value={formData.order?.consumer_address?.address_line_2 || ""}
+                  onChange={(e) =>
+                    handleChange(
+                      "consumer_address",
+                      "address_line_2",
+                      e.target.value
+                    )
+                  }
                   className="w-full p-2 border rounded-lg text-sm"
                 />
                 <div className="grid grid-cols-2 gap-3">
-                  <input 
+                  <input
                     placeholder="State"
-                    value={formData.order?.consumer_address?.state || ""} 
-                    onChange={(e) => handleChange("consumer_address", "state", e.target.value)}
+                    value={formData.order?.consumer_address?.state || ""}
+                    onChange={(e) =>
+                      handleChange("consumer_address", "state", e.target.value)
+                    }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
-                  <input 
+                  <input
                     placeholder="Pincode"
-                    value={formData.order?.consumer_address?.pincode || ""} 
-                    onChange={(e) => handleChange("consumer_address", "pincode", e.target.value)}
+                    value={formData.order?.consumer_address?.pincode || ""}
+                    onChange={(e) =>
+                      handleChange(
+                        "consumer_address",
+                        "pincode",
+                        e.target.value
+                      )
+                    }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
                 </div>
-                <input 
+                <input
                   placeholder="Contact Phone"
-                  value={formData.order?.consumer_address?.phone_no || ""} 
-                  onChange={(e) => handleChange("consumer_address", "phone_no", e.target.value)}
+                  value={formData.order?.consumer_address?.phone_no || ""}
+                  onChange={(e) =>
+                    handleChange("consumer_address", "phone_no", e.target.value)
+                  }
                   className="w-full p-2 border rounded-lg text-sm"
                 />
               </div>
@@ -361,37 +435,48 @@ const OrderEditForm = ({ orderData, onClose }) => {
                 <i className="fas fa-store text-orange-500"></i> Vendor Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">Address Line 1</label>
-                    <input 
-                      value={formData.order?.vendor_address?.address_line_1 || ""} 
-                      onChange={(e) => handleChange("vendor_address", "address_line_1", e.target.value)}
-                      className="w-full p-2 border rounded-lg text-sm"
-                    />
-                 </div>
-                 <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">Pincode</label>
-                    <input 
-                      value={formData.order?.vendor_address?.pincode || ""} 
-                      onChange={(e) => handleChange("vendor_address", "pincode", e.target.value)}
-                      className="w-full p-2 border rounded-lg text-sm"
-                    />
-                 </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Address Line 1
+                  </label>
+                  <input
+                    value={formData.order?.vendor_address?.address_line_1 || ""}
+                    onChange={(e) =>
+                      handleChange(
+                        "vendor_address",
+                        "address_line_1",
+                        e.target.value
+                      )
+                    }
+                    className="w-full p-2 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Pincode
+                  </label>
+                  <input
+                    value={formData.order?.vendor_address?.pincode || ""}
+                    onChange={(e) =>
+                      handleChange("vendor_address", "pincode", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-lg text-sm"
+                  />
+                </div>
               </div>
             </div>
-
           </div>
         </div>
 
         {/* Footer Actions */}
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end gap-3 shrink-0">
-          <button 
+          <button
             onClick={onClose}
             className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-white transition-all text-sm"
           >
             Cancel
           </button>
-          <button 
+          <button
             onClick={handleUpdate}
             className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-sm"
           >
@@ -414,7 +499,7 @@ const AdminOrders = () => {
     product_id: null,
     date: "all",
   });
-  
+
   // UI States
   const [viewMode, setViewMode] = useState("table");
   const [sortBy, setSortBy] = useState("recent");
@@ -431,7 +516,7 @@ const AdminOrders = () => {
       if (filters.date && filters.date !== "all") payload.date = filters.date;
 
       const response = await AdminOrderService.getOrderByFilter(payload);
-      
+
       // Handle the nested structure described in prompt: { data: [ { id, order: {...}, product: {...} } ], ... }
       setOrders(response.data || []);
     } catch (error) {
@@ -452,7 +537,9 @@ const AdminOrders = () => {
 
     // Status Filter (Client-side)
     if (statusFilter !== "all") {
-      res = res.filter(item => item.order_status?.toLowerCase() === statusFilter);
+      res = res.filter(
+        (item) => item.order_status?.toLowerCase() === statusFilter
+      );
     }
 
     // Sort
@@ -474,11 +561,18 @@ const AdminOrders = () => {
 
   // Handler for clearing specific filters
   const clearFilter = (key) => {
-    setFilters(prev => ({ ...prev, [key]: null }));
+    setFilters((prev) => ({ ...prev, [key]: null }));
   };
 
   const statusOptions = [
-    "all", "pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "refunded"
+    "all",
+    "pending",
+    "confirmed",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled",
+    "refunded",
   ];
 
   return (
@@ -486,17 +580,44 @@ const AdminOrders = () => {
       {/* Stats Header (Optional but consistent with dashboard style) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Orders", value: orders.length, icon: "fas fa-box", color: "from-blue-500 to-indigo-500" },
-          { label: "Pending", value: orders.filter(o => o.order_status === "pending").length, icon: "fas fa-clock", color: "from-yellow-400 to-orange-500" },
-          { label: "Delivered", value: orders.filter(o => o.order_status === "delivered").length, icon: "fas fa-check-circle", color: "from-green-500 to-emerald-500" },
-          { label: "Cancelled", value: orders.filter(o => o.order_status === "cancelled").length, icon: "fas fa-times-circle", color: "from-red-500 to-pink-500" },
+          {
+            label: "Total Orders",
+            value: orders.length,
+            icon: "fas fa-box",
+            color: "from-blue-500 to-indigo-500",
+          },
+          {
+            label: "Pending",
+            value: orders.filter((o) => o.order_status === "pending").length,
+            icon: "fas fa-clock",
+            color: "from-yellow-400 to-orange-500",
+          },
+          {
+            label: "Delivered",
+            value: orders.filter((o) => o.order_status === "delivered").length,
+            icon: "fas fa-check-circle",
+            color: "from-green-500 to-emerald-500",
+          },
+          {
+            label: "Cancelled",
+            value: orders.filter((o) => o.order_status === "cancelled").length,
+            icon: "fas fa-times-circle",
+            color: "from-red-500 to-pink-500",
+          },
         ].map((stat, idx) => (
-          <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div
+            key={idx}
+            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between"
+          >
             <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">{stat.label}</p>
+              <p className="text-xs text-gray-500 uppercase font-semibold">
+                {stat.label}
+              </p>
               <p className="text-xl font-bold text-gray-800">{stat.value}</p>
             </div>
-            <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white shadow-md`}>
+            <div
+              className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white shadow-md`}
+            >
               <i className={stat.icon}></i>
             </div>
           </div>
@@ -506,40 +627,58 @@ const AdminOrders = () => {
       {/* --- Search & Filter Bar --- */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
         <div className="flex flex-col gap-5">
-          
           {/* Row 1: Search Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <SearchDropdown 
+            <SearchDropdown
               label="Filter by Vendor"
               placeholder="Search Vendor..."
               icon="fa-store"
-              serviceCall={(q) => ConsumerSearchService.getSearchResults(q, "vendor")}
-              onSelect={(item) => setFilters(prev => ({ ...prev, vendor_id: item?.id || null }))}
+              serviceCall={(q) =>
+                ConsumerSearchService.getSearchResults(q, "vendor")
+              }
+              onSelect={(item) =>
+                setFilters((prev) => ({ ...prev, vendor_id: item?.id || null }))
+              }
             />
-            <SearchDropdown 
+            <SearchDropdown
               label="Filter by Product"
               placeholder="Search Product..."
               icon="fa-box-open"
-              serviceCall={(q) => ConsumerSearchService.getSearchResults(q, "product")}
-              onSelect={(item) => setFilters(prev => ({ ...prev, product_id: item?.id || null }))}
+              serviceCall={(q) =>
+                ConsumerSearchService.getSearchResults(q, "product")
+              }
+              onSelect={(item) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  product_id: item?.id || null,
+                }))
+              }
             />
-            <SearchDropdown 
+            <SearchDropdown
               label="Filter by Consumer"
               placeholder="Search Consumer..."
               icon="fa-user"
               serviceCall={(q) => AdminSearchService.searchConsumers(q)}
-              onSelect={(item) => setFilters(prev => ({ ...prev, consumer_id: item?.id || null }))}
+              onSelect={(item) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  consumer_id: item?.id || null,
+                }))
+              }
             />
           </div>
 
           {/* Row 2: Controls (Date, Status, Sort, View) */}
           <div className="flex flex-col md:flex-row gap-4 items-end">
-            
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Date Range</label>
-              <select 
+              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                Date Range
+              </label>
+              <select
                 value={filters.date}
-                onChange={(e) => setFilters(prev => ({ ...prev, date: e.target.value }))}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, date: e.target.value }))
+                }
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 bg-white text-sm"
               >
                 <option value="all">All Time</option>
@@ -550,21 +689,27 @@ const AdminOrders = () => {
             </div>
 
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Status</label>
-              <select 
+              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                Status
+              </label>
+              <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 bg-white text-sm capitalize"
               >
-                {statusOptions.map(opt => (
-                  <option key={opt} value={opt}>{opt === 'all' ? 'All Statuses' : opt}</option>
+                {statusOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt === "all" ? "All Statuses" : opt}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Sort By</label>
-              <select 
+              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                Sort By
+              </label>
+              <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 bg-white text-sm"
@@ -578,15 +723,23 @@ const AdminOrders = () => {
 
             {/* View Toggle */}
             <div className="flex bg-gray-100 p-1 rounded-lg">
-              <button 
-                onClick={() => setViewMode('table')}
-                className={`p-2.5 rounded-md transition-all ${viewMode === 'table' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              <button
+                onClick={() => setViewMode("table")}
+                className={`p-2.5 rounded-md transition-all ${
+                  viewMode === "table"
+                    ? "bg-white text-orange-600 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
               >
                 <i className="fas fa-list"></i>
               </button>
-              <button 
-                onClick={() => setViewMode('card')}
-                className={`p-2.5 rounded-md transition-all ${viewMode === 'card' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              <button
+                onClick={() => setViewMode("card")}
+                className={`p-2.5 rounded-md transition-all ${
+                  viewMode === "card"
+                    ? "bg-white text-orange-600 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
               >
                 <i className="fas fa-th-large"></i>
               </button>
@@ -607,53 +760,89 @@ const AdminOrders = () => {
           <h3 className="text-lg font-bold text-gray-700">No Orders Found</h3>
           <p className="text-gray-500">Try adjusting your search filters.</p>
         </div>
-      ) : viewMode === 'table' ? (
+      ) : viewMode === "table" ? (
         // TABLE VIEW
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px]">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Item ID</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Product</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Order Details</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Item ID
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Product
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Order Details
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filteredAndSortedOrders.map((item) => (
-                  <tr 
-                    key={item.id} 
+                  <tr
+                    key={item.id}
                     onClick={() => setSelectedOrder(item)}
                     className="hover:bg-orange-50/50 transition-colors cursor-pointer group"
                   >
                     <td className="px-6 py-4">
-                      <span className="font-semibold text-gray-800">#{item.id}</span>
-                      <div className="text-xs text-gray-500 mt-0.5">ORD #{item.order_id}</div>
+                      <span className="font-semibold text-gray-800">
+                        #{item.id}
+                      </span>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        ORD #{item.order_id}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <img 
-                          src={item.product?.product_images?.[0]?.url || "https://placehold.co/40"} 
-                          alt="" 
+                        <img
+                          src={
+                            item.product?.product_images?.[0]?.url ||
+                            "https://placehold.co/40"
+                          }
+                          alt=""
                           className="w-10 h-10 rounded-lg object-cover border border-gray-200"
                         />
                         <div>
-                          <p className="font-medium text-gray-900 text-sm truncate max-w-[150px]" title={item.product?.name}>{item.product?.name}</p>
-                          <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                          <p
+                            className="font-medium text-gray-900 text-sm truncate max-w-[150px]"
+                            title={item.product?.name}
+                          >
+                            {item.product?.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Qty: {item.quantity}
+                          </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-bold text-gray-800">{formatCurrency(item.order?.amount)}</div>
-                      <div className="text-xs text-gray-500 capitalize">{item.order?.payment_mode}</div>
+                      <div className="text-sm font-bold text-gray-800">
+                        {formatCurrency(item.order?.amount)}
+                      </div>
+                      <div className="text-xs text-gray-500 capitalize">
+                        {item.order?.payment_mode}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1 items-start">
                         <StatusBadge status={item.order_status} />
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${item.payment_status === 'paid' ? 'border-green-200 text-green-700 bg-green-50' : 'border-yellow-200 text-yellow-700 bg-yellow-50'}`}>
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                            item.payment_status === "paid"
+                              ? "border-green-200 text-green-700 bg-green-50"
+                              : "border-yellow-200 text-yellow-700 bg-yellow-50"
+                          }`}
+                        >
                           Pay: {item.payment_status}
                         </span>
                       </div>
@@ -676,7 +865,7 @@ const AdminOrders = () => {
         // GRID VIEW
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAndSortedOrders.map((item) => (
-            <div 
+            <div
               key={item.id}
               onClick={() => setSelectedOrder(item)}
               className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-orange-300 transition-all cursor-pointer flex flex-col group"
@@ -684,14 +873,19 @@ const AdminOrders = () => {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   <div className="bg-gray-100 p-2 rounded-xl">
-                    <img 
-                      src={item.product?.product_images?.[0]?.url || "https://placehold.co/50"} 
-                      alt="" 
+                    <img
+                      src={
+                        item.product?.product_images?.[0]?.url ||
+                        "https://placehold.co/50"
+                      }
+                      alt=""
                       className="w-10 h-10 object-cover rounded-lg"
                     />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900 text-sm line-clamp-1">{item.product?.name}</h4>
+                    <h4 className="font-bold text-gray-900 text-sm line-clamp-1">
+                      {item.product?.name}
+                    </h4>
                     <p className="text-xs text-gray-500">Item #{item.id}</p>
                   </div>
                 </div>
@@ -705,11 +899,15 @@ const AdminOrders = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Amount</span>
-                  <span className="font-bold text-gray-900">{formatCurrency(item.order?.amount)}</span>
+                  <span className="font-bold text-gray-900">
+                    {formatCurrency(item.order?.amount)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Payment</span>
-                  <span className="capitalize">{item.payment_status} ({item.order?.payment_mode})</span>
+                  <span className="capitalize">
+                    {item.payment_status} ({item.order?.payment_mode})
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Date</span>
@@ -729,9 +927,9 @@ const AdminOrders = () => {
 
       {/* Edit Form Overlay */}
       {selectedOrder && (
-        <OrderEditForm 
-          orderData={selectedOrder} 
-          onClose={() => setSelectedOrder(null)} 
+        <OrderEditForm
+          orderData={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
         />
       )}
     </div>

@@ -5,7 +5,9 @@ const BASE_URL = "/admin/order";
 export const AdminOrderService = {
   getOrderByFilter: async (filters) => {
     const { data: response } = await axiosInstance.get(`${BASE_URL}/`, {
-      filters,
+      params: {
+        filters: JSON.stringify(filters),
+      },
     });
     return response;
   },
