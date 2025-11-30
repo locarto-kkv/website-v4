@@ -12,9 +12,7 @@ declare
   consumer_address_id bigint;
   vendor_address_id bigint;
 
-  consumer_json jsonb;
   consumer_addr_json jsonb;
-  vendor_json jsonb;
   vendor_addr_json jsonb;
 
   order_row orders%rowtype;
@@ -53,30 +51,12 @@ begin
     raise exception 'Consumer address % not found', consumer_address_id;
   end if;
 
-  -- Load consumer using address.consumer_id
-  select to_jsonb(c.*) into consumer_json
-  from consumers c
-  where c.id = (consumer_addr_json->>'consumer_id')::bigint;
-
-  if consumer_json is null then
-    raise exception 'Consumer linked to address % not found', consumer_address_id;
-  end if;
-
   -- Load vendor address snapshot
   select to_jsonb(a.*) into vendor_addr_json
   from addresses a where a.id = vendor_address_id;
 
   if vendor_addr_json is null then
     raise exception 'Vendor address % not found', vendor_address_id;
-  end if;
-
-  -- Load vendor using address.vendor_id
-  select to_jsonb(v.*) into vendor_json
-  from vendors v
-  where v.id = (vendor_addr_json->>'vendor_id')::bigint;
-
-  if vendor_json is null then
-    raise exception 'Vendor linked to address % not found', vendor_address_id;
   end if;
 
   -- Insert order row with snapshots
@@ -89,11 +69,11 @@ begin
     vendor_address_id,
     consumer_address_id,
     delivery_fee,
-    consumer_profile,
-    vendor_profile
+    consumer_address,
+    vendor_address
   )
   values (
-    (consumer_json->>'id')::bigint,
+    (consumer_addr_json->>'consumer_id')::bigint,
     delivery_date,
     payment_mode,
     amount,
@@ -101,14 +81,8 @@ begin
     vendor_address_id,
     consumer_address_id,
     delivery_fee,
-    jsonb_build_object(
-      'consumer', consumer_json,
-      'consumer_address', consumer_addr_json
-    ),
-    jsonb_build_object(
-      'vendor', vendor_json,
-      'vendor_address', vendor_addr_json
-    )
+    consumer_addr_json, 
+    vendor_addr_json
       )
   returning * into order_row;
 

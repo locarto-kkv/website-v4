@@ -13,7 +13,6 @@ export const getOrderHistory = async (req, res) => {
       .select(
         `*,
         items: order_items_order_id_fkey(*,
-        product: order_items_product_id_fkey(*),          
         review: reviews_order_item_id_fkey(*)
         )
         `

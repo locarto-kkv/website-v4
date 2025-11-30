@@ -78,7 +78,7 @@ begin
       payment_status,
       support_status,
       order_status,
-      product_info
+      product
     )
     values (
       order_id,
