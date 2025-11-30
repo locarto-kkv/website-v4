@@ -152,17 +152,23 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
         path: "/admin/dashboard",
       },
       {
+        id: "blogs",
+        label: "Blogs",
+        icon: "fas fa-newspaper",
+        path: "/admin/blogs",
+      },
+      {
         id: "users",
         label: "Users",
         icon: "fas fa-users-cog",
         path: "/admin/users",
       }, // Example
-      {
-        id: "content",
-        label: "Content",
-        icon: "fas fa-edit",
-        path: "/admin/content",
-      }, // Example
+      // {
+      //   id: "content",
+      //   label: "Content",
+      //   icon: "fas fa-edit",
+      //   path: "/admin/content",
+      // }, 
     ];
   }
 

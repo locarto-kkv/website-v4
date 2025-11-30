@@ -55,7 +55,7 @@ const SearchDropdown = ({
     if (val.trim().length < 2) {
       setResults([]);
       setShowDropdown(false);
-      onSelect(null); // Clear selection if query cleared
+      // Modification: Removed onSelect(null) here to prevent triggering filter update on typing/backspace
       return;
     }
 
@@ -101,7 +101,7 @@ const SearchDropdown = ({
           <button
             onClick={() => {
               setQuery("");
-              onSelect(null);
+              onSelect(null); // This explicit clear still updates the filter, which is desired behavior
               setResults([]);
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"

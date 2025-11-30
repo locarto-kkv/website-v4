@@ -1,11 +1,13 @@
+// src/pages/admin/adminRoutes.jsx
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 
 import AuthAdmin from "./authAdmin";
 import AdminDashboardLayout from "./dashboard/adminDashboardLayout";
-import AdminDashboard from "./adminDashboard";
-import AdminOrders from "./dashboard/AdminOrders"; // Import the new component
+import AdminOrders from "./dashboard/AdminOrders";
+import AdminBlogs from "./dashboard/AdminBlogs";
 import NotFoundPage from "../NotFoundPage";
+
 // ... commented out imports kept for reference
 // import AdminProfile from "./dashboard/AdminProfile";
 // import AdminAnalytics from "./dashboard/AdminAnalytics";
@@ -50,9 +52,16 @@ const AdminRoutes = () => {
         <Route element={<AdminDashboardLayout />}>
           {/* Redirect index route of admin to dashboard */}
           <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="orders" element={<AdminOrders />} />{" "}
-          {/* Added Orders Route */}
+          
+          {/* Dashboard now renders Orders page */}
+          <Route path="dashboard" element={<AdminOrders />} />
+          
+          {/* Legacy orders route redirects to dashboard */}
+          <Route path="orders" element={<Navigate to="/admin/dashboard" replace />} />
+          
+          {/* Blogs Management Route */}
+          <Route path="blogs" element={<AdminBlogs />} />
+
           {/* Commented out routes for future implementation */}
           {/* <Route path="products" element={<AdminProducts />} />
           <Route path="members-hub" element={<AdminsMemberHub />} />
