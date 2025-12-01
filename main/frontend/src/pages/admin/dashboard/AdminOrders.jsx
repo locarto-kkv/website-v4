@@ -141,7 +141,124 @@ const SearchDropdown = ({
   );
 };
 
-// --- Edit Form Component ---
+// --- Bulk Update Form Component ---
+const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
+  const [formData, setFormData] = useState({});
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    // Filter out empty values
+    const cleanedData = Object.fromEntries(
+      Object.entries(formData).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+    );
+
+    if (Object.keys(cleanedData).length === 0) {
+      toast.error("No changes to update");
+      return;
+    }
+
+    console.log("Bulk Update FormData:", cleanedData);
+    toast.success("Bulk update initiated (Check console)");
+    onUpdate(cleanedData); // Pass data back to parent if needed for API logic later
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <i className="fas fa-layer-group text-orange-500"></i>
+            Bulk Update Orders
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+            <i className="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <div className="p-6 bg-gray-50 space-y-4">
+          <p className="text-sm text-gray-600 mb-2">
+            Only filled fields will be updated for the selected orders.
+          </p>
+          
+          <div>
+            <label className="text-xs font-semibold text-gray-500 block mb-1">Order Status</label>
+            <select
+              onChange={(e) => handleChange("order_status", e.target.value)}
+              className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500"
+              defaultValue=""
+            >
+              <option value="">No Change</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-500 block mb-1">Payment Status</label>
+            <select
+              onChange={(e) => handleChange("payment_status", e.target.value)}
+              className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500"
+              defaultValue=""
+            >
+              <option value="">No Change</option>
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="failed">Failed</option>
+              <option value="refunded">Refunded</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-500 block mb-1">Support Status</label>
+            <select
+              onChange={(e) => handleChange("support_status", e.target.value)}
+              className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500"
+              defaultValue=""
+            >
+              <option value="">No Change</option>
+              <option value="open">Open</option>
+              <option value="closed">Closed</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="text-xs font-semibold text-gray-500 block mb-1">Shipping Label / Note</label>
+            <input 
+              type="text" 
+              placeholder="Enter text to apply to all..."
+              onChange={(e) => handleChange("shipping_label", e.target.value)}
+              className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+        </div>
+
+        <div className="bg-gray-100 px-6 py-4 flex justify-end gap-3 border-t border-gray-200">
+          <button
+            onClick={onClose}
+            className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-white transition-all text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-sm"
+          >
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Edit Form Component (Single Item) ---
 
 const OrderEditForm = ({ orderData, onClose, onUpdate }) => {
   const [orderUpdate, setOrderUpdate] = useState(false);
@@ -669,6 +786,11 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [refresh, setRefresh] = useState(false);
 
+  // --- NEW: Selection States ---
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [showBulkModal, setShowBulkModal] = useState(false);
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -721,6 +843,56 @@ const AdminOrders = () => {
     return res;
   }, [orders, statusFilter, sortBy]);
 
+  // --- Selection Handlers ---
+  const handleRowClick = (item) => {
+    if (selectionMode) {
+      // Toggle selection
+      const newSelected = new Set(selectedIds);
+      if (newSelected.has(item.id)) {
+        newSelected.delete(item.id);
+      } else {
+        newSelected.add(item.id);
+      }
+      setSelectedIds(newSelected);
+    } else {
+      // Start selection mode and select this item
+      setSelectionMode(true);
+      setSelectedIds(new Set([item.id]));
+    }
+  };
+
+  const handleEditClick = (e, item) => {
+    e.stopPropagation(); // Prevent row click event
+    setSelectedOrder(item);
+  };
+
+  const handleSelectAll = () => {
+    const allIds = new Set(filteredAndSortedOrders.map((o) => o.id));
+    setSelectedIds(allIds);
+  };
+
+  const handleUnselectAll = () => {
+    setSelectedIds(new Set());
+  };
+
+  const handleCancelSelection = () => {
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
+
+  const handleBulkUpdateSubmit = (updatedData) => {
+    // Here we console log as requested
+    console.log("Submitting bulk update for IDs:", [...selectedIds]);
+    console.log("Data:", updatedData);
+    
+    // Cleanup
+    setShowBulkModal(false);
+    handleCancelSelection();
+    
+    // In a real app, you would call an API here and then:
+    setRefresh(prev => !prev);
+  };
+
   const statusOptions = [
     "all",
     "pending",
@@ -734,7 +906,7 @@ const AdminOrders = () => {
 
   return (
     <div className="space-y-6">
-      {/* Stats Header (Optional but consistent with dashboard style) */}
+      {/* Stats Header */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           {
@@ -905,6 +1077,47 @@ const AdminOrders = () => {
         </div>
       </div>
 
+      {/* --- Bulk Selection Action Bar --- */}
+      {selectionMode && (
+        <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-4 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center gap-4 text-white animate-fade-in-up">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center font-bold">
+              {selectedIds.size}
+            </div>
+            <span className="font-medium">Items Selected</span>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <button
+              onClick={handleSelectAll}
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+            >
+              Select All
+            </button>
+            <button
+              onClick={handleUnselectAll}
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+            >
+              Unselect All
+            </button>
+            <div className="h-6 w-px bg-gray-600 mx-1 hidden sm:block"></div>
+            <button
+              onClick={handleCancelSelection}
+              className="px-4 py-2 border border-gray-600 hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => setShowBulkModal(true)}
+              disabled={selectedIds.size === 0}
+              className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-bold shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Update
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* --- Results Section --- */}
       {loading ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
@@ -924,6 +1137,11 @@ const AdminOrders = () => {
             <table className="w-full min-w-[1000px]">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
+                  {selectionMode && (
+                    <th className="w-12 px-6 py-4 text-center">
+                      <i className="fas fa-check-square text-gray-400"></i>
+                    </th>
+                  )}
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Item ID
                   </th>
@@ -945,144 +1163,181 @@ const AdminOrders = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filteredAndSortedOrders.map((item) => (
-                  <tr
-                    key={item.id}
-                    onClick={() => setSelectedOrder(item)}
-                    className="hover:bg-orange-50/50 transition-colors cursor-pointer group"
-                  >
-                    <td className="px-6 py-4">
-                      <span className="font-semibold text-gray-800">
-                        #{item.id}
-                      </span>
-                      <div className="text-xs text-gray-500 mt-0.5">
-                        ORD #{item.order_id}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={
-                            item.product?.product_images?.[0]?.url ||
-                            "https://placehold.co/40"
-                          }
-                          alt=""
-                          className="w-10 h-10 rounded-lg object-cover border border-gray-200"
-                        />
-                        <div>
-                          <p
-                            className="font-medium text-gray-900 text-sm truncate max-w-[150px]"
-                            title={item.product?.name}
+                {filteredAndSortedOrders.map((item) => {
+                  const isSelected = selectedIds.has(item.id);
+                  return (
+                    <tr
+                      key={item.id}
+                      onClick={() => handleRowClick(item)}
+                      className={`transition-colors cursor-pointer group ${
+                        isSelected ? "bg-orange-50/70" : "hover:bg-gray-50"
+                      }`}
+                    >
+                      {selectionMode && (
+                        <td className="px-6 py-4 text-center">
+                          <div
+                            className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? "bg-orange-500 border-orange-500 text-white"
+                                : "bg-white border-gray-300"
+                            }`}
                           >
-                            {item.product?.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Qty: {item.quantity}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-bold text-gray-800">
-                        {formatCurrency(item.order?.amount)}
-                      </div>
-                      <div className="text-xs text-gray-500 capitalize">
-                        {item.order?.payment_mode}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1 items-start">
-                        <StatusBadge status={item.order_status} />
-                        <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                            item.payment_status === "paid"
-                              ? "border-green-200 text-green-700 bg-green-50"
-                              : "border-yellow-200 text-yellow-700 bg-yellow-50"
-                          }`}
-                        >
-                          Pay: {item.payment_status}
+                            {isSelected && <i className="fas fa-check text-xs"></i>}
+                          </div>
+                        </td>
+                      )}
+                      <td className="px-6 py-4">
+                        <span className="font-semibold text-gray-800">
+                          #{item.id}
                         </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {formatDate(item.created_at)}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="text-gray-400 group-hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-full">
-                        <i className="fas fa-edit"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          ORD #{item.order_id}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={
+                              item.product?.product_images?.[0]?.url ||
+                              "https://placehold.co/40"
+                            }
+                            alt=""
+                            className="w-10 h-10 rounded-lg object-cover border border-gray-200"
+                          />
+                          <div>
+                            <p
+                              className="font-medium text-gray-900 text-sm truncate max-w-[150px]"
+                              title={item.product?.name}
+                            >
+                              {item.product?.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Qty: {item.quantity}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-bold text-gray-800">
+                          {formatCurrency(item.order?.amount)}
+                        </div>
+                        <div className="text-xs text-gray-500 capitalize">
+                          {item.order?.payment_mode}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1 items-start">
+                          <StatusBadge status={item.order_status} />
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                              item.payment_status === "paid"
+                                ? "border-green-200 text-green-700 bg-green-50"
+                                : "border-yellow-200 text-yellow-700 bg-yellow-50"
+                            }`}
+                          >
+                            Pay: {item.payment_status}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {formatDate(item.created_at)}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button 
+                          className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-medium text-sm transition-colors group-hover:shadow-sm"
+                          onClick={(e) => handleEditClick(e, item)}
+                        >
+                          <i className="fas fa-edit mr-1"></i> Edit
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       ) : (
-        // GRID VIEW
+        // GRID VIEW (Adapted to handle clicks for selection)
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAndSortedOrders.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setSelectedOrder(item)}
-              className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-orange-300 transition-all cursor-pointer flex flex-col group"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="bg-gray-100 p-2 rounded-xl">
-                    <img
-                      src={
-                        item.product?.product_images?.[0]?.url ||
-                        "https://placehold.co/50"
-                      }
-                      alt=""
-                      className="w-10 h-10 object-cover rounded-lg"
-                    />
+          {filteredAndSortedOrders.map((item) => {
+            const isSelected = selectedIds.has(item.id);
+            return (
+              <div
+                key={item.id}
+                onClick={() => handleRowClick(item)}
+                className={`bg-white rounded-2xl p-5 border shadow-sm transition-all cursor-pointer flex flex-col group relative ${
+                  isSelected ? "border-orange-500 ring-2 ring-orange-200" : "border-gray-200 hover:border-orange-300 hover:shadow-md"
+                }`}
+              >
+                {selectionMode && (
+                  <div className={`absolute top-4 right-4 w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
+                    isSelected ? "bg-orange-500 border-orange-500 text-white" : "bg-white border-gray-300"
+                  }`}>
+                    {isSelected && <i className="fas fa-check text-xs"></i>}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 text-sm line-clamp-1">
-                      {item.product?.name}
-                    </h4>
-                    <p className="text-xs text-gray-500">Item #{item.id}</p>
+                )}
+
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-gray-100 p-2 rounded-xl">
+                      <img
+                        src={
+                          item.product?.product_images?.[0]?.url ||
+                          "https://placehold.co/50"
+                        }
+                        alt=""
+                        className="w-10 h-10 object-cover rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm line-clamp-1">
+                        {item.product?.name}
+                      </h4>
+                      <p className="text-xs text-gray-500">Item #{item.id}</p>
+                    </div>
+                  </div>
+                  {!selectionMode && <StatusBadge status={item.order_status} />}
+                </div>
+
+                <div className="space-y-2 mb-4 flex-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Order ID</span>
+                    <span className="font-medium">#{item.order_id}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Amount</span>
+                    <span className="font-bold text-gray-900">
+                      {formatCurrency(item.order?.amount)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Payment</span>
+                    <span className="capitalize">
+                      {item.payment_status} ({item.order?.payment_mode})
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Date</span>
+                    <span>{formatDate(item.created_at)}</span>
                   </div>
                 </div>
-                <StatusBadge status={item.order_status} />
-              </div>
 
-              <div className="space-y-2 mb-4 flex-1">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Order ID</span>
-                  <span className="font-medium">#{item.order_id}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Amount</span>
-                  <span className="font-bold text-gray-900">
-                    {formatCurrency(item.order?.amount)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Payment</span>
-                  <span className="capitalize">
-                    {item.payment_status} ({item.order?.payment_mode})
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Date</span>
-                  <span>{formatDate(item.created_at)}</span>
+                <div className="pt-4 border-t border-gray-100 flex justify-end">
+                  <button 
+                    onClick={(e) => handleEditClick(e, item)}
+                    className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-blue-600 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <i className="fas fa-edit"></i> Edit Order
+                  </button>
                 </div>
               </div>
-
-              <div className="pt-4 border-t border-gray-100 flex justify-end">
-                <span className="text-xs font-bold text-blue-600 group-hover:underline flex items-center gap-1">
-                  View & Edit Details <i className="fas fa-arrow-right"></i>
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Edit Form Overlay */}
+      {/* Edit Form Overlay (Single Item) */}
       {selectedOrder && (
         <OrderEditForm
           orderData={selectedOrder}
@@ -1091,6 +1346,14 @@ const AdminOrders = () => {
             setSelectedOrder(null);
             setRefresh((prev) => !prev);
           }}
+        />
+      )}
+
+      {/* Bulk Update Modal */}
+      {showBulkModal && (
+        <BulkOrderUpdateForm 
+          onClose={() => setShowBulkModal(false)}
+          onUpdate={handleBulkUpdateSubmit}
         />
       )}
     </div>
