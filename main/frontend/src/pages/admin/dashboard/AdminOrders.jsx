@@ -193,6 +193,7 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
               <option value="">No Change</option>
               <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
+              <option value="ready-for-pickup">Ready for Pickup</option>
               <option value="shipped">Shipped</option>
               <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
@@ -210,6 +211,7 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
               <option value="pending">Pending</option>
               <option value="paid">Paid</option>
               <option value="failed">Failed</option>
+              <option value="refunding">Refunding</option>
               <option value="refunded">Refunded</option>
             </select>
           </div>
@@ -465,6 +467,7 @@ const OrderEditForm = ({ orderData, onClose, onUpdate }) => {
                   >
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
+                    <option value="ready-for-pickup">Ready for Pickup</option>
                     <option value="shipped">Shipped</option>
                     <option value="delivered">Delivered</option>
                     <option value="cancelled">Cancelled</option>
@@ -484,6 +487,7 @@ const OrderEditForm = ({ orderData, onClose, onUpdate }) => {
                     <option value="pending">Pending</option>
                     <option value="paid">Paid</option>
                     <option value="failed">Failed</option>
+                    <option value="refunding">Refunding</option>
                     <option value="refunded">Refunded</option>
                   </select>
                 </div>
@@ -786,7 +790,7 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [refresh, setRefresh] = useState(false);
 
-  // --- NEW: Selection States ---
+  // --- Selection States ---
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -881,7 +885,6 @@ const AdminOrders = () => {
   };
 
   const handleBulkUpdateSubmit = (updatedData) => {
-    // Here we console log as requested
     console.log("Submitting bulk update for IDs:", [...selectedIds]);
     console.log("Data:", updatedData);
     
@@ -897,6 +900,7 @@ const AdminOrders = () => {
     "all",
     "pending",
     "confirmed",
+    "ready-for-pickup",
     "processing",
     "shipped",
     "delivered",
@@ -1028,7 +1032,7 @@ const AdminOrders = () => {
               >
                 {statusOptions.map((opt) => (
                   <option key={opt} value={opt}>
-                    {opt === "all" ? "All Statuses" : opt}
+                    {opt === "all" ? "All Statuses" : opt.replace("-", " ")}
                   </option>
                 ))}
               </select>
@@ -1258,7 +1262,7 @@ const AdminOrders = () => {
           </div>
         </div>
       ) : (
-        // GRID VIEW (Adapted to handle clicks for selection)
+        // GRID VIEW
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAndSortedOrders.map((item) => {
             const isSelected = selectedIds.has(item.id);

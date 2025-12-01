@@ -62,6 +62,16 @@ export const getOrderStatusConfig = (status) => {
       icon: "fas fa-cog",
       label: "Processing",
     },
+    confirmed: {
+      color: "bg-indigo-100 text-indigo-800",
+      icon: "fas fa-check",
+      label: "Confirmed",
+    },
+    "ready-for-pickup": {
+      color: "bg-orange-100 text-orange-800",
+      icon: "fas fa-box-open",
+      label: "Ready for Pickup",
+    },
     shipped: {
       color: "bg-purple-100 text-purple-800",
       icon: "fas fa-shipping-fast",
@@ -81,6 +91,11 @@ export const getOrderStatusConfig = (status) => {
       color: "bg-gray-100 text-gray-800",
       icon: "fas fa-undo",
       label: "Refunded",
+    },
+    refunding: {
+      color: "bg-pink-100 text-pink-800",
+      icon: "fas fa-sync-alt",
+      label: "Refunding",
     },
   };
   return configs[status?.toLowerCase()] || configs.pending;
