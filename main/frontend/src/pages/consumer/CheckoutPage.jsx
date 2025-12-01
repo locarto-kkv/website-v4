@@ -580,12 +580,20 @@ const CheckoutPage = () => {
                     </h2>
                   </div>
                   {!showNewAddressForm && (
-                    <button
-                      onClick={handleAddNewAddress}
-                      className="text-xs sm:text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors flex items-center gap-1"
-                    >
-                      <i className="fas fa-plus text-xs"></i> Add New
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => navigate("/consumer/dashboard/settings")}
+                        className="text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
+                      >
+                        <i className="fas fa-edit text-xs"></i> Edit
+                      </button>
+                      <button
+                        onClick={handleAddNewAddress}
+                        className="text-xs sm:text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors flex items-center gap-1"
+                      >
+                        <i className="fas fa-plus text-xs"></i> Add New
+                      </button>
+                    </div>
                   )}
                 </div>
                 {!showNewAddressForm && profile.address?.length > 0 && (
