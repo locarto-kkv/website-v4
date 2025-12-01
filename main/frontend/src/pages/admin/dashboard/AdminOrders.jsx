@@ -55,7 +55,6 @@ const SearchDropdown = ({
     if (val.trim().length < 2) {
       setResults([]);
       setShowDropdown(false);
-      // Modification: Removed onSelect(null) here to prevent triggering filter update on typing/backspace
       return;
     }
 
@@ -63,7 +62,6 @@ const SearchDropdown = ({
     setShowDropdown(true);
     try {
       const res = await serviceCall(val);
-      // Handle different response structures if necessary
       const list = res.vendors || res.products || res.consumers || res || [];
       setResults(list);
     } catch (err) {
@@ -101,7 +99,7 @@ const SearchDropdown = ({
           <button
             onClick={() => {
               setQuery("");
-              onSelect(null); // This explicit clear still updates the filter, which is desired behavior
+              onSelect(null);
               setResults([]);
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -154,20 +152,27 @@ const OrderEditForm = ({ orderData, onClose }) => {
   );
 
   const handleUpdate = async () => {
-    toast.success("Order data updated");
-
     const { order: updateOrderData, ...updateItemData } = formData;
 
-    if (orderUpdate) {
-      await AdminOrderService.updateOrder(updateOrderData.id, updateOrderData);
+    try {
+      if (orderUpdate) {
+        await AdminOrderService.updateOrder(
+          updateOrderData.id,
+          updateOrderData
+        );
+      }
+      if (itemUpdate) {
+        await AdminOrderService.updateOrderItem(
+          updateItemData.id,
+          updateItemData
+        );
+      }
+      toast.success("Order data updated successfully");
+      onClose();
+    } catch (error) {
+      console.error("Update failed", error);
+      toast.error("Failed to update order");
     }
-    if (itemUpdate) {
-      await AdminOrderService.updateOrderItem(
-        updateItemData.id,
-        updateItemData
-      );
-    }
-    onClose();
   };
 
   const handleChange = (section, field, value) => {
@@ -178,7 +183,6 @@ const OrderEditForm = ({ orderData, onClose }) => {
       }
       if (section === "product") {
         setItemUpdate(true);
-
         return { ...prev, product: { ...prev.product, [field]: value } };
       }
       if (section === "order") {
@@ -187,7 +191,6 @@ const OrderEditForm = ({ orderData, onClose }) => {
       }
       if (section === "consumer_address") {
         setOrderUpdate(true);
-
         return {
           ...prev,
           order: {
@@ -201,7 +204,6 @@ const OrderEditForm = ({ orderData, onClose }) => {
       }
       if (section === "vendor_address") {
         setOrderUpdate(true);
-
         return {
           ...prev,
           order: {
@@ -216,7 +218,7 @@ const OrderEditForm = ({ orderData, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4 flex justify-between items-center shrink-0">
           <div>
@@ -225,7 +227,7 @@ const OrderEditForm = ({ orderData, onClose }) => {
               Edit Order Details
             </h2>
             <p className="text-gray-400 text-xs mt-1">
-              ID: #{formData.id} • Order ID: #{formData.order_id}
+              Item ID: #{formData.id} • Order ID: #{formData.order_id}
             </p>
           </div>
           <button
@@ -239,14 +241,14 @@ const OrderEditForm = ({ orderData, onClose }) => {
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50 custom-scrollbar">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* 1. Item Details */}
+            {/* 1. Item & Product Details */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <i className="fas fa-box text-blue-500"></i> Item & Product
                 Details
               </h3>
               <div className="flex flex-col md:flex-row gap-6">
-                <div className="w-32 h-32 bg-gray-100 rounded-lg shrink-0 overflow-hidden border">
+                <div className="w-32 h-32 bg-gray-100 rounded-lg shrink-0 overflow-hidden border relative group">
                   <img
                     src={
                       formData.product?.product_images?.[0]?.url ||
@@ -256,8 +258,8 @@ const OrderEditForm = ({ orderData, onClose }) => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                  <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+                  <div className="sm:col-span-2">
                     <label className="text-xs font-semibold text-gray-500 block mb-1">
                       Product Name
                     </label>
@@ -279,6 +281,19 @@ const OrderEditForm = ({ orderData, onClose }) => {
                       value={formData.product?.category || ""}
                       onChange={(e) =>
                         handleChange("product", "category", e.target.value)
+                      }
+                      className="w-full p-2 border rounded-lg text-sm bg-gray-50 focus:bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Weight (g)
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.product?.weight || 0}
+                      onChange={(e) =>
+                        handleChange("product", "weight", e.target.value)
                       }
                       className="w-full p-2 border rounded-lg text-sm bg-gray-50 focus:bg-white"
                     />
@@ -313,50 +328,80 @@ const OrderEditForm = ({ orderData, onClose }) => {
               </div>
             </div>
 
-            {/* 2. Order Details */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            {/* 2. Order Summary & Status */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                 <i className="fas fa-file-invoice-dollar text-green-500"></i>{" "}
                 Order Summary
               </h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">
-                      Order Status
-                    </label>
-                    <select
-                      value={formData.order_status}
-                      onChange={(e) =>
-                        handleChange("root", "order_status", e.target.value)
-                      }
-                      className="w-full p-2 border rounded-lg text-sm bg-white"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 block mb-1">
-                      Payment Status
-                    </label>
-                    <select
-                      value={formData.payment_status}
-                      onChange={(e) =>
-                        handleChange("root", "payment_status", e.target.value)
-                      }
-                      className="w-full p-2 border rounded-lg text-sm bg-white"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="paid">Paid</option>
-                      <option value="failed">Failed</option>
-                      <option value="refunded">Refunded</option>
-                    </select>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Order Status
+                  </label>
+                  <select
+                    value={formData.order_status}
+                    onChange={(e) =>
+                      handleChange("root", "order_status", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
                 </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Payment Status
+                  </label>
+                  <select
+                    value={formData.payment_status}
+                    onChange={(e) =>
+                      handleChange("root", "payment_status", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="failed">Failed</option>
+                    <option value="refunded">Refunded</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Support Status
+                  </label>
+                  <select
+                    value={formData.support_status || "open"}
+                    onChange={(e) =>
+                      handleChange("root", "support_status", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Shipping Label (Tracking / Text)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.order?.shipping_label || ""}
+                    onChange={(e) =>
+                      handleChange("order", "shipping_label", e.target.value)
+                    }
+                    placeholder="Enter shipping details or tracking ID"
+                    className="w-full p-2 border rounded-lg text-sm"
+                  />
+                </div>
+
                 <div>
                   <label className="text-xs font-semibold text-gray-500 block mb-1">
                     Payment Mode
@@ -370,6 +415,21 @@ const OrderEditForm = ({ orderData, onClose }) => {
                     className="w-full p-2 border rounded-lg text-sm"
                   />
                 </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Delivery Fee
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.order?.delivery_fee || 0}
+                    onChange={(e) =>
+                      handleChange("order", "delivery_fee", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-lg text-sm"
+                  />
+                </div>
+
                 <div>
                   <label className="text-xs font-semibold text-gray-500 block mb-1">
                     Total Amount (Order Level)
@@ -392,6 +452,20 @@ const OrderEditForm = ({ orderData, onClose }) => {
                 <i className="fas fa-user text-purple-500"></i> Consumer Details
               </h3>
               <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    placeholder="Label (e.g. Home)"
+                    value={formData.order?.consumer_address?.label || ""}
+                    onChange={(e) =>
+                      handleChange(
+                        "consumer_address",
+                        "label",
+                        e.target.value
+                      )
+                    }
+                    className="w-full p-2 border rounded-lg text-sm col-span-2"
+                  />
+                </div>
                 <input
                   placeholder="Address Line 1"
                   value={formData.order?.consumer_address?.address_line_1 || ""}
@@ -421,7 +495,11 @@ const OrderEditForm = ({ orderData, onClose }) => {
                     placeholder="State"
                     value={formData.order?.consumer_address?.state || ""}
                     onChange={(e) =>
-                      handleChange("consumer_address", "state", e.target.value)
+                      handleChange(
+                        "consumer_address",
+                        "state",
+                        e.target.value
+                      )
                     }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
@@ -439,46 +517,130 @@ const OrderEditForm = ({ orderData, onClose }) => {
                   />
                 </div>
                 <input
-                  placeholder="Contact Phone"
-                  value={formData.order?.consumer_address?.phone_no || ""}
+                  placeholder="Country"
+                  value={formData.order?.consumer_address?.country || ""}
                   onChange={(e) =>
-                    handleChange("consumer_address", "phone_no", e.target.value)
+                    handleChange(
+                      "consumer_address",
+                      "country",
+                      e.target.value
+                    )
                   }
                   className="w-full p-2 border rounded-lg text-sm"
                 />
-              </div>
-            </div>
-
-            {/* 4. Vendor Address Details */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <i className="fas fa-store text-orange-500"></i> Vendor Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">
-                    Address Line 1
-                  </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
-                    value={formData.order?.vendor_address?.address_line_1 || ""}
+                    placeholder="Contact Phone"
+                    value={formData.order?.consumer_address?.phone_no || ""}
                     onChange={(e) =>
                       handleChange(
-                        "vendor_address",
-                        "address_line_1",
+                        "consumer_address",
+                        "phone_no",
+                        e.target.value
+                      )
+                    }
+                    className="w-full p-2 border rounded-lg text-sm"
+                  />
+                  <input
+                    placeholder="Email"
+                    value={formData.order?.consumer_address?.email || ""}
+                    onChange={(e) =>
+                      handleChange(
+                        "consumer_address",
+                        "email",
                         e.target.value
                       )
                     }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
                 </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">
-                    Pincode
-                  </label>
+              </div>
+            </div>
+
+            {/* 4. Vendor Address Details */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <i className="fas fa-store text-orange-500"></i> Vendor Details
+              </h3>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
                   <input
+                    placeholder="Label (e.g. Main)"
+                    value={formData.order?.vendor_address?.label || ""}
+                    onChange={(e) =>
+                      handleChange("vendor_address", "label", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-lg text-sm col-span-2"
+                  />
+                </div>
+                <input
+                  placeholder="Address Line 1"
+                  value={formData.order?.vendor_address?.address_line_1 || ""}
+                  onChange={(e) =>
+                    handleChange(
+                      "vendor_address",
+                      "address_line_1",
+                      e.target.value
+                    )
+                  }
+                  className="w-full p-2 border rounded-lg text-sm"
+                />
+                <input
+                  placeholder="Address Line 2"
+                  value={formData.order?.vendor_address?.address_line_2 || ""}
+                  onChange={(e) =>
+                    handleChange(
+                      "vendor_address",
+                      "address_line_2",
+                      e.target.value
+                    )
+                  }
+                  className="w-full p-2 border rounded-lg text-sm"
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    placeholder="State"
+                    value={formData.order?.vendor_address?.state || ""}
+                    onChange={(e) =>
+                      handleChange("vendor_address", "state", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-lg text-sm"
+                  />
+                  <input
+                    placeholder="Pincode"
                     value={formData.order?.vendor_address?.pincode || ""}
                     onChange={(e) =>
                       handleChange("vendor_address", "pincode", e.target.value)
+                    }
+                    className="w-full p-2 border rounded-lg text-sm"
+                  />
+                </div>
+                <input
+                  placeholder="Country"
+                  value={formData.order?.vendor_address?.country || ""}
+                  onChange={(e) =>
+                    handleChange("vendor_address", "country", e.target.value)
+                  }
+                  className="w-full p-2 border rounded-lg text-sm"
+                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    placeholder="Contact Phone"
+                    value={formData.order?.vendor_address?.phone_no || ""}
+                    onChange={(e) =>
+                      handleChange(
+                        "vendor_address",
+                        "phone_no",
+                        e.target.value
+                      )
+                    }
+                    className="w-full p-2 border rounded-lg text-sm"
+                  />
+                  <input
+                    placeholder="Email"
+                    value={formData.order?.vendor_address?.email || ""}
+                    onChange={(e) =>
+                      handleChange("vendor_address", "email", e.target.value)
                     }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
