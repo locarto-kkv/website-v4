@@ -41,8 +41,6 @@ export const updateProfile = async (req, res) => {
     }
 
     if (newProfileData.address) {
-      console.log(newProfileData.address);
-
       const { data, error } = await db
         .from("addresses")
         .upsert(

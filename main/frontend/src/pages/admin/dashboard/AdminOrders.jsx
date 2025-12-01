@@ -146,30 +146,48 @@ const SearchDropdown = ({
 // --- Edit Form Component ---
 
 const OrderEditForm = ({ orderData, onClose }) => {
-  // Deep clone initial data for local state editing
+  const [orderUpdate, setOrderUpdate] = useState(false);
+  const [itemUpdate, setItemUpdate] = useState(false);
+
   const [formData, setFormData] = useState(
     JSON.parse(JSON.stringify(orderData))
   );
 
-  const handleUpdate = () => {
-    console.log("Updated Order Data:", formData);
+  const handleUpdate = async () => {
     toast.success("Order data updated");
-    // In a real scenario: await AdminOrderService.updateOrder(formData.id, formData);
-    // onClose(); // Optional: close on save
+
+    const { order: updateOrderData, ...updateItemData } = formData;
+
+    if (orderUpdate) {
+      await AdminOrderService.updateOrder(updateOrderData.id, updateOrderData);
+    }
+    if (itemUpdate) {
+      await AdminOrderService.updateOrderItem(
+        updateItemData.id,
+        updateItemData
+      );
+    }
+    onClose();
   };
 
   const handleChange = (section, field, value) => {
     setFormData((prev) => {
       if (section === "root") {
+        setItemUpdate(true);
         return { ...prev, [field]: value };
       }
       if (section === "product") {
+        setItemUpdate(true);
+
         return { ...prev, product: { ...prev.product, [field]: value } };
       }
       if (section === "order") {
+        setOrderUpdate(true);
         return { ...prev, order: { ...prev.order, [field]: value } };
       }
       if (section === "consumer_address") {
+        setOrderUpdate(true);
+
         return {
           ...prev,
           order: {
@@ -182,6 +200,8 @@ const OrderEditForm = ({ orderData, onClose }) => {
         };
       }
       if (section === "vendor_address") {
+        setOrderUpdate(true);
+
         return {
           ...prev,
           order: {
@@ -517,7 +537,6 @@ const AdminOrders = () => {
 
       const response = await AdminOrderService.getOrderByFilter(payload);
 
-      // Handle the nested structure described in prompt: { data: [ { id, order: {...}, product: {...} } ], ... }
       setOrders(response.data || []);
     } catch (error) {
       console.error("Error fetching admin orders:", error);
@@ -558,11 +577,6 @@ const AdminOrders = () => {
 
     return res;
   }, [orders, statusFilter, sortBy]);
-
-  // Handler for clearing specific filters
-  const clearFilter = (key) => {
-    setFilters((prev) => ({ ...prev, [key]: null }));
-  };
 
   const statusOptions = [
     "all",
@@ -782,9 +796,6 @@ const AdminOrders = () => {
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    Action
-                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -849,11 +860,6 @@ const AdminOrders = () => {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {formatDate(item.created_at)}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="text-gray-400 group-hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-full">
-                        <i className="fas fa-edit"></i>
-                      </button>
                     </td>
                   </tr>
                 ))}
