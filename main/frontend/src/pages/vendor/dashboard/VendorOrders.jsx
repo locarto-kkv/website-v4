@@ -260,6 +260,9 @@ const VendorOrders = () => {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                       Date
                     </th>
+                    <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Action
+                    </th>
                   </tr>
                 </thead>
 
@@ -286,6 +289,11 @@ const VendorOrders = () => {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {formatDate(order.created_at)}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button className="text-gray-400 group-hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-full">
+                          <i className="fas fa-edit"></i>
+                        </button>
                       </td>
                     </tr>
                   ))}

@@ -143,7 +143,7 @@ const SearchDropdown = ({
 
 // --- Edit Form Component ---
 
-const OrderEditForm = ({ orderData, onClose }) => {
+const OrderEditForm = ({ orderData, onClose, onUpdate }) => {
   const [orderUpdate, setOrderUpdate] = useState(false);
   const [itemUpdate, setItemUpdate] = useState(false);
 
@@ -168,7 +168,7 @@ const OrderEditForm = ({ orderData, onClose }) => {
         );
       }
       toast.success("Order data updated successfully");
-      onClose();
+      onUpdate();
     } catch (error) {
       console.error("Update failed", error);
       toast.error("Failed to update order");
@@ -457,11 +457,7 @@ const OrderEditForm = ({ orderData, onClose }) => {
                     placeholder="Label (e.g. Home)"
                     value={formData.order?.consumer_address?.label || ""}
                     onChange={(e) =>
-                      handleChange(
-                        "consumer_address",
-                        "label",
-                        e.target.value
-                      )
+                      handleChange("consumer_address", "label", e.target.value)
                     }
                     className="w-full p-2 border rounded-lg text-sm col-span-2"
                   />
@@ -495,11 +491,7 @@ const OrderEditForm = ({ orderData, onClose }) => {
                     placeholder="State"
                     value={formData.order?.consumer_address?.state || ""}
                     onChange={(e) =>
-                      handleChange(
-                        "consumer_address",
-                        "state",
-                        e.target.value
-                      )
+                      handleChange("consumer_address", "state", e.target.value)
                     }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
@@ -520,11 +512,7 @@ const OrderEditForm = ({ orderData, onClose }) => {
                   placeholder="Country"
                   value={formData.order?.consumer_address?.country || ""}
                   onChange={(e) =>
-                    handleChange(
-                      "consumer_address",
-                      "country",
-                      e.target.value
-                    )
+                    handleChange("consumer_address", "country", e.target.value)
                   }
                   className="w-full p-2 border rounded-lg text-sm"
                 />
@@ -545,11 +533,7 @@ const OrderEditForm = ({ orderData, onClose }) => {
                     placeholder="Email"
                     value={formData.order?.consumer_address?.email || ""}
                     onChange={(e) =>
-                      handleChange(
-                        "consumer_address",
-                        "email",
-                        e.target.value
-                      )
+                      handleChange("consumer_address", "email", e.target.value)
                     }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
@@ -628,11 +612,7 @@ const OrderEditForm = ({ orderData, onClose }) => {
                     placeholder="Contact Phone"
                     value={formData.order?.vendor_address?.phone_no || ""}
                     onChange={(e) =>
-                      handleChange(
-                        "vendor_address",
-                        "phone_no",
-                        e.target.value
-                      )
+                      handleChange("vendor_address", "phone_no", e.target.value)
                     }
                     className="w-full p-2 border rounded-lg text-sm"
                   />
@@ -959,6 +939,9 @@ const AdminOrders = () => {
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -1023,6 +1006,11 @@ const AdminOrders = () => {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {formatDate(item.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button className="text-gray-400 group-hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-full">
+                        <i className="fas fa-edit"></i>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -1098,7 +1086,8 @@ const AdminOrders = () => {
       {selectedOrder && (
         <OrderEditForm
           orderData={selectedOrder}
-          onClose={() => {
+          onClose={() => setSelectedOrder(null)}
+          onUpdate={() => {
             setSelectedOrder(null);
             setRefresh((prev) => !prev);
           }}
