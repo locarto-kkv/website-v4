@@ -524,7 +524,8 @@ const AdminOrders = () => {
   const [viewMode, setViewMode] = useState("table");
   const [sortBy, setSortBy] = useState("recent");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedOrder, setSelectedOrder] = useState(null); // For modal
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [refresh, setRefresh] = useState(false);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -548,7 +549,7 @@ const AdminOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [filters]);
+  }, [filters, refresh]);
 
   // Derived filtered & sorted list
   const filteredAndSortedOrders = useMemo(() => {
@@ -935,7 +936,10 @@ const AdminOrders = () => {
       {selectedOrder && (
         <OrderEditForm
           orderData={selectedOrder}
-          onClose={() => setSelectedOrder(null)}
+          onClose={() => {
+            setSelectedOrder(null);
+            setRefresh((prev) => !prev);
+          }}
         />
       )}
     </div>
