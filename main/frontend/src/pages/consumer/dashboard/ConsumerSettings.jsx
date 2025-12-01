@@ -53,7 +53,6 @@ const CustomerSettings = () => {
     phone_no: "",
     address_line_1: "",
     address_line_2: "",
-    city: "",
     state: "",
     pincode: "",
     country: "",
@@ -76,7 +75,6 @@ const CustomerSettings = () => {
         phone_no: profile.phone_no || "",
         address_line_1: currentAddr.address_line_1 || "",
         address_line_2: currentAddr.address_line_2 || "",
-        city: currentAddr.city || "",
         state: currentAddr.state || "",
         pincode: currentAddr.pincode || "",
         country: currentAddr.country || "India",
@@ -95,8 +93,6 @@ const CustomerSettings = () => {
     toast.loading("Saving changes...");
 
     try {
-      // Construct payload based on backend expectations
-      // We send both parts, but updated with new form data
       const payload = {
         profile: {
           name: formData.name,
@@ -104,9 +100,9 @@ const CustomerSettings = () => {
           phone_no: formData.phone_no,
         },
         address: {
+          id: profile.address[0]?.id,
           address_line_1: formData.address_line_1,
           address_line_2: formData.address_line_2,
-          city: formData.city,
           state: formData.state,
           pincode: formData.pincode,
           country: formData.country,
@@ -147,7 +143,6 @@ const CustomerSettings = () => {
         phone_no: profile.phone_no || "",
         address_line_1: currentAddr.address_line_1 || "",
         address_line_2: currentAddr.address_line_2 || "",
-        city: currentAddr.city || "",
         state: currentAddr.state || "",
         pincode: currentAddr.pincode || "",
         country: currentAddr.country || "India",
@@ -164,7 +159,6 @@ const CustomerSettings = () => {
   const displayAddress = [
     formData.address_line_1,
     formData.address_line_2,
-    formData.city,
     formData.state,
     formData.pincode,
   ]
@@ -305,14 +299,6 @@ const CustomerSettings = () => {
               isEditing={editingSection === "address"}
             />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-              <EditableInput
-                label="City"
-                id="city"
-                name="city"
-                value={formData.city}
-                onChange={handleInputChange}
-                isEditing={editingSection === "address"}
-              />
               <EditableInput
                 label="State"
                 id="state"

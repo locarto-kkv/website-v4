@@ -13,6 +13,13 @@ export const ConsumerProfileService = {
     return response.data;
   },
 
+  deleteAddress: async (addressId) => {
+    const response = await axiosInstance.delete(
+      `${BASE_URL}/delete-address/${addressId}`
+    );
+    return response.data;
+  },
+
   deleteProfile: async () => {
     const response = await axiosInstance.delete(`${BASE_URL}/delete`);
     return response.data;

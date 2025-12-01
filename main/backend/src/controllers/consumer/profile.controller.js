@@ -73,6 +73,29 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+export const deleteAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params;
+    const userId = req.user.id;
+
+    await db
+      .from("addresses")
+      .delete()
+      .eq("id", addressId)
+      .eq("consumer_id", userId);
+
+    res.status(200).json({ message: "Address Deleted Successfully" });
+  } catch (error) {
+    logger({
+      level: "error",
+      message: error.message,
+      location: __filename,
+      func: "deleteAddress",
+    });
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const deleteProfile = async (req, res) => {
   try {
     const userId = req.user.id;
