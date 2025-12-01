@@ -67,8 +67,6 @@ begin
     payment_mode,
     amount,
     payment_date,
-    vendor_address_id,
-    consumer_address_id,
     delivery_fee,
     consumer_address,
     vendor_address
@@ -80,8 +78,6 @@ begin
     payment_mode,
     amount,
     payment_date,
-    vendor_address_id,
-    consumer_address_id,
     delivery_fee,
     consumer_addr_json, 
     vendor_addr_json
