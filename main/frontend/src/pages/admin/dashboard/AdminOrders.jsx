@@ -9,6 +9,7 @@ import {
   formatDate,
   getOrderStatusConfig,
 } from "../../../lib/utils";
+import { VendorOrderService } from "../../../services/vendor/vendorOrderService";
 
 // --- Helper Components ---
 
@@ -152,7 +153,9 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
   const handleSubmit = () => {
     // Filter out empty values
     const cleanedData = Object.fromEntries(
-      Object.entries(formData).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+      Object.entries(formData).filter(
+        ([_, v]) => v !== "" && v !== null && v !== undefined
+      )
     );
 
     if (Object.keys(cleanedData).length === 0) {
@@ -162,7 +165,7 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
 
     console.log("Bulk Update FormData:", cleanedData);
     toast.success("Bulk update initiated (Check console)");
-    onUpdate(cleanedData); // Pass data back to parent if needed for API logic later
+    onUpdate(cleanedData);
   };
 
   return (
@@ -173,7 +176,10 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
             <i className="fas fa-layer-group text-orange-500"></i>
             Bulk Update Orders
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
             <i className="fas fa-times text-xl"></i>
           </button>
         </div>
@@ -182,9 +188,11 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
           <p className="text-sm text-gray-600 mb-2">
             Only filled fields will be updated for the selected orders.
           </p>
-          
+
           <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-1">Order Status</label>
+            <label className="text-xs font-semibold text-gray-500 block mb-1">
+              Order Status
+            </label>
             <select
               onChange={(e) => handleChange("order_status", e.target.value)}
               className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500"
@@ -201,7 +209,9 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-1">Payment Status</label>
+            <label className="text-xs font-semibold text-gray-500 block mb-1">
+              Payment Status
+            </label>
             <select
               onChange={(e) => handleChange("payment_status", e.target.value)}
               className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500"
@@ -217,7 +227,9 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-1">Support Status</label>
+            <label className="text-xs font-semibold text-gray-500 block mb-1">
+              Support Status
+            </label>
             <select
               onChange={(e) => handleChange("support_status", e.target.value)}
               className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500"
@@ -229,11 +241,13 @@ const BulkOrderUpdateForm = ({ onClose, onUpdate }) => {
               <option value="resolved">Resolved</option>
             </select>
           </div>
-          
+
           <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-1">Shipping Label / Note</label>
-            <input 
-              type="text" 
+            <label className="text-xs font-semibold text-gray-500 block mb-1">
+              Shipping Label / Note
+            </label>
+            <input
+              type="text"
               placeholder="Enter text to apply to all..."
               onChange={(e) => handleChange("shipping_label", e.target.value)}
               className="w-full p-2.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500"
@@ -884,16 +898,15 @@ const AdminOrders = () => {
     setSelectionMode(false);
   };
 
-  const handleBulkUpdateSubmit = (updatedData) => {
-    console.log("Submitting bulk update for IDs:", [...selectedIds]);
+  const handleBulkUpdateSubmit = async (updatedData) => {
+    console.log(selectedIds);
     console.log("Data:", updatedData);
-    
-    // Cleanup
+
+    await VendorOrderService.updateOrderStatus([...selectedIds], updatedData);
     setShowBulkModal(false);
     handleCancelSelection();
-    
-    // In a real app, you would call an API here and then:
-    setRefresh(prev => !prev);
+
+    setRefresh((prev) => !prev);
   };
 
   const statusOptions = [
@@ -1090,7 +1103,7 @@ const AdminOrders = () => {
             </div>
             <span className="font-medium">Items Selected</span>
           </div>
-          
+
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <button
               onClick={handleSelectAll}
@@ -1186,7 +1199,9 @@ const AdminOrders = () => {
                                 : "bg-white border-gray-300"
                             }`}
                           >
-                            {isSelected && <i className="fas fa-check text-xs"></i>}
+                            {isSelected && (
+                              <i className="fas fa-check text-xs"></i>
+                            )}
                           </div>
                         </td>
                       )}
@@ -1247,7 +1262,7 @@ const AdminOrders = () => {
                         {formatDate(item.created_at)}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button 
+                        <button
                           className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-medium text-sm transition-colors group-hover:shadow-sm"
                           onClick={(e) => handleEditClick(e, item)}
                         >
@@ -1271,13 +1286,19 @@ const AdminOrders = () => {
                 key={item.id}
                 onClick={() => handleRowClick(item)}
                 className={`bg-white rounded-2xl p-5 border shadow-sm transition-all cursor-pointer flex flex-col group relative ${
-                  isSelected ? "border-orange-500 ring-2 ring-orange-200" : "border-gray-200 hover:border-orange-300 hover:shadow-md"
+                  isSelected
+                    ? "border-orange-500 ring-2 ring-orange-200"
+                    : "border-gray-200 hover:border-orange-300 hover:shadow-md"
                 }`}
               >
                 {selectionMode && (
-                  <div className={`absolute top-4 right-4 w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
-                    isSelected ? "bg-orange-500 border-orange-500 text-white" : "bg-white border-gray-300"
-                  }`}>
+                  <div
+                    className={`absolute top-4 right-4 w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
+                      isSelected
+                        ? "bg-orange-500 border-orange-500 text-white"
+                        : "bg-white border-gray-300"
+                    }`}
+                  >
                     {isSelected && <i className="fas fa-check text-xs"></i>}
                   </div>
                 )}
@@ -1328,7 +1349,7 @@ const AdminOrders = () => {
                 </div>
 
                 <div className="pt-4 border-t border-gray-100 flex justify-end">
-                  <button 
+                  <button
                     onClick={(e) => handleEditClick(e, item)}
                     className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-blue-600 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2"
                   >
@@ -1355,7 +1376,7 @@ const AdminOrders = () => {
 
       {/* Bulk Update Modal */}
       {showBulkModal && (
-        <BulkOrderUpdateForm 
+        <BulkOrderUpdateForm
           onClose={() => setShowBulkModal(false)}
           onUpdate={handleBulkUpdateSubmit}
         />
