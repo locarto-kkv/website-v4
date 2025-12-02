@@ -115,11 +115,54 @@ const CheckoutPage = () => {
     setShowNewAddressForm(false);
   };
 
+  // Fetch address from coordinates (reverse geocode)
+  const fetchAddress = async (lat, lng) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
+      );
+      const data = await response.json();
+
+      if (data && data.address) {
+        return data.address;
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddNewAddress = () => {
+    setLoading(true);
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        const data = await fetchAddress(latitude, longitude);
+
+        setFormData((prev) => ({
+          ...prev,
+          country: data.country ?? "",
+          state: data.state ?? "",
+          pincode: data.postcode ?? "",
+        }));
+      },
+      (err) => {
+        console.log(`Error: ${err.message}`);
+      }
+    );
+
+    setLoading(false);
     setFormData((prev) => ({
       ...prev,
-      email: "",
-      phone_no: "",
+      email: profile.email,
+      phone_no: profile.phone_no ?? "",
       address_line_1: "",
       address_line_2: "",
       country: "",
@@ -127,7 +170,6 @@ const CheckoutPage = () => {
       pincode: "",
       label: "",
     }));
-    setSelectedAddress(null);
     setShowNewAddressForm(true);
   };
 
@@ -324,8 +366,6 @@ const CheckoutPage = () => {
       vendor_address_id: brand?.address[0]?.id,
       address: selectedAddress,
     };
-
-    console.log(order);
 
     const updatedOrders = await ConsumerOrderService.placeOrder(order);
     await clearList("cart");
