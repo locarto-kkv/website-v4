@@ -38,15 +38,13 @@ export const getOrders = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
   try {
-    const { orderItemId } = req.params;
-    const { order_status } = req.body;
+    const { order_status, itemIds } = req.body;
 
     const { data: updatedOrder } = await db
       .from("order_items")
-      .update({ order_status })
-      .eq("id", orderItemId)
-      .select()
-      .single();
+      .update(order_status)
+      .in("id", itemIds)
+      .select();
 
     res.status(200).json(updatedOrder);
   } catch (error) {

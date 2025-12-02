@@ -8,11 +8,11 @@ export const VendorOrderService = {
     return response.data;
   },
 
-  updateOrderStatus: async (orderId, order_status) => {
-    const response = await axiosInstance.put(
-      `${BASE_URL}/update-status/${orderId}`,
-      order_status
-    );
+  updateOrderStatus: async (itemIds, order_status) => {
+    const response = await axiosInstance.put(`${BASE_URL}/update-status/`, {
+      itemIds,
+      order_status,
+    });
     return response.data;
   },
 };

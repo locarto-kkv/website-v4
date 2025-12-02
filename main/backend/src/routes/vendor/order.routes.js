@@ -8,10 +8,6 @@ import {
 const router = Router();
 
 router.get("/", protectRoute("vendor"), getOrders);
-router.patch(
-  "/update-status/:orderItemId",
-  protectRoute("vendor"),
-  updateOrderStatus
-);
+router.put("/update-status/", protectRoute("vendor"), updateOrderStatus);
 
 export default router;
