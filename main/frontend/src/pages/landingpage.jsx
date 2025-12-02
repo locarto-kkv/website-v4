@@ -1,4 +1,3 @@
-// src/pages/landingpage.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore.jsx";
@@ -381,31 +380,39 @@ const LandingPage = () => {
             {/* Search Bar */}
             <form
               onSubmit={handleSearch}
-              className="relative inline-block group w-full max-w-2xl mx-auto px-2 sm:px-0"
+              className="relative inline-block group w-full max-w-3xl mx-auto px-2 sm:px-0"
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-full blur-lg sm:blur-xl opacity-20 scale-105 group-hover:opacity-30 transition-all duration-500"></div>
-                <div className="relative bg-white rounded-full shadow-xl sm:shadow-2xl group-hover:shadow-3xl transition-all duration-500 border border-gray-100 group-hover:border-orange-200 flex items-center">
+                <div className="relative bg-white rounded-full shadow-xl sm:shadow-2xl group-hover:shadow-3xl transition-all duration-500 border border-gray-100 group-hover:border-orange-200 flex items-center p-1.5">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={handleInputChange}
                     placeholder="Search for a product, or brand...."
-                    className="flex-grow px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 md:py-5 pr-2 rounded-l-full focus:outline-none text-gray-900 placeholder-gray-400 bg-transparent text-xs sm:text-base md:text-lg font-medium"
+                    className="flex-grow px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 md:py-4 rounded-l-full focus:outline-none text-gray-900 placeholder-gray-400 bg-transparent text-xs sm:text-base md:text-lg font-medium min-w-0"
                   />
+                  
+                  {/* --- DISCOVER BUTTON (Map) --- */}
                   <Link
                     to="/map"
-                    className="mx-1.5 sm:mx-3 h-7 sm:h-9 md:h-10 px-3 sm:px-5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center hover:from-blue-600 hover:to-purple-600 transition-all duration-300 hover:scale-105 transform shadow-lg hover:shadow-xl text-[10px] sm:text-sm font-semibold whitespace-nowrap"
-                    title="Explore Map"
+                    className="flex items-center gap-2 mx-1.5 px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 text-xs sm:text-sm font-bold whitespace-nowrap"
+                    title="View on Map"
                   >
-                    Explore
+                     <i className="fas fa-map-marked-alt text-white"></i>
+                     <span className="hidden sm:inline">Discover</span>
                   </Link>
-                  <div className="pr-1.5 sm:pr-3 md:pr-4 group-hover:scale-110 transition-transform duration-300">
+
+                  {/* --- SEARCH BUTTON --- */}
+                  <div className="pr-1">
                     <button
                       type="submit"
-                      className="w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg focus:outline-none"
+                      className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 text-xs sm:text-sm font-bold whitespace-nowrap"
                     >
-                      <SearchIcon />
+                      <div className="w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
+                          <SearchIcon />
+                      </div>
+                      <span>Search</span>
                     </button>
                   </div>
                 </div>
