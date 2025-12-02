@@ -8,8 +8,8 @@ import { useConsumerDataStore } from "./store/consumer/consumerDataStore";
 import { useVendorDataStore } from "./store/vendor/vendorDataStore";
 
 // Public Pages
-import HomePage from "./pages/HomePage";
-import LandingPage from "./pages/LandingPage";
+import HomePage from "./pages/Homepage";
+import LandingPage from "./pages/landingpage";
 import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
 import BrandInfoPage from "./pages/BrandInfoPage";
@@ -18,6 +18,7 @@ import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import ShopProducts from "./pages/consumer/ShopProducts";
 import ProductViewPage from "./pages/ProductViewPage";
 import AlertsPage from "./pages/AlertsPage";
+import SearchResultsPage from "./pages/SearchResultsPage"; // New Import
 
 // Other Routes
 import VendorRoutes from "./pages/vendor/vendorRoutes";
@@ -80,6 +81,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/map" element={<MapView />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/search" element={<SearchResultsPage />} /> {/* New Route */}
         <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
         <Route
@@ -105,7 +107,6 @@ function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
-      {/* CHANGED: Added toastOptions to set global duration to 2000ms */}
       <Toaster
         toastOptions={{
           duration: 2000,

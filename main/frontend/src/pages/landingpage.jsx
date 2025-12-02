@@ -1,4 +1,4 @@
-// src/pages/LandingPage.jsx
+// src/pages/landingpage.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore.jsx";
@@ -43,14 +43,14 @@ const LandingPage = () => {
 
   const availableCategories = ["personal care", "accessories"];
 
-  // Function to handle email submission (copied from RegisterSocial)
+  // Function to handle email submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     await submitBeta(betaForm);
-    setBetaForm({ name: "", email: "" }); // Optionally clear email field after submission
+    setBetaForm({ name: "", email: "" });
   };
 
-  // 🟢 MODIFIED: handle live search input + API call
+  // handle live search input + API call
   const handleInputChange = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -100,25 +100,15 @@ const LandingPage = () => {
     setShowDropdown(false);
   };
 
+  // --- UPDATED SEARCH HANDLER ---
   const handleSearch = (e) => {
     e.preventDefault();
-
-    if (searchQuery.trim() === "") {
-      return;
-    }
-
-    const normalizedQuery = searchQuery.toLowerCase().trim();
-    const foundCategory = availableCategories.find((category) =>
-      category.includes(normalizedQuery)
-    );
-
-    if (foundCategory) {
-      navigate(`/map?category=${foundCategory.replace(" ", "%20")}`);
-    } else {
-      setShowError(true);
-      setSuggestedCategory(availableCategories[0]);
+    // Redirect to search results page if query is not empty
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+  // ------------------------------
 
   useEffect(() => {
     if (currentUser?.type === "consumer") {
@@ -420,7 +410,7 @@ const LandingPage = () => {
                   </div>
                 </div>
 
-                {/* 🟢 Dropdown Results */}
+                {/* Dropdown Results */}
                 {showDropdown && (
                   <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-72 overflow-y-auto z-50 text-left">
                     {searchResults.products.length === 0 &&
