@@ -10,4 +10,12 @@ export const ConsumerSearchService = {
 
     return response.data;
   },
+
+  getSimilarResults: async (query) => {
+    const response = await axiosInstance.get(`${BASE_URL}/similar`, {
+      params: { query },
+    });
+
+    return response.data;
+  },
 };

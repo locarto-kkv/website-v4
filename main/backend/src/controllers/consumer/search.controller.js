@@ -73,22 +73,38 @@ export const getSearchResults = async (req, res) => {
 // get similar products based on current user query
 export const getSimilarResults = async (req, res) => {
   try {
-    const query = req.query;
+    const { query } = req.query;
     const limit = 6;
 
     const searchPattern = `%${query}%`;
     // const embedding = await getEmbedding(query);
 
-    const { data: queryProducts, error: queryError } = await db
+    const { data: products, error: productError } = await db
       .from("products")
-      .select("id, name, product_uuid")
+      .select()
       .eq("base", true)
       .ilike("name", searchPattern)
       .order("name", { ascending: true })
       .limit(limit);
 
+    if (productError) throw productError;
+
+    const { data: vendors, error: vendorError } = await db
+      .from("vendors")
+      .select(
+        "id, name, email, phone_no, brand_logo_1, brand_logo_2, status, website"
+      )
+      .eq("status", "verified")
+      .ilike("name", searchPattern)
+      .order("name", { ascending: true })
+      .limit(limit);
+
+    if (vendorError) throw vendorError;
+
+    const results = { products, vendors };
+
     // const {data: similarProducts, error: similarError} = db.rpc("", {embedding, limit})
-    // return res.status(200).json(queryProducts, similarProducts);
+    return res.status(200).json(results);
   } catch (error) {
     logger({
       level: "error",

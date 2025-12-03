@@ -8,7 +8,7 @@ import { useConsumerDataStore } from "./store/consumer/consumerDataStore";
 import { useVendorDataStore } from "./store/vendor/vendorDataStore";
 
 // Public Pages
-import HomePage from "./pages/Homepage";
+import HomePage from "./pages/HomePage";
 import LandingPage from "./pages/landingpage";
 import MapView from "./components/MapView";
 import DiscoverPage from "./pages/DiscoverPage";
@@ -81,7 +81,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/map" element={<MapView />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/search" element={<SearchResultsPage />} /> {/* New Route */}
+        <Route path="/search" element={<SearchResultsPage />} />{" "}
+        {/* New Route */}
         <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
         <Route
@@ -95,13 +96,10 @@ function App() {
           element={<TermsAndConditionsPage />}
         />
         <Route path="/alerts" element={<AlertsPage />} />
-
         {/* --- ADMIN ROUTES --- */}
         <Route path="admin/*" element={<AdminRoutes />} />
-
         {/* --- VENDOR ROUTES --- */}
         <Route path="vendor/*" element={<VendorRoutes />} />
-
         {/* --- CONSUMER ROUTES --- */}
         <Route path="consumer/*" element={<ConsumerRoutes />} />
         <Route path="*" element={<NotFoundPage />} />
