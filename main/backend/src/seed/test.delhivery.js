@@ -105,7 +105,7 @@ async function testAll() {
     });
     console.log(shipmentRes);
     return;
-    const finalWaybill = shipmentRes.packages?.[0]?.waybill || fallbackWB;
+    const finalWaybill = shipmentRes.packages?.[0]?.waybill;
 
     /* ------------------------------------------
      * 8️⃣ UPDATE SHIPMENT

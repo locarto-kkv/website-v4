@@ -102,6 +102,124 @@ const VendorBulkOrderUpdateForm = ({ onClose, onUpdate }) => {
   );
 };
 
+const VendorOrderEditForm = ({ orderData, onClose, onUpdate }) => {
+  const [status, setStatus] = useState(orderData.order_status || "pending");
+
+  const handleSubmit = async () => {
+    // Only allow specific updates
+    const validStatuses = [
+      "confirmed",
+      "ready-for-pickup",
+      "shipped",
+      "cancelled",
+    ];
+
+    // Allow saving if status changed, even if it's currently something else,
+    // but ensure the *new* status is valid.
+    if (!validStatuses.includes(status)) {
+      toast.error("Invalid status selection.");
+      return;
+    }
+
+    try {
+      const payload = { order_status: status };
+      // Pass payload to onUpdate
+      onUpdate(payload);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4 flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <i className="fas fa-edit text-white"></i>
+              Update Order Status
+            </h2>
+            <p className="text-white/80 text-xs mt-1">
+              Item #{orderData.id} • Order #{orderData.order_id}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-white/80 hover:text-white transition-colors"
+          >
+            <i className="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <div className="p-6 bg-gray-50 space-y-6">
+          {/* Read-Only Info */}
+          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex gap-4">
+            <div className="w-16 h-16 bg-gray-100 rounded-lg shrink-0 overflow-hidden border">
+              <img
+                src={
+                  orderData.product?.product_images?.[0]?.url ||
+                  "https://placehold.co/100"
+                }
+                alt="Product"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm">
+                {orderData.product?.name}
+              </h3>
+              <p className="text-xs text-gray-500">Qty: {orderData.quantity}</p>
+              <p className="text-sm font-semibold text-orange-600 mt-1">
+                {formatCurrency(orderData.order?.amount)}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-500 block mb-2">
+              Select New Status
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full p-3 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="pending" disabled>
+                Pending
+              </option>
+              <option value="confirmed">Confirmed</option>
+              <option value="ready-for-pickup">Ready for Pickup</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered" disabled>
+                Delivered (System Update Only)
+              </option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <p className="text-xs text-gray-400 mt-2">
+              * Note: Delivered status is updated by logistics partners.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-gray-100 px-6 py-4 flex justify-end gap-3 border-t border-gray-200">
+          <button
+            onClick={onClose}
+            className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-white transition-all text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-sm"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- Main Component ---
 
 const VendorOrders = () => {
@@ -112,6 +230,7 @@ const VendorOrders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");
   const [viewMode, setViewMode] = useState("table");
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // Selection & Modal States
   const [selectionMode, setSelectionMode] = useState(false);
@@ -171,6 +290,16 @@ const VendorOrders = () => {
 
   // --- Handlers ---
 
+  const handleEditClick = (e, itemData) => {
+    e.stopPropagation();
+
+    const fullOrderData = {
+      ...itemData.item,
+      order: itemData.order,
+    };
+    setSelectedOrder(fullOrderData);
+  };
+
   const handleRowClick = (item) => {
     if (selectionMode) {
       const newSelected = new Set(selectedIds);
@@ -210,6 +339,14 @@ const VendorOrders = () => {
       console.error("Update error:", error);
       toast.error("Failed to update some orders.");
     }
+  };
+
+  const handleSingleUpdateSubmit = async (updateData) => {
+    toast.loading("Updating order...");
+    await performUpdate([selectedOrder.id], updateData);
+
+    toast.dismiss();
+    setSelectedOrder(null);
   };
 
   const handleBulkUpdateSubmit = async (updateData) => {
@@ -446,6 +583,9 @@ const VendorOrders = () => {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                       Date
                     </th>
+                    <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Action
+                    </th>
                   </tr>
                 </thead>
 
@@ -495,6 +635,14 @@ const VendorOrders = () => {
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-500">
                           {formatDate(order.created_at)}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={(e) => handleEditClick(e, { order, item })}
+                            className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-medium text-xs transition-colors"
+                          >
+                            <i className="fas fa-edit mr-1"></i> Edit
+                          </button>
                         </td>
                       </tr>
                     );
@@ -556,10 +704,27 @@ const VendorOrders = () => {
                 <p className="text-sm text-gray-700 mb-1">
                   <strong>Date:</strong> {formatDate(order.created_at)}
                 </p>
+                <div className="pt-4 border-t border-gray-100 flex justify-end">
+                  <button
+                    onClick={(e) => handleEditClick(e, { order, item })}
+                    className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-blue-600 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <i className="fas fa-edit"></i> Update Status
+                  </button>
+                </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {/* Edit Form Overlay (Single Item) */}
+      {selectedOrder && (
+        <VendorOrderEditForm
+          orderData={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+          onUpdate={handleSingleUpdateSubmit}
+        />
       )}
 
       {/* Bulk Update Modal */}
