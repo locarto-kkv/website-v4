@@ -427,8 +427,9 @@ const VendorOrderEditForm = ({ orderData, onClose, onUpdate }) => {
                 <span className="font-bold text-gray-800">
                   "ready-for-pickup"
                 </span>{" "}
-                will generate a pickup request to the vendor address displayed in
-                the order info form. Are you sure you want to update the status?
+                will generate a pickup request to the vendor address displayed
+                in the order info form. Are you sure you want to update the
+                status?
               </p>
               <div className="flex gap-3 w-full">
                 <button
@@ -563,7 +564,7 @@ const VendorOrders = () => {
 
   const performUpdate = async (ids, updateData) => {
     try {
-      await VendorOrderService.updateOrderStatus(ids, updateData.order_status);
+      await VendorOrderService.updateOrderStatus(ids, updateData);
 
       toast.success("Orders updated successfully");
       await fetchOrders(); // Refresh data

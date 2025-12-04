@@ -106,7 +106,7 @@ const BrandInfoPage = () => {
       <div className="mt-28 mb-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-[#0D1539]/40 overflow-hidden flex justify-center items-center max-w-3xl mx-4 sm:mx-auto h-48 sm:h-56 md:h-72 relative z-10 animate-[fadeIn_0.8s_ease-in]">
         {
           <img
-            src={brand.brand_logo}
+            src={brand.blog_image}
             alt={brand.title}
             className="absolute inset-0 w-full h-full object-contain"
           />
