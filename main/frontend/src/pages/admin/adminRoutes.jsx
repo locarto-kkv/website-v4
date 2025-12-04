@@ -6,6 +6,7 @@ import AuthAdmin from "./authAdmin";
 import AdminDashboardLayout from "./dashboard/adminDashboardLayout";
 import AdminOrders from "./dashboard/AdminOrders";
 import AdminBlogs from "./dashboard/AdminBlogs";
+import AdminVendors from "./dashboard/AdminVendors"; // Import the new component
 import NotFoundPage from "../NotFoundPage";
 
 // ... commented out imports kept for reference
@@ -58,6 +59,9 @@ const AdminRoutes = () => {
           
           {/* Legacy orders route redirects to dashboard */}
           <Route path="orders" element={<Navigate to="/admin/dashboard" replace />} />
+
+          {/* Vendors Management Route */}
+          <Route path="vendors" element={<AdminVendors />} />
           
           {/* Blogs Management Route */}
           <Route path="blogs" element={<AdminBlogs />} />

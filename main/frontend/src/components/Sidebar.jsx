@@ -93,7 +93,7 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
     headerDetails = {
       title: "Customer Portal",
       icon: "fas fa-user",
-      gradient: "from-orange-500 to-red-500", // Using same gradient as vendor for consistency
+      gradient: "from-orange-500 to-red-500", 
     };
     menuItems = [
       {
@@ -147,9 +147,15 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
     menuItems = [
       {
         id: "dashboard",
-        label: "Dashboard",
-        icon: "fas fa-th-large",
+        label: "Orders", // Renamed dashboard to Orders for clarity based on your previous file
+        icon: "fas fa-shopping-cart", // Changed icon to match orders
         path: "/admin/dashboard",
+      },
+      {
+        id: "vendors",
+        label: "Vendors",
+        icon: "fas fa-store",
+        path: "/admin/vendors",
       },
       {
         id: "blogs",
@@ -157,17 +163,11 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
         icon: "fas fa-newspaper",
         path: "/admin/blogs",
       },
-      {
-        id: "users",
-        label: "Users",
-        icon: "fas fa-users-cog",
-        path: "/admin/users",
-      }, // Example
       // {
-      //   id: "content",
-      //   label: "Content",
-      //   icon: "fas fa-edit",
-      //   path: "/admin/content",
+      //   id: "users",
+      //   label: "Users",
+      //   icon: "fas fa-users-cog",
+      //   path: "/admin/users",
       // }, 
     ];
   }
@@ -176,7 +176,6 @@ const Sidebar = ({ onNavigate, isOpen, onClose }) => {
     return activePath.startsWith(itemPath);
   };
 
-  // Handle navigation and close sidebar on mobile
   const handleNavigation = (path) => {
     navigate(path);
     if (onClose) onClose();

@@ -102,10 +102,12 @@ const VendorBulkOrderUpdateForm = ({ onClose, onUpdate }) => {
   );
 };
 
+// --- Enhanced Edit Form Component ---
 const VendorOrderEditForm = ({ orderData, onClose, onUpdate }) => {
   const [status, setStatus] = useState(orderData.order_status || "pending");
+  const [showPickupWarning, setShowPickupWarning] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSaveAttempt = () => {
     // Only allow specific updates
     const validStatuses = [
       "confirmed",
@@ -114,16 +116,25 @@ const VendorOrderEditForm = ({ orderData, onClose, onUpdate }) => {
       "cancelled",
     ];
 
-    // Allow saving if status changed, even if it's currently something else,
-    // but ensure the *new* status is valid.
     if (!validStatuses.includes(status)) {
       toast.error("Invalid status selection.");
       return;
     }
 
+    // Check if status is changing TO 'ready-for-pickup'
+    if (
+      status === "ready-for-pickup" &&
+      orderData.order_status !== "ready-for-pickup"
+    ) {
+      setShowPickupWarning(true);
+    } else {
+      submitUpdate();
+    }
+  };
+
+  const submitUpdate = () => {
     try {
       const payload = { order_status: status };
-      // Pass payload to onUpdate
       onUpdate(payload);
     } catch (error) {
       console.error(error);
@@ -132,12 +143,13 @@ const VendorOrderEditForm = ({ orderData, onClose, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4 flex justify-between items-center">
+      {/* --- Main Edit Modal --- */}
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden relative">
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4 flex justify-between items-center shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <i className="fas fa-edit text-white"></i>
-              Update Order Status
+              Manage Order
             </h2>
             <p className="text-white/80 text-xs mt-1">
               Item #{orderData.id} • Order #{orderData.order_id}
@@ -151,57 +163,239 @@ const VendorOrderEditForm = ({ orderData, onClose, onUpdate }) => {
           </button>
         </div>
 
-        <div className="p-6 bg-gray-50 space-y-6">
-          {/* Read-Only Info */}
-          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex gap-4">
-            <div className="w-16 h-16 bg-gray-100 rounded-lg shrink-0 overflow-hidden border">
-              <img
-                src={
-                  orderData.product?.product_images?.[0]?.url ||
-                  "https://placehold.co/100"
-                }
-                alt="Product"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-800 text-sm">
-                {orderData.product?.name}
+        <div className="flex-1 overflow-y-auto p-6 bg-gray-50 custom-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 1. Item & Product Details */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
+              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <i className="fas fa-box text-blue-500"></i> Item & Product
+                Details
               </h3>
-              <p className="text-xs text-gray-500">Qty: {orderData.quantity}</p>
-              <p className="text-sm font-semibold text-orange-600 mt-1">
-                {formatCurrency(orderData.order?.amount)}
-              </p>
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="w-32 h-32 bg-gray-100 rounded-lg shrink-0 overflow-hidden border">
+                  <img
+                    src={
+                      orderData.product?.product_images?.[0]?.url ||
+                      "https://placehold.co/150"
+                    }
+                    alt="Product"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Product Name
+                    </label>
+                    <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700">
+                      {orderData.product?.name || "N/A"}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Category
+                    </label>
+                    <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700">
+                      {orderData.product?.category || "N/A"}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Weight (g)
+                    </label>
+                    <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700">
+                      {orderData.product?.weight || 0}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Unit Price
+                    </label>
+                    <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700">
+                      {formatCurrency(orderData.product?.price)}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 block mb-1">
+                      Quantity
+                    </label>
+                    <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700">
+                      {orderData.quantity || 0}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-2">
-              Select New Status
-            </label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full p-3 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-orange-500"
-            >
-              <option value="pending" disabled>
-                Pending
-              </option>
-              <option value="confirmed">Confirmed</option>
-              <option value="ready-for-pickup">Ready for Pickup</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered" disabled>
-                Delivered (System Update Only)
-              </option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-            <p className="text-xs text-gray-400 mt-2">
-              * Note: Delivered status is updated by logistics partners.
-            </p>
+            {/* 2. Order Summary & Status */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
+              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <i className="fas fa-file-invoice-dollar text-green-500"></i>{" "}
+                Order Summary
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* EDITABLE STATUS */}
+                <div>
+                  <label className="text-xs font-bold text-orange-600 block mb-1">
+                    Order Status (Editable)
+                  </label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="w-full p-2 border-2 border-orange-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-orange-500 font-medium"
+                  >
+                    <option value="pending" disabled>
+                      Pending
+                    </option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="ready-for-pickup">Ready for Pickup</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered" disabled>
+                      Delivered (System Update)
+                    </option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Payment Status
+                  </label>
+                  <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700 capitalize">
+                    {orderData.payment_status || "Pending"}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Support Status
+                  </label>
+                  <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700 capitalize">
+                    {orderData.support_status || "Open"}
+                  </div>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Shipping Label / Tracking Info
+                  </label>
+                  <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700 min-h-[38px]">
+                    {orderData.order?.shipping_label || "N/A"}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Payment Mode
+                  </label>
+                  <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700 capitalize">
+                    {orderData.order?.payment_mode || "N/A"}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Delivery Fee
+                  </label>
+                  <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-700">
+                    {formatCurrency(orderData.order?.delivery_fee)}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">
+                    Total Amount (Order Level)
+                  </label>
+                  <div className="w-full p-2 border rounded-lg text-sm bg-gray-100 text-gray-900 font-bold">
+                    {formatCurrency(orderData.order?.amount)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Consumer Details */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <i className="fas fa-user text-purple-500"></i> Consumer Details
+              </h3>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2 text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span className="text-xs text-gray-500 block">Label</span>
+                    {orderData.order?.consumer_address?.label || "Home"}
+                  </div>
+                </div>
+                <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                  <span className="text-xs text-gray-500 block">Address</span>
+                  {orderData.order?.consumer_address?.address_line_1} <br />
+                  {orderData.order?.consumer_address?.address_line_2}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span className="text-xs text-gray-500 block">State</span>
+                    {orderData.order?.consumer_address?.state}
+                  </div>
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span className="text-xs text-gray-500 block">Pincode</span>
+                    {orderData.order?.consumer_address?.pincode}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span className="text-xs text-gray-500 block">Phone</span>
+                    {orderData.order?.consumer_address?.phone_no}
+                  </div>
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200 truncate">
+                    <span className="text-xs text-gray-500 block">Email</span>
+                    {orderData.order?.consumer_address?.email}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Vendor Details (Read-only pickup info) */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <i className="fas fa-store text-orange-500"></i> Pickup Location
+                (Your Info)
+              </h3>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2 text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span className="text-xs text-gray-500 block">Label</span>
+                    {orderData.order?.vendor_address?.label || "Main"}
+                  </div>
+                </div>
+                <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                  <span className="text-xs text-gray-500 block">Address</span>
+                  {orderData.order?.vendor_address?.address_line_1} <br />
+                  {orderData.order?.vendor_address?.address_line_2}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span className="text-xs text-gray-500 block">State</span>
+                    {orderData.order?.vendor_address?.state}
+                  </div>
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span className="text-xs text-gray-500 block">Pincode</span>
+                    {orderData.order?.vendor_address?.pincode}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200">
+                    <span className="text-xs text-gray-500 block">Phone</span>
+                    {orderData.order?.vendor_address?.phone_no}
+                  </div>
+                  <div className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-200 truncate">
+                    <span className="text-xs text-gray-500 block">Email</span>
+                    {orderData.order?.vendor_address?.email}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-gray-100 px-6 py-4 flex justify-end gap-3 border-t border-gray-200">
+        <div className="bg-gray-100 px-6 py-4 flex justify-end gap-3 border-t border-gray-200 shrink-0">
           <button
             onClick={onClose}
             className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-white transition-all text-sm"
@@ -209,13 +403,51 @@ const VendorOrderEditForm = ({ orderData, onClose, onUpdate }) => {
             Cancel
           </button>
           <button
-            onClick={handleSubmit}
+            onClick={handleSaveAttempt}
             className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-sm"
           >
             Save Changes
           </button>
         </div>
       </div>
+
+      {/* --- Warning Popup Overlay (Nested) --- */}
+      {showPickupWarning && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-in fade-in zoom-in duration-200">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-4">
+                <i className="fas fa-truck text-2xl"></i>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Initiate Pickup Request?
+              </h3>
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                Changing order status to{" "}
+                <span className="font-bold text-gray-800">
+                  "ready-for-pickup"
+                </span>{" "}
+                will generate a pickup request to the vendor address displayed in
+                the order info form. Are you sure you want to update the status?
+              </p>
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowPickupWarning(false)}
+                  className="flex-1 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitUpdate}
+                  className="flex-1 py-2.5 bg-orange-600 text-white rounded-xl font-semibold hover:bg-orange-700 shadow-md hover:shadow-lg transition-all"
+                >
+                  Agree & Update
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -331,7 +563,7 @@ const VendorOrders = () => {
 
   const performUpdate = async (ids, updateData) => {
     try {
-      await VendorOrderService.updateOrderStatus(ids, updateData);
+      await VendorOrderService.updateOrderStatus(ids, updateData.order_status);
 
       toast.success("Orders updated successfully");
       await fetchOrders(); // Refresh data
