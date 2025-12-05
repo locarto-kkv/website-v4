@@ -19,13 +19,13 @@ const BrandInfoPage = () => {
   const { brandName } = useParams();
   const navigate = useNavigate();
   
-  // Store full vendor object and specific blog object
+  // Store full vendor object and specific blog object separately
   const [vendor, setVendor] = useState(null);
   const [blog, setBlog] = useState(null);
   
   const brands = useDataStore((s) => s.brands);
   
-  // Filter for related section
+  // Filter for related section logic
   const brandData = useMemo(() => brands.filter((b) => b.blog && b.blog.length > 0), [brands]);
 
   // Scroll to top on mount or change
@@ -42,7 +42,7 @@ const BrandInfoPage = () => {
     
     if (foundVendor) {
       setVendor(foundVendor);
-      // Set the first blog post if available
+      // Set the first blog post if available to populate description/images
       if (foundVendor.blog && foundVendor.blog.length > 0) {
         setBlog(foundVendor.blog[0]);
       }
@@ -111,6 +111,7 @@ const BrandInfoPage = () => {
             {/* Cover / Blog Image Background */}
             <div className="h-48 md:h-64 w-full bg-gray-100 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
+              {/* Uses blog_image as cover */}
               <img 
                 src={blog.blog_image} 
                 alt="Cover" 
@@ -119,10 +120,17 @@ const BrandInfoPage = () => {
             </div>
 
             <div className="px-6 pb-8 md:px-10 relative z-20">
-              <div className="flex flex-col md:flex-row items-center md:items-end -mt-20 md:-mt-24 gap-6">
+              {/* Layout Fix: 
+                  1. 'flex-col md:flex-row' establishes the horizontal layout on desktop.
+                  2. 'items-start' aligns everything to the top of the container content area.
+                  3. The negative margin is applied ONLY to the logo wrapper, pulling it up over the banner.
+                  4. 'pt-4 md:pt-6' adds spacing for the text content so it aligns nicely with the visual center of the logo.
+              */}
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
                 
                 {/* 1. BRAND LOGO TILE (200x200) */}
-                <div className="w-[200px] h-[200px] bg-white rounded-2xl shadow-2xl p-2 flex-shrink-0 border-4 border-white flex items-center justify-center overflow-hidden">
+                {/* Pulls up with negative margin, shrinks 0 to maintain size */}
+                <div className="-mt-24 md:-mt-20 w-[200px] h-[200px] bg-white rounded-2xl shadow-2xl p-2 flex-shrink-0 border-4 border-white flex items-center justify-center overflow-hidden z-30 relative">
                   {vendor.brand_logo_1 ? (
                     <img 
                       src={vendor.brand_logo_1} 
@@ -130,85 +138,89 @@ const BrandInfoPage = () => {
                       className="w-full h-full object-contain rounded-xl"
                     />
                   ) : (
-                    <div className="text-center text-gray-400">
-                      <i className="fas fa-store text-5xl mb-2"></i>
-                      <p className="text-xs font-bold uppercase">{vendor.name}</p>
+                    // Fallback if logo is null
+                    <div className="text-center text-gray-400 flex flex-col items-center">
+                      <i className="fas fa-store text-6xl mb-3 text-orange-200"></i>
+                      <p className="text-sm font-bold uppercase text-gray-500 tracking-wide">{vendor.name}</p>
                     </div>
                   )}
                 </div>
 
-                {/* Brand Info */}
-                <div className="flex-1 text-center md:text-left mb-2 md:mb-0">
-                  <h1 className="text-3xl md:text-5xl font-black text-gray-900 mb-2 leading-tight">
-                    {vendor.name}
-                  </h1>
-                  
-                  {/* Rating */}
-                  {blog.rating && (
-                    <div className="flex items-center justify-center md:justify-start gap-2 mb-4 text-yellow-500">
-                      <div className="flex text-lg">
-                        {"★".repeat(Math.floor(blog.rating))}
-                        {"☆".repeat(5 - Math.floor(blog.rating))}
-                      </div>
-                      <span className="text-gray-600 font-bold text-sm">({blog.rating}/5)</span>
-                    </div>
-                  )}
+                {/* Brand Info & Actions Container */}
+                <div className="flex-1 w-full pt-2 md:pt-4">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    
+                    {/* Text Details */}
+                    <div className="text-center md:text-left w-full md:w-auto">
+                      <h1 className="text-3xl md:text-5xl font-black text-gray-900 mb-2 leading-tight uppercase tracking-tight">
+                        {vendor.name}
+                      </h1>
+                      
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2">
+                        {/* Rating */}
+                        {blog.rating && (
+                          <div className="flex items-center gap-2 text-yellow-500">
+                            <div className="flex text-lg">
+                              {"★".repeat(Math.floor(blog.rating))}
+                              {"☆".repeat(5 - Math.floor(blog.rating))}
+                            </div>
+                            <span className="text-gray-600 font-bold text-sm">({blog.rating}/5)</span>
+                          </div>
+                        )}
 
-                  {/* Contact Details */}
-                  <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-600 font-medium">
-                    {vendor.email && (
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-100 rounded-full">
-                        <i className="fas fa-envelope text-orange-500"></i> {vendor.email}
+                        {/* Contact Chips */}
+                        {vendor.email && (
+                          <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-600 font-medium">
+                            <i className="fas fa-envelope text-orange-500"></i> 
+                            <span className="truncate max-w-[200px]">{vendor.email}</span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                    {vendor.phone_no && (
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-100 rounded-full">
-                        <i className="fas fa-phone text-orange-500"></i> {vendor.phone_no}
-                      </div>
-                    )}
+                    </div>
+
+                    {/* 2. ACTION BUTTONS */}
+                    <div className="flex flex-wrap justify-center sm:justify-start gap-3 w-full md:w-auto">
+                      {/* Visit Store */}
+                      <Link
+                        to={`/vendor/${vendor.id}/products/all`}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#0D1539] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#1a2b6b] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 whitespace-nowrap min-w-[140px]"
+                      >
+                        <i className="fas fa-shopping-bag"></i> Visit Store
+                      </Link>
+
+                      {/* Visit Website */}
+                      {vendor.website && (
+                        <a
+                          href={vendor.website.startsWith('http') ? vendor.website : `https://${vendor.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-[#0D1539] border-2 border-[#0D1539] px-6 py-3 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 whitespace-nowrap min-w-[140px]"
+                        >
+                          <i className="fas fa-globe"></i> Website
+                        </a>
+                      )}
+
+                      {/* Share Button */}
+                      <button 
+                        onClick={handleShare}
+                        className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 transition-colors shadow-sm"
+                        title="Share Brand"
+                      >
+                        <i className="fas fa-share-alt text-lg"></i>
+                      </button>
+                    </div>
+
                   </div>
-                </div>
-
-                {/* 2. ACTION BUTTONS */}
-                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                  {/* Visit Store */}
-                  <Link
-                    to={`/vendor/${vendor.id}/products/all`}
-                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#0D1539] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#1a2b6b] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 whitespace-nowrap"
-                  >
-                    <i className="fas fa-shopping-bag"></i> Visit Store
-                  </Link>
-
-                  {/* Visit Website */}
-                  {vendor.website && (
-                    <a
-                      href={vendor.website.startsWith('http') ? vendor.website : `https://${vendor.website}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-[#0D1539] border-2 border-[#0D1539] px-6 py-3 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 whitespace-nowrap"
-                    >
-                      <i className="fas fa-globe"></i> Website
-                    </a>
-                  )}
-
-                  {/* Share */}
-                  <button 
-                    onClick={handleShare}
-                    className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 transition-colors"
-                    title="Share Brand"
-                  >
-                    <i className="fas fa-share-alt text-lg"></i>
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- BLOG CONTENT --- */}
+        {/* --- BLOG / STORY CONTENT --- */}
         <div className="max-w-4xl mx-auto px-4">
           <div className="prose max-w-none">
-            {/* Header */}
+            {/* Blog Title Header */}
             <div className="text-center mb-12 animate-[fadeIn_0.5s_ease-out]">
               <h2 className="text-3xl md:text-4xl font-extrabold text-[#0D1539] mb-4">
                 {blog.title}
@@ -218,7 +230,7 @@ const BrandInfoPage = () => {
               </h3>
             </div>
 
-            {/* Description */}
+            {/* Description Card */}
             <div className="bg-orange-50/50 rounded-3xl p-8 mb-12 border border-orange-100 text-lg leading-relaxed text-gray-700 whitespace-pre-line animate-[fadeIn_0.7s_ease-out]">
               {blog.description}
             </div>
@@ -233,7 +245,7 @@ const BrandInfoPage = () => {
                 >
                   <h3 className="text-2xl font-bold mb-4 flex items-center gap-3 text-[#0D1539]">
                     {section.icon && (
-                      <span className="w-10 h-10 flex items-center justify-center bg-orange-100 rounded-full text-xl">
+                      <span className="w-10 h-10 flex items-center justify-center bg-orange-100 rounded-full text-xl text-orange-600 font-bold">
                         {section.icon}
                       </span>
                     )}
@@ -258,7 +270,7 @@ const BrandInfoPage = () => {
           <div className="mt-16 text-center">
             <Link
               to="/discover"
-              className="inline-flex items-center gap-2 text-gray-500 hover:text-orange-500 font-semibold transition-colors"
+              className="inline-flex items-center gap-2 text-gray-500 hover:text-orange-500 font-semibold transition-colors px-6 py-3 rounded-full hover:bg-orange-50"
             >
               <i className="fas fa-arrow-left"></i> Back to All Brands
             </Link>
