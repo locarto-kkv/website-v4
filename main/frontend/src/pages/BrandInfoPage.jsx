@@ -18,15 +18,18 @@ const asset4 = "/assets/4.png";
 const BrandInfoPage = () => {
   const { brandName } = useParams();
   const navigate = useNavigate();
-  
+
   // Store full vendor object and specific blog object separately
   const [vendor, setVendor] = useState(null);
   const [blog, setBlog] = useState(null);
-  
+
   const brands = useDataStore((s) => s.brands);
-  
+
   // Filter for related section logic
-  const brandData = useMemo(() => brands.filter((b) => b.blog && b.blog.length > 0), [brands]);
+  const brandData = useMemo(
+    () => brands.filter((b) => b.blog && b.blog.length > 0),
+    [brands]
+  );
 
   // Scroll to top on mount or change
   useEffect(() => {
@@ -36,10 +39,10 @@ const BrandInfoPage = () => {
   // Find the specific brand data
   useEffect(() => {
     if (!brands || brands.length === 0) return;
-    
+
     // Find vendor by name
     const foundVendor = brands.find((b) => b.name === brandName);
-    
+
     if (foundVendor) {
       setVendor(foundVendor);
       // Set the first blog post if available to populate description/images
@@ -52,7 +55,7 @@ const BrandInfoPage = () => {
   // Related brands logic
   const randomBrands = useMemo(() => {
     if (!vendor || !brandData) return [];
-    
+
     const otherBrands = brandData.filter((b) => b.id !== vendor.id);
     // Fisher-Yates shuffle
     for (let i = otherBrands.length - 1; i > 0; i--) {
@@ -75,7 +78,7 @@ const BrandInfoPage = () => {
     }
   };
 
-  if (!vendor || !blog) {
+  if (!vendor && !blog) {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50">
         <Navbar />
@@ -83,6 +86,18 @@ const BrandInfoPage = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
             <p className="text-gray-500">Loading Brand Info...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  } else if (!blog) {
+    return (
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-500">Blog Not Created yet</p>
           </div>
         </div>
         <Footer />
@@ -96,25 +111,39 @@ const BrandInfoPage = () => {
 
       {/* --- Background Decorative Assets --- */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <img src={asset1} alt="" className="absolute -top-32 -left-32 w-[500px] h-[500px] opacity-[0.1] animate-[spin_40s_linear_infinite] blur-sm" />
-        <img src={asset2} alt="" className="absolute top-1/4 -right-32 w-[450px] h-[450px] opacity-[0.1] animate-[spin_42s_linear_infinite_reverse] blur-sm" />
-        <img src={asset4} alt="" className="absolute bottom-0 left-0 w-[480px] h-[480px] opacity-[0.1] animate-[spin_48s_linear_infinite] blur-sm" />
-        <img src={asset3} alt="" className="absolute top-3/4 right-20 w-[300px] h-[300px] opacity-[0.1] animate-pulse blur-sm" />
+        <img
+          src={asset1}
+          alt=""
+          className="absolute -top-32 -left-32 w-[500px] h-[500px] opacity-[0.1] animate-[spin_40s_linear_infinite] blur-sm"
+        />
+        <img
+          src={asset2}
+          alt=""
+          className="absolute top-1/4 -right-32 w-[450px] h-[450px] opacity-[0.1] animate-[spin_42s_linear_infinite_reverse] blur-sm"
+        />
+        <img
+          src={asset4}
+          alt=""
+          className="absolute bottom-0 left-0 w-[480px] h-[480px] opacity-[0.1] animate-[spin_48s_linear_infinite] blur-sm"
+        />
+        <img
+          src={asset3}
+          alt=""
+          className="absolute top-3/4 right-20 w-[300px] h-[300px] opacity-[0.1] animate-pulse blur-sm"
+        />
       </div>
 
       <main className="relative z-10 pt-24 pb-16">
-        
         {/* --- HERO SECTION WITH LOGO & ACTIONS --- */}
         <div className="max-w-6xl mx-auto px-4 mb-16">
           <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden relative">
-            
             {/* Cover / Blog Image Background */}
             <div className="h-48 md:h-64 w-full bg-gray-100 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
               {/* Uses blog_image as cover */}
-              <img 
-                src={blog.blog_image} 
-                alt="Cover" 
+              <img
+                src={blog.blog_image}
+                alt="Cover"
                 className="w-full h-full object-cover blur-[2px] scale-105"
               />
             </div>
@@ -127,21 +156,22 @@ const BrandInfoPage = () => {
                   4. 'pt-4 md:pt-6' adds spacing for the text content so it aligns nicely with the visual center of the logo.
               */}
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
-                
                 {/* 1. BRAND LOGO TILE (200x200) */}
                 {/* Pulls up with negative margin, shrinks 0 to maintain size */}
                 <div className="-mt-24 md:-mt-20 w-[200px] h-[200px] bg-white rounded-2xl shadow-2xl p-2 flex-shrink-0 border-4 border-white flex items-center justify-center overflow-hidden z-30 relative">
                   {vendor.brand_logo_1 ? (
-                    <img 
-                      src={vendor.brand_logo_1} 
-                      alt={`${vendor.name} Logo`} 
+                    <img
+                      src={vendor.brand_logo_1}
+                      alt={`${vendor.name} Logo`}
                       className="w-full h-full object-contain rounded-xl"
                     />
                   ) : (
                     // Fallback if logo is null
                     <div className="text-center text-gray-400 flex flex-col items-center">
                       <i className="fas fa-store text-6xl mb-3 text-orange-200"></i>
-                      <p className="text-sm font-bold uppercase text-gray-500 tracking-wide">{vendor.name}</p>
+                      <p className="text-sm font-bold uppercase text-gray-500 tracking-wide">
+                        {vendor.name}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -149,13 +179,12 @@ const BrandInfoPage = () => {
                 {/* Brand Info & Actions Container */}
                 <div className="flex-1 w-full pt-2 md:pt-4">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    
                     {/* Text Details */}
                     <div className="text-center md:text-left w-full md:w-auto">
                       <h1 className="text-3xl md:text-5xl font-black text-gray-900 mb-2 leading-tight uppercase tracking-tight">
                         {vendor.name}
                       </h1>
-                      
+
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2">
                         {/* Rating */}
                         {blog.rating && (
@@ -164,15 +193,19 @@ const BrandInfoPage = () => {
                               {"★".repeat(Math.floor(blog.rating))}
                               {"☆".repeat(5 - Math.floor(blog.rating))}
                             </div>
-                            <span className="text-gray-600 font-bold text-sm">({blog.rating}/5)</span>
+                            <span className="text-gray-600 font-bold text-sm">
+                              ({blog.rating}/5)
+                            </span>
                           </div>
                         )}
 
                         {/* Contact Chips */}
                         {vendor.email && (
                           <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-600 font-medium">
-                            <i className="fas fa-envelope text-orange-500"></i> 
-                            <span className="truncate max-w-[200px]">{vendor.email}</span>
+                            <i className="fas fa-envelope text-orange-500"></i>
+                            <span className="truncate max-w-[200px]">
+                              {vendor.email}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -191,7 +224,11 @@ const BrandInfoPage = () => {
                       {/* Visit Website */}
                       {vendor.website && (
                         <a
-                          href={vendor.website.startsWith('http') ? vendor.website : `https://${vendor.website}`}
+                          href={
+                            vendor.website.startsWith("http")
+                              ? vendor.website
+                              : `https://${vendor.website}`
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white text-[#0D1539] border-2 border-[#0D1539] px-6 py-3 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 whitespace-nowrap min-w-[140px]"
@@ -201,7 +238,7 @@ const BrandInfoPage = () => {
                       )}
 
                       {/* Share Button */}
-                      <button 
+                      <button
                         onClick={handleShare}
                         className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 transition-colors shadow-sm"
                         title="Share Brand"
@@ -209,7 +246,6 @@ const BrandInfoPage = () => {
                         <i className="fas fa-share-alt text-lg"></i>
                       </button>
                     </div>
-
                   </div>
                 </div>
               </div>
@@ -238,8 +274,8 @@ const BrandInfoPage = () => {
             {/* Dynamic Sections */}
             <div className="space-y-12">
               {blog.sections?.map((section, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow animate-[fadeIn_0.9s_ease-out]"
                   style={{ animationDelay: `${idx * 0.1}s` }}
                 >
