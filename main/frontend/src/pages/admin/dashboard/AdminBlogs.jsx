@@ -19,6 +19,8 @@ function BrandPage() {
   const [editingBrand, setEditingBrand] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageUpdated, setImageUpdated] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
   // --- Search State ---
   const [vendorSearchQuery, setVendorSearchQuery] = useState("");
   const [vendorSearchResults, setVendorSearchResults] = useState([]);
@@ -59,17 +61,58 @@ function BrandPage() {
       setFormData((prev) => ({ ...prev, [name]: value }));
     },
 
-    handleImageChange: (e) => {
-      if (e.target.files && e.target.files[0]) {
-        const file = e.target.files[0];
+    handleImageChange: async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-        setFormData((prev) => ({
-          ...prev,
-          blog_image: { file }, // <— matches product { file }
-        }));
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
 
-        setImageUpdated(true);
-      }
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // --- 1. Find square crop (center crop) ---
+        const size = Math.min(img.width, img.height);
+        const startX = (img.width - size) / 2;
+        const startY = (img.height - size) / 2;
+
+        // --- 2. Resize target output ---
+        canvas.width = 200;
+        canvas.height = 200;
+
+        ctx.drawImage(
+          img,
+          startX,
+          startY,
+          size,
+          size, // crop source
+          0,
+          0,
+          200,
+          200 // draw to 200x200
+        );
+
+        canvas.toBlob(
+          (blob) => {
+            const croppedFile = new File([blob], file.name, {
+              type: "image/jpeg",
+            });
+
+            // --- 3. Save into state ---
+            setFormData((prev) => ({
+              ...prev,
+              blog_image: { file: croppedFile },
+            }));
+            setPreviewUrl(URL.createObjectURL(croppedFile));
+
+            setImageUpdated(true);
+          },
+          "image/jpeg",
+          0.9
+        );
+      };
+
       e.target.value = null;
     },
 
@@ -138,8 +181,6 @@ function BrandPage() {
   };
 
   const removeSection = (index) => {
-    console.log(index);
-
     const updatedSections = formData.sections.filter((_, i) => i !== index);
 
     setFormData({ ...formData, sections: updatedSections });
@@ -377,6 +418,18 @@ function BrandPage() {
                   />
                 </div>
 
+                <div className="md:col-span-2 mt-4">
+                  <div className="p-3 bg-yellow-100 border border-yellow-300 rounded-lg text-sm text-yellow-800 flex items-center shadow-inner">
+                    <i className="fas fa-exclamation-triangle mr-3 text-base"></i>
+                    <p>
+                      The image will be cropped to a{" "}
+                      <strong>1:1 aspect ratio</strong> and displayed at
+                      approximately <strong>200x200px</strong> on the card. It
+                      will be displayed as previewed.
+                    </p>
+                  </div>
+                </div>
+
                 {/* Blog Image Upload Section */}
                 <div className="md:col-span-2 bg-gray-50 p-4 rounded-xl border border-gray-200">
                   <label className="block text-sm font-bold text-gray-700 mb-3">
@@ -388,11 +441,7 @@ function BrandPage() {
                     {formData.blog_image && (
                       <div className="relative aspect-square border rounded-lg overflow-hidden group bg-white shadow-sm">
                         <img
-                          src={
-                            formData.blog_image.file
-                              ? URL.createObjectURL(formData.blog_image.file)
-                              : formData.blog_image || "placeholder.png"
-                          }
+                          src={previewUrl || "placeholder.png"}
                           alt="Blog Preview"
                           className="w-full h-full object-cover"
                         />

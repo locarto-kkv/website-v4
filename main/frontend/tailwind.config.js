@@ -11,11 +11,17 @@ export default {
       },
       animation: {
         scroll: "scroll 20s linear infinite",
+        // NEW: Shine animation definition
+        shine: "shine 1s",
       },
       keyframes: {
         scroll: {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
+        },
+        // NEW: Shine keyframes definition
+        shine: {
+          "100%": { left: "125%" },
         },
       },
     },

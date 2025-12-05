@@ -16,22 +16,22 @@ const asset4 = "/assets/4.png";
 const asset5 = "/assets/5.png";
 
 const BrandInfoPage = () => {
-  const { brandTitle } = useParams();
+  const { brandName } = useParams();
   const [brand, setBrand] = useState();
-  const { brands } = useDataStore();
+  const brands = useDataStore((s) => s.brands);
   const brandData = brands.filter((b) => b.blog.length > 0);
 
   // Scroll to top whenever brandId changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [brandTitle]);
+  }, [brandName]);
 
   useEffect(() => {
     if (brandData.length < 1) return;
-    const foundBrand = brandData.find((b) => b.blog[0].title === brandTitle);
+    const foundBrand = brandData.find((b) => b.name === brandName);
 
-    setBrand(foundBrand.blog[0] || null);
-  }, [brandTitle, brandData]);
+    setBrand(foundBrand?.blog[0] || null);
+  }, [brandName, brandData]);
 
   // FIX: Memoize the random brands so they don't change on every render
   const randomBrands = useMemo(() => {
@@ -54,7 +54,7 @@ const BrandInfoPage = () => {
   if (!brand) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#0D1539] text-white">
-        Brand not found.
+        Blog not uploaded yet.
       </div>
     );
   }

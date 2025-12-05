@@ -84,7 +84,7 @@ function App() {
         <Route path="/search" element={<SearchResultsPage />} />{" "}
         {/* New Route */}
         <Route path="/discover" element={<DiscoverPage />} />
-        <Route path="/brand-info/:brandTitle" element={<BrandInfoPage />} />
+        <Route path="/brand-info/:brandName" element={<BrandInfoPage />} />
         <Route
           path="/vendor/:vendorId/products/:category"
           element={<ShopProducts />}
