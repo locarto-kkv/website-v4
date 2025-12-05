@@ -1,224 +1,292 @@
 // src/pages/BrandInfoPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDataStore } from "../store/useDataStore.jsx";
+import toast from "react-hot-toast";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import BrandIdentityCard from "../components/landing/card.jsx";
 import locartoImg from "../assets/locarto.png";
 
-// Background Assets - Now using public folder paths
+// Background Assets
 const asset1 = "/assets/1.png";
 const asset2 = "/assets/2.png";
 const asset3 = "/assets/3.png";
 const asset4 = "/assets/4.png";
-const asset5 = "/assets/5.png";
 
 const BrandInfoPage = () => {
   const { brandName } = useParams();
-  const [brand, setBrand] = useState();
+  const navigate = useNavigate();
+  
+  // Store full vendor object and specific blog object
+  const [vendor, setVendor] = useState(null);
+  const [blog, setBlog] = useState(null);
+  
   const brands = useDataStore((s) => s.brands);
-  const brandData = brands.filter((b) => b.blog.length > 0);
+  
+  // Filter for related section
+  const brandData = useMemo(() => brands.filter((b) => b.blog && b.blog.length > 0), [brands]);
 
-  // Scroll to top whenever brandId changes
+  // Scroll to top on mount or change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [brandName]);
 
+  // Find the specific brand data
   useEffect(() => {
-    if (brandData.length < 1) return;
-    const foundBrand = brandData.find((b) => b.name === brandName);
-
-    setBrand(foundBrand?.blog[0] || null);
-  }, [brandName, brandData]);
-
-  // FIX: Memoize the random brands so they don't change on every render
-  const randomBrands = useMemo(() => {
-    if (!brand || !brandData) {
-      return [];
+    if (!brands || brands.length === 0) return;
+    
+    // Find vendor by name
+    const foundVendor = brands.find((b) => b.name === brandName);
+    
+    if (foundVendor) {
+      setVendor(foundVendor);
+      // Set the first blog post if available
+      if (foundVendor.blog && foundVendor.blog.length > 0) {
+        setBlog(foundVendor.blog[0]);
+      }
     }
-    // Shuffle + get random brands (excluding current one)
+  }, [brandName, brands]);
 
-    const otherBrands = brandData.filter(
-      (b) => b.blog[0]?.title !== brand.title
-    );
-
+  // Related brands logic
+  const randomBrands = useMemo(() => {
+    if (!vendor || !brandData) return [];
+    
+    const otherBrands = brandData.filter((b) => b.id !== vendor.id);
+    // Fisher-Yates shuffle
     for (let i = otherBrands.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [otherBrands[i], otherBrands[j]] = [otherBrands[j], otherBrands[i]];
     }
     return otherBrands.slice(0, 3);
-  }, [brand, brandData]);
+  }, [vendor, brandData]);
 
-  if (!brand) {
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: vendor?.name || "Locarto Brand",
+        text: `Check out ${vendor?.name} on Locarto!`,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copied to clipboard!");
+    }
+  };
+
+  if (!vendor || !blog) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0D1539] text-white">
-        Blog not uploaded yet.
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading Brand Info...</p>
+          </div>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="font-sans text-[#0D1539] min-h-screen bg-white relative overflow-hidden">
-      {/* Background Decorative Assets */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <img
-          src={asset1}
-          alt=""
-          className="absolute -top-32 -left-32 w-[300px] h-[300px] md:w-[500px] md:h-[500px] opacity-[0.18] animate-[spin_40s_linear_infinite]"
-          style={{ filter: "blur(1px)" }}
-        />
-        <img
-          src={asset2}
-          alt=""
-          className="absolute top-10 -right-20 md:-right-32 w-[280px] h-[280px] md:w-[450px] md:h-[450px] opacity-[0.20] animate-[spin_42s_linear_infinite]"
-          style={{ filter: "blur(1px)" }}
-        />
-        <img
-          src={asset4}
-          alt=""
-          className="absolute top-[600px] md:top-[900px] -left-24 md:-left-36 w-[300px] h-[300px] md:w-[480px] md:h-[480px] opacity-[0.18] animate-[spin_48s_linear_infinite_reverse]"
-          style={{ filter: "blur(1px)" }}
-        />
-        <img
-          src={asset1}
-          alt=""
-          className="absolute top-[1200px] md:top-[1600px] -right-28 md:-right-40 w-[320px] h-[320px] md:w-[500px] md:h-[500px] opacity-[0.19] animate-[spin_45s_linear_infinite]"
-          style={{ filter: "blur(1px)" }}
-        />
-        <img
-          src={asset3}
-          alt=""
-          className="absolute top-[2400px] md:top-[3200px] -right-24 md:-right-36 w-[310px] h-[310px] md:w-[490px] md:h-[490px] opacity-[0.18] animate-[spin_46s_linear_infinite]"
-          style={{ filter: "blur(1px)" }}
-        />
-        <img
-          src={asset2}
-          alt=""
-          className="hidden md:block absolute top-[2000px] left-[12%] w-[220px] h-[220px] opacity-[0.15] animate-[spin_38s_linear_infinite_reverse]"
-        />
-      </div>
-
       <Navbar pageType="brand-info" />
 
-      {/* Brand Image */}
-      <div className="mt-28 mb-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-[#0D1539]/40 overflow-hidden flex justify-center items-center max-w-3xl mx-4 sm:mx-auto h-48 sm:h-56 md:h-72 relative z-10 animate-[fadeIn_0.8s_ease-in]">
-        {
-          <img
-            src={brand.blog_image}
-            alt={brand.title}
-            className="absolute inset-0 w-full h-full object-contain"
-          />
-        }
+      {/* --- Background Decorative Assets --- */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <img src={asset1} alt="" className="absolute -top-32 -left-32 w-[500px] h-[500px] opacity-[0.1] animate-[spin_40s_linear_infinite] blur-sm" />
+        <img src={asset2} alt="" className="absolute top-1/4 -right-32 w-[450px] h-[450px] opacity-[0.1] animate-[spin_42s_linear_infinite_reverse] blur-sm" />
+        <img src={asset4} alt="" className="absolute bottom-0 left-0 w-[480px] h-[480px] opacity-[0.1] animate-[spin_48s_linear_infinite] blur-sm" />
+        <img src={asset3} alt="" className="absolute top-3/4 right-20 w-[300px] h-[300px] opacity-[0.1] animate-pulse blur-sm" />
       </div>
 
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12 relative z-10">
-        {/* REVISED: Made rating section responsive */}
-        {brand.rating && (
-          <div className="mt-8 flex flex-wrap items-center gap-2 sm:gap-3 text-xl sm:text-2xl md:text-3xl text-[#0D1539]">
-            <span className="font-medium">
-              <span className="text-orange-400 font-bold">LETY</span> Rating:
-            </span>
-            <div className="flex text-3xl sm:text-4xl md:text-5xl text-purple-900">
-              {"★".repeat(Math.floor(brand.rating))}
-              {"☆".repeat(5 - Math.floor(brand.rating))}
+      <main className="relative z-10 pt-24 pb-16">
+        
+        {/* --- HERO SECTION WITH LOGO & ACTIONS --- */}
+        <div className="max-w-6xl mx-auto px-4 mb-16">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden relative">
+            
+            {/* Cover / Blog Image Background */}
+            <div className="h-48 md:h-64 w-full bg-gray-100 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
+              <img 
+                src={blog.blog_image} 
+                alt="Cover" 
+                className="w-full h-full object-cover blur-[2px] scale-105"
+              />
             </div>
-            <span className="text-lg sm:text-xl md:text-2xl">
-              ({brand.rating}/5)
-            </span>
+
+            <div className="px-6 pb-8 md:px-10 relative z-20">
+              <div className="flex flex-col md:flex-row items-center md:items-end -mt-20 md:-mt-24 gap-6">
+                
+                {/* 1. BRAND LOGO TILE (200x200) */}
+                <div className="w-[200px] h-[200px] bg-white rounded-2xl shadow-2xl p-2 flex-shrink-0 border-4 border-white flex items-center justify-center overflow-hidden">
+                  {vendor.brand_logo_1 ? (
+                    <img 
+                      src={vendor.brand_logo_1} 
+                      alt={`${vendor.name} Logo`} 
+                      className="w-full h-full object-contain rounded-xl"
+                    />
+                  ) : (
+                    <div className="text-center text-gray-400">
+                      <i className="fas fa-store text-5xl mb-2"></i>
+                      <p className="text-xs font-bold uppercase">{vendor.name}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Brand Info */}
+                <div className="flex-1 text-center md:text-left mb-2 md:mb-0">
+                  <h1 className="text-3xl md:text-5xl font-black text-gray-900 mb-2 leading-tight">
+                    {vendor.name}
+                  </h1>
+                  
+                  {/* Rating */}
+                  {blog.rating && (
+                    <div className="flex items-center justify-center md:justify-start gap-2 mb-4 text-yellow-500">
+                      <div className="flex text-lg">
+                        {"★".repeat(Math.floor(blog.rating))}
+                        {"☆".repeat(5 - Math.floor(blog.rating))}
+                      </div>
+                      <span className="text-gray-600 font-bold text-sm">({blog.rating}/5)</span>
+                    </div>
+                  )}
+
+                  {/* Contact Details */}
+                  <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-600 font-medium">
+                    {vendor.email && (
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-100 rounded-full">
+                        <i className="fas fa-envelope text-orange-500"></i> {vendor.email}
+                      </div>
+                    )}
+                    {vendor.phone_no && (
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-100 rounded-full">
+                        <i className="fas fa-phone text-orange-500"></i> {vendor.phone_no}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. ACTION BUTTONS */}
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                  {/* Visit Store */}
+                  <Link
+                    to={`/vendor/${vendor.id}/products/all`}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#0D1539] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#1a2b6b] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 whitespace-nowrap"
+                  >
+                    <i className="fas fa-shopping-bag"></i> Visit Store
+                  </Link>
+
+                  {/* Visit Website */}
+                  {vendor.website && (
+                    <a
+                      href={vendor.website.startsWith('http') ? vendor.website : `https://${vendor.website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-[#0D1539] border-2 border-[#0D1539] px-6 py-3 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 whitespace-nowrap"
+                    >
+                      <i className="fas fa-globe"></i> Website
+                    </a>
+                  )}
+
+                  {/* Share */}
+                  <button 
+                    onClick={handleShare}
+                    className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 transition-colors"
+                    title="Share Brand"
+                  >
+                    <i className="fas fa-share-alt text-lg"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-
-        {/* REVISED: Smoother font scaling for brand title and subtitle */}
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
-          {brand.title}
-        </h2>
-
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 mt-10 text-[#0D1539] animate-[fadeIn_1.2s_ease-in]">
-          {brand.subtitle}
-        </h2>
-
-        <div className="prose max-w-none mb-8 text-[#0D1539] animate-[fadeIn_1.4s_ease-in]">
-          <p>{brand.description}</p>
         </div>
 
-        {/* Sections */}
-        {brand.sections?.map((section, idx) => (
-          <div
-            key={idx}
-            className="mb-8"
-            style={{
-              animation: "fadeIn 0.6s ease-in ${1.6 + idx * 0.2}s both",
-            }}
-          >
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#0D1539]">
-              {section.icon && (
-                <span className="text-orange-400">{section.icon}</span>
-              )}
-              {section.title}
-            </h3>
-            <div className="prose max-w-none text-[#0D1539]">
-              {Array.isArray(section.content) ? (
-                <ul className="list-disc pl-6 space-y-2">
-                  {section.content.map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p>{section.content}</p>
-              )}
+        {/* --- BLOG CONTENT --- */}
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="prose max-w-none">
+            {/* Header */}
+            <div className="text-center mb-12 animate-[fadeIn_0.5s_ease-out]">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-[#0D1539] mb-4">
+                {blog.title}
+              </h2>
+              <h3 className="text-xl md:text-2xl font-medium text-orange-500 italic">
+                {blog.subtitle}
+              </h3>
+            </div>
+
+            {/* Description */}
+            <div className="bg-orange-50/50 rounded-3xl p-8 mb-12 border border-orange-100 text-lg leading-relaxed text-gray-700 whitespace-pre-line animate-[fadeIn_0.7s_ease-out]">
+              {blog.description}
+            </div>
+
+            {/* Dynamic Sections */}
+            <div className="space-y-12">
+              {blog.sections?.map((section, idx) => (
+                <div 
+                  key={idx} 
+                  className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow animate-[fadeIn_0.9s_ease-out]"
+                  style={{ animationDelay: `${idx * 0.1}s` }}
+                >
+                  <h3 className="text-2xl font-bold mb-4 flex items-center gap-3 text-[#0D1539]">
+                    {section.icon && (
+                      <span className="w-10 h-10 flex items-center justify-center bg-orange-100 rounded-full text-xl">
+                        {section.icon}
+                      </span>
+                    )}
+                    {section.title}
+                  </h3>
+                  <div className="text-gray-600 leading-relaxed text-lg">
+                    {Array.isArray(section.content) ? (
+                      <ul className="list-disc pl-6 space-y-2">
+                        {section.content.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="whitespace-pre-line">{section.content}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
 
-        <Link
-          to="/discover"
-          className="mb-4 mt-4 inline-flex items-center gap-4 text-[#0D1539] animate-[fadeIn_1s_ease-in]"
-        >
-          <div className="p-4 bg-gray-100 rounded-full hover:bg-orange-400 transition-all duration-200 hover:scale-110">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="text-[#0D1539]"
+          <div className="mt-16 text-center">
+            <Link
+              to="/discover"
+              className="inline-flex items-center gap-2 text-gray-500 hover:text-orange-500 font-semibold transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+              <i className="fas fa-arrow-left"></i> Back to All Brands
+            </Link>
           </div>
-          <span className="text-xl font-semibold">Back to Brands</span>
-        </Link>
+        </div>
 
-        {/* Related */}
+        {/* --- RELATED BRANDS --- */}
         {randomBrands.length > 0 && (
-          <div className="mt-12 border-t pt-8 border-[#0D1539]/30">
-            <h3 className="text-xl font-bold mb-6 text-[#0D1539]">
+          <div className="mt-24 border-t border-gray-200 pt-16 max-w-6xl mx-auto px-4">
+            <h3 className="text-2xl font-bold mb-8 text-[#0D1539] text-center">
               You Might Also Like
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {randomBrands.map((randomBrand) => (
-                <BrandIdentityCard key={randomBrand.id} brand={randomBrand} />
+              {randomBrands.map((brand) => (
+                <BrandIdentityCard key={brand.id} brand={brand} />
               ))}
             </div>
           </div>
         )}
       </main>
 
-      {/* Locarto Logo Banner - Bottom */}
-      <div className="bg-white w-full overflow-hidden relative z-10">
-        <div className="relative w-full h-48 md:h-64 lg:h-80">
+      {/* --- FOOTER BANNER --- */}
+      <div className="w-full overflow-hidden relative z-10 bg-white">
+        <div className="relative w-full h-40 md:h-56">
           <img
             src={locartoImg}
             alt="Locarto"
-            className="absolute inset-0 w-full h-auto object-contain object-center -translate-y-[25%] transform scale-110"
+            className="absolute inset-0 w-full h-full object-contain opacity-50"
           />
         </div>
       </div>
