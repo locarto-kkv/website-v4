@@ -58,7 +58,11 @@ export const signup = async (req, res) => {
 
     const { data: user, error } = await db
       .from("consumers")
-      .insert({ name, email, phone_no })
+      .insert({
+        name: name.trim(),
+        email: email?.trim() ?? null,
+        phone_no: phone_no?.trim() ?? null,
+      })
       .select()
       .single();
 

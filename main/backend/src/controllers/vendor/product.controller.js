@@ -28,7 +28,7 @@ export const addProduct = async (req, res) => {
     const imgPublicUrls = [];
 
     const productData = {
-      name,
+      name: name.trim(),
       quantity,
       price,
       weight,
@@ -117,7 +117,7 @@ export const addProductVariant = async (req, res) => {
     const imgPublicUrls = [];
 
     const productData = {
-      name,
+      name: name.trim(),
       quantity,
       price,
       weight,
