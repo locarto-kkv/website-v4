@@ -3,48 +3,26 @@ import React, { useRef, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../lib/utils";
 
-// --- Custom Hook for Tilt Effect (Desktop Only) ---
+// --- Custom Hook for Card Styles (No Tilt) ---
 const useTilt = (isMobile) => {
   const ref = useRef(null);
 
+  // New: Apply standard/glass styles on mount/unmount instead of tilt logic
   useEffect(() => {
     const card = ref.current;
-    if (!card || isMobile) return;
+    if (!card) return;
 
-    const handleMouseMove = (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const tiltX = (y / rect.height - 0.5) * 15;
-      const tiltY = (x / rect.width - 0.5) * -15;
-
-      card.style.transition = "none";
-      card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.03)`;
-      card.style.boxShadow = `0 20px 40px rgba(0,0,0,0.3), 0 0 10px rgba(255,255,255,0.1) inset`;
-    };
-
-    const handleMouseLeave = () => {
-      card.style.transition =
-        "transform 0.5s ease-out, box-shadow 0.5s ease-out";
-      card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
-      card.style.boxShadow = `0 8px 16px rgba(0,0,0,0.15)`;
-    };
-
-    card.addEventListener("mousemove", handleMouseMove);
-    card.addEventListener("mouseleave", handleMouseLeave);
-
+    // Apply base styles (Glass/shadow) for all states
     card.style.transition = "transform 0.5s ease-out, box-shadow 0.5s ease-out";
-    card.style.boxShadow = `0 8px 16px rgba(0,0,0,0.15)`;
+    card.style.boxShadow = `0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2) inset`; // Simpler, glass-friendly shadow
 
-    return () => {
-      card.removeEventListener("mousemove", handleMouseMove);
-      card.removeEventListener("mouseleave", handleMouseLeave);
-    };
+    // Cleanup function (no listeners needed as tilt is removed)
+    return () => {};
   }, [isMobile]);
 
   return ref;
 };
-// --- End Tilt Hook ---
+// --- End Card Style Hook ---
 
 const ProductCard = ({ product, isMobile }) => {
   const tiltRef = useTilt(isMobile);
@@ -54,7 +32,8 @@ const ProductCard = ({ product, isMobile }) => {
     <Link
       ref={tiltRef}
       to={`/product/${product.product_uuid}`}
-      className="product-card-v2 group bg-white shadow-xl lg:bg-white/80 lg:backdrop-blur-md rounded-2xl lg:shadow-xl overflow-hidden border border-gray-200 lg:border-white/40 transition-all duration-500 h-full flex flex-col cursor-pointer lg:hover:shadow-2xl lg:hover:border-white"
+      // UPDATED CLASSES: Removed tilt related styles and added glassmorphism
+      className="product-card-v2 group bg-white/40 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden border border-white/30 transition-all duration-300 h-full flex flex-col cursor-pointer hover:bg-white/60 hover:border-white/80"
     >
       {/* Image Container with Price */}
       <div className="relative h-32 sm:h-48 bg-gradient-to-br from-gray-100 to-blue-100 overflow-hidden flex-shrink-0">
@@ -73,10 +52,9 @@ const ProductCard = ({ product, isMobile }) => {
         </div>
       </div>
 
-      {/* Content Section MODIFIED: Added text-center */}
+      {/* Content Section */}
       <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-grow text-center">
         {/* Category & Title */}
-        {/* MODIFIED: Used mx-auto to center the category badge */}
         <span className="text-[10px] sm:text-xs font-bold text-purple-600 mb-1 sm:mb-2 mx-auto">
           {product.category || "Product"}
         </span>
@@ -95,8 +73,11 @@ const ProductCard = ({ product, isMobile }) => {
         {/* Action Button */}
         <div className="mt-auto pt-2 sm:pt-4 border-t border-gray-200 flex-shrink-0">
           <button
-            onClick={() => navigate(`/product/${product.product_uuid}`)}
-            className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(`/product/${product.product_uuid}`);
+            }}
+            className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]"
           >
             <i className="fas fa-eye"></i>
             <span className="font-black">View Details</span>
@@ -112,10 +93,10 @@ const VendorCard = ({ vendor, isMobile }) => {
   const navigate = useNavigate();
 
   return (
-    <Link
+    <div
       ref={tiltRef}
-      to={`/vendor/${vendor.id}/products/all`}
-      className="vendor-card-v2 group bg-white shadow-xl lg:bg-white/80 lg:backdrop-blur-md rounded-2xl p-4 sm:p-6 md:p-8 lg:p-8 lg:shadow-xl border border-gray-200 lg:border-white/40 transition-all duration-500 h-full flex flex-col items-center cursor-pointer lg:hover:shadow-2xl lg:hover:border-white"
+      // UPDATED CLASSES: Removed tilt related styles and added glassmorphism
+      className="vendor-card-v2 group bg-white/40 backdrop-blur-md rounded-2xl p-4 sm:p-6 md:p-8 lg:p-8 shadow-lg border border-white/30 transition-all duration-300 h-full flex flex-col items-center cursor-pointer hover:bg-white/60 hover:border-white/80"
     >
       {/* WRAPPER FOR CONTENT THAT SHOULD GROW */}
       <div className="flex flex-col items-center flex-grow">
@@ -124,20 +105,28 @@ const VendorCard = ({ vendor, isMobile }) => {
           {/* Background Shimmer Effect (Desktop Only) */}
           <div className="absolute inset-[-10px] rounded-full opacity-10 blur-md bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 lg:animate-shimmer hidden lg:block" />
 
-          <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white shadow-xl transition-all duration-300 group-hover:border-orange-500 group-hover:scale-105 bg-gradient-to-br from-orange-50 to-pink-50 relative z-10">
-            <img
-              src={vendor.brand_logo_1 || "/api/placeholder/112/112"}
-              alt={vendor.name}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-            />
-          </div>
+          <Link
+            to={`/vendor/${vendor.id}/products/all`}
+            className="relative z-10"
+          >
+            <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white shadow-xl transition-all duration-300 group-hover:border-orange-500 group-hover:scale-105 bg-gradient-to-br from-orange-50 to-pink-50">
+              <img
+                src={vendor.brand_logo_1 || "/api/placeholder/112/112"}
+                alt={vendor.name}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              />
+            </div>
+          </Link>
         </div>
 
         {/* Vendor Name */}
         <h3 className="font-black text-lg sm:text-2xl mb-2 sm:mb-3 transition-colors duration-300 text-center">
-          <span className="text-gray-900 group-hover:text-orange-700 transition-colors">
+          <Link
+            to={`/vendor/${vendor.id}/products/all`}
+            className="text-gray-900 group-hover:text-orange-700 transition-colors"
+          >
             {vendor.name}
-          </span>
+          </Link>
         </h3>
 
         {/* Email / Contact */}
@@ -150,17 +139,31 @@ const VendorCard = ({ vendor, isMobile }) => {
       </div>
       {/* END WRAPPER */}
 
-      {/* Visit Store Button MODIFIED: Added mt-auto to push to bottom */}
-      <button
-        onClick={() => {
-          navigate(`/vendor/${vendor.id}/products/all`);
-        }}
-        className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm font-bold shadow-xl transform hover:scale-105 transition-all duration-300 flex-shrink-0 mt-auto"
-      >
-        <span>Visit Store</span>
-        <i className="fas fa-store"></i>
-      </button>
-    </Link>
+      {/* Buttons: Visit Store & About Brand */}
+      <div className="mt-auto pt-4 border-t border-gray-200 w-full flex flex-col gap-3">
+        {/* Visit Store Button (Primary Action) */}
+        <button
+          onClick={() => {
+            navigate(`/vendor/${vendor.id}/products/all`);
+          }}
+          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm font-bold shadow-xl transform hover:scale-[1.02] transition-all duration-300 flex-shrink-0 w-full"
+        >
+          <span>Visit Store</span>
+          <i className="fas fa-store"></i>
+        </button>
+
+        {/* NEW: About Brand Button (Secondary Action) */}
+        <button
+          onClick={() => {
+            navigate(`/brand-info/${vendor.name}`);
+          }}
+          className="inline-flex items-center justify-center gap-2 bg-white/70 text-gray-700 border border-gray-300 px-4 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm font-semibold shadow-md transform hover:bg-white hover:scale-[1.02] transition-all duration-300 flex-shrink-0 w-full"
+        >
+          <i className="fas fa-info-circle"></i>
+          <span>About Brand</span>
+        </button>
+      </div>
+    </div>
   );
 };
 
@@ -272,11 +275,10 @@ const InteractiveGrid = ({ data, type }) => {
       <style>{`
         /* Global Styles for Cards */
         .product-card-v2, .vendor-card-v2 {
-          box-shadow: 0 8px 16px rgba(0,0,0,0.15); 
+          /* Glassmorphism relies on backdrop-blur applied directly to the element */
           transform-style: preserve-3d;
           perspective: 1000px;
         }
-
         /* Initial Fade-in Animation */
         @keyframes fade-in-up-v2 {
           from {
