@@ -62,7 +62,7 @@ export const signup = async (req, res) => {
         name: name.trim(),
         email: email?.trim() ?? null,
         phone_no: phone_no?.trim() ?? null,
-        status: "pending",
+        status: "incomplete",
       })
       .select()
       .single();
@@ -192,6 +192,7 @@ export const loginGoogle = async (req, res) => {
       .insert({
         email: userData.email,
         name: userData.name,
+        status: "incomplete",
       })
       .select()
       .single();

@@ -77,7 +77,6 @@ const AuthVendor = () => {
   const [usePassword, setUsePassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showTos, setShowTos] = useState(false);
-  const [tosAccepted, setTosAccepted] = useState(false);
   const [isGoogleLogin, setGoogleLogin] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -127,7 +126,7 @@ const AuthVendor = () => {
     e.preventDefault();
 
     if (sentOtp || usePassword) {
-      if (!tosAccepted && !showTos && !isLogin) {
+      if (!showTos && !isLogin) {
         setShowTos(true);
         return;
       }
@@ -143,7 +142,7 @@ const AuthVendor = () => {
   };
 
   const handleGoogleSubmit = async () => {
-    if (!tosAccepted && !showTos && !isLogin) {
+    if (!showTos && !isLogin) {
       setShowTos(true);
       setGoogleLogin(true);
       return;
@@ -249,7 +248,7 @@ const AuthVendor = () => {
                       htmlFor="name"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Name
+                      Brand Name
                     </label>
                     <input
                       id="name"
@@ -266,7 +265,7 @@ const AuthVendor = () => {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Email Address
+                  Brand Email
                 </label>
                 <input
                   id="email"
@@ -357,11 +356,7 @@ const AuthVendor = () => {
                 className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-300 transition-colors"
               >
                 {/* --- START: MODIFIED IMG TAG --- */}
-                <img
-                  src={GoogleLogo}
-                  alt="Google"
-                  className="w-5 h-5 mr-2"
-                />
+                <img src={GoogleLogo} alt="Google" className="w-5 h-5 mr-2" />
                 {/* --- END: MODIFIED IMG TAG --- */}
                 {isLogin ? "Login with Google" : "Sign up with Google"}
               </button>

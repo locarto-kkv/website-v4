@@ -1,39 +1,19 @@
 // src/pages/admin/dashboard/AdminVendors.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
-import {
-  formatDate,
-} from "../../../lib/utils";
-
-// --- Mock Data Generator (Placeholders since backend might not be ready) ---
-const MOCK_VENDORS = Array.from({ length: 25 }).map((_, i) => ({
-  id: i + 1,
-  name: `Vendor ${i + 1} Enterprises`,
-  email: `contact@vendor${i + 1}.com`,
-  phone: `+91 98765 432${i.toString().padStart(2, '0')}`,
-  status: i % 3 === 0 ? "verified" : i % 3 === 1 ? "pending" : "complete",
-  created_at: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
-  brand_logo: `https://placehold.co/100x100/orange/white?text=V${i + 1}`,
-  address: {
-    address_line_1: `${i + 10} Market Street`,
-    city: "Mumbai",
-    state: "Maharashtra",
-    pincode: "400001"
-  },
-  products_count: Math.floor(Math.random() * 50),
-  total_revenue: Math.floor(Math.random() * 100000),
-}));
+import { formatDate } from "../../../lib/utils";
+import { useDataStore } from "../../../store/useDataStore";
 
 // --- Helper Components ---
 
 const StatusBadge = ({ status }) => {
   const configs = {
-    pending: {
+    incomplete: {
       color: "bg-yellow-100 text-yellow-800 border-yellow-200",
       icon: "fas fa-clock",
-      label: "Pending Setup",
+      label: "Incomplete Setup",
     },
-    complete: {
+    pending: {
       color: "bg-blue-100 text-blue-800 border-blue-200",
       icon: "fas fa-hourglass-half",
       label: "Pending Verification",
@@ -50,7 +30,7 @@ const StatusBadge = ({ status }) => {
     },
   };
 
-  const config = configs[status?.toLowerCase()] || configs.pending;
+  const config = configs[status?.toLowerCase()] || configs.incomplete;
 
   return (
     <span
@@ -84,7 +64,10 @@ const BulkVendorUpdateForm = ({ onClose, onUpdate }) => {
             <i className="fas fa-users-cog text-orange-500"></i>
             Bulk Update Vendors
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
             <i className="fas fa-times text-lg"></i>
           </button>
         </div>
@@ -103,8 +86,8 @@ const BulkVendorUpdateForm = ({ onClose, onUpdate }) => {
               className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm bg-white"
             >
               <option value="">Select Status</option>
-              <option value="pending">Pending Setup</option>
-              <option value="complete">Pending Verification</option>
+              <option value="incomplete">Incomplete Setup</option>
+              <option value="pending">Pending Verification</option>
               <option value="verified">Verified</option>
               <option value="rejected">Rejected</option>
             </select>
@@ -143,7 +126,7 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      address: { ...prev.address, [name]: value }
+      address: { ...prev.address, [name]: value },
     }));
   };
 
@@ -163,9 +146,14 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
               <i className="fas fa-edit text-orange-500"></i>
               Edit Vendor Details
             </h2>
-            <p className="text-gray-400 text-xs mt-1">Vendor ID: #{formData.id}</p>
+            <p className="text-gray-400 text-xs mt-1">
+              Vendor ID: #{formData.id}
+            </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
             <i className="fas fa-times text-xl"></i>
           </button>
         </div>
@@ -173,11 +161,11 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50 custom-scrollbar">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
             {/* Status Section */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <i className="fas fa-toggle-on text-blue-500"></i> Account Status
+                <i className="fas fa-toggle-on text-blue-500"></i> Account
+                Status
               </h3>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-2">
@@ -189,14 +177,15 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm bg-white"
                 >
-                  <option value="pending">Pending Setup</option>
-                  <option value="complete">Pending Verification</option>
+                  <option value="incomplete">Incomplete Setup</option>
+                  <option value="pending">Pending Verification</option>
                   <option value="verified">Verified</option>
                   <option value="rejected">Rejected</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-2">
                   <i className="fas fa-info-circle mr-1"></i>
-                  Changing to "Verified" will grant the vendor full access to the platform.
+                  Changing to "Verified" will grant the vendor full access to
+                  the platform.
                 </p>
               </div>
             </div>
@@ -204,11 +193,14 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
             {/* Basic Info */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <i className="fas fa-store text-orange-500"></i> Basic Information
+                <i className="fas fa-store text-orange-500"></i> Basic
+                Information
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Company Name</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Company Name
+                  </label>
                   <input
                     type="text"
                     name="name"
@@ -218,7 +210,9 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Email Address</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Email Address
+                  </label>
                   <input
                     type="email"
                     name="email"
@@ -228,7 +222,9 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Phone Number</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Phone Number
+                  </label>
                   <input
                     type="text"
                     name="phone"
@@ -243,54 +239,62 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
             {/* Address Info */}
             <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
-                <i className="fas fa-map-marker-alt text-green-500"></i> Address Details
+                <i className="fas fa-map-marker-alt text-green-500"></i> Address
+                Details
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Address Line</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Address Line
+                  </label>
                   <input
                     type="text"
                     name="address_line_1"
-                    value={formData.address?.address_line_1 || ''}
+                    value={formData.address?.address_line_1 || ""}
                     onChange={handleAddressChange}
                     className="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1">City</label>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">
+                      City
+                    </label>
                     <input
                       type="text"
                       name="city"
-                      value={formData.address?.city || ''}
+                      value={formData.address?.city || ""}
                       onChange={handleAddressChange}
                       className="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1">State</label>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1">
+                      State
+                    </label>
                     <input
                       type="text"
                       name="state"
-                      value={formData.address?.state || ''}
+                      value={formData.address?.state || ""}
                       onChange={handleAddressChange}
                       className="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1">Pincode</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">
+                    Pincode
+                  </label>
                   <input
                     type="text"
                     name="pincode"
-                    value={formData.address?.pincode || ''}
+                    value={formData.address?.pincode || ""}
                     onChange={handleAddressChange}
                     className="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -317,68 +321,62 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
 // --- Main Page Component ---
 
 const AdminVendors = () => {
-  const [vendors, setVendors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
   // Filters
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");
-  
+
   // UI State
   const [viewMode, setViewMode] = useState("table");
   const [selectedVendor, setSelectedVendor] = useState(null);
-  
+
   // Selection State
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [showBulkModal, setShowBulkModal] = useState(false);
 
-  // Load Mock Data
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setVendors(MOCK_VENDORS);
-      setLoading(false);
-    }, 800);
-  }, []);
-
+  const vendors = useDataStore((s) => s.brands);
   // --- Filtering & Sorting Logic ---
   const processedVendors = useMemo(() => {
     let result = [...vendors];
 
     // Status Filter
     if (statusFilter !== "all") {
-      result = result.filter(v => v.status === statusFilter);
+      result = result.filter((v) => v.status === statusFilter);
     }
 
     // Search Filter
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(v => 
-        v.name.toLowerCase().includes(q) || 
-        v.email.toLowerCase().includes(q) ||
-        v.phone.includes(q)
+      result = result.filter(
+        (v) =>
+          v.name.toLowerCase().includes(q) ??
+          v.email.toLowerCase().includes(q) ??
+          v.phone.includes(q)
       );
     }
 
     // Date Filter (Mock logic for 'created_at')
     const now = new Date();
     if (dateFilter === "today") {
-      result = result.filter(v => new Date(v.created_at).toDateString() === now.toDateString());
+      result = result.filter(
+        (v) => new Date(v.created_at).toDateString() === now.toDateString()
+      );
     } else if (dateFilter === "week") {
       const weekAgo = new Date(now.setDate(now.getDate() - 7));
-      result = result.filter(v => new Date(v.created_at) >= weekAgo);
+      result = result.filter((v) => new Date(v.created_at) >= weekAgo);
     } else if (dateFilter === "month") {
       const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
-      result = result.filter(v => new Date(v.created_at) >= monthAgo);
+      result = result.filter((v) => new Date(v.created_at) >= monthAgo);
     }
 
     // Sorting
     result.sort((a, b) => {
-      if (sortBy === "recent") return new Date(b.created_at) - new Date(a.created_at);
-      if (sortBy === "oldest") return new Date(a.created_at) - new Date(b.created_at);
+      if (sortBy === "recent")
+        return new Date(b.created_at) - new Date(a.created_at);
+      if (sortBy === "oldest")
+        return new Date(a.created_at) - new Date(b.created_at);
       if (sortBy === "name_asc") return a.name.localeCompare(b.name);
       if (sortBy === "name_desc") return b.name.localeCompare(a.name);
       return 0;
@@ -388,15 +386,18 @@ const AdminVendors = () => {
   }, [vendors, statusFilter, dateFilter, searchQuery, sortBy]);
 
   // --- Stats Calculation ---
-  const stats = useMemo(() => ({
-    total: vendors.length,
-    pending: vendors.filter(v => v.status === "pending").length,
-    complete: vendors.filter(v => v.status === "complete").length,
-    verified: vendors.filter(v => v.status === "verified").length
-  }), [vendors]);
+  const stats = useMemo(
+    () => ({
+      total: vendors.length,
+      incomplete: vendors.filter((v) => v.status === "incomplete").length,
+      pending: vendors.filter((v) => v.status === "pending").length,
+      verified: vendors.filter((v) => v.status === "verified").length,
+    }),
+    [vendors]
+  );
 
   // --- Handlers ---
-  
+
   const handleEditClick = (e, vendor) => {
     e.stopPropagation();
     setSelectedVendor(vendor);
@@ -411,11 +412,13 @@ const AdminVendors = () => {
 
   const handleBulkUpdate = (data) => {
     // Only console.log as requested
-    console.log("Mock Backend Bulk Update:", { 
-      ids: Array.from(selectedIds), 
-      data 
+    console.log("Mock Backend Bulk Update:", {
+      ids: Array.from(selectedIds),
+      data,
     });
-    toast.success(`Bulk Update for ${selectedIds.size} vendors logged to Console`);
+    toast.success(
+      `Bulk Update for ${selectedIds.size} vendors logged to Console`
+    );
     setShowBulkModal(false);
     setSelectedIds(new Set());
     setSelectionMode(false);
@@ -435,7 +438,7 @@ const AdminVendors = () => {
   };
 
   const handleSelectAll = () => {
-    const allIds = new Set(processedVendors.map(v => v.id));
+    const allIds = new Set(processedVendors.map((v) => v.id));
     setSelectedIds(allIds);
   };
 
@@ -449,17 +452,46 @@ const AdminVendors = () => {
       {/* --- Top Stats --- */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Vendors", value: stats.total, icon: "fas fa-store", color: "from-gray-700 to-gray-900" },
-          { label: "Pending Setup", value: stats.pending, icon: "fas fa-clock", color: "from-yellow-400 to-orange-500" },
-          { label: "Pending Verification", value: stats.complete, icon: "fas fa-hourglass-half", color: "from-blue-400 to-indigo-500" },
-          { label: "Verified Vendors", value: stats.verified, icon: "fas fa-check-circle", color: "from-green-500 to-emerald-600" },
+          {
+            label: "Total Vendors",
+            value: stats.total,
+            icon: "fas fa-store",
+            color: "from-gray-700 to-gray-900",
+          },
+          {
+            label: "Incomplete Setup",
+            value: stats.incomplete,
+            icon: "fas fa-clock",
+            color: "from-yellow-400 to-orange-500",
+          },
+          {
+            label: "Pending Verification",
+            value: stats.pending,
+            icon: "fas fa-hourglass-half",
+            color: "from-blue-400 to-indigo-500",
+          },
+          {
+            label: "Verified Vendors",
+            value: stats.verified,
+            icon: "fas fa-check-circle",
+            color: "from-green-500 to-emerald-600",
+          },
         ].map((stat, idx) => (
-          <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div
+            key={idx}
+            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between"
+          >
             <div>
-              <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">{stat.label}</p>
-              <p className="text-2xl font-black text-gray-800 mt-1">{stat.value}</p>
+              <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">
+                {stat.label}
+              </p>
+              <p className="text-2xl font-black text-gray-800 mt-1">
+                {stat.value}
+              </p>
             </div>
-            <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white shadow-md`}>
+            <div
+              className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white shadow-md`}
+            >
               <i className={stat.icon}></i>
             </div>
           </div>
@@ -472,7 +504,7 @@ const AdminVendors = () => {
           {/* Search */}
           <div className="relative">
             <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            <input 
+            <input
               type="text"
               placeholder="Search by name, email or phone..."
               value={searchQuery}
@@ -483,10 +515,11 @@ const AdminVendors = () => {
 
           {/* Filters Row */}
           <div className="flex flex-col md:flex-row gap-4 items-end">
-            
             {/* Date Range */}
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Date Range</label>
+              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                Date Range
+              </label>
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
@@ -501,22 +534,26 @@ const AdminVendors = () => {
 
             {/* Status */}
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Status</label>
+              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                Status
+              </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 bg-white text-sm"
               >
                 <option value="all">All Statuses</option>
-                <option value="pending">Pending Setup</option>
-                <option value="complete">Pending Verification</option>
+                <option value="incomplete">Incomplete Setup</option>
+                <option value="pending">Pending Verification</option>
                 <option value="verified">Verified</option>
               </select>
             </div>
 
             {/* Sort */}
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Sort By</label>
+              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">
+                Sort By
+              </label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -534,7 +571,9 @@ const AdminVendors = () => {
               <button
                 onClick={() => setViewMode("table")}
                 className={`p-2.5 rounded-md transition-all ${
-                  viewMode === "table" ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  viewMode === "table"
+                    ? "bg-white text-orange-600 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
               >
                 <i className="fas fa-list"></i>
@@ -542,7 +581,9 @@ const AdminVendors = () => {
               <button
                 onClick={() => setViewMode("card")}
                 className={`p-2.5 rounded-md transition-all ${
-                  viewMode === "card" ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  viewMode === "card"
+                    ? "bg-white text-orange-600 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
               >
                 <i className="fas fa-th-large"></i>
@@ -594,18 +635,7 @@ const AdminVendors = () => {
       )}
 
       {/* --- Main Content --- */}
-      {loading ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading vendors...</p>
-        </div>
-      ) : processedVendors.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
-          <i className="fas fa-store-slash text-4xl text-gray-300 mb-4"></i>
-          <h3 className="text-lg font-bold text-gray-700">No Vendors Found</h3>
-          <p className="text-gray-500">Try adjusting your filters.</p>
-        </div>
-      ) : viewMode === "table" ? (
+      {viewMode === "table" ? (
         // --- Table View ---
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
@@ -613,12 +643,24 @@ const AdminVendors = () => {
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
                   {selectionMode && <th className="w-12 px-6 py-4"></th>}
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Vendor Info</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Date Joined</th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    ID
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Vendor Info
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Contact
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Date Joined
+                  </th>
+                  <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -634,30 +676,47 @@ const AdminVendors = () => {
                     >
                       {selectionMode && (
                         <td className="px-6 py-4 text-center">
-                          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                            isSelected ? "bg-orange-500 border-orange-500 text-white" : "bg-white border-gray-300"
-                          }`}>
-                            {isSelected && <i className="fas fa-check text-xs"></i>}
+                          <div
+                            className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? "bg-orange-500 border-orange-500 text-white"
+                                : "bg-white border-gray-300"
+                            }`}
+                          >
+                            {isSelected && (
+                              <i className="fas fa-check text-xs"></i>
+                            )}
                           </div>
                         </td>
                       )}
-                      <td className="px-6 py-4 text-sm text-gray-500 font-mono">#{vendor.id}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500 font-mono">
+                        #{vendor.id}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <img 
-                            src={vendor.brand_logo} 
-                            alt="" 
+                          <img
+                            src={vendor.brand_logo_1}
+                            alt=""
                             className="w-10 h-10 rounded-lg object-cover border border-gray-200 bg-gray-50"
                           />
                           <div>
-                            <p className="font-bold text-gray-900 text-sm">{vendor.name}</p>
-                            <p className="text-xs text-gray-500">{vendor.address.city}, {vendor.address.state}</p>
+                            <p className="font-bold text-gray-900 text-sm">
+                              {vendor.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {vendor.address[0]?.state},{" "}
+                              {vendor.address[0]?.country}
+                            </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-700">{vendor.email}</div>
-                        <div className="text-xs text-gray-500 mt-0.5">{vendor.phone}</div>
+                        <div className="text-sm text-gray-700">
+                          {vendor.email}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          {vendor.phone_no}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={vendor.status} />
@@ -690,21 +749,33 @@ const AdminVendors = () => {
                 key={vendor.id}
                 onClick={() => handleRowClick(vendor.id)}
                 className={`bg-white rounded-2xl p-5 border shadow-sm transition-all cursor-pointer relative group ${
-                  isSelected ? "border-orange-500 ring-2 ring-orange-200" : "border-gray-200 hover:border-orange-300 hover:shadow-md"
+                  isSelected
+                    ? "border-orange-500 ring-2 ring-orange-200"
+                    : "border-gray-200 hover:border-orange-300 hover:shadow-md"
                 }`}
               >
                 {selectionMode && (
-                  <div className={`absolute top-4 right-4 w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
-                    isSelected ? "bg-orange-500 border-orange-500 text-white" : "bg-white border-gray-300"
-                  }`}>
+                  <div
+                    className={`absolute top-4 right-4 w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
+                      isSelected
+                        ? "bg-orange-500 border-orange-500 text-white"
+                        : "bg-white border-gray-300"
+                    }`}
+                  >
                     {isSelected && <i className="fas fa-check text-xs"></i>}
                   </div>
                 )}
 
                 <div className="flex items-center gap-4 mb-4">
-                  <img src={vendor.brand_logo} alt="" className="w-14 h-14 rounded-xl object-cover border border-gray-100 shadow-sm" />
+                  <img
+                    src={vendor.brand_logo_1}
+                    alt=""
+                    className="w-14 h-14 rounded-xl object-cover border border-gray-100 shadow-sm"
+                  />
                   <div>
-                    <h4 className="font-bold text-gray-900 line-clamp-1">{vendor.name}</h4>
+                    <h4 className="font-bold text-gray-900 line-clamp-1">
+                      {vendor.name}
+                    </h4>
                     <p className="text-xs text-gray-500">ID: #{vendor.id}</p>
                   </div>
                 </div>
@@ -716,11 +787,18 @@ const AdminVendors = () => {
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">Email</span>
-                    <span className="text-gray-900 font-medium truncate max-w-[150px]" title={vendor.email}>{vendor.email}</span>
+                    <span
+                      className="text-gray-900 font-medium truncate max-w-[150px]"
+                      title={vendor.email}
+                    >
+                      {vendor.email}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">Joined</span>
-                    <span className="text-gray-900">{formatDate(vendor.created_at)}</span>
+                    <span className="text-gray-900">
+                      {formatDate(vendor.created_at)}
+                    </span>
                   </div>
                 </div>
 
@@ -738,14 +816,14 @@ const AdminVendors = () => {
 
       {/* --- Modals --- */}
       {showBulkModal && (
-        <BulkVendorUpdateForm 
+        <BulkVendorUpdateForm
           onClose={() => setShowBulkModal(false)}
           onUpdate={handleBulkUpdate}
         />
       )}
 
       {selectedVendor && (
-        <VendorEditForm 
+        <VendorEditForm
           vendor={selectedVendor}
           onClose={() => setSelectedVendor(null)}
           onUpdate={handleUpdateVendor}

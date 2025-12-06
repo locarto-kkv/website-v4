@@ -168,11 +168,11 @@ const VendorProfile = () => {
           icon: "fas fa-check-circle text-green-600",
           label: "Verified",
         };
-      case "pending":
+      case "incomplete":
         return {
           color: "bg-yellow-100 text-yellow-800",
           icon: "fas fa-clock text-yellow-600",
-          label: "Pending",
+          label: "Incomplete",
         };
       case "rejected":
         return {
@@ -192,7 +192,7 @@ const VendorProfile = () => {
   // Account status logic
   const getAccountStatus = (status) => {
     switch (status?.toLowerCase()) {
-      case "pending":
+      case "incomplete":
         return {
           label: "Setup Incomplete",
           color: "bg-yellow-50 border-yellow-200 text-yellow-800",
