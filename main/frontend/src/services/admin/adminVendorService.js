@@ -4,14 +4,14 @@ import { axiosInstance } from "../../lib/axios.js";
 const BASE_URL = "/admin/vendor";
 
 export const AdminVendorService = {
-  authoriseVendor: async (vendorId, status) => {
+  authoriseVendor: async (vendorData) => {
     try {
       const response = await axiosInstance.patch(
-        `${BASE_URL}/authorise/${vendorId}`,
-        status
+        `${BASE_URL}/authorise/`,
+        vendorData
       );
 
-      toast.success("Updated Vendor Authorisation");
+      return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || "Authorise Vendor failed");
       console.log("Error in authoriseVendor:", error);

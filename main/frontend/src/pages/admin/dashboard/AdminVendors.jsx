@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import { formatDate } from "../../../lib/utils";
 import { useDataStore } from "../../../store/useDataStore";
+import { AdminVendorService } from "../../../services/admin/adminVendorService";
 
 // --- Helper Components ---
 
@@ -51,9 +52,7 @@ const BulkVendorUpdateForm = ({ onClose, onUpdate }) => {
       toast.error("Please select a status");
       return;
     }
-    // Console log as requested
-    console.log("Bulk Update Payload:", { status });
-    onUpdate({ status });
+    onUpdate(status);
   };
 
   return (
@@ -131,9 +130,7 @@ const VendorEditForm = ({ vendor, onClose, onUpdate }) => {
   };
 
   const handleSubmit = () => {
-    // Console log as requested
-    console.log("Single Update Payload:", formData);
-    onUpdate(formData);
+    onUpdate(formData.id, formData.status);
   };
 
   return (
@@ -326,6 +323,7 @@ const AdminVendors = () => {
   const [dateFilter, setDateFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");
+  const [refresh, setRefresh] = useState(false);
 
   // UI State
   const [viewMode, setViewMode] = useState("table");
@@ -337,6 +335,12 @@ const AdminVendors = () => {
   const [showBulkModal, setShowBulkModal] = useState(false);
 
   const vendors = useDataStore((s) => s.brands);
+  const fetchBrands = useDataStore((s) => s.fetchBrands);
+
+  useEffect(() => {
+    fetchBrands();
+  }, [refresh]);
+
   // --- Filtering & Sorting Logic ---
   const processedVendors = useMemo(() => {
     let result = [...vendors];
@@ -403,25 +407,26 @@ const AdminVendors = () => {
     setSelectedVendor(vendor);
   };
 
-  const handleUpdateVendor = (data) => {
-    // Only console.log as requested
-    console.log("Mock Backend Update:", data);
-    toast.success("Update Logged to Console");
+  const handleUpdateVendor = async (vendorId, status) => {
+    await AdminVendorService.authoriseVendor({
+      vendorIds: [vendorId],
+      status,
+    });
+    toast.success("Vendor Status Updated");
     setSelectedVendor(null);
+    setRefresh((prev) => !prev);
   };
 
-  const handleBulkUpdate = (data) => {
-    // Only console.log as requested
-    console.log("Mock Backend Bulk Update:", {
-      ids: Array.from(selectedIds),
-      data,
+  const handleBulkUpdate = async (data) => {
+    await AdminVendorService.authoriseVendor({
+      vendorIds: Array.from(selectedIds),
+      status: data,
     });
-    toast.success(
-      `Bulk Update for ${selectedIds.size} vendors logged to Console`
-    );
+    toast.success("Vendor Status Updated");
     setShowBulkModal(false);
     setSelectedIds(new Set());
     setSelectionMode(false);
+    setRefresh((prev) => !prev);
   };
 
   // Selection Logic

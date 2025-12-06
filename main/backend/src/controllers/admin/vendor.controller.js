@@ -5,13 +5,12 @@ const __filename = fileURLToPath(import.meta.url);
 
 export const authoriseVendor = async (req, res) => {
   try {
-    const { vendorId } = req.params;
-    const { status } = req.body;
+    const { vendorIds, status } = req.body;
 
     const { data: vendor } = await db
       .from("vendors")
       .update({ status })
-      .eq("id", vendorId);
+      .in("id", vendorIds);
 
     res.status(200).json(vendor);
   } catch (error) {

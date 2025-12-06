@@ -4,6 +4,6 @@ import { authoriseVendor } from "../../controllers/admin/vendor.controller.js";
 
 const router = Router();
 
-router.patch("/authorise/:vendorId", protectRoute("admin"), authoriseVendor);
+router.patch("/authorise", protectRoute("admin"), authoriseVendor);
 
 export default router;
