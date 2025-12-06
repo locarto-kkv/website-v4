@@ -12,6 +12,7 @@ const VendorLocationSetup = () => {
 
   const [map, setMap] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [newAddress, setNewAddress] = useState({
     address_line_1: "",
     address_line_2: "",
@@ -199,6 +200,7 @@ const VendorLocationSetup = () => {
   const handleNextStep = async () => {
     toast.loading("Submitting Data...");
 
+    setSubmitting(true);
     let profileData;
 
     if (isProfile) {
@@ -264,6 +266,7 @@ const VendorLocationSetup = () => {
     await fetchProfile();
     toast.dismiss();
     toast.success("Your data has been submitted successfully!");
+    setSubmitting(false);
     navigate("/vendor/dashboard/profile");
   };
 
@@ -363,12 +366,14 @@ const VendorLocationSetup = () => {
             <button
               onClick={handleNextStep}
               className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-all"
+              disabled={!submitting}
             >
               Save Pin & Continue
             </button>
             <button
               onClick={closeSetup}
               className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-all"
+              disabled={!submitting}
             >
               Cancel
             </button>
